@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Golang Install | Helium</title>
+<meta name="keywords" content="golang, install">
+<meta name="description" content="Go 软件安装。">
+<meta name="author" content="helium">
+<link rel="canonical" href="https://heliu.site/posts/golang/install/install/">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://heliu.site/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/install/install/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono-nl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.6.0/style.css" />
+    <style>
+        body {
+            font-family: "LXGW WenKai Lite", sans-serif;
+            font-family: "LXGW WenKai Screen", sans-serif;
+        }
+    </style>
+</head>
+</html>
+
+  
+
+<meta property="og:title" content="Golang Install" />
+<meta property="og:description" content="Go 软件安装。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://heliu.site/posts/golang/install/install/" />
+<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-07-14T23:03:57+08:00" />
+<meta property="article:modified_time" content="2024-07-14T23:03:57+08:00" /><meta property="og:site_name" content="Helium" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:title" content="Golang Install"/>
+<meta name="twitter:description" content="Go 软件安装。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Article",
+      "item": "https://heliu.site/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "golang 合集",
+      "item": "https://heliu.site/posts/golang/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "install",
+      "item": "https://heliu.site/posts/golang/install/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  4 ,
+      "name": "Golang Install",
+      "item": "https://heliu.site/posts/golang/install/install/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Golang Install",
+  "name": "Golang Install",
+  "description": "Go 软件安装。",
+  "keywords": [
+    "golang", "install"
+  ],
+  "articleBody": "Golang 软件安装 首先需要下载Go语言安装包 下载地址为（中国大陆可能访问不到）：https://golang.org/dl/ 国内下载地址：https://golang.google.cn/dl/ 官方安装教程：https://golang.google.cn/doc/install，官方的安装教程已很详细（https://golang.google.cn/doc） 源码编译安装(Linux) UNIX/Linux/Mac OS和FreeBSD系统可以使用如下源码安装方法。以下示例Linux安装 Mac系统下可以使用以.pkg为扩展名的安装包直接双击来完成安装，安装目录在/usr/local/go/下。 Linux安装golang步骤 下载安装包 wget https://golang.google.cn/dl/go1.17.3.linux-amd64.tar.gz（替换你的版本） 32-bit Linux 下载安装包 https://golang.google.cn/dl/go1.17.3.linux-386.tar.gz 64-bit Linux 下载安装包 https://golang.google.cn/dl/go1.17.3.linux-amd64.tar.gz 删除老版本（如果存在则执行，不存在则忽略） rm -rf /usr/local/go 解压安装包 sudo tar -xzf go1.17.3.linux-amd64.tar.gz -C /usr/local 配置环境变量：使用go env -w命令一般只是本次生效 PATH 环境变量 export PATH=$PATH:/usr/local/go/bin GoLang工具位置，包含go、gofmt工具 GOROOT 变量 export GOROOT=/usr/local/go GoLang安装包位置 使用 go env -w GOROOT=/usr/local/go配置也是可以的 GOPATH 变量 export GOPATH=/var/local/go GoLang 1.11 版本前项目管理包位置 使用go env -w GOPATH=/var/local/go配置也是可以的 打印Go版本号 go version 如果上面(第4步)环境变量配置不成功，那么执行如下步骤配置： sudo vim ~/.bashrc命令打开文件 在文件最后添加： 1 2 3 4 5 6 7 export GOROOT=/usr/local/go export GOPATH=/var/local/go export PATH=$PATH:$GOROOT/bin:$GOPATH/bin export GOPROXY=\"https://goproxy.cn,direct\" # 在linux中设置临时目录，windows不用 export TMPDIR=/tmp 最后使配置生效 source ~/.bashrc Windows 安装 下载 https://golang.google.cn/dl/go1.17.3.windows-amd64.zip，直接解压到安装目录，如D:\\Go，然后把D:\\Go\\bin目录添加到PATH环境变量中。 设置GOPATH和GOROOT环境变量： GOPATH=D:\\goproject GOROOT=D:\\GO\\ 也可以选择https://golang.google.cn/dl/go1.17.3.windows-amd64.msi，双击运行程序，根据提示来操作安装。 GOROOT、GOPATH GOROOT GOROOT：Go软件的安装包绝对路径，默认是/usr/local/go GOPATH $GOPATH允许有多个目录，当有多个目录时，请注意分隔符，Windows中的分隔符是分号(;)。当有多个目录时默认将go get命令获取的包存放在第一个目录下，当在GOPATH模式下运行时是这样处理的 $GOPATH目录下约定有三个子目录： src目录：存放源代码（如.go，.c，.h，.s等文件）。按照Go默认约定，src目录是go run，go install等命令的当前工作路径（即在此路径下执行上述命令）。src也是用户代码存放的主要目录，所有的源代码都存放在这个目录下面，一般一个项目和一个目录对应。（当在GOPATH模式下运行时是这样处理的，但是Go官方在Go 1.11版本后不再推荐使用GOPATH模式编写Go代码，因此src目录无用处） pkg目录：存放编译时生成的中间文件（比如：.a） bin目录：存放编译后生成的可执行文件，比如后面安装的delve插件或多版本go软件就是在这个目录里 管理Go安装 安装多个Go版本 在同一台机器上安装多个Go版本。例如，我们可能希望在多个Go版本上测试代码。 注意：需要使用这种形式安装需要先安装git 多版本go安装步骤 要安装其他Go版本，运行go install命令，指定要安装的版本的下载位置。如下示例安装版本1.10.7： go install golang.org/dl/go1.10.7@latest 这里使用go install编译并安装指定的包来实现多版本go安裝，生成后的可执行文件在bin目录下（$GOPATH/bin） go1.10.7 download下载，需要切换到$GOPATH/bin下去执行，生成的安装路径在/root/sdk/go1.10.7 1 2 $ go install golang.org/dl/go1.10.7@latest # 安装并编译go1.10.7版本 $ go1.10.7 download 要使用新下载的版本运行命令，如下所示： 1 2 $ go1.10.7 version go version go1.10.7 linux/amd64 当你安装了多个版本时，可以使用如下命令查看每个版本的安装位置： 1 $ go1.10.7 env GOROOT 要卸载下载的版本时，只需要删除其由GOROOT环境变量和go.X.Y.Z二进制文件指定的安装目录即可 卸载Go 使用如下所描述的步骤从系统中删除Go Linux / macOS / FreeBSD 删除go目录：通常是/usr/local/go目录。 从PATH环境变量中删除Go bin目录。 在Linux和FreeBSD下，编辑/etc/profile或$HOME/.profile。 如果您使用macOS软件包安装了Go，请删除/etc/paths.d/go文件。 Windows 删除Go的最简单方法是通过Windows控制面板中的 Add/Remove 程序： 在控制面板中，双击 Add/Remove 程序。 在 Add/Remove 程序中，选择要卸载的软件，单击卸载，然后按照提示进行操作。 要使用工具删除Go，您还可以使用命令行： 通过运行以下命令使用命令行卸载：msiexec /x go{{version}}.windows-{{cpu-arch}}.msi /q 注意：对 Windows 使用此卸载过程将自动删除由原始安装创建的 Windows 环境变量。 ",
+  "wordCount" : "187",
+  "inLanguage": "zh",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-07-14T23:03:57+08:00",
+  "dateModified": "2024-07-14T23:03:57+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "helium"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://heliu.site/posts/golang/install/install/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Helium",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://heliu.site/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://heliu.site/" accesskey="h" title="helium Blog (Alt + H)">
+                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+                    height="35">helium Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://heliu.site/" title="Home">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/posts" title="Article">
+                    <span>Article</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/archives" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/tags/" title="Tag">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/support" title="🫶Help">
+                    <span>🫶Help</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+
+<article class="post" autonumbering>
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">golang 合集</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/install/">install</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Golang Install
+    </h1>
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2024-07-14</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2024-07-14</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select: text;">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="user-select: text;"></path>
+    <polyline points="14 2 14 8 20 8" style="user-select: text;"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
+    <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
+    <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
+</svg><span>187字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="9"></circle>
+    <polyline points="12 7 12 12 15 15"></polyline>
+</svg><span>1分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+</svg><span>helium</span></span>
+      <span class="x-post-meta-item">
+        &ensp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
+        <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
+            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://heliu.site/tags/install/" target="_blank" rel="noopener">Install</a>
+        </ul>
+      </span>
+      
+      <span id="busuanzi_container_page_pv" class="x-post-meta-item">
+        &ensp;<svg t="1720844685710" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="27237" width="200" height="200"><path d="M739.754667 574.08c-121.386667 45.610667-208.469333 169.813333-208.64 316.16 0 33.408 4.693333 65.493333 13.141333 95.914667H94.122667c-26.453333-43.52-41.685333-91.946667-41.685334-143.189334 0-185.173333 192.896-335.104 430.805334-335.104 96.256 0 184.832 24.746667 256.512 66.218667z m-280.490667-114.986667a214.869333 214.869333 0 0 1-214.869333-215.04A215.04 215.04 0 0 1 459.264 28.842667a215.04 215.04 0 0 1 215.04 215.210666 215.04 215.04 0 0 1-215.04 215.04zM974.506667 641.28c9.856 0 17.834667 7.466667 17.834666 16.64v59.989333c-0.341333 8.789333-7.850667 15.786667-17.28 16.085334-9.856 0.341333-18.176-6.826667-18.517333-16.085334v-20.053333l-99.114667 91.093333-0.256 0.256a18.474667 18.474667 0 0 1-14.848 4.352h-0.768a18.176 18.176 0 0 1-9.344-4.608l-0.938666-0.981333-85.930667-80.042667-123.562667 115.072a18.773333 18.773333 0 0 1-25.216 0 15.786667 15.786667 0 0 1 0-23.466666l136.149334-126.848 0.725333-0.597334a18.645333 18.645333 0 0 1 24.362667 0.512l87.253333 81.237334 86.058667-79.232h-21.248c-9.386667-0.298667-16.938667-7.338667-17.28-16.085334-0.341333-9.173333 7.381333-16.896 17.28-17.237333h64.64z m-367.146667 240h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v72.192a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042667-16.042666v-72.192c0-8.874667 7.210667-16.042667 16.042667-16.042667z m110.805333-106.666667h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v178.858667a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042666v-178.858667c0-8.874667 7.168-16.042667 16.042666-16.042667z m106.538667 80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v99.413333a16.042667 16.042667 0 0 1-16.042667 16.042667H824.746667a16.042667 16.042667 0 0 1-16.042667-16.042667v-99.413333c0-8.874667 7.168-16.042667 16.042667-16.042667z m110.165333-80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v179.413333a16.042667 16.042667 0 0 1-16.042667 16.042667h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042667v-179.413333c0-8.874667 7.210667-16.042667 16.042666-16.042667z" fill="#999999" p-id="27238"></path></svg>
+        <span id="busuanzi_value_page_pv"></span>
+      </span>&nbsp;|&nbsp;<a href="https://golang.google.cn/doc/install" rel="noopener noreferrer" target="_blank">google官方安装</a>
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#golang-%e8%bd%af%e4%bb%b6%e5%ae%89%e8%a3%85" aria-label="Golang 软件安装">Golang 软件安装</a><ul>
+                            
+                    <li>
+                        <a href="#%e6%ba%90%e7%a0%81%e7%bc%96%e8%af%91%e5%ae%89%e8%a3%85linux" aria-label="源码编译安装(Linux)">源码编译安装(Linux)</a></li>
+                    <li>
+                        <a href="#windows-%e5%ae%89%e8%a3%85" aria-label="Windows 安装">Windows 安装</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#gorootgopath" aria-label="GOROOT、GOPATH">GOROOT、GOPATH</a><ul>
+                            
+                    <li>
+                        <a href="#goroot" aria-label="GOROOT">GOROOT</a></li>
+                    <li>
+                        <a href="#gopath" aria-label="GOPATH">GOPATH</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e7%ae%a1%e7%90%86go%e5%ae%89%e8%a3%85" aria-label="管理Go安装">管理Go安装</a><ul>
+                            
+                    <li>
+                        <a href="#%e5%ae%89%e8%a3%85%e5%a4%9a%e4%b8%aago%e7%89%88%e6%9c%ac" aria-label="安装多个Go版本">安装多个Go版本</a></li>
+                    <li>
+                        <a href="#%e5%8d%b8%e8%bd%bdgo" aria-label="卸载Go">卸载Go</a>
+                    </li>
+                </ul>
+                </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+  <div class="post-content"><h2 id="golang-软件安装">Golang 软件安装<a hidden class="anchor" aria-hidden="true" href="#golang-软件安装">#</a></h2>
+<ol>
+<li>首先需要下载Go语言安装包
+<ul>
+<li>下载地址为（中国大陆可能访问不到）：<code>https://golang.org/dl/</code></li>
+<li>国内下载地址：<code>https://golang.google.cn/dl/</code></li>
+</ul>
+</li>
+<li>官方安装教程：<code>https://golang.google.cn/doc/install</code>，官方的安装教程已很详细（<code>https://golang.google.cn/doc</code>）</li>
+</ol>
+<h3 id="源码编译安装linux">源码编译安装(Linux)<a hidden class="anchor" aria-hidden="true" href="#源码编译安装linux">#</a></h3>
+<ol>
+<li>UNIX/Linux/Mac OS和FreeBSD系统可以使用如下源码安装方法。以下示例Linux安装</li>
+<li>Mac系统下可以使用以<code>.pkg</code>为扩展名的安装包直接双击来完成安装，安装目录在<code>/usr/local/go/</code>下。</li>
+</ol>
+
+
+<p><details >
+  <summary markdown="span">Linux安装golang步骤</summary>
+  <blockquote>
+<ol>
+<li>下载安装包 <code>wget https://golang.google.cn/dl/go1.17.3.linux-amd64.tar.gz</code>（替换你的版本）</li>
+</ol>
+<ul>
+<li><code>32-bit Linux</code> 下载安装包 <code>https://golang.google.cn/dl/go1.17.3.linux-386.tar.gz</code></li>
+<li><code>64-bit Linux</code> 下载安装包 <code>https://golang.google.cn/dl/go1.17.3.linux-amd64.tar.gz</code></li>
+</ul>
+<ol start="2">
+<li>删除老版本（如果存在则执行，不存在则忽略） <code>rm -rf /usr/local/go</code></li>
+<li>解压安装包 <code>sudo tar -xzf go1.17.3.linux-amd64.tar.gz -C /usr/local</code></li>
+<li>配置环境变量：使用<code>go env -w</code>命令一般只是本次生效</li>
+</ol>
+<ul>
+<li><code>PATH</code> 环境变量 <code>export PATH=$PATH:/usr/local/go/bin</code> GoLang工具位置，包含<code>go、gofmt</code>工具</li>
+<li><code>GOROOT</code> 变量 <code>export GOROOT=/usr/local/go</code> GoLang安装包位置
+<ul>
+<li>使用 <code>go env -w GOROOT=/usr/local/go</code>配置也是可以的</li>
+</ul>
+</li>
+<li><code>GOPATH</code> 变量 <code>export GOPATH=/var/local/go</code> GoLang 1.11 版本前项目管理包位置
+<ul>
+<li>使用<code>go env -w GOPATH=/var/local/go</code>配置也是可以的</li>
+</ul>
+</li>
+</ul>
+<ol start="5">
+<li>打印<code>Go</code>版本号 <code>go version</code></li>
+<li>如果上面(第4步)环境变量配置不成功，那么执行如下步骤配置：</li>
+</ol>
+<ul>
+<li><code>sudo vim ~/.bashrc</code>命令打开文件</li>
+<li>在文件最后添加：</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">GOROOT</span><span class="o">=</span>/usr/local/go
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">GOPATH</span><span class="o">=</span>/var/local/go
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$GOROOT</span>/bin:<span class="nv">$GOPATH</span>/bin
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">GOPROXY</span><span class="o">=</span><span class="s2">&#34;https://goproxy.cn,direct&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 在linux中设置临时目录，windows不用</span>
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">TMPDIR</span><span class="o">=</span>/tmp
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>最后使配置生效 <code>source ~/.bashrc</code></li>
+</ul>
+</blockquote>
+
+</details></p>
+
+<h3 id="windows-安装">Windows 安装<a hidden class="anchor" aria-hidden="true" href="#windows-安装">#</a></h3>
+<ol>
+<li>下载 <code>https://golang.google.cn/dl/go1.17.3.windows-amd64.zip</code>，直接解压到安装目录，如<code>D:\Go</code>，然后把<code>D:\Go\bin</code>目录添加到<code>PATH</code>环境变量中。</li>
+<li>设置<code>GOPATH</code>和<code>GOROOT</code>环境变量：
+<ul>
+<li><code>GOPATH=D:\goproject</code></li>
+<li><code>GOROOT=D:\GO\</code></li>
+</ul>
+</li>
+<li>也可以选择<code>https://golang.google.cn/dl/go1.17.3.windows-amd64.msi</code>，双击运行程序，根据提示来操作安装。</li>
+</ol>
+<h2 id="gorootgopath">GOROOT、GOPATH<a hidden class="anchor" aria-hidden="true" href="#gorootgopath">#</a></h2>
+<h3 id="goroot">GOROOT<a hidden class="anchor" aria-hidden="true" href="#goroot">#</a></h3>
+<ol>
+<li><code>GOROOT</code>：<code>Go</code>软件的安装包绝对路径，默认是<code>/usr/local/go</code></li>
+</ol>
+<h3 id="gopath">GOPATH<a hidden class="anchor" aria-hidden="true" href="#gopath">#</a></h3>
+<ul>
+<li><code>$GOPATH</code>允许有多个目录，当有多个目录时，请注意分隔符，Windows中的分隔符是分号(<code>;</code>)。当有多个目录时默认将<code>go get</code>命令获取的包存放在第一个目录下，当在<code>GOPATH</code>模式下运行时是这样处理的</li>
+<li><code>$GOPATH</code>目录下约定有三个子目录：
+<ol>
+<li><code>src</code>目录：存放源代码（如<code>.go</code>，<code>.c</code>，<code>.h</code>，<code>.s</code>等文件）。按照Go默认约定，<code>src</code>目录是<code>go run</code>，<code>go install</code>等命令的当前工作路径（即在此路径下执行上述命令）。<code>src</code>也是用户代码存放的主要目录，所有的源代码都存放在这个目录下面，一般一个项目和一个目录对应。（当在<code>GOPATH</code>模式下运行时是这样处理的，但是Go官方在Go 1.11版本后不再推荐使用<code>GOPATH</code>模式编写Go代码，因此<code>src</code>目录无用处）</li>
+<li><code>pkg</code>目录：存放编译时生成的中间文件（比如：<code>.a</code>）</li>
+<li><code>bin</code>目录：存放编译后生成的可执行文件，比如后面安装的delve插件或多版本go软件就是在这个目录里</li>
+</ol>
+</li>
+</ul>
+<h2 id="管理go安装">管理Go安装<a hidden class="anchor" aria-hidden="true" href="#管理go安装">#</a></h2>
+<h3 id="安装多个go版本">安装多个Go版本<a hidden class="anchor" aria-hidden="true" href="#安装多个go版本">#</a></h3>
+<ol>
+<li>在同一台机器上安装多个<code>Go</code>版本。例如，我们可能希望在多个<code>Go</code>版本上测试代码。</li>
+<li><strong>注意</strong>：需要使用这种形式安装需要先安装<code>git</code></li>
+</ol>
+
+
+<p><details >
+  <summary markdown="span">多版本go安装步骤</summary>
+  <blockquote>
+<ol>
+<li>要安装其他<code>Go</code>版本，运行<code>go install</code>命令，指定要安装的版本的下载位置。如下示例安装版本<code>1.10.7</code>：</li>
+</ol>
+<ul>
+<li><code>go install golang.org/dl/go1.10.7@latest</code> 这里使用<code>go install</code>编译并安装指定的包来实现多版本<code>go</code>安裝，生成后的可执行文件在<code>bin</code>目录下（<code>$GOPATH/bin</code>）</li>
+<li><code>go1.10.7 download</code>下载，需要切换到<code>$GOPATH/bin</code>下去执行，生成的安装路径在<code>/root/sdk/go1.10.7</code></li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ go install golang.org/dl/go1.10.7@latest <span class="c1"># 安装并编译go1.10.7版本</span>
+</span></span><span class="line"><span class="cl">$ go1.10.7 download
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="2">
+<li>要使用新下载的版本运行命令，如下所示：</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ go1.10.7 version
+</span></span><span class="line"><span class="cl">go version go1.10.7 linux/amd64
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="3">
+<li>当你安装了多个版本时，可以使用如下命令查看每个版本的安装位置：</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ go1.10.7 env GOROOT
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="4">
+<li>要卸载下载的版本时，只需要删除其由<code>GOROOT</code>环境变量和<code>go.X.Y.Z</code>二进制文件指定的安装目录即可</li>
+</ol>
+</blockquote>
+
+</details></p>
+
+<h3 id="卸载go">卸载Go<a hidden class="anchor" aria-hidden="true" href="#卸载go">#</a></h3>
+<ol>
+<li>使用如下所描述的步骤从系统中删除Go</li>
+</ol>
+
+
+<p><details >
+  <summary markdown="span">Linux / macOS / FreeBSD</summary>
+  <blockquote>
+<ol>
+<li>删除go目录：通常是<code>/usr/local/go</code>目录。</li>
+<li>从<code>PATH</code>环境变量中删除<code>Go bin</code>目录。</li>
+</ol>
+<ul>
+<li>在<code>Linux</code>和<code>FreeBSD</code>下，编辑<code>/etc/profile</code>或<code>$HOME/.profile</code>。</li>
+<li>如果您使用<code>macOS</code>软件包安装了<code>Go</code>，请删除<code>/etc/paths.d/go</code>文件。</li>
+</ul>
+</blockquote>
+
+</details></p>
+
+
+
+<p><details >
+  <summary markdown="span">Windows</summary>
+  <blockquote>
+<ol>
+<li>删除<code>Go</code>的最简单方法是通过<code>Windows</code>控制面板中的 <code>Add/Remove</code> 程序：</li>
+</ol>
+<ul>
+<li>在控制面板中，双击 <code>Add/Remove</code> 程序。</li>
+<li>在 <code>Add/Remove</code> 程序中，选择要卸载的软件，单击卸载，然后按照提示进行操作。</li>
+</ul>
+<ol start="2">
+<li>要使用工具删除<code>Go</code>，您还可以使用命令行：</li>
+</ol>
+<ul>
+<li>通过运行以下命令使用命令行卸载：<code>msiexec /x go{{version}}.windows-{{cpu-arch}}.msi /q</code></li>
+<li><strong>注意</strong>：对 Windows 使用此卸载过程将自动删除由原始安装创建的 Windows 环境变量。</li>
+</ul>
+</blockquote>
+
+</details></p>
+
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
+      <li><a href="https://heliu.site/tags/install/">Install</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://heliu.site/posts/golang/array/array/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>数组(一)</span>
+  </a>
+  <a class="next" href="https://heliu.site/posts/golang/sync/pool/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>sync.Pool</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    
+    <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv">
+        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    </span>
+    <span id="busuanzi_container_site_uv">
+        本站访客数<span id="busuanzi_value_site_uv"></span>人次
+    </span>
+    </div>
+        <span>Copyright © 2020-2024 <a href="#">heliu's blog</a>. All rights reserved</span>  
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'Copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'Done';
+            setTimeout(() => {
+                copybutton.innerHTML = 'Copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
