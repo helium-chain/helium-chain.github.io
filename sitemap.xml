@@ -2,95 +2,95 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:1313/posts/golang/install/</loc>
+    <loc>https://heliu.site/posts/golang/install/</loc>
     <lastmod>2024-07-14T23:03:57+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/golang/basic/</loc>
+    <loc>https://heliu.site/posts/golang/basic/</loc>
     <lastmod>2024-07-16T17:52:30+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/golang/array/array/</loc>
+    <loc>https://heliu.site/posts/golang/array/array/</loc>
     <lastmod>2020-03-09T17:42:36+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/golang/install/install/</loc>
+    <loc>https://heliu.site/posts/golang/install/install/</loc>
     <lastmod>2024-07-14T23:03:57+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/golang/sync/pool/</loc>
+    <loc>https://heliu.site/posts/golang/sync/pool/</loc>
     <lastmod>2024-07-14T20:32:54+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/golang/sync/rwmutex/</loc>
+    <loc>https://heliu.site/posts/golang/sync/rwmutex/</loc>
     <lastmod>2024-07-14T15:53:47+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/golang/sync/once/</loc>
+    <loc>https://heliu.site/posts/golang/sync/once/</loc>
     <lastmod>2024-07-14T13:10:26+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/golang/sync/mutex/</loc>
+    <loc>https://heliu.site/posts/golang/sync/mutex/</loc>
     <lastmod>2023-02-14T00:40:08+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/golang/sync/waitgroup/</loc>
+    <loc>https://heliu.site/posts/golang/sync/waitgroup/</loc>
     <lastmod>2023-07-13T22:00:10+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/golang/basic/type/</loc>
+    <loc>https://heliu.site/posts/golang/basic/type/</loc>
     <lastmod>2024-07-16T17:52:30+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/</loc>
+    <loc>https://heliu.site/posts/</loc>
     <lastmod>2024-07-16T17:52:30+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/basic/</loc>
+    <loc>https://heliu.site/tags/basic/</loc>
     <lastmod>2024-07-16T17:52:30+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/golang/</loc>
+    <loc>https://heliu.site/tags/golang/</loc>
     <lastmod>2024-07-16T17:52:30+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/golang/</loc>
+    <loc>https://heliu.site/posts/golang/</loc>
     <lastmod>2024-07-16T17:52:30+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/</loc>
+    <loc>https://heliu.site/</loc>
     <lastmod>2024-07-16T17:52:30+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/</loc>
+    <loc>https://heliu.site/tags/</loc>
     <lastmod>2024-07-16T17:52:30+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/install/</loc>
+    <loc>https://heliu.site/tags/install/</loc>
     <lastmod>2024-07-14T23:03:57+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/pool/</loc>
+    <loc>https://heliu.site/tags/pool/</loc>
     <lastmod>2024-07-14T20:32:54+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/golang/sync/</loc>
+    <loc>https://heliu.site/posts/golang/sync/</loc>
     <lastmod>2024-07-14T20:32:54+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/sync/</loc>
+    <loc>https://heliu.site/tags/sync/</loc>
     <lastmod>2024-07-14T20:32:54+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/rwmutex/</loc>
+    <loc>https://heliu.site/tags/rwmutex/</loc>
     <lastmod>2024-07-14T15:53:47+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/once/</loc>
+    <loc>https://heliu.site/tags/once/</loc>
     <lastmod>2024-07-14T13:10:26+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/waitgroup/</loc>
+    <loc>https://heliu.site/tags/waitgroup/</loc>
     <lastmod>2023-07-13T22:00:10+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/support/</loc>
+    <loc>https://heliu.site/support/</loc>
     <lastmod>2023-02-14T00:40:08+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/mutex/</loc>
+    <loc>https://heliu.site/tags/mutex/</loc>
     <lastmod>2023-02-14T00:40:08+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/golang/array/</loc>
+    <loc>https://heliu.site/posts/golang/array/</loc>
     <lastmod>2020-03-09T17:42:36+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/array/</loc>
+    <loc>https://heliu.site/tags/array/</loc>
     <lastmod>2020-03-09T17:42:36+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/categories/</loc>
+    <loc>https://heliu.site/categories/</loc>
     <lastmod>2020-03-09T17:42:36+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/categories/golang/</loc>
+    <loc>https://heliu.site/categories/golang/</loc>
     <lastmod>2020-03-09T17:42:36+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/search/</loc>
+    <loc>https://heliu.site/search/</loc>
   </url><url>
-    <loc>http://localhost:1313/archives/</loc>
+    <loc>https://heliu.site/archives/</loc>
   </url>
 </urlset>

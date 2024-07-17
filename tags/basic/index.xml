@@ -2,23 +2,23 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Basic on Helium</title>
-    <link>http://localhost:1313/tags/basic/</link>
+    <link>https://heliu.site/tags/basic/</link>
     <description>Recent content in Basic on Helium</description>
     <image>
       <title>Helium</title>
-      <url>http://localhost:1313/favicon-32x32.png</url>
-      <link>http://localhost:1313/favicon-32x32.png</link>
+      <url>https://heliu.site/favicon-32x32.png</url>
+      <link>https://heliu.site/favicon-32x32.png</link>
     </image>
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2020-2024 heliu&#39;s blog. All rights reserved</copyright>
     <lastBuildDate>Tue, 16 Jul 2024 17:52:30 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/basic/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://heliu.site/tags/basic/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>内置类型</title>
-      <link>http://localhost:1313/posts/golang/basic/type/</link>
+      <link>https://heliu.site/posts/golang/basic/type/</link>
       <pubDate>Tue, 16 Jul 2024 17:52:30 +0800</pubDate>
-      <guid>http://localhost:1313/posts/golang/basic/type/</guid>
+      <guid>https://heliu.site/posts/golang/basic/type/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
   </channel>
