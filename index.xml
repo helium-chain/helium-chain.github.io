@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2020-2024 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Tue, 16 Jul 2024 17:52:30 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 17 Jul 2024 22:28:03 +0800</lastBuildDate>
     <atom:link href="https://heliu.site/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>数组(一)</title>
@@ -68,6 +68,13 @@
       <link>https://heliu.site/posts/golang/basic/type/</link>
       <pubDate>Tue, 16 Jul 2024 17:52:30 +0800</pubDate>
       <guid>https://heliu.site/posts/golang/basic/type/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>变量</title>
+      <link>https://heliu.site/posts/golang/basic/variable/</link>
+      <pubDate>Wed, 17 Jul 2024 22:28:03 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/basic/variable/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
