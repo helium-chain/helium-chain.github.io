@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2020-2024 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Fri, 19 Jul 2024 10:31:19 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 19 Jul 2024 16:48:24 +0800</lastBuildDate>
     <atom:link href="https://heliu.site/posts/golang/basic/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>内置类型</title>
@@ -40,6 +40,48 @@
       <link>https://heliu.site/posts/golang/basic/operator/</link>
       <pubDate>Fri, 19 Jul 2024 10:31:19 +0800</pubDate>
       <guid>https://heliu.site/posts/golang/basic/operator/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>字面量</title>
+      <link>https://heliu.site/posts/golang/basic/literal/</link>
+      <pubDate>Fri, 19 Jul 2024 13:35:22 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/basic/literal/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>类型零值</title>
+      <link>https://heliu.site/posts/golang/basic/zero/</link>
+      <pubDate>Fri, 19 Jul 2024 15:02:31 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/basic/zero/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>作用域</title>
+      <link>https://heliu.site/posts/golang/basic/scope/</link>
+      <pubDate>Fri, 19 Jul 2024 15:12:30 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/basic/scope/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>指针</title>
+      <link>https://heliu.site/posts/golang/basic/pointer/</link>
+      <pubDate>Fri, 19 Jul 2024 15:34:44 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/basic/pointer/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>字符串</title>
+      <link>https://heliu.site/posts/golang/basic/string/</link>
+      <pubDate>Fri, 19 Jul 2024 15:59:27 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/basic/string/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>字符串(内存布局)</title>
+      <link>https://heliu.site/posts/golang/basic/string-memory/</link>
+      <pubDate>Fri, 19 Jul 2024 16:48:24 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/basic/string-memory/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
   </channel>

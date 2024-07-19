@@ -6,7 +6,7 @@
     <lastmod>2024-07-14T23:03:57+08:00</lastmod>
   </url><url>
     <loc>https://heliu.site/posts/golang/basic/</loc>
-    <lastmod>2024-07-19T10:31:19+08:00</lastmod>
+    <lastmod>2024-07-19T16:48:24+08:00</lastmod>
   </url><url>
     <loc>https://heliu.site/posts/golang/array/array/</loc>
     <lastmod>2020-03-09T17:42:36+08:00</lastmod>
@@ -41,32 +41,41 @@
     <loc>https://heliu.site/posts/golang/basic/operator/</loc>
     <lastmod>2024-07-19T10:31:19+08:00</lastmod>
   </url><url>
+    <loc>https://heliu.site/posts/golang/basic/literal/</loc>
+    <lastmod>2024-07-19T13:35:22+08:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/golang/basic/zero/</loc>
+    <lastmod>2024-07-19T15:02:31+08:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/golang/basic/scope/</loc>
+    <lastmod>2024-07-19T15:12:30+08:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/golang/basic/pointer/</loc>
+    <lastmod>2024-07-19T15:34:44+08:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/golang/basic/string/</loc>
+    <lastmod>2024-07-19T15:59:27+08:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/golang/basic/string-memory/</loc>
+    <lastmod>2024-07-19T16:48:24+08:00</lastmod>
+  </url><url>
     <loc>https://heliu.site/posts/</loc>
-    <lastmod>2024-07-19T10:31:19+08:00</lastmod>
-  </url><url>
-    <loc>https://heliu.site/tags/golang/</loc>
-    <lastmod>2024-07-19T10:31:19+08:00</lastmod>
-  </url><url>
-    <loc>https://heliu.site/posts/golang/</loc>
-    <lastmod>2024-07-19T10:31:19+08:00</lastmod>
-  </url><url>
-    <loc>https://heliu.site/</loc>
-    <lastmod>2024-07-19T10:31:19+08:00</lastmod>
-  </url><url>
-    <loc>https://heliu.site/tags/operator/</loc>
-    <lastmod>2024-07-19T10:31:19+08:00</lastmod>
-  </url><url>
-    <loc>https://heliu.site/tags/</loc>
-    <lastmod>2024-07-19T10:31:19+08:00</lastmod>
-  </url><url>
-    <loc>https://heliu.site/tags/constant/</loc>
-    <lastmod>2024-07-19T10:04:00+08:00</lastmod>
-  </url><url>
-    <loc>https://heliu.site/tags/variable/</loc>
-    <lastmod>2024-07-17T22:28:03+08:00</lastmod>
+    <lastmod>2024-07-19T16:48:24+08:00</lastmod>
   </url><url>
     <loc>https://heliu.site/tags/basic/</loc>
-    <lastmod>2024-07-16T17:52:30+08:00</lastmod>
+    <lastmod>2024-07-19T16:48:24+08:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/tags/golang/</loc>
+    <lastmod>2024-07-19T16:48:24+08:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/golang/</loc>
+    <lastmod>2024-07-19T16:48:24+08:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/</loc>
+    <lastmod>2024-07-19T16:48:24+08:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/tags/</loc>
+    <lastmod>2024-07-19T16:48:24+08:00</lastmod>
   </url><url>
     <loc>https://heliu.site/tags/install/</loc>
     <lastmod>2024-07-14T23:03:57+08:00</lastmod>

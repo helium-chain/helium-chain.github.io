@@ -5,11 +5,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>运算符 | Helium</title>
+<title>字面量 | Helium</title>
 <meta name="keywords" content="golang, Basic">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/basic/operator/">
+<link rel="canonical" href="https://heliu.site/posts/golang/basic/literal/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
@@ -20,7 +20,7 @@
 <link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/basic/operator/">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/basic/literal/">
 <noscript>
     <style>
         #theme-toggle,
@@ -74,18 +74,18 @@
 
   
 
-<meta property="og:title" content="运算符" />
+<meta property="og:title" content="字面量" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/basic/operator/" />
+<meta property="og:url" content="https://heliu.site/posts/golang/basic/literal/" />
 <meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2024-07-19T10:31:19+08:00" />
-<meta property="article:modified_time" content="2024-07-19T10:31:19+08:00" /><meta property="og:site_name" content="Helium" />
+<meta property="article:published_time" content="2024-07-19T13:35:22+08:00" />
+<meta property="article:modified_time" content="2024-07-19T13:35:22+08:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
-<meta name="twitter:title" content="运算符"/>
+<meta name="twitter:title" content="字面量"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
 
@@ -115,8 +115,8 @@
     {
       "@type": "ListItem",
       "position":  4 ,
-      "name": "运算符",
-      "item": "https://heliu.site/posts/golang/basic/operator/"
+      "name": "字面量",
+      "item": "https://heliu.site/posts/golang/basic/literal/"
     }
   ]
 }
@@ -125,24 +125,24 @@
 {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "运算符",
-  "name": "运算符",
+  "headline": "字面量",
+  "name": "字面量",
   "description": "💥本文章所有相关go代码参考自go 1.18+版本",
   "keywords": [
     "golang", "Basic"
   ],
-  "articleBody": "基本运算符 算数运算符 适用于数值类型，运算结果类型与除数类型一致。（除数是浮点数结果为浮点数，除数为整数结果为整数） 求余（%）运算结果符号与除数符号一致（除数是负数结果符号为负数）。 运算符 描述 适用范围 示例 + 加法运算符或字符串拼接符 适用于整数、浮点数、复数、字符串 5 + 3 = 8 - 减法运算符 适用于整数、浮点数、复数 5 - 3 = 2 * 乘法运算符 适用于整数、浮点数、复数 5 * 3 = 15 / 除法运算符 适用于整数、浮点数、复数 5 / 2 = 2 % 求余运算 适用于整数（有符号、无符号） -5 % 2 = -1，-5 % -2 = -1，5 % 2 = 1 ++ 自增 适用于整数（有符号、无符号） a++ -- 自减 适用于整数（有符号、无符号） a-- 变量 变量 商 取余 x y x/y x%y 5 3 1 2 -5 3 -1 -2 5 -3 -1 2 -5 -3 1 -2 关系运算符 双目运算符作比较，结果为布尔值。 运算符 含义 示例（A 小于 B） == 等于 A == B false != 不等于 A != B true \u003e 大于 A \u003e B false \u003c 小于 A \u003c B true \u003e= 大于等于 A \u003e= B false \u003c= 小于等于 A \u003c= B true 逻辑运算符 双目运算符，处理左右布尔值。 运算符 描述 示例 \u0026\u0026 逻辑与运算符（左右两边都为true返回true，否则返回false） (true \u0026\u0026 false) == false || 逻辑或运算符（左右两边都为false返回false，否则返回true） (false || false) == false ! 逻辑非运算符（一位运算符true取反为false，false取反为true） !true == false 位运算符 操作二进制数。 运算符 含义 \u0026 按为与，双目运算符。参与运算的两数各对应的位相与（同1得1） | 按为或，双目运算符。参与运算的两数各对应的位相或（有1得1） ^ 按为异或，双目运算符。参与运算的两数各对应的位异或（相同得0）或 ^作为一元运算符是按位取反 « 左移运算符，双目运算符。把左边的运算数的各位全部左移若干位，高位丢弃，低位补0 » 右移运算符，双目运算符。把右边的运算数的各位全部左移若干位 变量1 变量2 与运算 或运算 异或运算 p q p\u0026q p|q p^q 0 0 0 0 0 0 1 0 1 1 1 1 1 1 0 1 0 0 1 1 变量1 变量2 左移运算 右移运算 p q p\u003c",
-  "wordCount" : "532",
+  "articleBody": " 字面量是指由字母、数字等构成的字符串或数值，它只能作为右值出现。 整数字面量 表示整数常量的数字序列。 42 // 十进制 0600 // 八进制 6*8^2 + 0*8^1 + 0*8^0 oxBadFace // 十六进制 11*16^6 + 10*16^5 + ... ob11110000 // 二进制 ob1111_0000 // 二进制 1 2 3 4 5 6 7 8 func Example() { var o int = 067 // 6*8+7 var ox int = 0xBa77 // 11*16^3 + 10*16^2 + 7*16 + 7 fmt.Println(o, ox) // Output: // 55 47735 } 浮点数字面量 浮点常量的十进制表示。 科学计数法：一个整数部分、一个小数点、一个小数部分和一个指数部分。 0. // 0 72.40 // 72.4 072.40 // 72.4 2.712 1.e+0 6.654e-11 // 科学计数法 6.654 * 10^-11 1E6\t.25 // 0.25 .12345E+5 // 0.12345E+5 1 2 3 4 5 6 7 func Example() { a, b, c, d := 0., 072.40, 1.e+0, .1254E+5 fmt.Println(a, b, c, d) // Output: // 0 72.4 1 12540 } 虚数字面量 虚数字面量是复数常数的虚数的十进制表示。 0i 011i // 11i 0.1 2.2454i 1.e+0i 6.67e-11i 1E6i .25i 1 2 3 4 5 6 7 func Example() { a, b, c, d := 0i, 011i, 0.1, 6.67e-11i fmt.Println(a, b, c, d) // Output: // (0+0i) (0+11i) 0.1 (0+6.67e-11i) } Rune字面量 Rune 别名 长度 范围 rune int32 4B -2147483648 ~ 2147483647 Rune字面量是标识Unicode代码点的整数值。（Unicode是定长两个字节） Rune字面量表示用单引号括起来的一个或多个字符。'x'或'\\n'。 单引号字符表示字符本身的Unicode值。而以反斜杠开头的字符序列表示各种格式编码值。 Go源码是以UTF-8编码的Unicode字符，因此多个UTF-8编码的字节可以表示单个整数值。 'a'表示是a的单个字节，Unicode U+0061，值为0x61。 “好” 编码0x597d包含两个字节 ，U+00E4值为0xe4。 将整数值表示为数字常量。 \\x后跟恰好两个十六进制数字\\x00 ~ \\xff (0 ~ 255) 1B (2^8)\t1字节。 \\u后跟恰好四个十六进制数字\\u0000 ~ \\uffff (0 ~ 65535) 2B (2^16) 2字节。 \\U后跟恰好八个十六进制数字\\U00000000 ~ \\Uffffffff (0 ~ 4294967295) 4B 4字节。 \\ 后跟恰好三个八进制数字\\000 ~ \\777 (0 ~ 511)。 Unicode 最大值 0x10FFF 69631。 'a' '笨' '\\t' '\\000' '\\007' '\\xff' '\\u12e4' '\\U00101234' 'aa' // 非法 多个字符 '\\xa' // 非法 十六进制数字太少 '\\0' // 非法八进制数字不正确 '\\U001000000' // 非法 无效的Unicode代码点 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 func Example() { // rune = int32 // byte = uint8 var a rune = '\\n' var b rune = '好' var c byte = '\\007' var d rune = '\\xff' var e rune = '\\u12e4' fmt.Println(a, b, c, d, e) fmt.Printf(\"%c %c %c %c %c\", a, b, c, d, e) // Output: // 10 22909 7 255 4836 // // 好 ÿ ዤ } 字符串字面量 原始字符串字面量：反引号之间的字符序列。 解释的字符串：双引号之间的字符序列。 在双引号内，除了换行符和未转义的双引号外，任何字符都可以出现。 引号之间的文本形成文字的rune值，反斜杠转义符被解释为符文(rune)。 `abc` // \"abc\" `\\n \\n` // \"\\\\n\\n\\\\n\" \"\\n\"\t\"\\\"\" // `\"` \"Hello,World!\\n\" \"洒水\" \"\\u65e5 本\\U00008a9e\" \"\\xff\\u00FF\" ",
+  "wordCount" : "352",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-07-19T10:31:19+08:00",
-  "dateModified": "2024-07-19T10:31:19+08:00",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-07-19T13:35:22+08:00",
+  "dateModified": "2024-07-19T13:35:22+08:00",
   "author":[{
     "@type": "Person",
     "name": "helium"
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/basic/operator/"
+    "@id": "https://heliu.site/posts/golang/basic/literal/"
   },
   "publisher": {
     "@type": "Organization",
@@ -238,7 +238,7 @@
   <header class="post-header">
     <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">golang 合集</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/basic/">第2章 基础数据类型</a></div>
     <h1 class="post-title entry-hint-parent">
-      运算符
+      字面量
     </h1>
     <div class="post-description">
       💥本文章所有相关go代码参考自go 1.18&#43;版本
@@ -261,12 +261,12 @@
     <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
     <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
     <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
-</svg><span>532字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>352字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="12" r="9"></circle>
     <polyline points="12 7 12 12 15 15"></polyline>
-</svg><span>3分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>2分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="7" r="4"></circle>
@@ -295,39 +295,16 @@
 
             <div class="inner"><ul>
                     <li>
-                        <a href="#%e5%9f%ba%e6%9c%ac%e8%bf%90%e7%ae%97%e7%ac%a6" aria-label="基本运算符">基本运算符</a><ul>
-                            
+                        <a href="#%e6%95%b4%e6%95%b0%e5%ad%97%e9%9d%a2%e9%87%8f" aria-label="整数字面量">整数字面量</a></li>
                     <li>
-                        <a href="#%e7%ae%97%e6%95%b0%e8%bf%90%e7%ae%97%e7%ac%a6" aria-label="算数运算符">算数运算符</a></li>
+                        <a href="#%e6%b5%ae%e7%82%b9%e6%95%b0%e5%ad%97%e9%9d%a2%e9%87%8f" aria-label="浮点数字面量">浮点数字面量</a></li>
                     <li>
-                        <a href="#%e5%85%b3%e7%b3%bb%e8%bf%90%e7%ae%97%e7%ac%a6" aria-label="关系运算符">关系运算符</a></li>
+                        <a href="#%e8%99%9a%e6%95%b0%e5%ad%97%e9%9d%a2%e9%87%8f" aria-label="虚数字面量">虚数字面量</a></li>
                     <li>
-                        <a href="#%e9%80%bb%e8%be%91%e8%bf%90%e7%ae%97%e7%ac%a6" aria-label="逻辑运算符">逻辑运算符</a></li>
+                        <a href="#rune%e5%ad%97%e9%9d%a2%e9%87%8f" aria-label="Rune字面量">Rune字面量</a></li>
                     <li>
-                        <a href="#%e4%bd%8d%e8%bf%90%e7%ae%97%e7%ac%a6" aria-label="位运算符">位运算符</a></li>
-                    <li>
-                        <a href="#%e8%b5%8b%e5%80%bc%e8%bf%90%e7%ae%97%e7%ac%a6" aria-label="赋值运算符">赋值运算符</a></li>
-                    <li>
-                        <a href="#%e6%8c%87%e9%92%88%e8%bf%90%e7%ae%97%e7%ac%a6" aria-label="指针运算符">指针运算符</a></li>
-                    <li>
-                        <a href="#go%e8%af%ad%e8%a8%80%e8%bf%90%e7%ae%97%e7%ac%a6%e6%b1%87%e6%80%bb" aria-label="Go语言运算符汇总">Go语言运算符汇总</a></li>
-                    <li>
-                        <a href="#%e8%bf%90%e7%ae%97%e7%ac%a6%e4%bc%98%e5%85%88%e7%ba%a7" aria-label="运算符优先级">运算符优先级</a></li></ul>
+                        <a href="#%e5%ad%97%e7%ac%a6%e4%b8%b2%e5%ad%97%e9%9d%a2%e9%87%8f" aria-label="字符串字面量">字符串字面量</a>
                     </li>
-                    <li>
-                        <a href="#%e7%89%b9%e6%ae%8a%e8%bf%90%e7%ae%97%e7%ac%a6" aria-label="特殊运算符">特殊运算符</a><ul>
-                            
-                    <li>
-                        <a href="#%e4%bd%8d%e6%b8%85%e9%99%a4-" aria-label="位清除 &amp;amp;^">位清除 <code>&amp;^</code></a></li>
-                    <li>
-                        <a href="#-%e5%bc%82%e6%88%96xor" aria-label="^ 异或（XOR）">^ 异或（<code>XOR</code>）</a></li>
-                    <li>
-                        <a href="#%e8%ae%be%e7%bd%ae%e7%ac%acn%e4%bd%8d%e4%b8%ba1" aria-label="设置第n位为1">设置第<code>n</code>位为1</a></li>
-                    <li>
-                        <a href="#%e8%ae%be%e7%bd%ae%e7%ac%acn%e4%bd%8d%e4%b8%ba0" aria-label="设置第n位为0">设置第<code>n</code>位为0</a>
-                    </li>
-                </ul>
-                </li>
                 </ul>
             </div>
         </details>
@@ -392,513 +369,18 @@
         return rect.top + win.pageYOffset;   
     }
 </script>
-  <div class="post-content"><h2 id="基本运算符">基本运算符<a hidden class="anchor" aria-hidden="true" href="#基本运算符">#</a></h2>
-<h3 id="算数运算符">算数运算符<a hidden class="anchor" aria-hidden="true" href="#算数运算符">#</a></h3>
-<ol>
-<li>适用于数值类型，运算结果类型与<strong>除数类型</strong>一致。（除数是浮点数结果为浮点数，除数为整数结果为整数）</li>
-<li>求余（<code>%</code>）运算结果符号与<strong>除数符号</strong>一致（除数是负数结果符号为负数）。</li>
-</ol>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">描述</th>
-<th style="text-align:center">适用范围</th>
-<th style="text-align:center">示例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><code>+</code></td>
-<td style="text-align:center">加法运算符或字符串拼接符</td>
-<td style="text-align:center">适用于整数、浮点数、复数、字符串</td>
-<td style="text-align:center"><code>5 + 3 = 8</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>-</code></td>
-<td style="text-align:center">减法运算符</td>
-<td style="text-align:center">适用于整数、浮点数、复数</td>
-<td style="text-align:center"><code>5 - 3 = 2</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>*</code></td>
-<td style="text-align:center">乘法运算符</td>
-<td style="text-align:center">适用于整数、浮点数、复数</td>
-<td style="text-align:center"><code>5 * 3 = 15</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>/</code></td>
-<td style="text-align:center">除法运算符</td>
-<td style="text-align:center">适用于整数、浮点数、复数</td>
-<td style="text-align:center"><code>5  /  2 = 2</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>%</code></td>
-<td style="text-align:center">求余运算</td>
-<td style="text-align:center">适用于整数（有符号、无符号）</td>
-<td style="text-align:center"><code>-5 % 2 = -1</code>，<code>-5 % -2 = -1</code>，<code>5 % 2 = 1</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>++</code></td>
-<td style="text-align:center">自增</td>
-<td style="text-align:center">适用于整数（有符号、无符号）</td>
-<td style="text-align:center"><code>a++</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>--</code></td>
-<td style="text-align:center">自减</td>
-<td style="text-align:center">适用于整数（有符号、无符号）</td>
-<td style="text-align:center"><code>a--</code></td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">变量</th>
-<th style="text-align:center">变量</th>
-<th style="text-align:center">商</th>
-<th style="text-align:center">取余</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><code>x</code></td>
-<td style="text-align:center"><code>y</code></td>
-<td style="text-align:center"><code>x/y</code></td>
-<td style="text-align:center"><code>x%y</code></td>
-</tr>
-<tr>
-<td style="text-align:center">5</td>
-<td style="text-align:center">3</td>
-<td style="text-align:center">1</td>
-<td style="text-align:center">2</td>
-</tr>
-<tr>
-<td style="text-align:center">-5</td>
-<td style="text-align:center">3</td>
-<td style="text-align:center">-1</td>
-<td style="text-align:center">-2</td>
-</tr>
-<tr>
-<td style="text-align:center">5</td>
-<td style="text-align:center">-3</td>
-<td style="text-align:center">-1</td>
-<td style="text-align:center">2</td>
-</tr>
-<tr>
-<td style="text-align:center">-5</td>
-<td style="text-align:center">-3</td>
-<td style="text-align:center">1</td>
-<td style="text-align:center">-2</td>
-</tr>
-</tbody>
-</table>
-<h3 id="关系运算符">关系运算符<a hidden class="anchor" aria-hidden="true" href="#关系运算符">#</a></h3>
-<ol>
-<li>双目运算符作比较，结果为布尔值。</li>
-</ol>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">含义</th>
-<th style="text-align:center">示例（A 小于 B）</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><code>==</code></td>
-<td style="text-align:center">等于</td>
-<td style="text-align:center"><code>A == B</code> <code>false</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>!=</code></td>
-<td style="text-align:center">不等于</td>
-<td style="text-align:center"><code>A != B</code> <code>true</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>&gt;</code></td>
-<td style="text-align:center">大于</td>
-<td style="text-align:center"><code>A &gt; B</code> <code>false</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>&lt;</code></td>
-<td style="text-align:center">小于</td>
-<td style="text-align:center"><code>A &lt; B</code> <code>true</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>&gt;=</code></td>
-<td style="text-align:center">大于等于</td>
-<td style="text-align:center"><code>A &gt;= B</code> <code>false</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>&lt;=</code></td>
-<td style="text-align:center">小于等于</td>
-<td style="text-align:center"><code>A &lt;= B</code> <code>true</code></td>
-</tr>
-</tbody>
-</table>
-<h3 id="逻辑运算符">逻辑运算符<a hidden class="anchor" aria-hidden="true" href="#逻辑运算符">#</a></h3>
-<ol>
-<li>双目运算符，处理左右布尔值。</li>
-</ol>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">描述</th>
-<th style="text-align:center">示例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">&amp;&amp;</td>
-<td style="text-align:center">逻辑与运算符（左右两边都为<code>true</code>返回<code>true</code>，否则返回<code>false</code>）</td>
-<td style="text-align:center"><code>(true &amp;&amp; false) == false</code></td>
-</tr>
-<tr>
-<td style="text-align:center">||</td>
-<td style="text-align:center">逻辑或运算符（左右两边都为<code>false</code>返回<code>false</code>，否则返回<code>true</code>）</td>
-<td style="text-align:center"><code>(false || false) == false</code></td>
-</tr>
-<tr>
-<td style="text-align:center">!</td>
-<td style="text-align:center">逻辑非运算符（一位运算符<code>true</code>取反为<code>false</code>，<code>false</code>取反为<code>true</code>）</td>
-<td style="text-align:center"><code>!true == false</code></td>
-</tr>
-</tbody>
-</table>
-<h3 id="位运算符">位运算符<a hidden class="anchor" aria-hidden="true" href="#位运算符">#</a></h3>
-<ol>
-<li>操作二进制数。</li>
-</ol>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">含义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">&amp;</td>
-<td style="text-align:center">按为与，双目运算符。参与运算的两数各对应的位相与（<strong>同1得1</strong>）</td>
-</tr>
-<tr>
-<td style="text-align:center">|</td>
-<td style="text-align:center">按为或，双目运算符。参与运算的两数各对应的位相或（<strong>有1得1</strong>）</td>
-</tr>
-<tr>
-<td style="text-align:center">^</td>
-<td style="text-align:center">按为异或，双目运算符。参与运算的两数各对应的位异或（<strong>相同得0</strong>）或 <code>^</code>作为一元运算符是按位取反</td>
-</tr>
-<tr>
-<td style="text-align:center">&laquo;</td>
-<td style="text-align:center">左移运算符，双目运算符。把左边的运算数的各位全部左移若干位，高位丢弃，低位补0</td>
-</tr>
-<tr>
-<td style="text-align:center">&raquo;</td>
-<td style="text-align:center">右移运算符，双目运算符。把右边的运算数的各位全部左移若干位</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">变量1</th>
-<th style="text-align:center">变量2</th>
-<th style="text-align:center">与运算</th>
-<th style="text-align:center">或运算</th>
-<th style="text-align:center">异或运算</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><code>p</code></td>
-<td style="text-align:center"><code>q</code></td>
-<td style="text-align:center"><code>p&amp;q</code></td>
-<td style="text-align:center"><code>p|q</code></td>
-<td style="text-align:center"><code>p^q</code></td>
-</tr>
-<tr>
-<td style="text-align:center">0</td>
-<td style="text-align:center">0</td>
-<td style="text-align:center">0</td>
-<td style="text-align:center">0</td>
-<td style="text-align:center">0</td>
-</tr>
-<tr>
-<td style="text-align:center">0</td>
-<td style="text-align:center">1</td>
-<td style="text-align:center">0</td>
-<td style="text-align:center">1</td>
-<td style="text-align:center">1</td>
-</tr>
-<tr>
-<td style="text-align:center">1</td>
-<td style="text-align:center">1</td>
-<td style="text-align:center">1</td>
-<td style="text-align:center">1</td>
-<td style="text-align:center">0</td>
-</tr>
-<tr>
-<td style="text-align:center">1</td>
-<td style="text-align:center">0</td>
-<td style="text-align:center">0</td>
-<td style="text-align:center">1</td>
-<td style="text-align:center">1</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">变量1</th>
-<th style="text-align:center">变量2</th>
-<th style="text-align:center">左移运算</th>
-<th style="text-align:center">右移运算</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><code>p</code></td>
-<td style="text-align:center"><code>q</code></td>
-<td style="text-align:center"><code>p&lt;&lt;q</code></td>
-<td style="text-align:center"><code>p&gt;&gt;q</code></td>
-</tr>
-<tr>
-<td style="text-align:center">00001101</td>
-<td style="text-align:center">3</td>
-<td style="text-align:center">01101000</td>
-<td style="text-align:center">00000001</td>
-</tr>
-</tbody>
-</table>
-<h3 id="赋值运算符">赋值运算符<a hidden class="anchor" aria-hidden="true" href="#赋值运算符">#</a></h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">含义</th>
-<th style="text-align:center">示例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><code>=</code></td>
-<td style="text-align:center">赋值运算符</td>
-<td style="text-align:center"></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>+=</code></td>
-<td style="text-align:center">相加后再赋值</td>
-<td style="text-align:center"><code>C += A</code> 等于 <code>C = C + A</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>-=</code></td>
-<td style="text-align:center">相减后再赋值</td>
-<td style="text-align:center"><code>C -= A</code> 等于 <code>C = C - A</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>*=</code></td>
-<td style="text-align:center">相乘后再赋值</td>
-<td style="text-align:center"><code>C *= A</code> 等于 <code>C = C * A</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>/=</code></td>
-<td style="text-align:center">相除后再赋值</td>
-<td style="text-align:center"><code>C /= A</code> 等于 <code>C = C / A</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>%=</code></td>
-<td style="text-align:center">求余后再赋值</td>
-<td style="text-align:center"><code>C %= A</code> 等于 <code>C = C % A</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>&lt;&lt;=</code></td>
-<td style="text-align:center">左移后再赋值</td>
-<td style="text-align:center"><code>C &lt;&lt;= 2</code> 等于 <code>C = C &lt;&lt; 2</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>&gt;&gt;=</code></td>
-<td style="text-align:center">右移后再赋值</td>
-<td style="text-align:center"><code>C &gt;&gt;= 2</code> 等于 <code>C = C &gt;&gt; 2</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>&amp;=</code></td>
-<td style="text-align:center">按位与后赋值</td>
-<td style="text-align:center"><code>C &amp;= 2</code> 等于 <code>C = C &amp; 2</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>^=</code></td>
-<td style="text-align:center">按位异或后赋值</td>
-<td style="text-align:center"><code>C ^= 2</code> 等于 <code>C = C ^ 2</code></td>
-</tr>
-<tr>
-<td style="text-align:center"><code>|=</code></td>
-<td style="text-align:center">按位或后赋值</td>
-<td style="text-align:center"><code>C |= 2</code> 等于 <code>C = C | 2</code></td>
-</tr>
-</tbody>
-</table>
-<h3 id="指针运算符">指针运算符<a hidden class="anchor" aria-hidden="true" href="#指针运算符">#</a></h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">含义</th>
-<th style="text-align:center">实例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><code>&amp;</code></td>
-<td style="text-align:center">返回变量存储地址</td>
-<td style="text-align:center"><code>&amp;a</code> 将输出变量的实际地址</td>
-</tr>
-<tr>
-<td style="text-align:center"><code>*</code></td>
-<td style="text-align:center">指针变量</td>
-<td style="text-align:center"><code>*a</code> 是一个指针变量</td>
-</tr>
-</tbody>
-</table>
-<h3 id="go语言运算符汇总">Go语言运算符汇总<a hidden class="anchor" aria-hidden="true" href="#go语言运算符汇总">#</a></h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">运算符</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">+</td>
-<td style="text-align:center">&amp;</td>
-<td style="text-align:center">+=</td>
-<td style="text-align:center">&amp;=</td>
-<td style="text-align:center">&amp;&amp;</td>
-<td style="text-align:center">==</td>
-<td style="text-align:center">!=</td>
-<td style="text-align:center">(</td>
-<td style="text-align:center">)</td>
-</tr>
-<tr>
-<td style="text-align:center">-</td>
-<td style="text-align:center">|</td>
-<td style="text-align:center">-=</td>
-<td style="text-align:center">|=</td>
-<td style="text-align:center">||</td>
-<td style="text-align:center">&lt;</td>
-<td style="text-align:center">&lt;=</td>
-<td style="text-align:center">[</td>
-<td style="text-align:center">]</td>
-</tr>
-<tr>
-<td style="text-align:center">*</td>
-<td style="text-align:center">^</td>
-<td style="text-align:center">*=</td>
-<td style="text-align:center">^=</td>
-<td style="text-align:center">&lt;-</td>
-<td style="text-align:center">&gt;</td>
-<td style="text-align:center">&gt;=</td>
-<td style="text-align:center">{</td>
-<td style="text-align:center">}</td>
-</tr>
-<tr>
-<td style="text-align:center">/</td>
-<td style="text-align:center">&laquo;</td>
-<td style="text-align:center">/=</td>
-<td style="text-align:center">&laquo;=</td>
-<td style="text-align:center">++</td>
-<td style="text-align:center">=</td>
-<td style="text-align:center">:=</td>
-<td style="text-align:center">,</td>
-<td style="text-align:center">;</td>
-</tr>
-<tr>
-<td style="text-align:center">%</td>
-<td style="text-align:center">&raquo;</td>
-<td style="text-align:center">||</td>
-<td style="text-align:center">&raquo;=</td>
-<td style="text-align:center">&ndash;</td>
-<td style="text-align:center">!</td>
-<td style="text-align:center">&hellip;</td>
-<td style="text-align:center">.</td>
-<td style="text-align:center">:</td>
-</tr>
-<tr>
-<td style="text-align:center">&amp;^</td>
-<td style="text-align:center">&amp;^=</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-</tr>
-</tbody>
-</table>
-<h3 id="运算符优先级">运算符优先级<a hidden class="anchor" aria-hidden="true" href="#运算符优先级">#</a></h3>
-<ol>
-<li>一元运算符具有最高优先级。（<code>++</code>和<code>--</code>运算符是形成语句而不是表达式，所以他们不属于运算符层次结构，语句<code>*p++</code>与<code>(*p)++</code>相同）</li>
-<li>二元运算符有五个层次结构，如下优先级数字越大表示优先级越高。</li>
-<li>可以使用<code>()</code>来临时提高优先级。</li>
-</ol>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">优先级</th>
-<th style="text-align:center">运算符</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">5</td>
-<td style="text-align:center"><code>*  /  %  &lt;&lt;  &gt;&gt;  &amp;  &amp;^</code></td>
-</tr>
-<tr>
-<td style="text-align:center">4</td>
-<td style="text-align:center"><code>+  -  |  ^</code></td>
-</tr>
-<tr>
-<td style="text-align:center">3</td>
-<td style="text-align:center"><code>==  !=  &lt;  &lt;=  &gt;  &gt;=</code></td>
-</tr>
-<tr>
-<td style="text-align:center">2</td>
-<td style="text-align:center"><code>&amp;&amp;</code></td>
-</tr>
-<tr>
-<td style="text-align:center">1</td>
-<td style="text-align:center"><code>||</code></td>
-</tr>
-</tbody>
-</table>
-<h2 id="特殊运算符">特殊运算符<a hidden class="anchor" aria-hidden="true" href="#特殊运算符">#</a></h2>
-<h3 id="位清除-">位清除 <code>&amp;^</code><a hidden class="anchor" aria-hidden="true" href="#位清除-">#</a></h3>
-<ol>
-<li>将指定位置上的值设置为0。将运算符左边数据相异的位保留，相同位清零。</li>
-<li>如果Y某位上的数是0，则取X上对应位置的值。如果Y某位上为1，则结果位上取0。
-<ul>
-<li>如果右侧是0，则左侧数保持不变。</li>
-<li>如果右侧是1，则左侧数一定清零。</li>
-<li>功能与a&amp;(^b)相同。</li>
+  <div class="post-content"><ul>
+<li>字面量是指由字母、数字等构成的字符串或数值，它只能作为右值出现。</li>
 </ul>
-</li>
+<h2 id="整数字面量">整数字面量<a hidden class="anchor" aria-hidden="true" href="#整数字面量">#</a></h2>
+<ol>
+<li>表示整数常量的数字序列。</li>
 </ol>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">X = 0b0000_0010             // 0000 0010
-</span></span><span class="line"><span class="cl">Y = 0b0000_0100             // 0000 0100
-</span></span><span class="line"><span class="cl">X &amp;^ Y == X &amp; (^Y)          // 0000 0010
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">42           // 十进制
+</span></span><span class="line"><span class="cl">0600         // 八进制      6*8^2 + 0*8^1 + 0*8^0
+</span></span><span class="line"><span class="cl">oxBadFace    // 十六进制    11*16^6 + 10*16^5 + ...
+</span></span><span class="line"><span class="cl">ob11110000   // 二进制
+</span></span><span class="line"><span class="cl">ob1111_0000  // 二进制
 </span></span></code></pre></div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
@@ -911,59 +393,193 @@
 </span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 相异的保留，相同位清零
-</span></span></span><span class="line"><span class="cl"><span class="c1">// a &amp;^ b
-</span></span></span><span class="line"><span class="cl"><span class="c1">// 如果右侧(a)位是0，则左侧数保持不变
-</span></span></span><span class="line"><span class="cl"><span class="c1">// 如果右侧(a)为是1，则左侧数一定清零
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// 清除a的第7位
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">a</span> <span class="o">&amp;^</span> <span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">7</span><span class="p">)</span> <span class="c1">// 10000000  128
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">Example</span><span class="p">()</span>  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">o</span> <span class="kt">int</span> <span class="p">=</span> <span class="mo">067</span>     <span class="c1">// 6*8+7
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">var</span> <span class="nx">ox</span> <span class="kt">int</span> <span class="p">=</span> <span class="mh">0xBa77</span> <span class="c1">// 11*16^3 + 10*16^2 + 7*16 + 7
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">o</span><span class="p">,</span> <span class="nx">ox</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Output:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 55 47735
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h3 id="-异或xor">^ 异或（<code>XOR</code>）<a hidden class="anchor" aria-hidden="true" href="#-异或xor">#</a></h3>
+</div><h2 id="浮点数字面量">浮点数字面量<a hidden class="anchor" aria-hidden="true" href="#浮点数字面量">#</a></h2>
 <ol>
-<li>在Go语言中XOR是作为二元运算符存在。如果作为一元运算符出现，意思是按位取反。</li>
-<li>作为二元运算符，XOR是不进位加法计算，也就是异或运算。</li>
+<li>浮点常量的十进制表示。</li>
+<li>科学计数法：一个整数部分、一个小数点、一个小数部分和一个指数部分。</li>
 </ol>
-<h3 id="设置第n位为1">设置第<code>n</code>位为1<a hidden class="anchor" aria-hidden="true" href="#设置第n位为1">#</a></h3>
-<div class="highlight"><div class="chroma">
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">0.          // 0
+</span></span><span class="line"><span class="cl">72.40       // 72.4
+</span></span><span class="line"><span class="cl">072.40      // 72.4
+</span></span><span class="line"><span class="cl">2.712
+</span></span><span class="line"><span class="cl">1.e+0
+</span></span><span class="line"><span class="cl">6.654e-11   // 科学计数法 6.654 * 10^-11
+</span></span><span class="line"><span class="cl">1E6			   
+</span></span><span class="line"><span class="cl">.25         // 0.25
+</span></span><span class="line"><span class="cl">.12345E+5   // 0.12345E+5
+</span></span></code></pre></div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">a</span> <span class="kt">uint8</span>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">Example</span><span class="p">()</span>  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">,</span> <span class="nx">d</span> <span class="o">:=</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">072.40</span><span class="p">,</span> <span class="mf">1.</span><span class="nx">e</span><span class="o">+</span><span class="mi">0</span><span class="p">,</span> <span class="mf">.1254E+5</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">,</span> <span class="nx">d</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="nx">a</span> <span class="p">=</span> <span class="nx">a</span> <span class="p">|</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">)</span>    <span class="c1">// 10000000
+</span></span><span class="line"><span class="cl">    <span class="c1">// Output:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 0 72.4 1 12540
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h3 id="设置第n位为0">设置第<code>n</code>位为0<a hidden class="anchor" aria-hidden="true" href="#设置第n位为0">#</a></h3>
+</div><h2 id="虚数字面量">虚数字面量<a hidden class="anchor" aria-hidden="true" href="#虚数字面量">#</a></h2>
 <ol>
-<li><code>&amp;^</code>：清零某位。</li>
+<li>虚数字面量是复数常数的虚数的十进制表示。</li>
 </ol>
-<div class="highlight"><div class="chroma">
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">0i
+</span></span><span class="line"><span class="cl">011i    // 11i
+</span></span><span class="line"><span class="cl">0.1
+</span></span><span class="line"><span class="cl">2.2454i
+</span></span><span class="line"><span class="cl">1.e+0i
+</span></span><span class="line"><span class="cl">6.67e-11i
+</span></span><span class="line"><span class="cl">1E6i
+</span></span><span class="line"><span class="cl">.25i
+</span></span></code></pre></div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">a</span> <span class="kt">uint8</span> <span class="p">=</span> <span class="mb">0b0010_0001</span>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">Example</span><span class="p">()</span>  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">,</span> <span class="nx">d</span> <span class="o">:=</span> <span class="m">0i</span><span class="p">,</span> <span class="m">011i</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="m">6.67e-11i</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">,</span> <span class="nx">d</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="nx">a</span> <span class="p">=</span> <span class="nx">a</span> <span class="o">&amp;^</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">5</span><span class="p">)</span>   <span class="c1">// 1
+</span></span><span class="line"><span class="cl">    <span class="c1">// Output:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// (0+0i) (0+11i) 0.1 (0+6.67e-11i)
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
+</div><h2 id="rune字面量">Rune字面量<a hidden class="anchor" aria-hidden="true" href="#rune字面量">#</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Rune</th>
+<th style="text-align:center">别名</th>
+<th style="text-align:center">长度</th>
+<th style="text-align:center">范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>rune</code></td>
+<td style="text-align:center"><code>int32</code></td>
+<td style="text-align:center"><code>4B</code></td>
+<td style="text-align:center">-2147483648 ~ 2147483647</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><code>Rune</code>字面量是标识<code>Unicode</code>代码点的整数值。（<code>Unicode</code>是定长两个字节）</li>
+<li><code>Rune</code>字面量表示用单引号括起来的一个或多个字符。<code>'x'</code>或<code>'\n'</code>。</li>
+<li>单引号字符表示字符本身的<code>Unicode</code>值。而以反斜杠开头的字符序列表示各种格式编码值。</li>
+<li><code>Go</code>源码是以<code>UTF-8</code>编码的<code>Unicode</code>字符，因此多个<code>UTF-8</code>编码的字节可以表示单个整数值。
+<ul>
+<li><code>'a'</code>表示是a的单个字节，<code>Unicode U+0061</code>，值为<code>0x61</code>。</li>
+<li>&ldquo;好&rdquo; 编码<code>0x597d</code>包含两个字节 ，<code>U+00E4</code>值为<code>0xe4</code>。</li>
+</ul>
+</li>
+<li>将整数值表示为数字常量。
+<ul>
+<li><code>\x</code>后跟恰好两个十六进制数字<code>\x00 ~ \xff</code> <code>(0 ~ 255)</code> <code>1B</code> <code>(2^8)</code>	1字节。</li>
+<li><code>\u</code>后跟恰好四个十六进制数字<code>\u0000 ~ \uffff</code> <code>(0 ~ 65535)</code> <code>2B</code> <code>(2^16)</code> 2字节。</li>
+<li><code>\U</code>后跟恰好八个十六进制数字<code>\U00000000 ~ \Uffffffff</code> <code>(0 ~ 4294967295)</code> <code>4B</code> 4字节。</li>
+<li><code>\</code> 后跟恰好三个八进制数字<code>\000 ~ \777</code> <code>(0 ~ 511)</code>。</li>
+</ul>
+</li>
+<li><code>Unicode</code> 最大值 <code>0x10FFF</code> <code>69631</code>。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">&#39;a&#39;
+</span></span><span class="line"><span class="cl">&#39;笨&#39;
+</span></span><span class="line"><span class="cl">&#39;\t&#39;
+</span></span><span class="line"><span class="cl">&#39;\000&#39;
+</span></span><span class="line"><span class="cl">&#39;\007&#39;
+</span></span><span class="line"><span class="cl">&#39;\xff&#39;
+</span></span><span class="line"><span class="cl">&#39;\u12e4&#39;
+</span></span><span class="line"><span class="cl">&#39;\U00101234&#39;
+</span></span><span class="line"><span class="cl">&#39;aa&#39;            // 非法 多个字符
+</span></span><span class="line"><span class="cl">&#39;\xa&#39;           // 非法 十六进制数字太少
+</span></span><span class="line"><span class="cl">&#39;\0&#39;            // 非法八进制数字不正确
+</span></span><span class="line"><span class="cl">&#39;\U001000000&#39;   // 非法 无效的Unicode代码点
+</span></span></code></pre></div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">Example</span><span class="p">()</span>  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// rune = int32
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// byte = uint8
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">var</span> <span class="nx">a</span> <span class="kt">rune</span> <span class="p">=</span> <span class="sc">&#39;\n&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">b</span> <span class="kt">rune</span> <span class="p">=</span> <span class="sc">&#39;好&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">c</span> <span class="kt">byte</span> <span class="p">=</span> <span class="sc">&#39;\007&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">d</span> <span class="kt">rune</span> <span class="p">=</span> <span class="sc">&#39;\xff&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">e</span> <span class="kt">rune</span> <span class="p">=</span> <span class="sc">&#39;\u12e4&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">,</span> <span class="nx">d</span><span class="p">,</span> <span class="nx">e</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%c %c %c %c %c&#34;</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">,</span> <span class="nx">d</span><span class="p">,</span> <span class="nx">e</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Output:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 10 22909 7 255 4836
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//  好  ÿ ዤ
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
+</div><h2 id="字符串字面量">字符串字面量<a hidden class="anchor" aria-hidden="true" href="#字符串字面量">#</a></h2>
+<ol>
+<li>原始字符串字面量：<strong>反引号</strong>之间的字符序列。</li>
+<li>解释的字符串：<strong>双引号</strong>之间的字符序列。
+<ul>
+<li>在双引号内，除了换行符和未转义的双引号外，任何字符都可以出现。</li>
+<li>引号之间的文本形成文字的<code>rune</code>值，反斜杠转义符被解释为符文(<code>rune</code>)。</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">`abc`       // &#34;abc&#34;
+</span></span><span class="line"><span class="cl">`\n
+</span></span><span class="line"><span class="cl">\n`         // &#34;\\n\n\\n&#34;
+</span></span><span class="line"><span class="cl">&#34;\n&#34;		
+</span></span><span class="line"><span class="cl">&#34;\&#34;&#34;        // `&#34;`
+</span></span><span class="line"><span class="cl">&#34;Hello,World!\n&#34;
+</span></span><span class="line"><span class="cl">&#34;洒水&#34;
+</span></span><span class="line"><span class="cl">&#34;\u65e5 本\U00008a9e&#34;
+</span></span><span class="line"><span class="cl">&#34;\xff\u00FF&#34;
+</span></span></code></pre></div>
 
   </div>
 
@@ -973,15 +589,15 @@
       <li><a href="https://heliu.site/tags/basic/">Basic</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/basic/const/">
+  <a class="prev" href="https://heliu.site/posts/golang/basic/operator/">
     <span class="title">« 上一页</span>
     <br>
-    <span>常量</span>
+    <span>运算符</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/basic/literal/">
+  <a class="next" href="https://heliu.site/posts/golang/basic/zero/">
     <span class="title">下一页 »</span>
     <br>
-    <span>字面量</span>
+    <span>类型零值</span>
   </a>
 </nav>
 

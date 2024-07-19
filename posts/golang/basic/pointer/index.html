@@ -5,11 +5,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>常量 | Helium</title>
+<title>指针 | Helium</title>
 <meta name="keywords" content="golang, Basic">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/basic/const/">
+<link rel="canonical" href="https://heliu.site/posts/golang/basic/pointer/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
@@ -20,7 +20,7 @@
 <link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/basic/const/">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/basic/pointer/">
 <noscript>
     <style>
         #theme-toggle,
@@ -74,18 +74,18 @@
 
   
 
-<meta property="og:title" content="常量" />
+<meta property="og:title" content="指针" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/basic/const/" />
+<meta property="og:url" content="https://heliu.site/posts/golang/basic/pointer/" />
 <meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2024-07-19T10:04:00+08:00" />
-<meta property="article:modified_time" content="2024-07-19T10:04:00+08:00" /><meta property="og:site_name" content="Helium" />
+<meta property="article:published_time" content="2024-07-19T15:34:44+08:00" />
+<meta property="article:modified_time" content="2024-07-19T15:34:44+08:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
-<meta name="twitter:title" content="常量"/>
+<meta name="twitter:title" content="指针"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
 
@@ -115,8 +115,8 @@
     {
       "@type": "ListItem",
       "position":  4 ,
-      "name": "常量",
-      "item": "https://heliu.site/posts/golang/basic/const/"
+      "name": "指针",
+      "item": "https://heliu.site/posts/golang/basic/pointer/"
     }
   ]
 }
@@ -125,24 +125,24 @@
 {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "常量",
-  "name": "常量",
+  "headline": "指针",
+  "name": "指针",
   "description": "💥本文章所有相关go代码参考自go 1.18+版本",
   "keywords": [
     "golang", "Basic"
   ],
-  "articleBody": "常量的定义及使用 常量是一个简单的标识符，运行时不会被修改，没使用的常量在编译时候不会报错（全局变量未使用也不会报错）。 常量在其他语言一般建议使用全大写字母，但是在 Go 中大写字母开头的表示可导出。 常量中的数据类型只可以是布尔型(bool)、数值型（整数型、浮点型、复数）和字符串型(string)，不能是复合类型。 不能获取常量的地址（也没必要），如 \u0026a，a为常量，常量通常是与代码一起被保存在代码段。 字符串单个字符也不能取地址如\u0026s[0](s为string类型)，字符串是只读类型，在语言层面阻止。 注意字符串\u0026s和\u0026s[0]代表的不是同一个地址的区别。 字典的单个key也不能取地址\u0026m[\"o\"](m为map类型)，字典使用哈希桶形式存储，一个桶存8个key-value。 常量的定义 const identifier [type] = value const：定义常量关键字。 identifier：常量名称标识符。 [type]：类型，可选。 value：常量值。 1 2 // 关键字 标识符 [类型] = 值 const identifier [type] = value 1 2 3 4 5 // 指定类型常量 const IDENTIFIER bool = false // 显式类型定义 // 无类型常量，推断类型行为bool const IDENTIFIER = true // 隐式类型定义 定义多个常量 1 2 // 1. 推断类型 A为bool B为int C为string const A, B, C = true, 52, \"golang\"\t// 多重赋值 1 2 3 4 5 6 // 2. const ( UNKNOWN = 0 // 推断为int类型 FEMALE = 1 // 推断为int类型 MALE = 2 // 推断为int类型 ) 1 2 3 4 5 6 7 // 同时声明多个常量时，如果省略了值则表示和上面一行的值相同 const ( A uint16 = 255 // 255 B // 255 C = \"hello\" // hello D // hello ) 无类型常量 没有指明常量类型的常量。const PI = 3.14159 无类型常量具有默认类型，该类型在需要类型化值得上下文中隐式转换常量的类型： 在简式声明中：i := 0 没有显示类型，这与变量的无类型声明不同。 无类型常量的默认类型分别是 bool、rune、int、float64、comolex128或string。 具体决定于它是布尔值、字符、整数、浮点数、复数还是字符串。 常量的值必须是在编译时就能确定的。 可以在赋值表达式中涉及计算过程，但是所有用于计算的值必须在编译期间就能获得。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 package main import ( \"fmt\" ) func main() { const a = 5 // 无类型常量在使用时根据上下文语境转换 var intVar int = a var int32Var int32 = a var float64Var float64 = a var complex64Var complex64 = a fmt.Println(intVar, int32Var, float64Var, complex64Var)\t// 5 5 5 (5+0i) const aa = 5.0 var intVV int = aa // 浮点数不能默认转int类型 fmt.Println(intVV) // 5 //const aaa = 5.1 //var intVVV int = aaa // constant 5.1 truncated to integer //fmt.Println(intVVV) } iota 特殊常量，可以被编译器修改的常量。 每遇到const关键字，iota将被重置为0。 每当 iota 在新的一行被使用时，iota会自动加一，iota++。其实并不是iota在新的一行中出现就会加一，不出现也会自增。 【iota的准确定义是】：iota 表示 const 声明块的行索引（下标从0开始），解释就是iota表示当前const的行号，不管使用没使用iota。 【const还有一个重要的特点是】：第一个常量必须指定一个表达式，后续的常量如果没有表达式，则继承上面的表达式。 iota使用 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 const ( A = iota // 0 (iota == 0)\tB = iota // 1 (iota == 1) C = iota // 2 (iota == 2) ) const ( AA = iota // 0 (iota == 0) BB // 1 (iota == 1) 等效于 BB = iota CC // 2 (iota == 2) 等效于 CC = iota ) // 不管conts中是否有使用iota，都是按照行号递增的 const ( one = 3 // 3 (iota == 0) two = iota // 1 (iota == 1) three = iota // 2 (iota == 2) four // 3 (iota == 3) five // 4 (iota == 4) ) type CAPACITY uint const ( B CAPACITY = 1 \u003c\u003c (iota * 10)// 1 == 2^0 (iota == 0) // 等效于 KB CAPACITY = 1 \u003c\u003c (iota * 10) KB // 1024 == 2^10 (iota == 1) // 等效于 MB CAPACITY = 1 \u003c\u003c (iota * 10) MB // 1024 * 1024 = 2^20 (iota == 2) ) const ( D1 = iota // 0 (iota == 0) D2 // 1 (iota == 1) 等效于 D2 = iota D3 // 2 (iota == 2) 等效于 D3 = iota D4 // 3 (iota == 3) 等效于 D4 = iota D5 = \"HELLO\" // HELLO (iota == 4) D6 // HELLO (iota == 5) 等效于 D6 = \"HELLO\" D7 = 23 // 23 (iota == 6)\tD8 // 23 (iota == 7) 等效于 D7 = 23 D9 = iota // 8 (iota == 8) D10 // 9 (iota == 9) 等效于 D10 = iota ) const ( D1, D2 = 1 \u003c\u003c iota, 1 \u003c\u003c iota - 1 // 1 0 iota == 0\t00000001 \u003c\u003c 0 == 0 , 00000001 \u003c\u003c 0 - 1 == 0 // 等效于 D3, D4 = 1 \u003c\u003c iota, 1 \u003c\u003c iota - 1 D3, D4 // 2 1 iota == 1\t00000001 \u003c\u003c 1 == 2 , 00000001 \u003c\u003c 1 - 1 == 1 // 等效于 D5, D6 = 1 \u003c\u003c iota, 1 \u003c\u003c iota - 1 D5, D6 // 4 3 iota == 2\t00000001 \u003c\u003c 2 == 4 , 00000001 \u003c\u003c 2 - 1 == 3 ) 参考 Go高阶指南05，iota 实现原理 ",
-  "wordCount" : "660",
+  "articleBody": " Go语言中的指针不能进行偏移和运算，是安全指针。 指针地址、指针类型和指针取值。 Go语言中的函数传参都是值拷贝，当我们想要修改某个变量的时候，我们可以创建一个指向该变量地址的指针变量。 传递数据使用指针，而无须拷贝数据。 类型指针不能进行偏移和运算。 Go语言中的指针操作非常简单，只需要记住两个符号： \u0026（取地址）、*（根据地址取值）。 指针地址与指针类型 每个变量在运行时都拥有一个地址，这个地址代表变量在内存中的位置，Go语言中使用\u0026字符放在变量前面对变量进行**“取地址”**操作。 Go语言中的值类型（int、float、bool、string、array、struct），对应的指针 *int、*int64、*string等。 1 2 3 4 5 6 // 取变量指针地址语法 ptr := \u0026v // v的类型为T // v: 代表被取地址的变量，类型为T // ptr：用于接收地址的变量，ptr的类型就为*T，称做T的指针类型 // * 代表指针 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 package main import \"fmt\" func main() { a := 10\t// int类型 b := \u0026a\t// *int类型 // a:10 ptr:0xc00001a078 type:int fmt.Printf(\"a:%d ptr:%p type:%T\\n\", a, \u0026a, a) // b:0xc00001a078 type:*int fmt.Printf(\"b:%p type:%T\\n\", b, b) // 0xc00000e018 fmt.Println(\u0026b) } 指针取值 在对普通变量使用\u0026操作符取地址后会获得这个变量的指针，然后可以对指针使用*操作，也就是指针取值。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 package main import \"fmt\" func main() { a := 10 // int类型 // 取变量a的地址，将指针保存到b中 b := \u0026a // *int类型 fmt.Printf(\"type of b:%T\\n\", b) // type of b:*int // 指针取值（根据指针去内存取值） c := *b fmt.Printf(\"type of c:%T\\n\", c) // type of c:int fmt.Printf(\"value of c:%v\\n\", c)// value of c:10 *b = 11 fmt.Println(a, *b, c) // 11 11 10 } 空指针 当一个指针被定义后没有分配到任何变量时，它的值为 nil。 空指针的判断。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 package main import \"fmt\" func main() { var p *string fmt.Println(p) // fmt.Printf(\"p的值是%v\\n\", p) // p的值是 if p != nil { fmt.Println(\"非空\") } else { fmt.Println(\"空值\") // 空值 } } 类型转换 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 { var ff float64 = 12.23 ii := *(*uint64)(unsafe.Pointer(\u0026ff)) // uint64 类型 fmt.Printf(\"%064b \\n\", ii) ff1 := *(*float64)(unsafe.Pointer(\u0026ii)) fmt.Println(ff1) // Output: // 0100000000101000011101011100001010001111010111000010100011110110 // 12.23 } 指针练习 程序定义一个int变量num的地址并打印。 将num的地址赋给指针ptr，并通过ptr去修改num的值。 1 2 3 4 5 6 7 8 9 10 11 12 package main import \"fmt\" func main() { var a int fmt.Println(\u0026a) var p *int p = \u0026a *p = 20 fmt.Println(a) } 使用注意 【常量】不能使用\u0026取地址，常量是只读类型因此取地址没啥意义。 【字符串元素】，比如\u0026string[0]不能取地址，字符串也是只读类型对字符串中的符号取地址意义也不大。 【字典元素】，比如\u0026map[‘key’]不能取地址，字典的存储位置是经常变化的，因此对字典中元素取地址意义不大。 总结 取地址操作符\u0026和取值操作符*是一对互补操作符。 \u0026：取出地址；*：根据地址取出地址指向的值。 变量、指针地址、指针变量、取地址、取值的相互关系和特性如下： 对变量进行取地址（\u0026）操作，可以获得这个变量的存储地址。 指针变量的值是指针地址。 对指针变量进行取值（*）操作，可以获得指针变量指向的原变量的值。 指针传值例子。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 package main import \"fmt\" func main() { a := 10 modify1(a) fmt.Println(a) // 10 modify2(\u0026a) fmt.Println(a) // 100 } func modify1(x int) { x = 100 } func modify2(x *int) { *x = 100 } ",
+  "wordCount" : "367",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-07-19T10:04:00+08:00",
-  "dateModified": "2024-07-19T10:04:00+08:00",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-07-19T15:34:44+08:00",
+  "dateModified": "2024-07-19T15:34:44+08:00",
   "author":[{
     "@type": "Person",
     "name": "helium"
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/basic/const/"
+    "@id": "https://heliu.site/posts/golang/basic/pointer/"
   },
   "publisher": {
     "@type": "Organization",
@@ -238,7 +238,7 @@
   <header class="post-header">
     <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">golang 合集</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/basic/">第2章 基础数据类型</a></div>
     <h1 class="post-title entry-hint-parent">
-      常量
+      指针
     </h1>
     <div class="post-description">
       💥本文章所有相关go代码参考自go 1.18&#43;版本
@@ -261,12 +261,12 @@
     <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
     <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
     <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
-</svg><span>660字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>367字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="12" r="9"></circle>
     <polyline points="12 7 12 12 15 15"></polyline>
-</svg><span>4分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>2分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="7" r="4"></circle>
@@ -295,23 +295,19 @@
 
             <div class="inner"><ul>
                     <li>
-                        <a href="#%e5%b8%b8%e9%87%8f%e7%9a%84%e5%ae%9a%e4%b9%89%e5%8f%8a%e4%bd%bf%e7%94%a8" aria-label="常量的定义及使用">常量的定义及使用</a><ul>
-                            
+                        <a href="#%e6%8c%87%e9%92%88%e5%9c%b0%e5%9d%80%e4%b8%8e%e6%8c%87%e9%92%88%e7%b1%bb%e5%9e%8b" aria-label="指针地址与指针类型">指针地址与指针类型</a></li>
                     <li>
-                        <a href="#%e5%b8%b8%e9%87%8f%e7%9a%84%e5%ae%9a%e4%b9%89" aria-label="常量的定义">常量的定义</a></li>
+                        <a href="#%e6%8c%87%e9%92%88%e5%8f%96%e5%80%bc" aria-label="指针取值">指针取值</a></li>
                     <li>
-                        <a href="#%e5%ae%9a%e4%b9%89%e5%a4%9a%e4%b8%aa%e5%b8%b8%e9%87%8f" aria-label="定义多个常量">定义多个常量</a></li>
+                        <a href="#%e7%a9%ba%e6%8c%87%e9%92%88" aria-label="空指针">空指针</a></li>
                     <li>
-                        <a href="#%e6%97%a0%e7%b1%bb%e5%9e%8b%e5%b8%b8%e9%87%8f" aria-label="无类型常量">无类型常量</a></li></ul>
-                    </li>
+                        <a href="#%e7%b1%bb%e5%9e%8b%e8%bd%ac%e6%8d%a2" aria-label="类型转换">类型转换</a></li>
                     <li>
-                        <a href="#iota" aria-label="iota">iota</a><ul>
-                            
+                        <a href="#%e6%8c%87%e9%92%88%e7%bb%83%e4%b9%a0" aria-label="指针练习">指针练习</a></li>
                     <li>
-                        <a href="#iota%e4%bd%bf%e7%94%a8" aria-label="iota使用">iota使用</a></li></ul>
-                    </li>
+                        <a href="#%e4%bd%bf%e7%94%a8%e6%b3%a8%e6%84%8f" aria-label="使用注意">使用注意</a></li>
                     <li>
-                        <a href="#%e5%8f%82%e8%80%83" aria-label="参考">参考</a>
+                        <a href="#%e6%80%bb%e7%bb%93" aria-label="总结">总结</a>
                     </li>
                 </ul>
             </div>
@@ -377,117 +373,86 @@
         return rect.top + win.pageYOffset;   
     }
 </script>
-  <div class="post-content"><h2 id="常量的定义及使用">常量的定义及使用<a hidden class="anchor" aria-hidden="true" href="#常量的定义及使用">#</a></h2>
-<ol>
-<li>常量是一个简单的标识符，运行时不会被修改，没使用的常量在编译时候不会报错（全局变量未使用也不会报错）。</li>
-<li>常量在其他语言一般建议使用全大写字母，但是在 Go 中大写字母开头的表示可导出。</li>
-<li>常量中的数据类型只可以是<strong>布尔型</strong>(<code>bool</code>)、<strong>数值型</strong>（整数型、浮点型、复数）和<strong>字符串型</strong>(<code>string</code>)，不能是复合类型。</li>
-<li>不能获取常量的地址（也没必要），如 <code>&amp;a</code>，<code>a</code>为常量，常量通常是与代码一起被保存在代码段。</li>
-<li>字符串单个字符也不能取地址如<code>&amp;s[0]</code>(<code>s</code>为<code>string</code>类型)，字符串是只读类型，在语言层面阻止。</li>
-<li>注意字符串<code>&amp;s</code>和<code>&amp;s[0]</code>代表的不是同一个地址的区别。</li>
-<li>字典的单个key也不能取地址<code>&amp;m[&quot;o&quot;]</code>(<code>m</code>为<code>map</code>类型)，字典使用哈希桶形式存储，一个桶存8个key-value。</li>
-</ol>
-<h3 id="常量的定义">常量的定义<a hidden class="anchor" aria-hidden="true" href="#常量的定义">#</a></h3>
-<ol>
-<li><code>const identifier [type] = value</code>
+  <div class="post-content"><ol>
+<li><code>Go</code>语言中的指针<strong>不能进行偏移和运算</strong>，是<strong>安全指针</strong>。</li>
+<li><strong>指针地址</strong>、<strong>指针类型</strong>和<strong>指针取值</strong>。</li>
+<li><code>Go</code>语言中的函数传参都是<strong>值拷贝</strong>，当我们想要修改某个变量的时候，我们可以创建一个指向该变量地址的指针变量。</li>
+<li>传递数据使用指针，而无须拷贝数据。</li>
+<li>类型指针不能进行偏移和运算。</li>
+<li><code>Go</code>语言中的指针操作非常简单，只需要记住两个符号：
 <ul>
-<li><code>const</code>：定义常量关键字。</li>
-<li><code>identifier</code>：常量名称标识符。</li>
-<li><code>[type]</code>：类型，可选。</li>
-<li><code>value</code>：常量值。</li>
+<li><strong><code>&amp;</code></strong>（取地址）、<strong><code>*</code></strong>（根据地址取值）。</li>
 </ul>
 </li>
 </ol>
+<h2 id="指针地址与指针类型">指针地址与指针类型<a hidden class="anchor" aria-hidden="true" href="#指针地址与指针类型">#</a></h2>
+<ol>
+<li>每个变量在运行时都拥有一个地址，这个地址代表变量在内存中的位置，<code>Go</code>语言中使用<code>&amp;</code>字符放在变量前面对变量进行**“取地址”**操作。</li>
+<li><code>Go</code>语言中的值类型（<code>int</code>、<code>float</code>、<code>bool</code>、<code>string</code>、<code>array</code>、<code>struct</code>），对应的指针 <code>*int</code>、<code>*int64</code>、<code>*string</code>等。</li>
+</ol>
 <div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 关键字 标识符 [类型] = 值
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">const</span> <span class="nx">identifier</span> <span class="p">[</span><span class="kd">type</span><span class="p">]</span> <span class="p">=</span> <span class="nx">value</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
 </span><span class="lnt">5
+</span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 指定类型常量
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">const</span> <span class="nx">IDENTIFIER</span> <span class="kt">bool</span> <span class="p">=</span> <span class="kc">false</span>   <span class="c1">// 显式类型定义
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 取变量指针地址语法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">ptr</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">v</span> <span class="c1">// v的类型为T
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl"><span class="c1">// 无类型常量，推断类型行为bool
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">const</span> <span class="nx">IDENTIFIER</span> <span class="p">=</span> <span class="kc">true</span>         <span class="c1">// 隐式类型定义
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="定义多个常量">定义多个常量<a hidden class="anchor" aria-hidden="true" href="#定义多个常量">#</a></h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 1. 推断类型 A为bool B为int C为string
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">const</span> <span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">C</span> <span class="p">=</span> <span class="kc">true</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="s">&#34;golang&#34;</span>	<span class="c1">// 多重赋值
+</span></span><span class="line"><span class="cl"><span class="c1">// v: 代表被取地址的变量，类型为T
+</span></span></span><span class="line"><span class="cl"><span class="c1">// ptr：用于接收地址的变量，ptr的类型就为*T，称做T的指针类型
+</span></span></span><span class="line"><span class="cl"><span class="c1">// * 代表指针
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 2. 
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">const</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">UNKNOWN</span> <span class="p">=</span> <span class="mi">0</span> <span class="c1">// 推断为int类型
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">FEMALE</span>  <span class="p">=</span> <span class="mi">1</span> <span class="c1">// 推断为int类型
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">MALE</span>    <span class="p">=</span> <span class="mi">2</span> <span class="c1">// 推断为int类型
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">)</span>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">a</span> <span class="o">:=</span> <span class="mi">10</span>	<span class="c1">// int类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">b</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">a</span>	<span class="c1">// *int类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// a:10 ptr:0xc00001a078 type:int
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;a:%d ptr:%p type:%T\n&#34;</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">a</span><span class="p">,</span> <span class="nx">a</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// b:0xc00001a078 type:*int
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;b:%p type:%T\n&#34;</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 0xc00000e018
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">b</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 同时声明多个常量时，如果省略了值则表示和上面一行的值相同
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">const</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">A</span> <span class="kt">uint16</span> <span class="p">=</span> <span class="mi">255</span>  <span class="c1">// 255
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">B</span>               <span class="c1">// 255
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">C</span> <span class="p">=</span> <span class="s">&#34;hello&#34;</span>     <span class="c1">// hello
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">D</span>               <span class="c1">// hello
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">)</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="无类型常量">无类型常量<a hidden class="anchor" aria-hidden="true" href="#无类型常量">#</a></h3>
+</div><p><img loading="lazy" src="../images/pointer-001.png" alt=""  />
+</p>
+<h2 id="指针取值">指针取值<a hidden class="anchor" aria-hidden="true" href="#指针取值">#</a></h2>
 <ol>
-<li>没有指明常量类型的常量。<code>const PI = 3.14159</code></li>
-<li>无类型常量具有默认类型，该类型在需要类型化值得<strong>上下文中隐式转换</strong>常量的类型：
-<ul>
-<li>在简式声明中：<code>i := 0</code> 没有显示类型，这与变量的无类型声明不同。</li>
-<li>无类型常量的默认类型分别是 <code>bool</code>、<code>rune</code>、<code>int</code>、<code>float64</code>、<code>comolex128</code>或<code>string</code>。</li>
-<li>具体决定于它是布尔值、字符、整数、浮点数、复数还是字符串。</li>
-</ul>
-</li>
-<li>常量的值必须是在<strong>编译时</strong>就能确定的。
-<ul>
-<li>可以在赋值表达式中涉及计算过程，但是所有用于计算的值必须在编译期间就能获得。</li>
-</ul>
-</li>
+<li>在对普通变量使用<code>&amp;</code>操作符取地址后会获得这个变量的指针，然后可以对指针使用<code>*</code>操作，也就是指针取值。</li>
 </ol>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -511,43 +476,167 @@
 </span><span class="lnt">18
 </span><span class="lnt">19
 </span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">    <span class="s">&#34;fmt&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">const</span> <span class="nx">a</span> <span class="p">=</span> <span class="mi">5</span>             <span class="c1">// 无类型常量在使用时根据上下文语境转换
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">var</span> <span class="nx">intVar</span> <span class="kt">int</span> <span class="p">=</span> <span class="nx">a</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">int32Var</span> <span class="kt">int32</span> <span class="p">=</span> <span class="nx">a</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">float64Var</span> <span class="kt">float64</span> <span class="p">=</span> <span class="nx">a</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">complex64Var</span> <span class="kt">complex64</span> <span class="p">=</span> <span class="nx">a</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">intVar</span><span class="p">,</span> <span class="nx">int32Var</span><span class="p">,</span> <span class="nx">float64Var</span><span class="p">,</span> <span class="nx">complex64Var</span><span class="p">)</span>	<span class="c1">// 5 5 5 (5+0i)
+</span></span><span class="line"><span class="cl">    <span class="nx">a</span> <span class="o">:=</span> <span class="mi">10</span> <span class="c1">// int类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 取变量a的地址，将指针保存到b中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">b</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">a</span> <span class="c1">// *int类型
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl">    <span class="kd">const</span> <span class="nx">aa</span> <span class="p">=</span> <span class="mf">5.0</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">intVV</span> <span class="kt">int</span> <span class="p">=</span> <span class="nx">aa</span> <span class="c1">// 浮点数不能默认转int类型
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">intVV</span><span class="p">)</span> <span class="c1">// 5
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;type of b:%T\n&#34;</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="c1">// type of b:*int
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl">    <span class="c1">//const aaa = 5.1
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//var intVVV int = aaa  // constant 5.1 truncated to integer
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//fmt.Println(intVVV)
+</span></span><span class="line"><span class="cl">    <span class="c1">// 指针取值（根据指针去内存取值）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">c</span> <span class="o">:=</span> <span class="o">*</span><span class="nx">b</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;type of c:%T\n&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="c1">// type of c:int
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;value of c:%v\n&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span><span class="c1">// value of c:10
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="nx">b</span> <span class="p">=</span> <span class="mi">11</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="o">*</span><span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span>   <span class="c1">// 11 11 10
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="iota">iota<a hidden class="anchor" aria-hidden="true" href="#iota">#</a></h2>
+</div><h2 id="空指针">空指针<a hidden class="anchor" aria-hidden="true" href="#空指针">#</a></h2>
 <ol>
-<li>特殊常量，可以<strong>被编译器修改</strong>的常量。</li>
-<li>每遇到<code>const</code>关键字，<code>iota</code>将被重置为0。</li>
-<li>每当 <code>iota</code> 在新的<strong>一行</strong>被使用时，<code>iota</code>会自动加一，<code>iota++</code>。其实并不是iota在新的一行中出现就会加一，不出现也会自增。</li>
-<li>【<strong>iota</strong>的准确定义是】：<strong>iota 表示 const 声明块的行索引（下标从0开始）</strong>，解释就是iota表示当前const的行号，不管使用没使用iota。</li>
-<li>【<strong>const</strong>还有一个重要的特点是】：<strong>第一个常量必须指定一个表达式，后续的常量如果没有表达式，则继承上面的表达式</strong>。</li>
+<li>当一个指针被定义后没有分配到任何变量时，它的值为 <code>nil</code>。</li>
+<li>空指针的判断。</li>
 </ol>
-<h3 id="iota使用">iota使用<a hidden class="anchor" aria-hidden="true" href="#iota使用">#</a></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">p</span> <span class="o">*</span><span class="kt">string</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span>  <span class="c1">// &lt;nil&gt;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;p的值是%v\n&#34;</span><span class="p">,</span> <span class="nx">p</span><span class="p">)</span> <span class="c1">// p的值是&lt;nil&gt;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">p</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;非空&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;空值&#34;</span><span class="p">)</span> <span class="c1">// 空值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="类型转换">类型转换<a hidden class="anchor" aria-hidden="true" href="#类型转换">#</a></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">ff</span> <span class="kt">float64</span> <span class="p">=</span> <span class="mf">12.23</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">ii</span> <span class="o">:=</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="kt">uint64</span><span class="p">)(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ff</span><span class="p">))</span> <span class="c1">// uint64 类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%064b \n&#34;</span><span class="p">,</span> <span class="nx">ii</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">ff1</span> <span class="o">:=</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="kt">float64</span><span class="p">)(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ii</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">ff1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// Output:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 0100000000101000011101011100001010001111010111000010100011110110
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 12.23
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="指针练习">指针练习<a hidden class="anchor" aria-hidden="true" href="#指针练习">#</a></h2>
+<ol>
+<li>程序定义一个<code>int</code>变量<code>num</code>的地址并打印。</li>
+<li>将<code>num</code>的地址赋给指针<code>ptr</code>，并通过<code>ptr</code>去修改<code>num</code>的值。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">a</span> <span class="kt">int</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">a</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">p</span> <span class="o">*</span><span class="kt">int</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">p</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">a</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="nx">p</span> <span class="p">=</span> <span class="mi">20</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="使用注意">使用注意<a hidden class="anchor" aria-hidden="true" href="#使用注意">#</a></h2>
+<ol>
+<li>【<strong>常量</strong>】不能使用&amp;取地址，常量是只读类型因此取地址没啥意义。</li>
+<li>【<strong>字符串元素</strong>】，比如<code>&amp;string[0]</code>不能取地址，字符串也是只读类型对字符串中的符号取地址意义也不大。</li>
+<li>【<strong>字典元素</strong>】，比如<code>&amp;map[‘key’]</code>不能取地址，字典的存储位置是经常变化的，因此对字典中元素取地址意义不大。</li>
+</ol>
+<h2 id="总结">总结<a hidden class="anchor" aria-hidden="true" href="#总结">#</a></h2>
+<ol>
+<li>取地址操作符<code>&amp;</code>和取值操作符<code>*</code>是一对互补操作符。
+<ul>
+<li><code>&amp;</code>：取出地址；<code>*</code>：根据地址取出地址指向的值。</li>
+</ul>
+</li>
+<li>变量、指针地址、指针变量、取地址、取值的相互关系和特性如下：
+<ul>
+<li>对变量进行取地址（<code>&amp;</code>）操作，可以获得这个变量的存储地址。</li>
+<li>指针变量的值是指针地址。</li>
+<li>对指针变量进行取值（<code>*</code>）操作，可以获得指针变量指向的原变量的值。</li>
+</ul>
+</li>
+<li>指针传值例子。</li>
+</ol>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -573,92 +662,34 @@
 </span><span class="lnt">21
 </span><span class="lnt">22
 </span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span><span class="lnt">50
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">const</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">A</span> <span class="p">=</span> <span class="kc">iota</span>    <span class="c1">// 0  (iota == 0)	
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">B</span> <span class="p">=</span> <span class="kc">iota</span>    <span class="c1">// 1  (iota == 1)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">C</span> <span class="p">=</span> <span class="kc">iota</span>    <span class="c1">// 2  (iota == 2)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">)</span>
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">const</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">AA</span> <span class="p">=</span> <span class="kc">iota</span>   <span class="c1">// 0  (iota == 0)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">BB</span>          <span class="c1">// 1  (iota == 1)   等效于 BB = iota
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">CC</span>          <span class="c1">// 2  (iota == 2)   等效于 CC = iota
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// 不管conts中是否有使用iota，都是按照行号递增的
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">const</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">one</span>   <span class="p">=</span> <span class="mi">3</span>       <span class="c1">// 3 (iota == 0)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">two</span>   <span class="p">=</span> <span class="kc">iota</span>    <span class="c1">// 1 (iota == 1)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">three</span> <span class="p">=</span> <span class="kc">iota</span>    <span class="c1">// 2 (iota == 2)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">four</span>            <span class="c1">// 3 (iota == 3)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">five</span>            <span class="c1">// 4 (iota == 4)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">a</span> <span class="o">:=</span> <span class="mi">10</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">CAPACITY</span> <span class="kt">uint</span>
-</span></span><span class="line"><span class="cl"><span class="kd">const</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">B</span> <span class="nx">CAPACITY</span> <span class="p">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="kc">iota</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span><span class="c1">// 1 == 2^0            (iota == 0)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 等效于 KB CAPACITY = 1 &lt;&lt; (iota * 10)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">KB</span>                           <span class="c1">// 1024 == 2^10        (iota == 1)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 等效于 MB CAPACITY = 1 &lt;&lt; (iota * 10)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">MB</span>                           <span class="c1">// 1024 * 1024 = 2^20  (iota == 2)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">modify1</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">const</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">D1</span> <span class="p">=</span> <span class="kc">iota</span>       <span class="c1">// 0        (iota == 0)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">D2</span>              <span class="c1">// 1        (iota == 1) 等效于 D2 = iota
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">D3</span>              <span class="c1">// 2        (iota == 2) 等效于 D3 = iota
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">D4</span>              <span class="c1">// 3        (iota == 3) 等效于 D4 = iota
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">D5</span> <span class="p">=</span> <span class="s">&#34;HELLO&#34;</span>    <span class="c1">// HELLO    (iota == 4)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">D6</span>              <span class="c1">// HELLO    (iota == 5) 等效于 D6 = &#34;HELLO&#34;
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">D7</span> <span class="p">=</span> <span class="mi">23</span>         <span class="c1">// 23       (iota == 6)		
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">D8</span>              <span class="c1">// 23       (iota == 7) 等效于 D7 = 23
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">D9</span> <span class="p">=</span> <span class="kc">iota</span>       <span class="c1">// 8        (iota == 8)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">D10</span>             <span class="c1">// 9        (iota == 9) 等效于 D10 = iota
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>  <span class="c1">// 10
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="nf">modify2</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">a</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">const</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">D1</span><span class="p">,</span> <span class="nx">D2</span> <span class="p">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="kc">iota</span><span class="p">,</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="kc">iota</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1">// 1 0  iota == 0	00000001 &lt;&lt; 0 == 0 , 00000001 &lt;&lt; 0 - 1 == 0
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 等效于 D3, D4 = 1 &lt;&lt; iota, 1 &lt;&lt; iota - 1
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">D3</span><span class="p">,</span> <span class="nx">D4</span>                            <span class="c1">// 2 1  iota == 1	00000001 &lt;&lt; 1 == 2 , 00000001 &lt;&lt; 1 - 1 == 1
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 等效于 D5, D6 = 1 &lt;&lt; iota, 1 &lt;&lt; iota - 1
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">D5</span><span class="p">,</span> <span class="nx">D6</span>                            <span class="c1">// 4 3  iota == 2	00000001 &lt;&lt; 2 == 4 , 00000001 &lt;&lt; 2 - 1 == 3
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span>  <span class="c1">// 100
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">modify1</span><span class="p">(</span><span class="nx">x</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">x</span> <span class="p">=</span> <span class="mi">100</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">modify2</span><span class="p">(</span><span class="nx">x</span> <span class="o">*</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="nx">x</span> <span class="p">=</span> <span class="mi">100</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="参考">参考<a hidden class="anchor" aria-hidden="true" href="#参考">#</a></h2>
-<ol>
-<li><a href="https://cloud.tencent.com/developer/article/1876231?from=article.detail.1876229" target="_blank" rel="noopener">Go高阶指南05，iota 实现原理</a></li>
-</ol>
-
+</div>
 
   </div>
 
@@ -668,15 +699,15 @@
       <li><a href="https://heliu.site/tags/basic/">Basic</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/basic/variable/">
+  <a class="prev" href="https://heliu.site/posts/golang/basic/scope/">
     <span class="title">« 上一页</span>
     <br>
-    <span>变量</span>
+    <span>作用域</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/basic/operator/">
+  <a class="next" href="https://heliu.site/posts/golang/basic/string/">
     <span class="title">下一页 »</span>
     <br>
-    <span>运算符</span>
+    <span>字符串</span>
   </a>
 </nav>
 
