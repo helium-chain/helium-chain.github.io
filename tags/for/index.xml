@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2020-2024 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Sat, 20 Jul 2024 15:13:18 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 20 Jul 2024 17:28:53 +0800</lastBuildDate>
     <atom:link href="https://heliu.site/tags/for/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>流程控制(条件语句)</title>
@@ -40,6 +40,13 @@
       <link>https://heliu.site/posts/golang/process/switch/</link>
       <pubDate>Sat, 20 Jul 2024 15:13:18 +0800</pubDate>
       <guid>https://heliu.site/posts/golang/process/switch/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>流程控制(select)</title>
+      <link>https://heliu.site/posts/golang/process/select/</link>
+      <pubDate>Sat, 20 Jul 2024 17:28:53 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/process/select/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
   </channel>
