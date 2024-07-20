@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>For on Helium</title>
+    <link>https://heliu.site/tags/for/</link>
+    <description>Recent content in For on Helium</description>
+    <image>
+      <title>Helium</title>
+      <url>https://heliu.site/favicon-32x32.png</url>
+      <link>https://heliu.site/favicon-32x32.png</link>
+    </image>
+    <generator>Hugo -- 0.128.2</generator>
+    <language>zh</language>
+    <copyright>Copyright © 2020-2024 heliu&#39;s blog. All rights reserved</copyright>
+    <lastBuildDate>Sat, 20 Jul 2024 15:13:18 +0800</lastBuildDate>
+    <atom:link href="https://heliu.site/tags/for/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>流程控制(条件语句)</title>
+      <link>https://heliu.site/posts/golang/process/if/</link>
+      <pubDate>Fri, 19 Jul 2024 23:14:00 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/process/if/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>流程控制(循环语句)</title>
+      <link>https://heliu.site/posts/golang/process/for/</link>
+      <pubDate>Sat, 20 Jul 2024 09:25:09 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/process/for/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>流程控制(range迭代)</title>
+      <link>https://heliu.site/posts/golang/process/range/</link>
+      <pubDate>Sat, 20 Jul 2024 11:30:22 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/process/range/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>流程控制(switch)</title>
+      <link>https://heliu.site/posts/golang/process/switch/</link>
+      <pubDate>Sat, 20 Jul 2024 15:13:18 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/process/switch/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+  </channel>
+</rss>

@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2020-2024 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Fri, 19 Jul 2024 23:00:21 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 20 Jul 2024 15:13:18 +0800</lastBuildDate>
     <atom:link href="https://heliu.site/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>数组(一)</title>
@@ -145,6 +145,34 @@
       <link>https://heliu.site/posts/golang/basic/string-type/</link>
       <pubDate>Fri, 19 Jul 2024 23:00:21 +0800</pubDate>
       <guid>https://heliu.site/posts/golang/basic/string-type/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>流程控制(条件语句)</title>
+      <link>https://heliu.site/posts/golang/process/if/</link>
+      <pubDate>Fri, 19 Jul 2024 23:14:00 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/process/if/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>流程控制(循环语句)</title>
+      <link>https://heliu.site/posts/golang/process/for/</link>
+      <pubDate>Sat, 20 Jul 2024 09:25:09 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/process/for/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>流程控制(range迭代)</title>
+      <link>https://heliu.site/posts/golang/process/range/</link>
+      <pubDate>Sat, 20 Jul 2024 11:30:22 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/process/range/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>流程控制(switch)</title>
+      <link>https://heliu.site/posts/golang/process/switch/</link>
+      <pubDate>Sat, 20 Jul 2024 15:13:18 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/process/switch/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>

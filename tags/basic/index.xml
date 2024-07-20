@@ -71,6 +71,13 @@
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
+      <title>字符串</title>
+      <link>https://heliu.site/posts/golang/basic/string/</link>
+      <pubDate>Fri, 19 Jul 2024 15:59:27 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/basic/string/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
       <title>字符串(内存布局)</title>
       <link>https://heliu.site/posts/golang/basic/string-memory/</link>
       <pubDate>Fri, 19 Jul 2024 16:48:24 +0800</pubDate>
