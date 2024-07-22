@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2020-2024 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Sat, 20 Jul 2024 21:59:40 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 21 Jul 2024 19:12:39 +0800</lastBuildDate>
     <atom:link href="https://heliu.site/tags/golang/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>数组(一)</title>
@@ -20,13 +20,6 @@
       <pubDate>Mon, 09 Mar 2020 17:42:36 +0800</pubDate>
       <guid>https://heliu.site/posts/golang/array/array/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
-    </item>
-    <item>
-      <title>Install Golang</title>
-      <link>https://heliu.site/posts/golang/install/install/</link>
-      <pubDate>Sun, 14 Jul 2024 23:03:57 +0800</pubDate>
-      <guid>https://heliu.site/posts/golang/install/install/</guid>
-      <description>Go 软件安装。</description>
     </item>
     <item>
       <title>sync.Pool</title>
@@ -57,6 +50,20 @@
       <description>💥本文章所有相关go代码参考自go 1.18版本</description>
     </item>
     <item>
+      <title>type</title>
+      <link>https://heliu.site/posts/golang/type/typ/</link>
+      <pubDate>Sat, 22 Feb 2020 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/type/typ/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Install Golang</title>
+      <link>https://heliu.site/posts/golang/install/install/</link>
+      <pubDate>Mon, 14 Jan 2019 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/install/install/</guid>
+      <description>Go 软件安装。</description>
+    </item>
+    <item>
       <title>sync.WaitGroup</title>
       <link>https://heliu.site/posts/golang/sync/waitgroup/</link>
       <pubDate>Mon, 13 Jul 2020 22:00:10 +0800</pubDate>
@@ -66,120 +73,134 @@
     <item>
       <title>内置类型</title>
       <link>https://heliu.site/posts/golang/basic/type/</link>
-      <pubDate>Tue, 16 Jul 2024 17:52:30 +0800</pubDate>
+      <pubDate>Wed, 23 Jan 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/basic/type/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>变量</title>
       <link>https://heliu.site/posts/golang/basic/variable/</link>
-      <pubDate>Wed, 17 Jul 2024 22:28:03 +0800</pubDate>
+      <pubDate>Sun, 27 Jan 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/basic/variable/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>常量</title>
       <link>https://heliu.site/posts/golang/basic/const/</link>
-      <pubDate>Fri, 19 Jul 2024 10:04:00 +0800</pubDate>
+      <pubDate>Wed, 06 Feb 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/basic/const/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>运算符</title>
       <link>https://heliu.site/posts/golang/basic/operator/</link>
-      <pubDate>Fri, 19 Jul 2024 10:31:19 +0800</pubDate>
+      <pubDate>Tue, 19 Feb 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/basic/operator/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>字面量</title>
       <link>https://heliu.site/posts/golang/basic/literal/</link>
-      <pubDate>Fri, 19 Jul 2024 13:35:22 +0800</pubDate>
+      <pubDate>Sat, 23 Feb 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/basic/literal/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>类型零值</title>
       <link>https://heliu.site/posts/golang/basic/zero/</link>
-      <pubDate>Fri, 19 Jul 2024 15:02:31 +0800</pubDate>
+      <pubDate>Sun, 10 Mar 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/basic/zero/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>作用域</title>
       <link>https://heliu.site/posts/golang/basic/scope/</link>
-      <pubDate>Fri, 19 Jul 2024 15:12:30 +0800</pubDate>
+      <pubDate>Sun, 24 Mar 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/basic/scope/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>指针</title>
       <link>https://heliu.site/posts/golang/basic/pointer/</link>
-      <pubDate>Fri, 19 Jul 2024 15:34:44 +0800</pubDate>
+      <pubDate>Fri, 19 Apr 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/basic/pointer/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>字符串</title>
       <link>https://heliu.site/posts/golang/basic/string/</link>
-      <pubDate>Fri, 19 Jul 2024 15:59:27 +0800</pubDate>
+      <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/basic/string/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>字符串(内存布局)</title>
       <link>https://heliu.site/posts/golang/basic/string-memory/</link>
-      <pubDate>Fri, 19 Jul 2024 16:48:24 +0800</pubDate>
+      <pubDate>Tue, 21 May 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/basic/string-memory/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>字符串(&#43;拼接)</title>
       <link>https://heliu.site/posts/golang/basic/string-splice/</link>
-      <pubDate>Fri, 19 Jul 2024 22:49:41 +0800</pubDate>
+      <pubDate>Thu, 27 Jun 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/basic/string-splice/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>字符串(类型结构)</title>
       <link>https://heliu.site/posts/golang/basic/string-type/</link>
-      <pubDate>Fri, 19 Jul 2024 23:00:21 +0800</pubDate>
+      <pubDate>Mon, 29 Jul 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/basic/string-type/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>流程控制(条件语句)</title>
       <link>https://heliu.site/posts/golang/process/if/</link>
-      <pubDate>Fri, 19 Jul 2024 23:14:00 +0800</pubDate>
+      <pubDate>Fri, 02 Aug 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/process/if/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>流程控制(循环语句)</title>
       <link>https://heliu.site/posts/golang/process/for/</link>
-      <pubDate>Sat, 20 Jul 2024 09:25:09 +0800</pubDate>
+      <pubDate>Fri, 20 Sep 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/process/for/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>流程控制(range迭代)</title>
       <link>https://heliu.site/posts/golang/process/range/</link>
-      <pubDate>Sat, 20 Jul 2024 11:30:22 +0800</pubDate>
+      <pubDate>Sat, 05 Oct 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/process/range/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>流程控制(switch)</title>
       <link>https://heliu.site/posts/golang/process/switch/</link>
-      <pubDate>Sat, 20 Jul 2024 15:13:18 +0800</pubDate>
+      <pubDate>Sun, 27 Oct 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/process/switch/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>流程控制(select)</title>
       <link>https://heliu.site/posts/golang/process/select/</link>
-      <pubDate>Sat, 20 Jul 2024 17:28:53 +0800</pubDate>
+      <pubDate>Fri, 20 Dec 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/process/select/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Slice(原理)</title>
+      <link>https://heliu.site/posts/golang/slice/theory/</link>
+      <pubDate>Sun, 21 Jul 2024 17:58:15 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/slice/theory/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>边界检查</title>
+      <link>https://heliu.site/posts/golang/slice/check/</link>
+      <pubDate>Sun, 21 Jul 2024 19:12:39 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/slice/check/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>

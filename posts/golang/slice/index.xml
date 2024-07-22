@@ -12,6 +12,21 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2020-2024 heliu&#39;s blog. All rights reserved</copyright>
+    <lastBuildDate>Sun, 21 Jul 2024 19:12:39 +0800</lastBuildDate>
     <atom:link href="https://heliu.site/posts/golang/slice/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Slice(原理)</title>
+      <link>https://heliu.site/posts/golang/slice/theory/</link>
+      <pubDate>Sun, 21 Jul 2024 17:58:15 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/slice/theory/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>边界检查</title>
+      <link>https://heliu.site/posts/golang/slice/check/</link>
+      <pubDate>Sun, 21 Jul 2024 19:12:39 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/slice/check/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
   </channel>
 </rss>
