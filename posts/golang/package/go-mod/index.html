@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>go.mod 文件 | Helium</title>
+<meta name="keywords" content="golang, 包管理">
+<meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
+<meta name="author" content="helium">
+<link rel="canonical" href="https://heliu.site/posts/golang/package/go-mod/">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://heliu.site/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/package/go-mod/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono-nl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.6.0/style.css" />
+    <style>
+        body {
+            font-family: "LXGW WenKai Lite", sans-serif;
+            font-family: "LXGW WenKai Screen", sans-serif;
+        }
+    </style>
+</head>
+</html>
+
+  
+
+<meta property="og:title" content="go.mod 文件" />
+<meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://heliu.site/posts/golang/package/go-mod/" />
+<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2020-05-08T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-05-08T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:title" content="go.mod 文件"/>
+<meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Article",
+      "item": "https://heliu.site/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "golang 合集",
+      "item": "https://heliu.site/posts/golang/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "第4章 包管理",
+      "item": "https://heliu.site/posts/golang/package/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  4 ,
+      "name": "go.mod 文件",
+      "item": "https://heliu.site/posts/golang/package/go-mod/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "go.mod 文件",
+  "name": "go.mod 文件",
+  "description": "💥本文章所有相关go代码参考自go 1.18+版本",
+  "keywords": [
+    "golang", "包管理"
+  ],
+  "articleBody": " 模块由其根目录中名为go.mod，UTF-8编码文本文件定义。 go.mod文件是面向行的。每行包含一个指令，由关键字后跟参数组成。例如： 1 2 3 4 5 6 7 8 9 module example.com/my/thing go 1.12 require example.com/other/thing v1.0.2 require example.com/new/thing/v2 v2.3.4 exclude example.com/old/thing v1.2.3 replace example.com/bad/thing v1.4.5 =\u003e example.com/good/thing v1.4.5 retract [v1.9.0, v1.9.5] 前导关键字可以从相邻行中分解出来以创建一个块，就像在Go import中一样。 1 2 3 4 require ( example.com/new/thing/v2 v2.3.4 example.com/old/thing v1.2.3 ) go.mod文件被设计为人类可读和机器可写。go命令提供了几个更改go.mod文件的子命令。例如： go get可以升级或降级特定的依赖项。 加载模块图的命令将在需要时自动更新go.mod。 go mod edit可以执行低级编辑。 主模块以及使用本地文件路径指定的任何替换指令替换都需要一个go.mod文件。但是，缺少明确的go.mod文件的模块可能仍然需要作为依赖项，或者用作使用模块。 词汇元素 对一个go.mod文件进行分析，其内容被分成标记形式。 有几种标记：空格、注释、标点符号、关键字、标识符和字符串。 空白：由空格(U+0020)、制表符(U+0009)、回车(U+000D)和换行符(U+000A)组成。 除了换行符之外的空白字符没有任何作用，除非分隔本来与其他组合的标记。 换行符是重要的标记。 注释：以//开始到行尾。/**/注释不允许添加注释文案。 标点符号：包括（,）和=\u003e。 关键字：是区分go.mod文件中不同种类的指令。 允许的关键字module，go，require，replace，exclude，retract。 标识符：非空白字符的序列，例如模块路径或语义版本。 字符串：带引号的字符序列，有两种字符串： 以引号(\",U+0022)开头和结尾的解释字符串。 解释的字符串可能包含由反斜杠(\\,U+005C)后跟另一个字符组成的转义序列。 转义引号(\\\")不会终止已解释的字符串。 解释字符串的不带引号的值是引号之间的字符序列，每个转义序列都被反斜杠后面的字符\\“替换（例如，被替换为”，\\n被替换为n）。 以重音符 (`,U+0060)开头和结尾的原始字符串。 相比之下，原始字符串的不带引号的值只是重音符之间的字符序列，反斜杠在原始字符串中没有特殊含义。 标识符和字符串在go.mod语法中是可以互换的。 模块路径和版本 go.mod文件中的大多数标识符和字符串要么是模块路径，要么是版本。 模块路径必须满足以下要求： 路径必须由一个或多个以斜线(/,U+002F)分隔的路径元素组成，它不能以斜线开头或结尾。 每个路径是由多个ASCII字母，ASCII数字或非空字符串，和有限的ASCII标点符号（-、.、_、~）。 路径元素不能以点(., U+002E)开始或结束。 直到第一个点的元素前缀不能是Windows上的保留文件名，无论大小写（CON、com1、NuL等），不能以con.或com1.或Nul.等开头。 第一个点之前的元素前缀不得以波浪号(~)后跟一个或多个数字（如EXAMPL~1.COM）结尾。 如果模块路径出现在require指令中并且没有被替换，或者模块路径出现在replace指令的右侧，则该go命令可能需要下载具有该路径的模块，并且必须满足一些附加要求。 前导路径元素（直到第一个斜杠，如果有的话），按照约定，域名必须只包含小写ASCII字母、ASCII数字、点（.,U+002E）和破折号（-,U+002D）它必须至少包含一个点，并且不能以破折号开头。 对于形式的最终路径元素/vN在那里N是数字（ASCII数字和点），N不得带前导零的开始，一定不能/v1，一定不能包含任何圆点。 对于以gopkg.in/开头的路径，此要求将替换为路径遵循gopkg.in服务约定的要求。 go.mod文件中的版本可能是规范的或非规范的，规范版本以字母v开头，后跟符合语义版本控制2.0.0规范的语义版本。 非规范版本只允许在主模块的go.mod文件中，该go命令将尝试时，它会自动用等效的规范版本替换每个非规范版本更新的go.mod文件。 在一个模块路径与版本相关的地方（如require，replace和exclude指令），最后的路径元素必须与版本是一致的，请参阅主要版本后缀。 语法 go.mod下面使用扩展巴科斯-诺尔形式(EBNF)指定语法。有关EBNF语法的详细信息，请参阅Go语言规范中的符号部分。 1 2 3 4 5 6 7 GoMod = { Directive } . Directive = ModuleDirective | GoDirective | RequireDirective | ExcludeDirective | ReplaceDirective | RetractDirective . 换行，标识符和字符串分别标注newline，ident和 string。 模块路径和版本用ModulePath和表示Version。 1 2 ModulePath = ident | string . /* see restrictions above */ Version = ident | string . /* see restrictions above */ module模块指令 一个module指令定义了主模块的路径。一个go.mod文件必须只包含一个module指令。 module指令定义了模块名称： ModuleDirective = \"module\" ( ModulePath | \"(\" newline ModulePath newline \")\" ) newline . 示例： module golang.org/x/net Deprecated：弃用标志 可以在Deprecated:段落开头包含字符串（区分大小写）的注释块中将模块标记为已弃用。 弃用消息在冒号之后开始并运行到段落的末尾。注释可能出现在module指令之前或之后出现在同一行。 示例： // Deprecated: 改用 example.com/mod/v2 module example.com/mod 从Go 1.17开始，go list -m -u检查构建列表中所有弃用模块的信息。go get检查构建在命令行上命名的包所需的不推荐使用的模块。 当该go命令检索模块的弃用信息时，它会从与@latest版本查询匹配的版本加载go.mod文件，而不考虑撤回的或排除的。go命令从同一个go.mod文件加载撤回。 要弃用模块，作者可以添加// Deprecated:评论并标记新版本。作者可能会在更高版本中更改或删除弃用消息。 弃用适用于模块的所有次要版本。以v2为例，主版本高于被认为是单独的模块，因为它们的主版本后缀为它们提供了不同的模块路径。 弃用消息旨在通知用户该模块不再受支持并提供迁移说明，例如迁移到最新的主要版本。不能弃用单个次要版本和补丁版本，retract可能更适合单个版本。 go 版本指令 一个go指令表明一个模块是在假设Go的给定版本的语义的情况下编写的。 版本必须是有效的Go发布版本：一个正整数，后跟一个点和一个非负整数（例如，1.9,1.14）。示例：go 1.14。 go指令最初旨在支持Go语言的向后不兼容更改（请参阅Go 2 transition）。 自引入模块以来，没有发生不兼容的语言更改，但该go指令仍然影响新语言功能的使用： 对于模块内的包，编译器拒绝使用在go指令指定的版本之后引入的语言功能。例如，如果一个模块有指令go 1.12，它的包可能不会使用像1_000_000 Go 1.13中引入的数字文字。 如果较旧的Go版本构建模块的包之一并遇到编译错误，则该错误会指出该模块是为较新的Go版本编写的。假设一个模块有go 1.13一个包使用数字文字1_000_000。如果该包是用Go 1.12构建的，编译器会注意到代码是为Go 1.13编写的。 在go 1.17或更高版本： go.mod文件为每个模块包含一个显式的require指令，该指令提供由主模块中的包或测试传递导入的任何包。（在go 1.16及更低版本中，仅当最小版本选择会选择不同版本时才包含间接依赖项。）此额外信息启用模块图修剪和延迟模块加载。 由于可能存在// indirect比以前go版本更多的依赖项 ，因此间接依赖项记录在go.mod文件中的单独块中。 go mod vendor省略了vendor依赖的go.mod和go.sum文件。（这允许在vendor的子目录中调用go命令来识别正确的主模块。） go mod vendor将go每个依赖项go.mod文件的版本记录在vendor/modules.txt。 一个go.mod文件最多可以包含一个go指令。如果当前Go版本不存在，大多数命令会添加一个go指令。 1 2 GoDirective = \"go\" GoVersion newline . GoVersion = string | ident . /* valid release version; see above */ require 需求指令 一个require指令声明一个给定的模块依赖的最低版本。对于每个所需的模块版本，go命令加载该版本的go.mod文件并合并来自该文件的require。加载所有require后，go命令将使用最小版本选择 (MVS)解决它们以生成构建列表。 go命令会自动为某些require添加// indirect间接依赖注释。// indirect表示主模块中的任何包都不会直接导入所需模块中的包。 如果go指令指定go 1.16或更低版本，则当所选模块的版本高于主模块的其他依赖项已经暗示（传递）的版本时，go命令会添加一个indirect。这可能是由于显式升级（go get -u ./...）、删除了先前强加要求的其他依赖项（go mod tidy），或者导入了一个包而没有相应要求的依赖项go.mod文件（例如完全缺少go.mod文件的依赖项） 在go 1.17及更高版本中，go命令为每个模块添加了一个indirect，该模块提供由主模块中的包或测试导入（甚至indirect）的任何包，或作为参数传递给go get。 这些更全面的要求支持模块图修剪和延迟模块加载。 1 2 RequireDirective = \"require\" ( RequireSpec | \"(\" newline { RequireSpec } \")\" newline ) . RequireSpec = ModulePath Version newline . 示例： 1 2 3 4 5 6 require golang.org/x/net v1.2.3 require ( golang.org/x/crypto v1.4.5 // indirect golang.org/x/text v1.6.7 ) exclude 排除指令 exclude指令防止模块版本被go命令加载。(排除指定的模块版本) 从Go 1.16开始，如果任何go.mod文件中的require指令引用的版本被主模块的go.mod文件中的exclude指令排除，则该require将被忽略。 这可能会导致像go get和go mod tidy这样的命令将更高版本的新要求添加到go.mod，如果合适，带有// indirect。 在Go 1.16之前，如果一个排除的版本被require指令引用，go命令会列出模块的可用版本（如go list -m -versions所示）并加载下一个更高的非排除版本。这可能导致不确定的版本选择，因为下一个更高的版本可能会随着时间的推移而改变。为此目的，发行版和预发行版都被考虑在内，但伪版本则不然。如果没有更高版本，go命令报错。 exclude指令仅适用于主模块的go.mod文件，在其他模块中被忽略。有关详细信息，请参阅最小版本选择。 1 2 ExcludeDirective = \"exclude\" ( ExcludeSpec | \"(\" newline { ExcludeSpec } \")\" newline ) . ExcludeSpec = ModulePath Version newline . 示例： 1 2 3 4 5 6 exclude golang.org/x/net v1.2.3 exclude ( golang.org/x/crypto v1.4.5 golang.org/x/text v1.6.7 ) replace 替换指令 replace指令用在别处找到的内容替换模块的特定版本或模块的所有版本的内容。以使用另一个模块路径和版本或特定于平台的文件路径来指定替换。 如果箭头左侧(=\u003e)存在某个版本，则仅替换该模块的特定版本。其他版本将正常访问。如果省略左版本，则替换模块的所有版本。 如果箭头右侧的路径是绝对或相对路径（以./或../开头），则解释为替换模块根目录的本地文件路径，必须包含一个go.mod文件。在这种情况下必须省略替换版本。 如果右侧的路径不是本地路径，则必须是有效的模块路径。在这种情况下，需要一个版本。相同的模块版本不得出现在构建列表中。 不管替换是用本地路径还是模块路径指定的，如果替换模块有go.mod文件，它的module指令必须匹配它替换的模块路径。 replace指令仅适用于主模块的go.mod文件，在其他模块中被忽略。有关详细信息，请参阅最小版本选择。 如果有多个主模块，则应用所有主模块的 go.mod 文件。 不允许跨主模块冲突的替换指令，并且必须在 go.work 文件的替换中删除或覆盖。 请注意，单独的replace指令不会将模块添加到模块图中。在主模块的go.mod文件或依赖项的go.mod文件中，还需要引用替换模块版本的require指令。如果不需要左侧的模块版本，则替换指令无效。 1 2 3 4 ReplaceDirective = \"replace\" ( ReplaceSpec | \"(\" newline { ReplaceSpec } \")\" newline ) . ReplaceSpec = ModulePath [ Version ] \"=\u003e\" FilePath newline | ModulePath [ Version ] \"=\u003e\" ModulePath Version newline . FilePath = /* platform-specific relative or absolute file path */ 示例： 1 2 3 4 5 6 7 8 replace golang.org/x/net v1.2.3 =\u003e example.com/fork/net v1.4.5 replace ( golang.org/x/net v1.2.3 =\u003e example.com/fork/net v1.4.5 golang.org/x/net =\u003e example.com/fork/net v1.4.5 golang.org/x/net v1.2.3 =\u003e ./fork/net golang.org/x/net =\u003e ./fork/net ) retract 撤回指令 retract指令指示不应依赖由go.mod定义的模块的版本或版本范围。当版本过早发布或版本发布后发现严重问题时，撤回指令很有用。撤回的版本应该在版本控制存储库和模块代理中保持可用，以确保依赖于它们的构建不会被破坏。撤回这个词是从学术文献中借来的：被撤回的研究论文仍然可用，但它有问题，不应作为未来工作的基础。 当模块版本被撤回时，用户不会使用go get、go mod tidy或其他命令自动升级到它。依赖于撤回版本的构建应该继续工作，但是当用户使用go list -m -u检查更新或使用go get更新相关模块时，会收到撤回通知。 要撤回一个版本，模块作者应该向go.mod添加一个撤回指令，然后发布一个包含该指令的新版本。新版本必须高于其他发布或预发布版本。也就是说，在考虑撤回之前，@latest版本查询应该解析为新版本。go命令从go list -m -retracted $modpath@latest（其中$modpath是模块路径）显示的版本加载并应用撤回。 除非使用-retracted标志，否则从go list -m -versions打印的版本列表中隐藏已撤回的版本。解析@\u003e=v1.2.3或@latest之类的版本查询时，将排除撤回的版本。 包含撤回的版本可能会撤回自己。如果模块的最高发行版或预发行版自行收回，则在排除收回的版本后，@latest查询将解析为较低版本。 例如，考虑模块example.com/m的作者意外发布版本v1.0.0的情况。为了防止用户升级到v1.0.0，作者可以在go.mod中添加两个撤消指令，然后将撤回标记为v1.0.1。 1 2 3 4 retract ( v1.0.0 // 意外发布 v1.0.1 // 仅包含撤回 ) 当用户运行go get example.com/m@latest时，go命令从v1.0.1读取撤回，现在是最高版本。v1.0.0和v1.0.1都已撤回，因此go命令将升级（或降级！）到下一个最高版本，可能是v0.9.5。 撤回指令可以使用单个版本（如v1.0.0）或具有上下限的封闭区间版本编写，由[和]分隔（如[v1.1.0, v1.2.0]）。单个版本相当于上下限相同的区间。像其他指令一样，多个撤回指令可以组合在一个块中，由（在一行的末尾和）在它自己的行上分隔。 每个撤回指令都应该有一个注释来解释撤回的理由，尽管这不是强制性的。go命令可能会在有关撤回版本的警告和go列表输出中显示撤回注释。撤回注释可以写在撤回指令的正上方（中间没有空行），也可以写在同一行之后。如果注释出现在块上方，则它适用于块内没有自己注释的所有撤回指令。撤回注释可能跨越多行。 1 2 RetractDirective = \"retract\" ( RetractSpec | \"(\" newline { RetractSpec } \")\" newline ) . RetractSpec = ( Version | \"[\" Version \",\" Version \"]\" ) newline . 示例： 1 2 3 4 5 6 retract v1.0.0 retract [v1.0.0, v1.9.9] retract ( v1.0.0 [v1.0.0, v1.9.9] ) Retract指令是在Go 1.16中添加的。如果在主模块的go.mod文件中写入了撤回指令，则Go 1.15及更低版本将报告错误，并且将忽略依赖项的go.mod文件中的撤回指令。 自动更新 如果go.mod缺少信息或不能准确反映现实，大多数命令都会报告错误。go get和go mod tidy命令可用于解决大多数这些问题。 此外，-mod=mod标志可以与大多数模块感知命令（go build、go test等）一起使用，以指示go命令自动修复go.mod和go.sum中的问题。 例如，考虑这个go.mod文件： 1 2 3 4 5 6 7 8 9 10 11 12 13 module example.com/M go 1.16 require ( example.com/A v1 example.com/B v1.0.0 example.com/C v1.0.0 example.com/D v1.2.3 example.com/E dev ) exclude example.com/D v1.2.3 使用-mod=mod触发的更新将非规范版本标识符重写为规范semver形式，因此example.com/A的v1变为v1.0.0，example.com/E的dev成为dev上最新提交的伪版本分支，可能是v0.0.0-20180523231146-b3f5c0f6e5f1。 该更新修改了要求以遵守排除规则，因此对排除的example.com/D v1.2.3的require更新为使用example.com/D的下一个可用版本，可能是v1.2.4或v1.3.0。 此更新删除了多余或误导性的要求。例如，如果example.com/A v1.0.0本身需要example.com/B v1.2.0和example.com/C v1.0.0，那么 go.mod对example.com/B v1.0.0的要求具有误导性（已取代通过example.com/A需要v1.2.0），并且它对example.com/C v1.0.0的要求是多余的（暗示example.com/A需要相同版本），因此两者都将被删除。如果主模块包含直接从example.com/B或example.com/C导入包的包，那么需求将被保留但更新到正在使用的实际版本。 最后，更新以规范格式重新格式化go.mod，以便未来的机械更改将导致最小差异。 如果只需要更改格式，go命令将不会更新go.mod。 因为模块图定义了import语句的含义，所以任何加载包的命令也使用go.mod，因此可以更新它，包括go build、go get、go install、go list、go test、go mod tidy。 在Go 1.15及更低版本中，默认启用-mod=mod标志，因此会自动执行更新。从Go 1.16开始，go命令的行为就像设置了-mod=readonly一样，如果需要对go.mod进行任何更改，则go命令会报告错误并建议修复。 ",
+  "wordCount" : "609",
+  "inLanguage": "zh",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2020-05-08T00:00:00Z",
+  "dateModified": "2020-05-08T00:00:00Z",
+  "author":[{
+    "@type": "Person",
+    "name": "helium"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://heliu.site/posts/golang/package/go-mod/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Helium",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://heliu.site/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+                    height="35">Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://heliu.site/" title="主页">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/posts" title="文章">
+                    <span>Article</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/archives" title="时间轴">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/tags/" title="标签">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/support" title="打赏">
+                    <span>🫶Help</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+
+<article class="post" autonumbering>
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">golang 合集</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/package/">第4章 包管理</a></div>
+    <h1 class="post-title entry-hint-parent">
+      go.mod 文件
+    </h1>
+    <div class="post-description">
+      💥本文章所有相关go代码参考自go 1.18&#43;版本
+    </div>
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2020-05-08</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2020-05-08</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select: text;">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="user-select: text;"></path>
+    <polyline points="14 2 14 8 20 8" style="user-select: text;"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
+    <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
+    <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
+</svg><span>609字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="9"></circle>
+    <polyline points="12 7 12 12 15 15"></polyline>
+</svg><span>3分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+</svg><span>helium</span></span>
+      <span class="x-post-meta-item">
+        &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
+        <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
+            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/" target="_blank" rel="noopener">包管理</a>
+        </ul>
+      </span>
+      
+      <span id="busuanzi_container_page_pv" class="x-post-meta-item">
+        &nbsp;<svg t="1720844685710" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="27237" width="200" height="200"><path d="M739.754667 574.08c-121.386667 45.610667-208.469333 169.813333-208.64 316.16 0 33.408 4.693333 65.493333 13.141333 95.914667H94.122667c-26.453333-43.52-41.685333-91.946667-41.685334-143.189334 0-185.173333 192.896-335.104 430.805334-335.104 96.256 0 184.832 24.746667 256.512 66.218667z m-280.490667-114.986667a214.869333 214.869333 0 0 1-214.869333-215.04A215.04 215.04 0 0 1 459.264 28.842667a215.04 215.04 0 0 1 215.04 215.210666 215.04 215.04 0 0 1-215.04 215.04zM974.506667 641.28c9.856 0 17.834667 7.466667 17.834666 16.64v59.989333c-0.341333 8.789333-7.850667 15.786667-17.28 16.085334-9.856 0.341333-18.176-6.826667-18.517333-16.085334v-20.053333l-99.114667 91.093333-0.256 0.256a18.474667 18.474667 0 0 1-14.848 4.352h-0.768a18.176 18.176 0 0 1-9.344-4.608l-0.938666-0.981333-85.930667-80.042667-123.562667 115.072a18.773333 18.773333 0 0 1-25.216 0 15.786667 15.786667 0 0 1 0-23.466666l136.149334-126.848 0.725333-0.597334a18.645333 18.645333 0 0 1 24.362667 0.512l87.253333 81.237334 86.058667-79.232h-21.248c-9.386667-0.298667-16.938667-7.338667-17.28-16.085334-0.341333-9.173333 7.381333-16.896 17.28-17.237333h64.64z m-367.146667 240h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v72.192a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042667-16.042666v-72.192c0-8.874667 7.210667-16.042667 16.042667-16.042667z m110.805333-106.666667h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v178.858667a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042666v-178.858667c0-8.874667 7.168-16.042667 16.042666-16.042667z m106.538667 80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v99.413333a16.042667 16.042667 0 0 1-16.042667 16.042667H824.746667a16.042667 16.042667 0 0 1-16.042667-16.042667v-99.413333c0-8.874667 7.168-16.042667 16.042667-16.042667z m110.165333-80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v179.413333a16.042667 16.042667 0 0 1-16.042667 16.042667h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042667v-179.413333c0-8.874667 7.210667-16.042667 16.042666-16.042667z" fill="#999999" p-id="27238"></path></svg>
+        <span id="busuanzi_value_page_pv"></span>
+      </span>
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#%e8%af%8d%e6%b1%87%e5%85%83%e7%b4%a0" aria-label="词汇元素">词汇元素</a></li>
+                    <li>
+                        <a href="#%e6%a8%a1%e5%9d%97%e8%b7%af%e5%be%84%e5%92%8c%e7%89%88%e6%9c%ac" aria-label="模块路径和版本">模块路径和版本</a></li>
+                    <li>
+                        <a href="#%e8%af%ad%e6%b3%95" aria-label="语法">语法</a><ul>
+                            
+                    <li>
+                        <a href="#module%e6%a8%a1%e5%9d%97%e6%8c%87%e4%bb%a4" aria-label="module模块指令"><code>module</code>模块指令</a></li>
+                    <li>
+                        <a href="#go-%e7%89%88%e6%9c%ac%e6%8c%87%e4%bb%a4" aria-label="go 版本指令"><code>go</code> 版本指令</a></li>
+                    <li>
+                        <a href="#require-%e9%9c%80%e6%b1%82%e6%8c%87%e4%bb%a4" aria-label="require 需求指令"><code>require</code> 需求指令</a></li>
+                    <li>
+                        <a href="#exclude-%e6%8e%92%e9%99%a4%e6%8c%87%e4%bb%a4" aria-label="exclude 排除指令"><code>exclude</code> 排除指令</a></li>
+                    <li>
+                        <a href="#replace-%e6%9b%bf%e6%8d%a2%e6%8c%87%e4%bb%a4" aria-label="replace 替换指令"><code>replace</code> 替换指令</a></li>
+                    <li>
+                        <a href="#retract-%e6%92%a4%e5%9b%9e%e6%8c%87%e4%bb%a4" aria-label="retract 撤回指令"><code>retract</code> 撤回指令</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e8%87%aa%e5%8a%a8%e6%9b%b4%e6%96%b0" aria-label="自动更新">自动更新</a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+  <div class="post-content"><ol>
+<li>模块由其根目录中名为<code>go.mod</code>，<code>UTF-8</code>编码文本文件定义。</li>
+<li><code>go.mod</code>文件是面向行的。每行包含一个指令，由关键字后跟参数组成。例如：</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mod" data-lang="mod"><span class="line"><span class="cl"><span class="n">module</span> <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">my</span><span class="o">/</span><span class="n">thing</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">go</span> <span class="mf">1.12</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">require</span> <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">other</span><span class="o">/</span><span class="n">thing</span> <span class="n">v1</span><span class="p">.</span><span class="mf">0.2</span>
+</span></span><span class="line"><span class="cl"><span class="n">require</span> <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">new</span><span class="o">/</span><span class="n">thing</span><span class="o">/</span><span class="n">v2</span> <span class="n">v2</span><span class="p">.</span><span class="mf">3.4</span>
+</span></span><span class="line"><span class="cl"><span class="n">exclude</span> <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">old</span><span class="o">/</span><span class="n">thing</span> <span class="n">v1</span><span class="p">.</span><span class="mf">2.3</span>
+</span></span><span class="line"><span class="cl"><span class="n">replace</span> <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">bad</span><span class="o">/</span><span class="n">thing</span> <span class="n">v1</span><span class="p">.</span><span class="mf">4.5</span> <span class="o">=&gt;</span> <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">good</span><span class="o">/</span><span class="n">thing</span> <span class="n">v1</span><span class="p">.</span><span class="mf">4.5</span>
+</span></span><span class="line"><span class="cl"><span class="n">retract</span> <span class="p">[</span><span class="n">v1</span><span class="p">.</span><span class="mf">9.0</span><span class="p">,</span> <span class="n">v1</span><span class="p">.</span><span class="mf">9.5</span><span class="p">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="3">
+<li>前导关键字可以从相邻行中分解出来以创建一个块，就像在Go import中一样。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mod" data-lang="mod"><span class="line"><span class="cl"><span class="n">require</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">new</span><span class="o">/</span><span class="n">thing</span><span class="o">/</span><span class="n">v2</span> <span class="n">v2</span><span class="p">.</span><span class="mf">3.4</span>
+</span></span><span class="line"><span class="cl">    <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">old</span><span class="o">/</span><span class="n">thing</span> <span class="n">v1</span><span class="p">.</span><span class="mf">2.3</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="4">
+<li><code>go.mod</code>文件被设计为人类可读和机器可写。go命令提供了几个更改<code>go.mod</code>文件的子命令。例如：
+<ul>
+<li><code>go get</code>可以升级或降级特定的依赖项。</li>
+<li>加载模块图的命令将在需要时自动更新<code>go.mod</code>。</li>
+<li><code>go mod edit</code>可以执行低级编辑。</li>
+</ul>
+</li>
+<li>主模块以及使用本地文件路径指定的任何替换指令替换都需要一个<code>go.mod</code>文件。但是，缺少明确的<code>go.mod</code>文件的模块可能仍然需要作为依赖项，或者用作使用模块。</li>
+</ol>
+<h2 id="词汇元素">词汇元素<a hidden class="anchor" aria-hidden="true" href="#词汇元素">#</a></h2>
+<ol>
+<li>对一个<code>go.mod</code>文件进行分析，其内容被分成标记形式。</li>
+<li>有几种标记：空格、注释、标点符号、关键字、标识符和字符串。
+<ol>
+<li><strong>空白</strong>：由空格(U+0020)、制表符(U+0009)、回车(U+000D)和换行符(U+000A)组成。
+<ul>
+<li>除了换行符之外的空白字符没有任何作用，除非分隔本来与其他组合的标记。</li>
+<li>换行符是重要的标记。</li>
+</ul>
+</li>
+<li><strong>注释</strong>：以<code>//</code>开始到行尾。<code>/**/</code>注释不允许添加注释文案。</li>
+<li><strong>标点符号</strong>：包括（<code>,</code>）和<code>=&gt;</code>。</li>
+<li><strong>关键字</strong>：是区分<code>go.mod</code>文件中不同种类的指令。
+<ul>
+<li>允许的关键字<code>module</code>，<code>go</code>，<code>require</code>，<code>replace</code>，<code>exclude</code>，<code>retract</code>。</li>
+</ul>
+</li>
+<li><strong>标识符</strong>：非空白字符的序列，例如模块路径或语义版本。</li>
+<li><strong>字符串</strong>：带引号的字符序列，有两种字符串：
+<ul>
+<li>以引号(<code>&quot;</code>,U+0022)开头和结尾的解释字符串。
+<ul>
+<li>解释的字符串可能包含由反斜杠(<code>\</code>,U+005C)后跟另一个字符组成的转义序列。</li>
+<li>转义引号(<code>\&quot;</code>)不会终止已解释的字符串。</li>
+<li>解释字符串的不带引号的值是引号之间的字符序列，每个转义序列都被反斜杠后面的字符\&ldquo;替换（例如，被替换为&rdquo;，<code>\n</code>被替换为n）。</li>
+</ul>
+</li>
+<li>以重音符 (`,U+0060)开头和结尾的原始字符串。
+<ul>
+<li>相比之下，原始字符串的不带引号的值只是重音符之间的字符序列，反斜杠在原始字符串中没有特殊含义。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>标识符和字符串在<code>go.mod</code>语法中是可以互换的。</li>
+</ol>
+<h2 id="模块路径和版本">模块路径和版本<a hidden class="anchor" aria-hidden="true" href="#模块路径和版本">#</a></h2>
+<ol>
+<li><code>go.mod</code>文件中的大多数标识符和字符串要么是模块路径，要么是版本。</li>
+<li>模块路径必须满足以下要求：
+<ul>
+<li>路径必须由一个或多个以斜线(<code>/</code>,U+002F)分隔的路径元素组成，它不能以斜线开头或结尾。</li>
+<li>每个路径是由多个ASCII字母，ASCII数字或非空字符串，和有限的ASCII标点符号（<strong><code>-</code></strong>、<strong><code>.</code></strong>、<strong><code>_</code></strong>、<strong><code>~</code></strong>）。</li>
+<li>路径元素不能以点(<strong><code>.</code></strong>, U+002E)开始或结束。</li>
+<li>直到第一个点的元素前缀不能是Windows上的保留文件名，无论大小写（<code>CON</code>、<code>com1</code>、<code>NuL</code>等），不能以<code>con.</code>或<code>com1.</code>或<code>Nul.</code>等开头。</li>
+<li>第一个点之前的元素前缀不得以波浪号(<strong><code>~</code></strong>)后跟一个或多个数字（如<code>EXAMPL~1.COM</code>）结尾。</li>
+</ul>
+</li>
+<li>如果模块路径出现在<code>require</code>指令中并且没有被替换，或者模块路径出现在<code>replace</code>指令的右侧，则该<code>go</code>命令可能需要下载具有该路径的模块，并且必须满足一些附加要求。
+<ul>
+<li>前导路径元素（直到第一个斜杠，如果有的话），按照约定，域名必须只包含小写ASCII字母、ASCII数字、点（<code>.</code>,U+002E）和破折号（<code>-</code>,U+002D）它必须至少包含一个点，并且不能以破折号开头。</li>
+<li>对于形式的最终路径元素<code>/vN</code>在那里<code>N</code>是数字（ASCII数字和点），<code>N</code>不得带前导零的开始，一定不能<code>/v1</code>，一定不能包含任何圆点。
+<ul>
+<li>对于以<code>gopkg.in/</code>开头的路径，此要求将替换为路径遵循<a href="https://gopkg.in/" target="_blank" rel="noopener">gopkg.in</a>服务约定的要求。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>go.mod</code>文件中的版本可能是规范的或非规范的，规范版本以字母<code>v</code>开头，后跟符合<a href="https://semver.org/spec/v2.0.0.html" target="_blank" rel="noopener">语义版本控制2.0.0</a>规范的语义版本。</li>
+<li>非规范版本只允许在主模块的<code>go.mod</code>文件中，该<code>go</code>命令将尝试时，它会自动用等效的规范版本替换每个非规范版本更新的<code>go.mod</code>文件。</li>
+<li>在一个模块路径与版本相关的地方（如<code>require</code>，<code>replace</code>和<code>exclude</code>指令），最后的路径元素必须与版本是一致的，请参阅<a href="#major-version-suffixes">主要版本后缀</a>。</li>
+</ol>
+<h2 id="语法">语法<a hidden class="anchor" aria-hidden="true" href="#语法">#</a></h2>
+<ol>
+<li><code>go.mod</code>下面使用扩展巴科斯-诺尔形式(EBNF)指定语法。有关EBNF语法的详细信息，请参阅<a href="https://golang.google.cn/ref/spec#Notation" target="_blank" rel="noopener">Go语言规范中</a>的符号部分。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">GoMod </span><span class="o">=</span> <span class="p">{</span> <span class="k">Directive </span><span class="p">}</span> <span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="k">Directive </span><span class="o">=</span> <span class="k">ModuleDirective </span><span class="p">|</span>
+</span></span><span class="line"><span class="cl">            <span class="k">GoDirective </span><span class="p">|</span>
+</span></span><span class="line"><span class="cl">            <span class="k">RequireDirective </span><span class="p">|</span>
+</span></span><span class="line"><span class="cl">            <span class="k">ExcludeDirective </span><span class="p">|</span>
+</span></span><span class="line"><span class="cl">            <span class="k">ReplaceDirective </span><span class="p">|</span>
+</span></span><span class="line"><span class="cl">            <span class="k">RetractDirective </span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="2">
+<li>换行，标识符和字符串分别标注<code>newline</code>，<code>ident</code>和 <code>string</code>。</li>
+<li>模块路径和版本用<code>ModulePath</code>和表示<code>Version</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">ModulePath </span><span class="o">=</span> <span class="k">ident </span><span class="p">|</span> <span class="k">string </span><span class="p">.</span> <span class="err">/*</span> <span class="k">see restrictions above </span><span class="err">*/</span>
+</span></span><span class="line"><span class="cl"><span class="k">Version </span><span class="o">=</span> <span class="k">ident </span><span class="p">|</span> <span class="k">string </span><span class="p">.</span>    <span class="err">/*</span> <span class="k">see restrictions above </span><span class="err">*/</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="module模块指令"><code>module</code>模块指令<a hidden class="anchor" aria-hidden="true" href="#module模块指令">#</a></h3>
+<ol>
+<li>一个<code>module</code>指令定义了主模块的路径。一个<code>go.mod</code>文件必须只包含一个<code>module</code>指令。</li>
+<li><code>module</code>指令定义了模块名称：
+<ul>
+<li><code>ModuleDirective = &quot;module&quot; ( ModulePath | &quot;(&quot; newline ModulePath newline &quot;)&quot; ) newline .</code></li>
+</ul>
+</li>
+<li>示例：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-mod" data-lang="mod"><span class="line"><span class="cl"><span class="n">module</span> <span class="n">golang</span><span class="p">.</span><span class="n">org</span><span class="o">/</span><span class="n">x</span><span class="o">/</span><span class="n">net</span>
+</span></span></code></pre></div>
+
+<p><details >
+  <summary markdown="span"><code>Deprecated</code>：弃用标志</summary>
+  <blockquote>
+<ol>
+<li>可以在<code>Deprecated:</code>段落开头包含字符串（区分大小写）的注释块中将模块标记为已弃用。</li>
+<li>弃用消息在冒号之后开始并运行到段落的末尾。注释可能出现在<code>module</code>指令之前或之后出现在同一行。</li>
+<li>示例：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-mod" data-lang="mod"><span class="line"><span class="cl"><span class="c1">// Deprecated: 改用 example.com/mod/v2
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">module</span> <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">mod</span>
+</span></span></code></pre></div><ol start="4">
+<li>从Go 1.17开始，<code>go list -m -u</code>检查构建列表中所有弃用模块的信息。<code>go get</code>检查构建在命令行上命名的包所需的不推荐使用的模块。</li>
+<li>当该go命令检索模块的弃用信息时，它会从与@latest版本查询匹配的版本加载go.mod文件，而不考虑撤回的或排除的。go命令从同一个go.mod文件加载撤回。</li>
+<li>要弃用模块，作者可以添加<code>// Deprecated:</code>评论并标记新版本。作者可能会在更高版本中更改或删除弃用消息。</li>
+<li>弃用适用于模块的所有次要版本。以<code>v2</code>为例，主版本高于被认为是单独的模块，因为它们的主版本后缀为它们提供了不同的模块路径。</li>
+<li>弃用消息旨在通知用户该模块不再受支持并提供迁移说明，例如迁移到最新的主要版本。不能弃用单个次要版本和补丁版本，retract可能更适合单个版本。</li>
+</ol>
+</blockquote>
+
+</details></p>
+
+<h3 id="go-版本指令"><code>go</code> 版本指令<a hidden class="anchor" aria-hidden="true" href="#go-版本指令">#</a></h3>
+<ol>
+<li>一个<code>go</code>指令表明一个模块是在假设Go的给定版本的语义的情况下编写的。</li>
+<li>版本必须是有效的Go发布版本：一个正整数，后跟一个点和一个非负整数（例如，<code>1.9</code>,<code>1.14</code>）。示例：<code>go 1.14</code>。</li>
+<li><code>go</code>指令最初旨在支持Go语言的向后不兼容更改（请参阅<a href="https://golang.google.cn/design/28221-go2-transitions" target="_blank" rel="noopener">Go 2 transition</a>）。</li>
+<li>自引入模块以来，没有发生不兼容的语言更改，但该<code>go</code>指令仍然影响新语言功能的使用：
+<ol>
+<li>对于模块内的包，编译器拒绝使用在<code>go</code>指令指定的版本之后引入的语言功能。例如，如果一个模块有指令<code>go 1.12</code>，它的包可能不会使用像<code>1_000_000</code> Go 1.13中引入的数字文字。</li>
+<li>如果较旧的Go版本构建模块的包之一并遇到编译错误，则该错误会指出该模块是为较新的Go版本编写的。假设一个模块有<code>go 1.13</code>一个包使用数字文字<code>1_000_000</code>。如果该包是用Go 1.12构建的，编译器会注意到代码是为Go 1.13编写的。</li>
+<li>在<code>go 1.17</code>或更高版本：
+<ul>
+<li><code>go.mod</code>文件为每个模块包含一个显式的<code>require</code>指令，该指令提供由主模块中的包或测试传递导入的任何包。（在<code>go 1.16</code>及更低版本中，仅当最小版本选择会选择不同版本时才包含间接依赖项。）此额外信息启用模块图修剪和延迟模块加载。</li>
+<li>由于可能存在<code>// indirect</code>比以前<code>go</code>版本更多的依赖项 ，因此间接依赖项记录在<code>go.mod</code>文件中的单独块中。</li>
+<li><code>go mod vendor</code>省略了vendor依赖的go.mod和go.sum文件。（这允许在vendor的子目录中调用go命令来识别正确的主模块。）</li>
+<li><code>go mod vendor</code>将<code>go</code>每个依赖项<code>go.mod</code>文件的版本记录在<code>vendor/modules.txt</code>。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>一个<code>go.mod</code>文件最多可以包含一个<code>go</code>指令。如果当前Go版本不存在，大多数命令会添加一个<code>go</code>指令。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">GoDirective </span><span class="o">=</span> <span class="s2">&#34;go&#34;</span> <span class="k">GoVersion newline </span><span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="k">GoVersion </span><span class="o">=</span> <span class="k">string </span><span class="p">|</span> <span class="k">ident </span><span class="p">.</span>  <span class="err">/*</span> <span class="k">valid release version</span><span class="err">;</span> <span class="k">see above </span><span class="err">*/</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="require-需求指令"><code>require</code> 需求指令<a hidden class="anchor" aria-hidden="true" href="#require-需求指令">#</a></h3>
+<ol>
+<li>一个<code>require</code>指令声明一个给定的模块依赖的最低版本。对于每个所需的模块版本，<code>go</code>命令加载该版本的<code>go.mod</code>文件并合并来自该文件的<code>require</code>。加载所有<code>require</code>后，<code>go</code>命令将使用最小版本选择 (MVS)解决它们以生成构建列表。</li>
+<li><code>go</code>命令会自动为某些require添加<code>// indirect</code>间接依赖注释。<code>// indirect</code>表示主模块中的任何包都不会直接导入所需模块中的包。</li>
+<li>如果<code>go</code>指令指定<code>go 1.16</code>或更低版本，则当所选模块的版本高于主模块的其他依赖项已经暗示（传递）的版本时，go命令会添加一个<code>indirect</code>。这可能是由于显式升级（<code>go get -u ./...</code>）、删除了先前强加要求的其他依赖项（<code>go mod tidy</code>），或者导入了一个包而没有相应要求的依赖项<code>go.mod</code>文件（例如完全缺少<code>go.mod</code>文件的依赖项）</li>
+<li>在<code>go 1.17</code>及更高版本中，go命令为每个模块添加了一个<code>indirect</code>，该模块提供由主模块中的包或测试导入（甚至<code>indirect</code>）的任何包，或作为参数传递给<code>go get</code>。 这些更全面的要求支持模块图修剪和延迟模块加载。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">RequireDirective </span><span class="o">=</span> <span class="s2">&#34;require&#34;</span> <span class="p">(</span> <span class="k">RequireSpec </span><span class="p">|</span> <span class="s2">&#34;(&#34;</span> <span class="k">newline </span><span class="p">{</span> <span class="k">RequireSpec </span><span class="p">}</span> <span class="s2">&#34;)&#34;</span> <span class="k">newline </span><span class="p">)</span> <span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="k">RequireSpec </span><span class="o">=</span> <span class="k">ModulePath Version newline </span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="5">
+<li>示例：</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mod" data-lang="mod"><span class="line"><span class="cl"><span class="n">require</span> <span class="n">golang</span><span class="p">.</span><span class="n">org</span><span class="o">/</span><span class="n">x</span><span class="o">/</span><span class="n">net</span> <span class="n">v1</span><span class="p">.</span><span class="mf">2.3</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">require</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">golang</span><span class="p">.</span><span class="n">org</span><span class="o">/</span><span class="n">x</span><span class="o">/</span><span class="n">crypto</span> <span class="n">v1</span><span class="p">.</span><span class="mf">4.5</span> <span class="o">//</span> <span class="n">indirect</span>
+</span></span><span class="line"><span class="cl">    <span class="n">golang</span><span class="p">.</span><span class="n">org</span><span class="o">/</span><span class="n">x</span><span class="o">/</span><span class="n">text</span> <span class="n">v1</span><span class="p">.</span><span class="mf">6.7</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="exclude-排除指令"><code>exclude</code> 排除指令<a hidden class="anchor" aria-hidden="true" href="#exclude-排除指令">#</a></h3>
+<ol>
+<li><code>exclude</code>指令防止模块版本被<code>go</code>命令加载。(排除指定的模块版本)</li>
+<li>从<code>Go 1.16</code>开始，如果任何<code>go.mod</code>文件中的<code>require</code>指令引用的版本被主模块的<code>go.mod</code>文件中的<code>exclude</code>指令排除，则该<code>require</code>将被忽略。</li>
+<li>这可能会导致像<code>go get</code>和<code>go mod tidy</code>这样的命令将更高版本的新要求添加到<code>go.mod</code>，如果合适，带有<code>// indirect</code>。</li>
+<li>在<code>Go 1.16</code>之前，如果一个排除的版本被<code>require</code>指令引用，<code>go</code>命令会列出模块的可用版本（如go list -m -versions所示）并加载下一个更高的非排除版本。这可能导致不确定的版本选择，因为下一个更高的版本可能会随着时间的推移而改变。为此目的，发行版和预发行版都被考虑在内，但伪版本则不然。如果没有更高版本，<code>go</code>命令报错。</li>
+<li><code>exclude</code>指令仅适用于主模块的<code>go.mod</code>文件，在其他模块中被忽略。有关详细信息，请参阅最小版本选择。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">ExcludeDirective </span><span class="o">=</span> <span class="s2">&#34;exclude&#34;</span> <span class="p">(</span> <span class="k">ExcludeSpec </span><span class="p">|</span> <span class="s2">&#34;(&#34;</span> <span class="k">newline </span><span class="p">{</span> <span class="k">ExcludeSpec </span><span class="p">}</span> <span class="s2">&#34;)&#34;</span> <span class="k">newline </span><span class="p">)</span> <span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="k">ExcludeSpec </span><span class="o">=</span> <span class="k">ModulePath Version newline </span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="6">
+<li>示例：</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mod" data-lang="mod"><span class="line"><span class="cl"><span class="n">exclude</span> <span class="n">golang</span><span class="p">.</span><span class="n">org</span><span class="o">/</span><span class="n">x</span><span class="o">/</span><span class="n">net</span> <span class="n">v1</span><span class="p">.</span><span class="mf">2.3</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">exclude</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">golang</span><span class="p">.</span><span class="n">org</span><span class="o">/</span><span class="n">x</span><span class="o">/</span><span class="n">crypto</span> <span class="n">v1</span><span class="p">.</span><span class="mf">4.5</span>
+</span></span><span class="line"><span class="cl">    <span class="n">golang</span><span class="p">.</span><span class="n">org</span><span class="o">/</span><span class="n">x</span><span class="o">/</span><span class="n">text</span> <span class="n">v1</span><span class="p">.</span><span class="mf">6.7</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="replace-替换指令"><code>replace</code> 替换指令<a hidden class="anchor" aria-hidden="true" href="#replace-替换指令">#</a></h3>
+<ol>
+<li><code>replace</code>指令用在别处找到的内容替换模块的特定版本或模块的所有版本的内容。以使用另一个模块路径和版本或特定于平台的文件路径来指定替换。</li>
+<li>如果箭头左侧(<code>=&gt;</code>)存在某个版本，则仅替换该模块的特定版本。其他版本将正常访问。如果省略左版本，则替换模块的所有版本。</li>
+<li>如果箭头右侧的路径是绝对或相对路径（以<code>./</code>或<code>../</code>开头），则解释为替换模块根目录的本地文件路径，必须包含一个<code>go.mod</code>文件。在这种情况下必须省略替换版本。</li>
+<li>如果右侧的路径不是本地路径，则必须是有效的模块路径。在这种情况下，需要一个版本。相同的模块版本不得出现在构建列表中。</li>
+<li>不管替换是用本地路径还是模块路径指定的，如果替换模块有<code>go.mod</code>文件，它的<code>module</code>指令必须匹配它替换的模块路径。</li>
+<li><code>replace</code>指令仅适用于主模块的<code>go.mod</code>文件，在其他模块中被忽略。有关详细信息，请参阅最小版本选择。</li>
+<li>如果有多个主模块，则应用所有主模块的 go.mod 文件。 不允许跨主模块冲突的替换指令，并且必须在 go.work 文件的替换中删除或覆盖。</li>
+<li>请注意，单独的<code>replace</code>指令不会将模块添加到模块图中。在主模块的<code>go.mod</code>文件或依赖项的<code>go.mod</code>文件中，还需要引用替换模块版本的require指令。如果不需要左侧的模块版本，则替换指令无效。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">ReplaceDirective </span><span class="o">=</span> <span class="s2">&#34;replace&#34;</span> <span class="p">(</span> <span class="k">ReplaceSpec </span><span class="p">|</span> <span class="s2">&#34;(&#34;</span> <span class="k">newline </span><span class="p">{</span> <span class="k">ReplaceSpec </span><span class="p">}</span> <span class="s2">&#34;)&#34;</span> <span class="k">newline </span><span class="p">)</span> <span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="k">ReplaceSpec </span><span class="o">=</span> <span class="k">ModulePath </span><span class="p">[</span> <span class="k">Version </span><span class="p">]</span> <span class="s2">&#34;=&gt;&#34;</span> <span class="k">FilePath newline</span>
+</span></span><span class="line"><span class="cl">            <span class="p">|</span> <span class="k">ModulePath </span><span class="p">[</span> <span class="k">Version </span><span class="p">]</span> <span class="s2">&#34;=&gt;&#34;</span> <span class="k">ModulePath Version newline </span><span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="k">FilePath </span><span class="o">=</span> <span class="err">/*</span> <span class="k">platform-specific relative or absolute file path </span><span class="err">*/</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="9">
+<li>示例：</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mod" data-lang="mod"><span class="line"><span class="cl"><span class="n">replace</span> <span class="n">golang</span><span class="p">.</span><span class="n">org</span><span class="o">/</span><span class="n">x</span><span class="o">/</span><span class="n">net</span> <span class="n">v1</span><span class="p">.</span><span class="mf">2.3</span> <span class="o">=&gt;</span> <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">fork</span><span class="o">/</span><span class="n">net</span> <span class="n">v1</span><span class="p">.</span><span class="mf">4.5</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">replace</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">golang</span><span class="p">.</span><span class="n">org</span><span class="o">/</span><span class="n">x</span><span class="o">/</span><span class="n">net</span> <span class="n">v1</span><span class="p">.</span><span class="mf">2.3</span> <span class="o">=&gt;</span> <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">fork</span><span class="o">/</span><span class="n">net</span> <span class="n">v1</span><span class="p">.</span><span class="mf">4.5</span>
+</span></span><span class="line"><span class="cl">    <span class="n">golang</span><span class="p">.</span><span class="n">org</span><span class="o">/</span><span class="n">x</span><span class="o">/</span><span class="n">net</span> <span class="o">=&gt;</span> <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">fork</span><span class="o">/</span><span class="n">net</span> <span class="n">v1</span><span class="p">.</span><span class="mf">4.5</span>
+</span></span><span class="line"><span class="cl">    <span class="n">golang</span><span class="p">.</span><span class="n">org</span><span class="o">/</span><span class="n">x</span><span class="o">/</span><span class="n">net</span> <span class="n">v1</span><span class="p">.</span><span class="mf">2.3</span> <span class="o">=&gt;</span> <span class="p">.</span><span class="o">/</span><span class="n">fork</span><span class="o">/</span><span class="n">net</span>
+</span></span><span class="line"><span class="cl">    <span class="n">golang</span><span class="p">.</span><span class="n">org</span><span class="o">/</span><span class="n">x</span><span class="o">/</span><span class="n">net</span> <span class="o">=&gt;</span> <span class="p">.</span><span class="o">/</span><span class="n">fork</span><span class="o">/</span><span class="n">net</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="retract-撤回指令"><code>retract</code> 撤回指令<a hidden class="anchor" aria-hidden="true" href="#retract-撤回指令">#</a></h3>
+<ol>
+<li><code>retract</code>指令指示不应依赖由<code>go.mod</code>定义的模块的版本或版本范围。当版本过早发布或版本发布后发现严重问题时，撤回指令很有用。撤回的版本应该在版本控制存储库和模块代理中保持可用，以确保依赖于它们的构建不会被破坏。撤回这个词是从学术文献中借来的：被撤回的研究论文仍然可用，但它有问题，不应作为未来工作的基础。</li>
+<li>当模块版本被撤回时，用户不会使用go get、go mod tidy或其他命令自动升级到它。依赖于撤回版本的构建应该继续工作，但是当用户使用go list -m -u检查更新或使用<code>go get</code>更新相关模块时，会收到撤回通知。</li>
+<li>要撤回一个版本，模块作者应该向<code>go.mod</code>添加一个撤回指令，然后发布一个包含该指令的新版本。新版本必须高于其他发布或预发布版本。也就是说，在考虑撤回之前，<code>@latest</code>版本查询应该解析为新版本。<code>go</code>命令从<code>go list -m -retracted $modpath@latest</code>（其中<code>$modpath</code>是模块路径）显示的版本加载并应用撤回。</li>
+<li>除非使用<code>-retracted</code>标志，否则从go list -m -versions打印的版本列表中隐藏已撤回的版本。解析<code>@&gt;=v1.2.3</code>或<code>@latest</code>之类的版本查询时，将排除撤回的版本。</li>
+<li>包含撤回的版本可能会撤回自己。如果模块的最高发行版或预发行版自行收回，则在排除收回的版本后，<code>@latest</code>查询将解析为较低版本。</li>
+<li>例如，考虑模块<code>example.com/m</code>的作者意外发布版本<code>v1.0.0</code>的情况。为了防止用户升级到<code>v1.0.0</code>，作者可以在<code>go.mod</code>中添加两个撤消指令，然后将撤回标记为<code>v1.0.1</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mod" data-lang="mod"><span class="line"><span class="cl"><span class="n">retract</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">v1</span><span class="p">.</span><span class="mf">0.0</span> <span class="o">//</span> <span class="err">意外发布</span>
+</span></span><span class="line"><span class="cl">    <span class="n">v1</span><span class="p">.</span><span class="mf">0.1</span> <span class="o">//</span> <span class="err">仅包含撤回</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="7">
+<li>当用户运行<code>go get example.com/m@latest</code>时，<code>go</code>命令从<code>v1.0.1</code>读取撤回，现在是最高版本。<code>v1.0.0</code>和<code>v1.0.1</code>都已撤回，因此<code>go</code>命令将升级（或降级！）到下一个最高版本，可能是<code>v0.9.5</code>。</li>
+<li>撤回指令可以使用单个版本（如<code>v1.0.0</code>）或具有上下限的封闭区间版本编写，由<code>[</code>和<code>]</code>分隔（如<code>[v1.1.0, v1.2.0]</code>）。单个版本相当于上下限相同的区间。像其他指令一样，多个撤回指令可以组合在一个块中，由（在一行的末尾和）在它自己的行上分隔。</li>
+<li>每个撤回指令都应该有一个注释来解释撤回的理由，尽管这不是强制性的。<code>go</code>命令可能会在有关撤回版本的警告和<code>go</code>列表输出中显示撤回注释。撤回注释可以写在撤回指令的正上方（中间没有空行），也可以写在同一行之后。如果注释出现在块上方，则它适用于块内没有自己注释的所有撤回指令。撤回注释可能跨越多行。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">RetractDirective </span><span class="o">=</span> <span class="s2">&#34;retract&#34;</span> <span class="p">(</span> <span class="k">RetractSpec </span><span class="p">|</span> <span class="s2">&#34;(&#34;</span> <span class="k">newline </span><span class="p">{</span> <span class="k">RetractSpec </span><span class="p">}</span> <span class="s2">&#34;)&#34;</span> <span class="k">newline </span><span class="p">)</span> <span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="k">RetractSpec </span><span class="o">=</span> <span class="p">(</span> <span class="k">Version </span><span class="p">|</span> <span class="s2">&#34;[&#34;</span> <span class="k">Version </span><span class="s2">&#34;,&#34;</span> <span class="k">Version </span><span class="s2">&#34;]&#34;</span> <span class="p">)</span> <span class="k">newline </span><span class="p">.</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="10">
+<li>示例：</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mod" data-lang="mod"><span class="line"><span class="cl"><span class="n">retract</span> <span class="n">v1</span><span class="p">.</span><span class="mf">0.0</span>
+</span></span><span class="line"><span class="cl"><span class="n">retract</span> <span class="p">[</span><span class="n">v1</span><span class="p">.</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">v1</span><span class="p">.</span><span class="mf">9.9</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">retract</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">v1</span><span class="p">.</span><span class="mf">0.0</span>
+</span></span><span class="line"><span class="cl">    <span class="p">[</span><span class="n">v1</span><span class="p">.</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">v1</span><span class="p">.</span><span class="mf">9.9</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="11">
+<li><code>Retract</code>指令是在<code>Go 1.16</code>中添加的。如果在主模块的<code>go.mod</code>文件中写入了撤回指令，则<code>Go 1.15</code>及更低版本将报告错误，并且将忽略依赖项的<code>go.mod</code>文件中的撤回指令。</li>
+</ol>
+<h2 id="自动更新">自动更新<a hidden class="anchor" aria-hidden="true" href="#自动更新">#</a></h2>
+<ol>
+<li>如果<code>go.mod</code>缺少信息或不能准确反映现实，大多数命令都会报告错误。go get和go mod tidy命令可用于解决大多数这些问题。</li>
+<li>此外，<code>-mod=mod</code>标志可以与大多数模块感知命令（<code>go build</code>、<code>go test</code>等）一起使用，以指示<code>go</code>命令自动修复<code>go.mod</code>和<code>go.sum</code>中的问题。</li>
+<li>例如，考虑这个<code>go.mod</code>文件：</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mod" data-lang="mod"><span class="line"><span class="cl"><span class="n">module</span> <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">M</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">go</span> <span class="mf">1.16</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">require</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">A</span> <span class="n">v1</span>
+</span></span><span class="line"><span class="cl">    <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">B</span> <span class="n">v1</span><span class="p">.</span><span class="mf">0.0</span>
+</span></span><span class="line"><span class="cl">    <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">C</span> <span class="n">v1</span><span class="p">.</span><span class="mf">0.0</span>
+</span></span><span class="line"><span class="cl">    <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">D</span> <span class="n">v1</span><span class="p">.</span><span class="mf">2.3</span>
+</span></span><span class="line"><span class="cl">    <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">E</span> <span class="n">dev</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">exclude</span> <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">D</span> <span class="n">v1</span><span class="p">.</span><span class="mf">2.3</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="4">
+<li>使用<code>-mod=mod</code>触发的更新将非规范版本标识符重写为规范<code>semver</code>形式，因此<code>example.com/A</code>的<code>v1</code>变为<code>v1.0.0</code>，<code>example.com/E</code>的<code>dev</code>成为<code>dev</code>上最新提交的伪版本分支，可能是<code>v0.0.0-20180523231146-b3f5c0f6e5f1</code>。</li>
+<li>该更新修改了要求以遵守排除规则，因此对排除的<code>example.com/D v1.2.3</code>的require更新为使用<code>example.com/D</code>的下一个可用版本，可能是<code>v1.2.4</code>或<code>v1.3.0</code>。</li>
+<li>此更新删除了多余或误导性的要求。例如，如果<code>example.com/A v1.0.0</code>本身需要<code>example.com/B v1.2.0</code>和<code>example.com/C v1.0.0</code>，那么 go.mod对<code>example.com/B v1.0.0</code>的要求具有误导性（已取代通过<code>example.com/A</code>需要<code>v1.2.0</code>），并且它对<code>example.com/C v1.0.0</code>的要求是多余的（暗示<code>example.com/A</code>需要相同版本），因此两者都将被删除。如果主模块包含直接从<code>example.com/B</code>或<code>example.com/C</code>导入包的包，那么需求将被保留但更新到正在使用的实际版本。</li>
+<li>最后，更新以规范格式重新格式化<code>go.mod</code>，以便未来的机械更改将导致最小差异。 如果只需要更改格式，<code>go</code>命令将不会更新<code>go.mod</code>。</li>
+<li>因为模块图定义了<code>import</code>语句的含义，所以任何加载包的命令也使用<code>go.mod</code>，因此可以更新它，包括<code>go build</code>、<code>go get</code>、<code>go install</code>、<code>go list</code>、<code>go test</code>、<code>go mod tidy</code>。</li>
+<li>在<code>Go 1.15</code>及更低版本中，默认启用<code>-mod=mod</code>标志，因此会自动执行更新。从<code>Go 1.16</code>开始，<code>go</code>命令的行为就像设置了<code>-mod=readonly</code>一样，如果需要对<code>go.mod</code>进行任何更改，则<code>go</code>命令会报告错误并建议修复。</li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
+      <li><a href="https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/">包管理</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://heliu.site/posts/golang/package/go-work/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>go.work 文件</span>
+  </a>
+  <a class="next" href="https://heliu.site/posts/golang/package/use-work/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>工作区使用</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    
+    <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv">
+        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    </span>
+    <span id="busuanzi_container_site_uv">
+        本站访客数<span id="busuanzi_value_site_uv"></span>人次
+    </span>
+    </div>
+        <span>Copyright © 2020-2024 <a href="#">heliu's blog</a>. All rights reserved</span>  
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'Copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'Done';
+            setTimeout(() => {
+                copybutton.innerHTML = 'Copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

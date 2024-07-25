@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>模块相关环境变量 | Helium</title>
+<meta name="keywords" content="golang, 包管理">
+<meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
+<meta name="author" content="helium">
+<link rel="canonical" href="https://heliu.site/posts/golang/package/env/">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://heliu.site/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/package/env/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono-nl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.6.0/style.css" />
+    <style>
+        body {
+            font-family: "LXGW WenKai Lite", sans-serif;
+            font-family: "LXGW WenKai Screen", sans-serif;
+        }
+    </style>
+</head>
+</html>
+
+  
+
+<meta property="og:title" content="模块相关环境变量" />
+<meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://heliu.site/posts/golang/package/env/" />
+<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2020-04-05T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-04-05T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:title" content="模块相关环境变量"/>
+<meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Article",
+      "item": "https://heliu.site/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "golang 合集",
+      "item": "https://heliu.site/posts/golang/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "第4章 包管理",
+      "item": "https://heliu.site/posts/golang/package/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  4 ,
+      "name": "模块相关环境变量",
+      "item": "https://heliu.site/posts/golang/package/env/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "模块相关环境变量",
+  "name": "模块相关环境变量",
+  "description": "💥本文章所有相关go代码参考自go 1.18+版本",
+  "keywords": [
+    "golang", "包管理"
+  ],
+  "articleBody": "GO111MODULE Go语言提供了GO111MODULE这个环境变量来作为Go modules的开关，其允许设置以下参数： auto：只要项目包含了go.mod文件(在$GOPATH/src外面且根目录有go.mod文件时)的话启用Go modules。 on：启用Go modules，推荐设置，会忽略GOPATH和vendor文件夹，只根据go.mod下载依赖。 off：禁用Go modules，不推荐设置，会从GOPATH和vendor文件夹寻找包。 GO111MODULE相关解释： GO111MODULE这个命名代表着Go语言在1.11版本添加的，针对Module的变量。 像是在Go1.5版本的时候，也发布了一个系统环境变量GO15VENDOREXPERIMENT。 作用是用于开启vendor目录的支持，当时其默认值也不是开启，仅仅作为experimental。 其随后在Go1.6版本时也将默认值改为了开启，并且最后作为了official，GO15VENDOREXPERIMENT系统变量就退出了历史舞台。 而未来GO111MODULE这一个系统环境变量也会面临这个问题，不去除是为了兼容老版本。 $ go env -w GO111MODULE=auto GOPROXY 这个环境变量主要是用于设置Go模块代理，直接通过镜像站点来快速拉取。 GOPROXY的默认值是：https://proxy.golang.org,direct，这有一个很严重的问题，就是https://proxy.golang.org在国内是无法访问的。 在该配置下，go命令首先去Google运行的Go模块镜像，如果镜像没有模块，则回退到直接连接。 可以设置GOPRIVATE和GONOPROXY环境变量以防止使用代理下载特定模块。 中国大陆推荐使用 go env -w GOPROXY=https://goproxy.cn,direct。 其他源地址列表：https://goproxy.cn、https://goproxy.io、https://goproxy.baidu.com/。 GOPROXY的值是一个以英文逗号(,)或竖线(|)分割的Go模块代理列表，允许设置多个模块代理。 假设你不想使用，也可以将其设置为“off” ，这将会禁止Go在后续操作中使用任何Go模块代理。也就是go env -w GOPROXY=off。 direct 是什么? 是一个特殊指示符，用于指示Go回源到模块版本的源地址去抓取（比如GitHub等）。 当值列表中上一个Go模块代理返回404或410错误时，Go自动尝试列表中的下一个。 遇见“direct”时回源，也就是回到源地址去抓取，而遇见EOF时终止并抛出类似“invalid version: unknown revision...”的错误。 模块代理URL列表，以逗号 (,) 或竖线 (|) 分隔： 当go命令查找某个模块的信息时，它会依次联系列表中的每个代理，直到收到成功响应或终端错误为止。 代理可能会以404（未找到）或410（已消失）状态响应，以指示该模块在该服务器上不可用。 go命令的错误回退行为由URL之间的分隔符决定： ,：go命令会在404或410错误后回退到下一个URL，所有其他错误都被视为终端错误。 |：go命令在出现任何错误（包括超时等非HTTP错误）后回退到下一个源。 GOPROXY的URL可能具有https、http或file方案，如果URL没有方案，则假定为https。 模块缓存可以直接用作文件代理：go env -w GOPROXY=file://$(go env GOMODCACHE)/cache/download。 可以使用两个关键字代替代理URL： off：禁止从任何来源下载模块。 direct：直接从版本控制存储库下载，而不是使用模块代理。 $ go env -w GOPROXY=https://goproxy.cn,direct GOSUMDB 用于在拉取模块版本时（无论是从源站拉取还是通过Go module proxy拉取）保证拉取到的模块版本数据未经过篡改。若发现不一致，也就是可能存在篡改，将会立即中止。 GOSUMDB的默认值为：sum.golang.org，在国内也是无法访问的，但是GOSUMDB可以被Go模块代理所代理。 因此我们可以通过设置GOPROXY来解决，而先前我们所设置的模块代理goproxy.cn就能支持代理sum.golang.org。 所以这一个问题在设置GOPROXY后，你可以不需要过度关心。 另外若对GOSUMDB的值有自定义需求，其支持如下格式： 格式 1：+。 格式 2：+ 。 也可以将其设置为“off”，也就是禁止Go在后续操作中校验模块版本，也就是go env -w GOSUMDB=off。 如果GOSUMDB设置为off或者使用go get设置-insecure标志则不会查询校验和数据库，并接受所有无法识别的模块。 代价是放弃对所有模块进行已验证的可重复下载的安全保证。 绕过特定模块的校验和数据库的更好方法是使用GOPRIVATE或GONOSUMDB环境变量。 相关参考文档：https://goproxy.io/zh/docs/GOSUMDB-env.html。 GOPRIVATE 用于当前项目依赖了私有模块，如你公司的私有git仓库，又或是github中的私有库，都是属于私有模块，都是要进行设置的，否则会拉取失败。 就是依赖了由GOPROXY指定的Go模块代理或由GOSUMDB指定Go checksum database都无法访问到的模块时的场景。 以英文逗号“,”分割的模块路径前缀，也就是可以设置多个，例如： go env -w GOPRIVATE=\"git.example.com,github.com/helium/bms\"。 设置后，前缀为git.xxx.com和github.com/helium/bms的模块都会被认为是私有模块。 如果不想每次都重新设置，我们也可以利用通配符，例如： go env -w GOPRIVATE=\"*.example.com\"。 这样子设置的话，所有模块路径为example.com的子域名(例如：git.example.com)都将不经过Go module proxy和Go checksum database。 需要注意的是不包括example.com本身。 相关参考文档：https://goproxy.io/zh/docs/GOPRIVATE-env.html。 GONOPROXY 用于指定不使用模块代理（如proxy.golang.org）下载模块的模块路径前缀列表。 模块代理是Go 1.13及以上版本推出的功能，用于缓存公共模块，以加快模块下载速度和提高模块下载的可靠性。 该变量包含一个由逗号分隔的模块路径前缀列表。 如果你有一个私有模块存储在 git.example.com，并希望Go命令直接从该仓库下载模块而不是通过模块代理，你可以设置GONOPROXY=git.example.com。 GONOSUMDB 用于指定不检查其校验和的模块路径前缀列表。 Go modules使用校验和数据库（如sum.golang.org）来确保下载的模块版本没有被篡改。 与GONOPROXY类似，该变量也包含一个由逗号分隔的模块路径前缀列表。 假设你有私有模块并且不希望Go命令尝试验证这些模块的校验和，你可以设置GONOSUMDB=git.example.com。 GOVCS 控制go命令可以用来下载公共和私有模块，（由它们的路径是否与GOPRIVATE中的模式匹配）或其他与glob模式匹配的模块的版本控制工具集。 如果未设置GOVCS，或者模块与GOVCS中的任何模式都不匹配，则go命令可能对公共模块使用git和hg，或对私有模块使用任何已知的版本控制工具。 具体来说，go命令就像GOVCS被设置为（默认模式）：public:git|hg,private:all。 ",
+  "wordCount" : "132",
+  "inLanguage": "zh",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2020-04-05T00:00:00Z",
+  "dateModified": "2020-04-05T00:00:00Z",
+  "author":[{
+    "@type": "Person",
+    "name": "helium"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://heliu.site/posts/golang/package/env/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Helium",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://heliu.site/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+                    height="35">Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://heliu.site/" title="主页">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/posts" title="文章">
+                    <span>Article</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/archives" title="时间轴">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/tags/" title="标签">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/support" title="打赏">
+                    <span>🫶Help</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+
+<article class="post" autonumbering>
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">golang 合集</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/package/">第4章 包管理</a></div>
+    <h1 class="post-title entry-hint-parent">
+      模块相关环境变量
+    </h1>
+    <div class="post-description">
+      💥本文章所有相关go代码参考自go 1.18&#43;版本
+    </div>
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2020-04-05</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2020-04-05</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select: text;">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="user-select: text;"></path>
+    <polyline points="14 2 14 8 20 8" style="user-select: text;"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
+    <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
+    <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
+</svg><span>132字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="9"></circle>
+    <polyline points="12 7 12 12 15 15"></polyline>
+</svg><span>1分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+</svg><span>helium</span></span>
+      <span class="x-post-meta-item">
+        &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
+        <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
+            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/" target="_blank" rel="noopener">包管理</a>
+        </ul>
+      </span>
+      
+      <span id="busuanzi_container_page_pv" class="x-post-meta-item">
+        &nbsp;<svg t="1720844685710" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="27237" width="200" height="200"><path d="M739.754667 574.08c-121.386667 45.610667-208.469333 169.813333-208.64 316.16 0 33.408 4.693333 65.493333 13.141333 95.914667H94.122667c-26.453333-43.52-41.685333-91.946667-41.685334-143.189334 0-185.173333 192.896-335.104 430.805334-335.104 96.256 0 184.832 24.746667 256.512 66.218667z m-280.490667-114.986667a214.869333 214.869333 0 0 1-214.869333-215.04A215.04 215.04 0 0 1 459.264 28.842667a215.04 215.04 0 0 1 215.04 215.210666 215.04 215.04 0 0 1-215.04 215.04zM974.506667 641.28c9.856 0 17.834667 7.466667 17.834666 16.64v59.989333c-0.341333 8.789333-7.850667 15.786667-17.28 16.085334-9.856 0.341333-18.176-6.826667-18.517333-16.085334v-20.053333l-99.114667 91.093333-0.256 0.256a18.474667 18.474667 0 0 1-14.848 4.352h-0.768a18.176 18.176 0 0 1-9.344-4.608l-0.938666-0.981333-85.930667-80.042667-123.562667 115.072a18.773333 18.773333 0 0 1-25.216 0 15.786667 15.786667 0 0 1 0-23.466666l136.149334-126.848 0.725333-0.597334a18.645333 18.645333 0 0 1 24.362667 0.512l87.253333 81.237334 86.058667-79.232h-21.248c-9.386667-0.298667-16.938667-7.338667-17.28-16.085334-0.341333-9.173333 7.381333-16.896 17.28-17.237333h64.64z m-367.146667 240h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v72.192a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042667-16.042666v-72.192c0-8.874667 7.210667-16.042667 16.042667-16.042667z m110.805333-106.666667h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v178.858667a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042666v-178.858667c0-8.874667 7.168-16.042667 16.042666-16.042667z m106.538667 80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v99.413333a16.042667 16.042667 0 0 1-16.042667 16.042667H824.746667a16.042667 16.042667 0 0 1-16.042667-16.042667v-99.413333c0-8.874667 7.168-16.042667 16.042667-16.042667z m110.165333-80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v179.413333a16.042667 16.042667 0 0 1-16.042667 16.042667h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042667v-179.413333c0-8.874667 7.210667-16.042667 16.042666-16.042667z" fill="#999999" p-id="27238"></path></svg>
+        <span id="busuanzi_value_page_pv"></span>
+      </span>
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#go111module" aria-label="GO111MODULE"><code>GO111MODULE</code></a></li>
+                    <li>
+                        <a href="#goproxy" aria-label="GOPROXY"><code>GOPROXY</code></a></li>
+                    <li>
+                        <a href="#gosumdb" aria-label="GOSUMDB"><code>GOSUMDB</code></a></li>
+                    <li>
+                        <a href="#goprivate" aria-label="GOPRIVATE"><code>GOPRIVATE</code></a></li>
+                    <li>
+                        <a href="#gonoproxy" aria-label="GONOPROXY"><code>GONOPROXY</code></a></li>
+                    <li>
+                        <a href="#gonosumdb" aria-label="GONOSUMDB"><code>GONOSUMDB</code></a></li>
+                    <li>
+                        <a href="#govcs" aria-label="GOVCS"><code>GOVCS</code></a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+  <div class="post-content"><h2 id="go111module"><code>GO111MODULE</code><a hidden class="anchor" aria-hidden="true" href="#go111module">#</a></h2>
+<ol>
+<li><code>Go</code>语言提供了<code>GO111MODULE</code>这个环境变量来作为<code>Go modules</code>的开关，其允许设置以下参数：
+<ul>
+<li><strong><code>auto</code></strong>：只要项目包含了<code>go.mod</code>文件(在<code>$GOPATH/src</code>外面且根目录有<code>go.mod</code>文件时)的话启用<code>Go modules</code>。</li>
+<li><strong><code>on</code></strong>：启用<code>Go modules</code>，推荐设置，会忽略<code>GOPATH</code>和<code>vendor</code>文件夹，只根据<code>go.mod</code>下载依赖。</li>
+<li><strong><code>off</code></strong>：禁用<code>Go modules</code>，不推荐设置，会从<code>GOPATH</code>和<code>vendor</code>文件夹寻找包。</li>
+</ul>
+</li>
+<li><code>GO111MODULE</code>相关解释：
+<ul>
+<li><code>GO111MODULE</code>这个命名代表着<code>Go</code>语言在<code>1.11</code>版本添加的，针对<code>Module</code>的变量。</li>
+<li>像是在<code>Go1.5</code>版本的时候，也发布了一个系统环境变量<code>GO15VENDOREXPERIMENT</code>。</li>
+<li>作用是用于开启<code>vendor</code>目录的支持，当时其默认值也不是开启，仅仅作为<code>experimental</code>。</li>
+<li>其随后在<code>Go1.6</code>版本时也将默认值改为了开启，并且最后作为了<code>official</code>，<code>GO15VENDOREXPERIMENT</code>系统变量就退出了历史舞台。</li>
+<li>而未来<code>GO111MODULE</code>这一个系统环境变量也会面临这个问题，不去除是为了兼容老版本。</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ go env -w <span class="nv">GO111MODULE</span><span class="o">=</span>auto
+</span></span></code></pre></div><h2 id="goproxy"><code>GOPROXY</code><a hidden class="anchor" aria-hidden="true" href="#goproxy">#</a></h2>
+<ol>
+<li>这个环境变量主要是用于设置<code>Go</code>模块代理，直接通过镜像站点来快速拉取。</li>
+<li><code>GOPROXY</code>的默认值是：<code>https://proxy.golang.org,direct</code>，这有一个很严重的问题，就是<a href="https://proxy.golang.org" target="_blank" rel="noopener">https://proxy.golang.org</a>在国内是无法访问的。
+<ul>
+<li>在该配置下，<code>go</code>命令首先去<code>Google</code>运行的<code>Go</code>模块镜像，如果镜像没有模块，则回退到直接连接。</li>
+<li>可以设置<code>GOPRIVATE</code>和<code>GONOPROXY</code>环境变量以防止使用代理下载特定模块。</li>
+</ul>
+</li>
+<li>中国大陆推荐使用 <strong><code>go env -w GOPROXY=https://goproxy.cn,direct</code></strong>。
+<ul>
+<li>其他源地址列表：<a href="https://goproxy.cn" target="_blank" rel="noopener">https://goproxy.cn</a>、<a href="https://goproxy.io" target="_blank" rel="noopener">https://goproxy.io</a>、<a href="https://goproxy.baidu.com/" target="_blank" rel="noopener">https://goproxy.baidu.com/</a>。</li>
+<li><code>GOPROXY</code>的值是一个以英文逗号(<code>,</code>)或竖线(<code>|</code>)分割的<code>Go</code>模块代理列表，允许设置多个模块代理。</li>
+<li>假设你不想使用，也可以将其设置为<code>“off”</code> ，这将会禁止<code>Go</code>在后续操作中使用任何<code>Go</code>模块代理。也就是<code>go env -w GOPROXY=off</code>。</li>
+<li><strong>direct</strong> 是什么?
+<ul>
+<li>是一个特殊指示符，用于指示<code>Go</code>回源到模块版本的源地址去抓取（比如<code>GitHub</code>等）。</li>
+<li>当值列表中上一个<code>Go</code>模块代理返回<code>404</code>或<code>410</code>错误时，<code>Go</code>自动尝试列表中的下一个。</li>
+<li>遇见<code>“direct”</code>时回源，也就是回到源地址去抓取，而遇见<code>EOF</code>时终止并抛出类似<code>“invalid version: unknown revision...”</code>的错误。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>模块代理<code>URL</code>列表，以逗号 (<code>,</code>) 或竖线 (<code>|</code>) 分隔：
+<ul>
+<li>当<code>go</code>命令查找某个模块的信息时，它会依次联系列表中的每个代理，直到收到成功响应或终端错误为止。</li>
+<li>代理可能会以<code>404</code>（未找到）或<code>410</code>（已消失）状态响应，以指示该模块在该服务器上不可用。</li>
+</ul>
+</li>
+<li><code>go</code>命令的错误回退行为由<code>URL</code>之间的分隔符决定：
+<ul>
+<li><strong><code>,</code></strong>：<code>go</code>命令会在<code>404</code>或<code>410</code>错误后回退到下一个<code>URL</code>，所有其他错误都被视为终端错误。</li>
+<li><strong><code>|</code></strong>：<code>go</code>命令在出现任何错误（包括超时等非<code>HTTP</code>错误）后回退到下一个源。</li>
+</ul>
+</li>
+<li><code>GOPROXY</code>的<code>URL</code>可能具有<code>https</code>、<code>http</code>或<code>file</code>方案，如果<code>URL</code>没有方案，则假定为<code>https</code>。</li>
+<li>模块缓存可以直接用作文件代理：<code>go env -w GOPROXY=file://$(go env GOMODCACHE)/cache/download</code>。</li>
+<li>可以使用两个关键字代替代理<code>URL</code>：
+<ul>
+<li><code>off</code>：禁止从任何来源下载模块。</li>
+<li><code>direct</code>：直接从版本控制存储库下载，而不是使用模块代理。</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ go env -w <span class="nv">GOPROXY</span><span class="o">=</span>https://goproxy.cn,direct
+</span></span></code></pre></div><h2 id="gosumdb"><code>GOSUMDB</code><a hidden class="anchor" aria-hidden="true" href="#gosumdb">#</a></h2>
+<ol>
+<li>用于在拉取模块版本时（无论是从源站拉取还是通过<code>Go module proxy</code>拉取）保证拉取到的模块版本数据未经过篡改。若发现不一致，也就是可能存在篡改，将会立即中止。</li>
+<li><code>GOSUMDB</code>的默认值为：<code>sum.golang.org</code>，在国内也是无法访问的，但是<code>GOSUMDB</code>可以被<code>Go</code>模块代理所代理。
+<ul>
+<li>因此我们可以通过设置<code>GOPROXY</code>来解决，而先前我们所设置的模块代理<code>goproxy.cn</code>就能支持代理<code>sum.golang.org</code>。</li>
+<li>所以这一个问题在设置<code>GOPROXY</code>后，你可以不需要过度关心。</li>
+</ul>
+</li>
+<li>另外若对<code>GOSUMDB</code>的值有自定义需求，其支持如下格式：
+<ul>
+<li>格式 1：<code>&lt;SUMDB_NAME&gt;+&lt;PUBLIC_KEY&gt;</code>。</li>
+<li>格式 2：<code>&lt;SUMDB_NAME&gt;+&lt;PUBLIC_KEY&gt; &lt;SUMDB_URL&gt;</code>。</li>
+</ul>
+</li>
+<li>也可以将其设置为<code>“off”</code>，也就是禁止<code>Go</code>在后续操作中校验模块版本，也就是<code>go env -w GOSUMDB=off</code>。</li>
+<li>如果<code>GOSUMDB</code>设置为<code>off</code>或者使用<code>go get</code>设置<code>-insecure</code>标志则不会查询校验和数据库，并接受所有无法识别的模块。
+<ul>
+<li>代价是放弃对所有模块进行已验证的可重复下载的安全保证。</li>
+<li>绕过特定模块的校验和数据库的更好方法是使用<code>GOPRIVATE</code>或<code>GONOSUMDB</code>环境变量。</li>
+</ul>
+</li>
+<li>相关参考文档：<a href="https://goproxy.io/zh/docs/GOSUMDB-env.html" target="_blank" rel="noopener">https://goproxy.io/zh/docs/GOSUMDB-env.html</a>。</li>
+</ol>
+<h2 id="goprivate"><code>GOPRIVATE</code><a hidden class="anchor" aria-hidden="true" href="#goprivate">#</a></h2>
+<ol>
+<li>用于当前项目依赖了私有模块，如你公司的私有<code>git</code>仓库，又或是<code>github</code>中的私有库，都是属于私有模块，都是要进行设置的，否则会拉取失败。
+<ul>
+<li>就是依赖了由<code>GOPROXY</code>指定的<code>Go</code>模块代理或由<code>GOSUMDB</code>指定<code>Go checksum database</code>都无法访问到的模块时的场景。</li>
+</ul>
+</li>
+<li>以英文逗号<code>“,”</code>分割的模块路径前缀，也就是可以设置多个，例如：
+<ul>
+<li><code>go env -w GOPRIVATE=&quot;git.example.com,github.com/helium/bms&quot;</code>。</li>
+<li>设置后，前缀为<code>git.xxx.com</code>和<code>github.com/helium/bms</code>的模块都会被认为是私有模块。</li>
+</ul>
+</li>
+<li>如果不想每次都重新设置，我们也可以利用通配符，例如：
+<ul>
+<li><code>go env -w GOPRIVATE=&quot;*.example.com&quot;</code>。</li>
+<li>这样子设置的话，所有模块路径为<code>example.com</code>的子域名(例如：<code>git.example.com</code>)都将不经过<code>Go module proxy</code>和<code>Go checksum database</code>。</li>
+<li>需要注意的是不包括<code>example.com</code>本身。</li>
+</ul>
+</li>
+<li>相关参考文档：<a href="https://goproxy.io/zh/docs/GOPRIVATE-env.html" target="_blank" rel="noopener">https://goproxy.io/zh/docs/GOPRIVATE-env.html</a>。</li>
+</ol>
+<h2 id="gonoproxy"><code>GONOPROXY</code><a hidden class="anchor" aria-hidden="true" href="#gonoproxy">#</a></h2>
+<ol>
+<li>用于指定不使用模块代理（如proxy.golang.org）下载模块的模块路径前缀列表。
+<ul>
+<li>模块代理是Go 1.13及以上版本推出的功能，用于缓存公共模块，以加快模块下载速度和提高模块下载的可靠性。</li>
+</ul>
+</li>
+<li>该变量包含一个由逗号分隔的模块路径前缀列表。</li>
+<li>如果你有一个私有模块存储在 git.example.com，并希望Go命令直接从该仓库下载模块而不是通过模块代理，你可以设置<code>GONOPROXY=git.example.com</code>。</li>
+</ol>
+<h2 id="gonosumdb"><code>GONOSUMDB</code><a hidden class="anchor" aria-hidden="true" href="#gonosumdb">#</a></h2>
+<ol>
+<li>用于指定不检查其校验和的模块路径前缀列表。
+<ul>
+<li>Go modules使用校验和数据库（如sum.golang.org）来确保下载的模块版本没有被篡改。</li>
+</ul>
+</li>
+<li>与<code>GONOPROXY</code>类似，该变量也包含一个由逗号分隔的模块路径前缀列表。</li>
+<li>假设你有私有模块并且不希望Go命令尝试验证这些模块的校验和，你可以设置<code>GONOSUMDB=git.example.com</code>。</li>
+</ol>
+<h2 id="govcs"><code>GOVCS</code><a hidden class="anchor" aria-hidden="true" href="#govcs">#</a></h2>
+<ol>
+<li>控制<code>go</code>命令可以用来下载公共和私有模块，（由它们的路径是否与<code>GOPRIVATE</code>中的模式匹配）或其他与<code>glob</code>模式匹配的模块的版本控制工具集。</li>
+<li>如果未设置<code>GOVCS</code>，或者模块与<code>GOVCS</code>中的任何模式都不匹配，则<code>go</code>命令可能对公共模块使用<code>git</code>和<code>hg</code>，或对私有模块使用任何已知的版本控制工具。</li>
+<li>具体来说，<code>go</code>命令就像<code>GOVCS</code>被设置为（默认模式）：<code>public:git|hg,private:all</code>。</li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
+      <li><a href="https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/">包管理</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://heliu.site/posts/golang/package/work/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>go work</span>
+  </a>
+  <a class="next" href="https://heliu.site/posts/golang/package/go-work/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>go.work 文件</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    
+    <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv">
+        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    </span>
+    <span id="busuanzi_container_site_uv">
+        本站访客数<span id="busuanzi_value_site_uv"></span>人次
+    </span>
+    </div>
+        <span>Copyright © 2020-2024 <a href="#">heliu's blog</a>. All rights reserved</span>  
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'Copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'Done';
+            setTimeout(() => {
+                copybutton.innerHTML = 'Copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

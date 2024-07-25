@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>开发和发布模块 | Helium</title>
+<meta name="keywords" content="golang, 包管理">
+<meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
+<meta name="author" content="helium">
+<link rel="canonical" href="https://heliu.site/posts/golang/package/publish-mod/">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://heliu.site/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/package/publish-mod/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono-nl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.6.0/style.css" />
+    <style>
+        body {
+            font-family: "LXGW WenKai Lite", sans-serif;
+            font-family: "LXGW WenKai Screen", sans-serif;
+        }
+    </style>
+</head>
+</html>
+
+  
+
+<meta property="og:title" content="开发和发布模块" />
+<meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://heliu.site/posts/golang/package/publish-mod/" />
+<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2020-06-28T00:00:00+00:00" />
+<meta property="article:modified_time" content="2023-07-25T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:title" content="开发和发布模块"/>
+<meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Article",
+      "item": "https://heliu.site/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "golang 合集",
+      "item": "https://heliu.site/posts/golang/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "第4章 包管理",
+      "item": "https://heliu.site/posts/golang/package/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  4 ,
+      "name": "开发和发布模块",
+      "item": "https://heliu.site/posts/golang/package/publish-mod/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "开发和发布模块",
+  "name": "开发和发布模块",
+  "description": "💥本文章所有相关go代码参考自go 1.18+版本",
+  "keywords": [
+    "golang", "包管理"
+  ],
+  "articleBody": " 您可以将相关包收集到模块中，然后发布模块供其他开发人员使用。本主题概述了开发和发布模块。 为了支持开发、发布和使用模块，您可以使用： 您开发和发布模块的工作流程，随着时间的推移使用新版本对其进行修改。请参阅【开发和发布模块的工作流程】。 帮助模块用户理解并以稳定方式升级到新版本的设计实践。请参【阅设计和开发】。 用于发布模块和检索其代码的去中心化系统。您使您的模块可供其他开发人员从您自己的存储库中使用并使用版本号发布。请参阅 去中心化出版。 一个包搜索引擎和文档浏览器(pkg.go.dev)，开发人员可以在其中找到您的模块。请参阅包发现。 一种模块版本编号约定，用于向使用您的模块的开发人员传达对稳定性和向后兼容性的期望。请参阅 版本控制。 Go 工具使其他开发人员更容易管理依赖项，包括获取模块的源代码、升级等。请参阅管理依赖项。 也可以看看： 如果您只是对使用其他人开发的软件包感兴趣，那么这不是您的主题。相反，请参阅管理依赖项。 有关包含一些模块开发基础知识的教程，请参阅教程：创建 Go 模块。 开发和发布模块的工作流程 当您想为其他人发布您的模块时，您可以采用一些约定来简化这些模块的使用。 模块发布和版本控制工作流程中更详细地描述了以下高级步骤。 设计和编码模块将包含的包。 使用约定将代码提交到您的存储库，以确保其他人可以通过 Go 工具使用它。 发布模块以使其可被开发人员发现。 随着时间的推移，使用使用版本编号约定的版本来修改模块，以表明每个版本的稳定性和向后兼容性。 设计和开发 如果模块中的功能和包形成一个连贯的整体，您的模块将更容易被开发人员找到和使用。当你设计一个模块的公共 API 时，尽量保持它的功能集中和离散。 此外，在设计和开发模块时考虑到向后兼容性可以帮助其用户升级，同时最大限度地减少他们自己的代码的流失。您可以在代码中使用某些技术来避免发布破坏向后兼容性的版本。有关这些技术的更多信息，请参阅Go博客上的保持模块兼容。 在发布模块之前，您可以使用replace指令在本地文件系统上引用它。这使得在模块仍在开发时编写调用模块中的函数的客户端代码变得更加容易。有关详细信息，请参阅模块发布和版本控制工作流程中的“针对未发布的模块进行编码” 。 去中心化出版 在Go中，您通过在存储库中标记其代码来发布您的模块，以使其可供其他开发人员使用。 您不需要将模块推送到集中式服务，因为Go工具可以直接从您的存储库（使用模块的路径定位，这是一个省略了该方案的URL）或从代理服务器下载您的模块。 在他们的代码中导入你的包后，开发人员使用Go工具（包括go get命令）下载你的模块代码以进行编译。为了支持此模型，您遵循约定和最佳实践，使Go工具（代表其他开发人员）可以从存储库中检索模块的源代码。 例如，Go工具使用你指定的模块的模块路径，以及你用来标记模块以发布的模块版本号，为它的用户定位和下载模块。 有关源和发布约定以及最佳实践的更多信息，请参阅管理模块源。 有关发布模块的分步说明，请参阅发布模块。 包发现 在您发布了您的模块并且有人使用Go工具获取了它之后，它将在Go包发现站点pkg.go.dev上可见。在那里，开发人员可以搜索该站点以找到它并阅读其文档。 要开始使用该模块，开发人员从该模块导入包，然后运行go get命令下载其源代码以进行编译。 有关开发人员如何查找和使用模块的更多信息，请参阅管理依赖项。 版本控制 当您随着时间的推移修改和改进您的模块时，您会分配版本号（基于语义版本控制模型），旨在表明每个版本的稳定性和向后兼容性。这有助于使用您的模块的开发人员确定模块何时稳定以及升级是否可能包括行为的重大变化。您可以通过在存储库中标记模块的源代码来指示模块的版本号。 有关开发主要版本更新的更多信息，请参阅开发主要版本更新。 有关如何为Go模块使用语义版本控制模型的更多信息，请参阅模块版本编号。 模块发布和版本控制工作流程 当您开发供其他开发人员使用的模块时，您可以遵循有助于确保使用该模块的开发人员获得可靠、一致的体验的工作流程。 本主题描述了该工作流中的高级步骤。 有关模块开发的概述，请参阅开发和发布模块。 也可以看看 如果您只想在代码中使用外部包，请务必查看管理依赖项。 对于每个新版本，您都用其版本号表示对模块的更改。有关更多信息，请参阅模块版本编号。 常见的工作流程步骤 以下序列说明了示例新模块的发布和版本控制工作流程步骤。有关每个步骤的更多信息，请参阅本主题中的部分。\n开始一个模块并组织它的源代码，使开发人员更容易使用和维护。如果您是开发模块的新手，请查看教程：创建Go模块。在 Go 的去中心化模块发布系统中，如何组织代码很重要。有关更多信息，请参阅管理模块源。 设置为编写调用未发布模块中的函数的本地客户端代码。在发布模块之前，对于使用诸如go get。 在此阶段测试模块代码的一个好方法是在它位于调用代码的本地目录中时尝试它。有关本地开发的更多信息，请参阅针对未发布的模块进行编码。 当模块的代码准备好供其他开发人员试用时，开始发布v0预发布版本，例如alpha和beta。有关更多信息，请参阅发布预发布版本。 发布一个不保证稳定**的v0，但用户可以尝试。**有关更多信息，请参阅发布第一个（不稳定）版本。 在您的 v0 版本发布后，您可以（并且应该！）继续 发布它的新版本。这些新版本可能包括错误修复（补丁版本）、对模块公共 API 的添加（次要版本），甚至是重大更改。由于v0版本不保证稳定性或向后兼容性，因此您可以对其版本进行重大更改。有关更多信息，请参阅发布错误修复和发布非破坏性API更改。 当您准备好发布的稳定版本时，您可以将预发布版本发布为alphas和betas。有关更多信息，请参阅发布预发布版本。 发布 v1 作为第一个稳定版本。这是对模块稳定性做出承诺的第一个版本。有关更多信息，请参阅发布第一个稳定版本。 在 v1 版本中，继续修复错误，并在必要时对模块的公共 API 进行添加。有关更多信息，请参阅发布错误修复和发布非破坏性 API 更改。 如果无法避免，请在新的主要版本中发布重大更改。主要版本更新——例如从 v1.xx 到 v2.xx——对于模块的用户来说可能是一个非常具有破坏性的升级。这应该是最后的手段。有关更多信息，请参阅发布重大 API 更改。 ",
+  "wordCount" : "89",
+  "inLanguage": "zh",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2020-06-28T00:00:00Z",
+  "dateModified": "2023-07-25T00:00:00Z",
+  "author":[{
+    "@type": "Person",
+    "name": "helium"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://heliu.site/posts/golang/package/publish-mod/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Helium",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://heliu.site/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+                    height="35">Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://heliu.site/" title="主页">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/posts" title="文章">
+                    <span>Article</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/archives" title="时间轴">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/tags/" title="标签">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/support" title="打赏">
+                    <span>🫶Help</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+
+<article class="post" autonumbering>
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">golang 合集</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/package/">第4章 包管理</a></div>
+    <h1 class="post-title entry-hint-parent">
+      开发和发布模块
+    </h1>
+    <div class="post-description">
+      💥本文章所有相关go代码参考自go 1.18&#43;版本
+    </div>
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2020-06-28</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2023-07-25</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select: text;">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="user-select: text;"></path>
+    <polyline points="14 2 14 8 20 8" style="user-select: text;"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
+    <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
+    <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
+</svg><span>89字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="9"></circle>
+    <polyline points="12 7 12 12 15 15"></polyline>
+</svg><span>1分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+</svg><span>helium</span></span>
+      <span class="x-post-meta-item">
+        &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
+        <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
+            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/" target="_blank" rel="noopener">包管理</a>
+        </ul>
+      </span>
+      
+      <span id="busuanzi_container_page_pv" class="x-post-meta-item">
+        &nbsp;<svg t="1720844685710" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="27237" width="200" height="200"><path d="M739.754667 574.08c-121.386667 45.610667-208.469333 169.813333-208.64 316.16 0 33.408 4.693333 65.493333 13.141333 95.914667H94.122667c-26.453333-43.52-41.685333-91.946667-41.685334-143.189334 0-185.173333 192.896-335.104 430.805334-335.104 96.256 0 184.832 24.746667 256.512 66.218667z m-280.490667-114.986667a214.869333 214.869333 0 0 1-214.869333-215.04A215.04 215.04 0 0 1 459.264 28.842667a215.04 215.04 0 0 1 215.04 215.210666 215.04 215.04 0 0 1-215.04 215.04zM974.506667 641.28c9.856 0 17.834667 7.466667 17.834666 16.64v59.989333c-0.341333 8.789333-7.850667 15.786667-17.28 16.085334-9.856 0.341333-18.176-6.826667-18.517333-16.085334v-20.053333l-99.114667 91.093333-0.256 0.256a18.474667 18.474667 0 0 1-14.848 4.352h-0.768a18.176 18.176 0 0 1-9.344-4.608l-0.938666-0.981333-85.930667-80.042667-123.562667 115.072a18.773333 18.773333 0 0 1-25.216 0 15.786667 15.786667 0 0 1 0-23.466666l136.149334-126.848 0.725333-0.597334a18.645333 18.645333 0 0 1 24.362667 0.512l87.253333 81.237334 86.058667-79.232h-21.248c-9.386667-0.298667-16.938667-7.338667-17.28-16.085334-0.341333-9.173333 7.381333-16.896 17.28-17.237333h64.64z m-367.146667 240h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v72.192a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042667-16.042666v-72.192c0-8.874667 7.210667-16.042667 16.042667-16.042667z m110.805333-106.666667h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v178.858667a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042666v-178.858667c0-8.874667 7.168-16.042667 16.042666-16.042667z m106.538667 80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v99.413333a16.042667 16.042667 0 0 1-16.042667 16.042667H824.746667a16.042667 16.042667 0 0 1-16.042667-16.042667v-99.413333c0-8.874667 7.168-16.042667 16.042667-16.042667z m110.165333-80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v179.413333a16.042667 16.042667 0 0 1-16.042667 16.042667h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042667v-179.413333c0-8.874667 7.210667-16.042667 16.042666-16.042667z" fill="#999999" p-id="27238"></path></svg>
+        <span id="busuanzi_value_page_pv"></span>
+      </span>&nbsp;|&nbsp;<a href="https://golang.google.cn/doc/modules/developing" rel="noopener noreferrer" target="_blank">Golang官方文档</a>
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#%e5%bc%80%e5%8f%91%e5%92%8c%e5%8f%91%e5%b8%83%e6%a8%a1%e5%9d%97%e7%9a%84%e5%b7%a5%e4%bd%9c%e6%b5%81%e7%a8%8b" aria-label="开发和发布模块的工作流程">开发和发布模块的工作流程</a></li>
+                    <li>
+                        <a href="#%e8%ae%be%e8%ae%a1%e5%92%8c%e5%bc%80%e5%8f%91" aria-label="设计和开发">设计和开发</a></li>
+                    <li>
+                        <a href="#%e5%8e%bb%e4%b8%ad%e5%bf%83%e5%8c%96%e5%87%ba%e7%89%88" aria-label="去中心化出版">去中心化出版</a></li>
+                    <li>
+                        <a href="#%e5%8c%85%e5%8f%91%e7%8e%b0" aria-label="包发现">包发现</a></li>
+                    <li>
+                        <a href="#%e7%89%88%e6%9c%ac%e6%8e%a7%e5%88%b6" aria-label="版本控制">版本控制</a></li>
+                    <li>
+                        <a href="#%e6%a8%a1%e5%9d%97%e5%8f%91%e5%b8%83%e5%92%8c%e7%89%88%e6%9c%ac%e6%8e%a7%e5%88%b6%e5%b7%a5%e4%bd%9c%e6%b5%81%e7%a8%8b" aria-label="模块发布和版本控制工作流程">模块发布和版本控制工作流程</a><ul>
+                            
+                    <li>
+                        <a href="#%e5%b8%b8%e8%a7%81%e7%9a%84%e5%b7%a5%e4%bd%9c%e6%b5%81%e7%a8%8b%e6%ad%a5%e9%aa%a4" aria-label="常见的工作流程步骤">常见的工作流程步骤</a>
+                    </li>
+                </ul>
+                </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+  <div class="post-content"><ol>
+<li>您可以将相关包收集到模块中，然后发布模块供其他开发人员使用。本主题概述了开发和发布模块。</li>
+<li>为了支持开发、发布和使用模块，您可以使用：
+<ol>
+<li>您开发和发布模块的<strong>工作流程</strong>，随着时间的推移使用新版本对其进行修改。请参阅【开发和发布模块的工作流程】。</li>
+<li>帮助模块用户理解并以稳定方式升级到新版本的设计实践。请参【阅设计和开发】。</li>
+<li><strong>用于发布</strong>模块和检索其代码的去中心化系统。您使您的模块可供其他开发人员从您自己的存储库中使用并使用版本号发布。请参阅 去中心化出版。</li>
+<li>一个<strong>包搜索引擎</strong>和文档浏览器(<code>pkg.go.dev</code>)，开发人员可以在其中找到您的模块。请参阅包发现。</li>
+<li>一种模块<strong>版本编号约定</strong>，用于向使用您的模块的开发人员传达对稳定性和向后兼容性的期望。请参阅 版本控制。</li>
+<li><strong>Go 工具</strong>使其他开发人员更容易管理依赖项，包括获取模块的源代码、升级等。请参阅<a href="https://go.dev/doc/modules/managing-dependencies" target="_blank" rel="noopener">管理依赖项</a>。</li>
+</ol>
+</li>
+<li>也可以看看：
+<ol>
+<li>如果您只是对使用其他人开发的软件包感兴趣，那么这不是您的主题。相反，请参阅<a href="https://go.dev/doc/modules/managing-dependencies" target="_blank" rel="noopener">管理依赖项</a>。</li>
+<li>有关包含一些模块开发基础知识的教程，请参阅<a href="https://go.dev/doc/tutorial/create-module" target="_blank" rel="noopener">教程：创建 Go 模块</a>。</li>
+</ol>
+</li>
+</ol>
+<h2 id="开发和发布模块的工作流程">开发和发布模块的工作流程<a hidden class="anchor" aria-hidden="true" href="#开发和发布模块的工作流程">#</a></h2>
+<ol>
+<li>当您想为其他人发布您的模块时，您可以采用一些约定来简化这些模块的使用。</li>
+<li><a href="https://go.dev/doc/modules/release-workflow" target="_blank" rel="noopener">模块发布和版本控制工作流程</a>中更详细地描述了以下高级步骤。
+<ol>
+<li>设计和编码模块将包含的包。</li>
+<li>使用约定将代码提交到您的存储库，以确保其他人可以通过 Go 工具使用它。</li>
+<li>发布模块以使其可被开发人员发现。</li>
+<li>随着时间的推移，使用使用版本编号约定的版本来修改模块，以表明每个版本的稳定性和向后兼容性。</li>
+</ol>
+</li>
+</ol>
+<h2 id="设计和开发">设计和开发<a hidden class="anchor" aria-hidden="true" href="#设计和开发">#</a></h2>
+<ol>
+<li>如果模块中的功能和包形成一个连贯的整体，您的模块将更容易被开发人员找到和使用。当你设计一个模块的公共 API 时，尽量保持它的功能集中和离散。</li>
+<li>此外，在设计和开发模块时考虑到向后兼容性可以帮助其用户升级，同时最大限度地减少他们自己的代码的流失。您可以在代码中使用某些技术来避免发布破坏向后兼容性的版本。有关这些技术的更多信息，请参阅Go博客上的<a href="https://blog.golang.org/module-compatibility" target="_blank" rel="noopener">保持模块兼容</a>。</li>
+<li>在发布模块之前，您可以使用replace指令在本地文件系统上引用它。这使得在模块仍在开发时编写调用模块中的函数的客户端代码变得更加容易。有关详细信息，请参阅模块发布和版本控制工作流程中的“针对未发布的模块进行编码” 。</li>
+</ol>
+<h2 id="去中心化出版">去中心化出版<a hidden class="anchor" aria-hidden="true" href="#去中心化出版">#</a></h2>
+<ol>
+<li>在Go中，您通过在存储库中标记其代码来发布您的模块，以使其可供其他开发人员使用。 您不需要将模块推送到集中式服务，因为Go工具可以直接从您的存储库（使用模块的路径定位，这是一个省略了该方案的URL）或从代理服务器下载您的模块。</li>
+<li>在他们的代码中导入你的包后，开发人员使用Go工具（包括go get命令）下载你的模块代码以进行编译。为了支持此模型，您遵循约定和最佳实践，使Go工具（代表其他开发人员）可以从存储库中检索模块的源代码。 例如，Go工具使用你指定的模块的模块路径，以及你用来标记模块以发布的模块版本号，为它的用户定位和下载模块。</li>
+<li>有关源和发布约定以及最佳实践的更多信息，请参阅<a href="https://go.dev/doc/modules/managing-source" target="_blank" rel="noopener">管理模块源</a>。</li>
+<li>有关发布模块的分步说明，请参阅<a href="https://go.dev/doc/modules/publishing" target="_blank" rel="noopener">发布模块</a>。</li>
+</ol>
+<h2 id="包发现">包发现<a hidden class="anchor" aria-hidden="true" href="#包发现">#</a></h2>
+<ol>
+<li>在您发布了您的模块并且有人使用Go工具获取了它之后，它将在Go包发现站点<a href="https://pkg.go.dev/" target="_blank" rel="noopener">pkg.go.dev</a>上可见。在那里，开发人员可以搜索该站点以找到它并阅读其文档。</li>
+<li>要开始使用该模块，开发人员从该模块导入包，然后运行<code>go get</code>命令下载其源代码以进行编译。</li>
+<li>有关开发人员如何查找和使用模块的更多信息，请参阅<a href="https://go.dev/doc/modules/managing-dependencies" target="_blank" rel="noopener">管理依赖项</a>。</li>
+</ol>
+<h2 id="版本控制">版本控制<a hidden class="anchor" aria-hidden="true" href="#版本控制">#</a></h2>
+<ol>
+<li>当您随着时间的推移修改和改进您的模块时，您会分配版本号（基于语义版本控制模型），旨在表明每个版本的稳定性和向后兼容性。这有助于使用您的模块的开发人员确定模块何时稳定以及升级是否可能包括行为的重大变化。您可以通过在存储库中标记模块的源代码来指示模块的版本号。</li>
+<li>有关开发主要版本更新的更多信息，请参阅<a href="https://go.dev/doc/modules/major-version" target="_blank" rel="noopener">开发主要版本更新</a>。</li>
+<li>有关如何为Go模块使用语义版本控制模型的更多信息，请参阅<a href="https://go.dev/doc/modules/version-numbers" target="_blank" rel="noopener">模块版本编号</a>。</li>
+</ol>
+<h2 id="模块发布和版本控制工作流程">模块发布和版本控制工作流程<a hidden class="anchor" aria-hidden="true" href="#模块发布和版本控制工作流程">#</a></h2>
+<ol>
+<li>当您开发供其他开发人员使用的模块时，您可以遵循有助于确保使用该模块的开发人员获得可靠、一致的体验的工作流程。 本主题描述了该工作流中的高级步骤。</li>
+<li>有关模块开发的概述，请参阅开发和发布模块。</li>
+<li><strong>也可以看看</strong>
+<ul>
+<li>如果您只想在代码中使用外部包，请务必查看<a href="https://go.dev/doc/modules/managing-dependencies" target="_blank" rel="noopener">管理依赖项</a>。</li>
+<li>对于每个新版本，您都用其版本号表示对模块的更改。有关更多信息，请参阅<a href="https://go.dev/doc/modules/version-numbers" target="_blank" rel="noopener">模块版本编号</a>。</li>
+</ul>
+</li>
+</ol>
+<h3 id="常见的工作流程步骤">常见的工作流程步骤<a hidden class="anchor" aria-hidden="true" href="#常见的工作流程步骤">#</a></h3>
+<p>以下序列说明了示例新模块的发布和版本控制工作流程步骤。有关每个步骤的更多信息，请参阅本主题中的部分。</p>
+<ol>
+<li><strong>开始一个模块</strong>并组织它的源代码，使开发人员更容易使用和维护。如果您是开发模块的新手，请查看<a href="https://go.dev/doc/tutorial/create-module" target="_blank" rel="noopener">教程：创建Go模块</a>。在 Go 的去中心化模块发布系统中，如何组织代码很重要。有关更多信息，请参阅<a href="https://go.dev/doc/modules/managing-source" target="_blank" rel="noopener">管理模块源</a>。</li>
+<li>设置为<strong>编写</strong>调用未发布模块中的函数的本地客户端代码。在发布模块之前，对于使用诸如<code>go get</code>。 在此阶段测试模块代码的一个好方法是在它位于调用代码的本地目录中时尝试它。有关本地开发的更多信息，请参阅<a href="https://go.dev/doc/modules/release-workflow#unpublished" target="_blank" rel="noopener">针对未发布的模块进行编码</a>。</li>
+<li>当模块的代码准备好供其他开发人员试用时，<strong>开始发布v0预发布版本</strong>，例如alpha和beta。有关更多信息，请参阅<a href="https://go.dev/doc/modules/release-workflow#pre-release" target="_blank" rel="noopener">发布预发布版本</a>。</li>
+<li>发布一个不保证稳定**的v0，但用户可以尝试。**有关更多信息，请参阅<a href="https://go.dev/doc/modules/release-workflow#first-unstable" target="_blank" rel="noopener">发布第一个（不稳定）版本</a>。</li>
+<li>在您的 v0 版本发布后，您可以（并且应该！）继续 <strong>发布它的新版本</strong>。这些新版本可能包括错误修复（补丁版本）、对模块公共 API 的添加（次要版本），甚至是重大更改。由于v0版本不保证稳定性或向后兼容性，因此您可以对其版本进行重大更改。有关更多信息，请参阅<a href="https://go.dev/doc/modules/release-workflow#bug-fixes" target="_blank" rel="noopener">发布错误修复</a>和<a href="https://go.dev/doc/modules/release-workflow#non-breaking" target="_blank" rel="noopener">发布非破坏性API更改</a>。</li>
+<li>当您准备好发布的稳定版本时，您可以<strong>将预发布版本发布为alphas和betas</strong>。有关更多信息，请参阅<a href="https://go.dev/doc/modules/release-workflow#pre-release" target="_blank" rel="noopener">发布预发布版本</a>。</li>
+<li>发布 v1 作为第<strong>一个稳定版本</strong>。这是对模块稳定性做出承诺的第一个版本。有关更多信息，请参阅<a href="https://go.dev/doc/modules/release-workflow#first-stable" target="_blank" rel="noopener">发布第一个稳定版本</a>。</li>
+<li>在 v1 版本中，<strong>继续修复错误</strong>，并在必要时对模块的公共 API 进行添加。有关更多信息，请参阅<a href="https://go.dev/doc/modules/release-workflow#bug-fixes" target="_blank" rel="noopener">发布错误修复</a>和<a href="https://go.dev/doc/modules/release-workflow#non-breaking" target="_blank" rel="noopener">发布非破坏性 API 更改</a>。</li>
+<li>如果无法避免，请在<strong>新的主要版本</strong>中发布重大更改。主要版本更新——例如从 v1.xx 到 v2.xx——对于模块的用户来说可能是一个非常具有破坏性的升级。这应该是最后的手段。有关更多信息，请参阅<a href="https://go.dev/doc/modules/release-workflow#breaking" target="_blank" rel="noopener">发布重大 API 更改</a>。</li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
+      <li><a href="https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/">包管理</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://heliu.site/posts/golang/package/use-mod/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>创建模块</span>
+  </a>
+  <a class="next" href="https://heliu.site/posts/golang/slice/theory/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>Slice(原理)</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    
+    <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv">
+        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    </span>
+    <span id="busuanzi_container_site_uv">
+        本站访客数<span id="busuanzi_value_site_uv"></span>人次
+    </span>
+    </div>
+        <span>Copyright © 2020-2024 <a href="#">heliu's blog</a>. All rights reserved</span>  
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'Copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'Done';
+            setTimeout(() => {
+                copybutton.innerHTML = 'Copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

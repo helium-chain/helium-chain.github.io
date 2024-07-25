@@ -12,6 +12,7 @@
     <lastmod>2020-08-20T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://heliu.site/posts/golang/package/</loc>
+    <lastmod>2023-07-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://heliu.site/posts/golang/type/</loc>
     <lastmod>2020-02-22T00:00:00+00:00</lastmod>
@@ -116,6 +117,33 @@
     <loc>https://heliu.site/posts/golang/process/select/</loc>
     <lastmod>2020-08-20T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://heliu.site/posts/golang/package/bag/</loc>
+    <lastmod>2020-02-23T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/golang/package/module/</loc>
+    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/golang/package/work/</loc>
+    <lastmod>2020-03-23T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/golang/package/env/</loc>
+    <lastmod>2020-04-05T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/golang/package/go-work/</loc>
+    <lastmod>2020-04-23T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/golang/package/go-mod/</loc>
+    <lastmod>2020-05-08T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/golang/package/use-work/</loc>
+    <lastmod>2023-07-25T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/golang/package/use-mod/</loc>
+    <lastmod>2023-07-25T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/golang/package/publish-mod/</loc>
+    <lastmod>2023-07-25T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://heliu.site/posts/golang/slice/theory/</loc>
     <lastmod>2024-07-21T17:58:15+08:00</lastmod>
   </url><url>
@@ -166,6 +194,9 @@
   </url><url>
     <loc>https://heliu.site/tags/waitgroup/</loc>
     <lastmod>2023-07-13T22:00:10+08:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/</loc>
+    <lastmod>2023-07-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://heliu.site/support/</loc>
     <lastmod>2023-02-14T00:40:08+08:00</lastmod>

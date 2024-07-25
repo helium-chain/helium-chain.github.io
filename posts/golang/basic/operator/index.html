@@ -132,7 +132,7 @@
     "golang", "基础类型"
   ],
   "articleBody": "基本运算符 算数运算符 适用于数值类型，运算结果类型与除数类型一致。（除数是浮点数结果为浮点数，除数为整数结果为整数） 求余（%）运算结果符号与除数符号一致（除数是负数结果符号为负数）。 运算符 描述 适用范围 示例 + 加法运算符或字符串拼接符 适用于整数、浮点数、复数、字符串 5 + 3 = 8 - 减法运算符 适用于整数、浮点数、复数 5 - 3 = 2 * 乘法运算符 适用于整数、浮点数、复数 5 * 3 = 15 / 除法运算符 适用于整数、浮点数、复数 5 / 2 = 2 % 求余运算 适用于整数（有符号、无符号） -5 % 2 = -1，-5 % -2 = -1，5 % 2 = 1 ++ 自增 适用于整数（有符号、无符号） a++ -- 自减 适用于整数（有符号、无符号） a-- 变量 变量 商 取余 x y x/y x%y 5 3 1 2 -5 3 -1 -2 5 -3 -1 2 -5 -3 1 -2 关系运算符 双目运算符作比较，结果为布尔值。 运算符 含义 示例（A 小于 B） == 等于 A == B false != 不等于 A != B true \u003e 大于 A \u003e B false \u003c 小于 A \u003c B true \u003e= 大于等于 A \u003e= B false \u003c= 小于等于 A \u003c= B true 逻辑运算符 双目运算符，处理左右布尔值。 运算符 描述 示例 \u0026\u0026 逻辑与运算符（左右两边都为true返回true，否则返回false） (true \u0026\u0026 false) == false || 逻辑或运算符（左右两边都为false返回false，否则返回true） (false || false) == false ! 逻辑非运算符（一位运算符true取反为false，false取反为true） !true == false 位运算符 操作二进制数。 运算符 含义 \u0026 按为与，双目运算符。参与运算的两数各对应的位相与（同1得1） | 按为或，双目运算符。参与运算的两数各对应的位相或（有1得1） ^ 按为异或，双目运算符。参与运算的两数各对应的位异或（相同得0）或 ^作为一元运算符是按位取反 « 左移运算符，双目运算符。把左边的运算数的各位全部左移若干位，高位丢弃，低位补0 » 右移运算符，双目运算符。把右边的运算数的各位全部左移若干位 变量1 变量2 与运算 或运算 异或运算 p q p\u0026q p|q p^q 0 0 0 0 0 0 1 0 1 1 1 1 1 1 0 1 0 0 1 1 变量1 变量2 左移运算 右移运算 p q p\u003c",
-  "wordCount" : "532",
+  "wordCount" : "528",
   "inLanguage": "zh",
   "image": "https://heliu.site/favicon-32x32.png","datePublished": "2019-02-19T00:00:00Z",
   "dateModified": "2022-07-19T00:00:00Z",
@@ -261,7 +261,7 @@
     <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
     <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
     <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
-</svg><span>532字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>528字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="12" r="9"></circle>
@@ -773,10 +773,6 @@
 <th style="text-align:center">运算符</th>
 <th style="text-align:center">运算符</th>
 <th style="text-align:center">运算符</th>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">运算符</th>
-<th style="text-align:center">运算符</th>
 </tr>
 </thead>
 <tbody>
@@ -786,10 +782,6 @@
 <td style="text-align:center">+=</td>
 <td style="text-align:center">&amp;=</td>
 <td style="text-align:center">&amp;&amp;</td>
-<td style="text-align:center">==</td>
-<td style="text-align:center">!=</td>
-<td style="text-align:center">(</td>
-<td style="text-align:center">)</td>
 </tr>
 <tr>
 <td style="text-align:center">-</td>
@@ -797,10 +789,6 @@
 <td style="text-align:center">-=</td>
 <td style="text-align:center">|=</td>
 <td style="text-align:center">||</td>
-<td style="text-align:center">&lt;</td>
-<td style="text-align:center">&lt;=</td>
-<td style="text-align:center">[</td>
-<td style="text-align:center">]</td>
 </tr>
 <tr>
 <td style="text-align:center">*</td>
@@ -808,10 +796,6 @@
 <td style="text-align:center">*=</td>
 <td style="text-align:center">^=</td>
 <td style="text-align:center">&lt;-</td>
-<td style="text-align:center">&gt;</td>
-<td style="text-align:center">&gt;=</td>
-<td style="text-align:center">{</td>
-<td style="text-align:center">}</td>
 </tr>
 <tr>
 <td style="text-align:center">/</td>
@@ -819,10 +803,6 @@
 <td style="text-align:center">/=</td>
 <td style="text-align:center">&laquo;=</td>
 <td style="text-align:center">++</td>
-<td style="text-align:center">=</td>
-<td style="text-align:center">:=</td>
-<td style="text-align:center">,</td>
-<td style="text-align:center">;</td>
 </tr>
 <tr>
 <td style="text-align:center">%</td>
@@ -830,18 +810,38 @@
 <td style="text-align:center">||</td>
 <td style="text-align:center">&raquo;=</td>
 <td style="text-align:center">&ndash;</td>
+</tr>
+<tr>
+<td style="text-align:center">==</td>
+<td style="text-align:center">&lt;</td>
+<td style="text-align:center">&gt;</td>
+<td style="text-align:center">=</td>
 <td style="text-align:center">!</td>
+</tr>
+<tr>
+<td style="text-align:center">!=</td>
+<td style="text-align:center">&lt;=</td>
+<td style="text-align:center">&gt;=</td>
+<td style="text-align:center">:=</td>
 <td style="text-align:center">&hellip;</td>
+</tr>
+<tr>
+<td style="text-align:center">(</td>
+<td style="text-align:center">[</td>
+<td style="text-align:center">{</td>
+<td style="text-align:center">,</td>
 <td style="text-align:center">.</td>
+</tr>
+<tr>
+<td style="text-align:center">)</td>
+<td style="text-align:center">]</td>
+<td style="text-align:center">}</td>
+<td style="text-align:center">;</td>
 <td style="text-align:center">:</td>
 </tr>
 <tr>
 <td style="text-align:center">&amp;^</td>
 <td style="text-align:center">&amp;^=</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
 <td style="text-align:center"></td>
 <td style="text-align:center"></td>
 <td style="text-align:center"></td>

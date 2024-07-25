@@ -130,8 +130,8 @@
   "keywords": [
     "golang", "环境安装"
   ],
-  "articleBody": "Golang 软件安装 首先需要下载Go语言安装包。 下载地址：https://golang.org/dl/。（中国大陆可能访问不到） 国内下载地址：https://golang.google.cn/dl/。 官方安装教程：https://golang.google.cn/doc/install。 官方的教程很详细（https://golang.google.cn/doc）。 Linux UNIX/Linux/Mac OS和FreeBSD系统可以使用如下源码安装方法。 Mac系统下可以使用以.pkg为扩展名的安装包直接双击来完成安装，安装目录在/usr/local/go/下。 Linux下安装golang步骤 下载安装包wget https://golang.google.cn/dl/go1.17.3.linux-amd64.tar.gz。 32-bit Linux下载安装包https://golang.google.cn/dl/go1.17.3.linux-386.tar.gz。 64-bit Linux下载安装包https://golang.google.cn/dl/go1.17.3.linux-amd64.tar.gz。 删除老版本（如果存在则执行，不存在则忽略）rm -rf /usr/local/go。 解压安装包sudo tar -xzf go1.17.3.linux-amd64.tar.gz -C /usr/local。 配置环境变量：使用go env -w命令一般只是本次生效。 PATH环境变量export PATH=$PATH:/usr/local/go/binGoLang工具位置，包含gofmt工具。 GOROOT变量export GOROOT=/usr/local/goGoLang安装包位置。 使用go env -w GOROOT=/usr/local/go配置也是可以的。 GOPATH变量export GOPATH=/var/local/goGoLang 1.11版本前项目管理包位置。 使用go env -w GOPATH=/var/local/go配置也是可以的。 打印Go版本号go version。 如果上面(第4步)环境变量配置不成功，那么执行如下步骤配置： sudo vim ~/.bashrc命令打开文件。 在文件最后添加： 1 2 3 4 5 6 7 export GOROOT=/usr/local/go export GOPATH=/var/local/go export PATH=$PATH:$GOROOT/bin:$GOPATH/bin export GOPROXY=\"https://goproxy.cn,direct\" # 在linux中设置临时目录，windows不用 export TMPDIR=/tmp 最后使配置生效 source ~/.bashrc。 Windows 下载 https://golang.google.cn/dl/go1.17.3.windows-amd64.zip，直接解压到安装目录。 如D:\\Go，然后把D:\\Go\\bin目录添加到PATH环境变量中。 设置GOPATH和GOROOT环境变量： GOPATH=D:\\goproject。 GOROOT=D:\\GO\\。 也可以选择https://golang.google.cn/dl/go1.17.3.windows-amd64.msi，双击运行程序，根据提示来操作安装。 GOROOT、GOPATH GOROOT Go软件的安装包绝对路径，默认是/usr/local/go。 GOPATH $GOPATH允许有多个目录，当有多个目录时，请注意分隔符，Windows中的分隔符是分号(;)。 当有多个目录时默认将go get命令获取的包存放在第一个目录下，当在GOPATH模式下运行时是这样处理的。 $GOPATH目录下约定有三个子目录： src目录：存放源代码（如.go，.c，.h，.s等文件）。 按照Go默认约定，src目录是go run，go install等命令的当前工作路径（即在此路径下执行上述命令）。 src也是用户代码存放的主要目录，所有的源代码都存放在这个目录下面，一般一个项目和一个目录对应。 当在GOPATH模式下运行时是这样处理的，但是Go官方在Go 1.11版本后不再推荐使用GOPATH模式编写Go代码，因此src目录无用处。 pkg目录：存放编译时生成的中间文件（比如：.a）。 bin目录：存放编译后生成的可执行文件，比如后面安装的delve插件或多版本go软件就是在这个目录里。 管理Go安装 安装多个Go版本 在同一台机器上安装多个Go版本。例如，我们可能希望在多个Go版本上测试代码。 注意：需要使用这种形式安装需要先安装git。 多版本go安装步骤 要安装其他Go版本，运行go install命令，指定要安装的版本的下载位置。如下示例安装版本1.10.7： go install golang.org/dl/go1.10.7@latest这里使用go install编译并安装指定的包来实现多版本go安裝，生成后的可执行文件在bin目录下（$GOPATH/bin）。 go1.10.7 download下载，需要切换到$GOPATH/bin下去执行，生成的安装路径在/root/sdk/go1.10.7。 1 2 $ go install golang.org/dl/go1.10.7@latest # 安装并编译go1.10.7版本 $ go1.10.7 download 要使用新下载的版本运行命令，如下所示： 1 2 $ go1.10.7 version go version go1.10.7 linux/amd64 当你安装了多个版本时，可以使用如下命令查看每个版本的安装位置： 1 $ go1.10.7 env GOROOT 要卸载下载的版本时，只需要删除其由GOROOT环境变量和go.X.Y.Z二进制文件指定的安装目录即可。 卸载Go 使用如下所描述的步骤从系统中删除Go。 Linux / macOS / FreeBSD 删除go目录：通常是/usr/local/go目录。 从PATH环境变量中删除Go bin目录。 在Linux和FreeBSD下，编辑/etc/profile或$HOME/.profile。 如果您使用macOS软件包安装了Go，请删除/etc/paths.d/go文件。 Windows 删除Go的最简单方法是通过Windows控制面板中的 Add/Remove 程序： 在控制面板中，双击Add/Remove程序。 在Add/Remove程序中，选择要卸载的软件，单击卸载，然后按照提示进行操作。 要使用工具删除Go，您还可以使用命令行： 通过运行以下命令使用命令行卸载：msiexec /x go{{version}}.windows-{{cpu-arch}}.msi /q 注意：对 Windows 使用此卸载过程将自动删除由原始安装创建的 Windows 环境变量。 ",
-  "wordCount" : "168",
+  "articleBody": "Golang 软件安装 首先需要下载Go语言安装包。 下载地址：https://golang.org/dl/。（中国大陆可能访问不到） 国内下载地址：https://golang.google.cn/dl/。 官方安装教程：https://golang.google.cn/doc/install。 官方的教程很详细（https://golang.google.cn/doc）。 Linux UNIX / Linux / Mac OS和FreeBSD系统可以使用如下源码安装方法。 Mac系统下可以使用以.pkg为扩展名的安装包直接双击来完成安装，安装目录在/usr/local/go/下。 Linux下安装golang步骤 下载安装包wget https://golang.google.cn/dl/go1.17.3.linux-amd64.tar.gz。 32-bit Linux下载安装包 https://golang.google.cn/dl/go1.17.3.linux-386.tar.gz。 64-bit Linux下载安装包 https://golang.google.cn/dl/go1.17.3.linux-amd64.tar.gz。 删除老版本（如果存在则执行，不存在则忽略）rm -rf /usr/local/go。 解压安装包sudo tar -xzf go1.17.3.linux-amd64.tar.gz -C /usr/local。 配置环境变量：使用go env -w命令一般只是本次生效。 PATH环境变量export PATH=$PATH:/usr/local/go/binGoLang工具位置，包含gofmt工具。 GOROOT变量export GOROOT=/usr/local/goGoLang安装包位置。 使用go env -w GOROOT=/usr/local/go配置也是可以的。 GOPATH变量export GOPATH=/var/local/goGoLang 1.11版本前项目管理包位置。 使用go env -w GOPATH=/var/local/go配置也是可以的。 打印Go版本号go version。 如果上面(第4步)环境变量配置不成功，那么执行如下步骤配置： sudo vim ~/.bashrc命令打开文件。 在文件最后添加： 1 2 3 4 5 6 7 export GOROOT=/usr/local/go export GOPATH=/var/local/go export PATH=$PATH:$GOROOT/bin:$GOPATH/bin export GOPROXY=\"https://goproxy.cn,direct\" # 在linux中设置临时目录，windows不用 export TMPDIR=/tmp 最后使配置生效 source ~/.bashrc。 Windows 下载 https://golang.google.cn/dl/go1.17.3.windows-amd64.zip，直接解压到安装目录。 如D:\\Go，然后把D:\\Go\\bin目录添加到PATH环境变量中。 设置GOPATH和GOROOT环境变量： GOPATH=D:\\goproject。 GOROOT=D:\\GO\\。 也可以选择 https://golang.google.cn/dl/go1.17.3.windows-amd64.msi，双击运行程序，根据提示来操作安装。 GOROOT、GOPATH GOROOT Go软件的安装包绝对路径，默认是/usr/local/go。 GOPATH $GOPATH允许有多个目录，当有多个目录时，请注意分隔符，Windows中的分隔符是分号(;)。 当有多个目录时默认将go get命令获取的包存放在第一个目录下，当在GOPATH模式下运行时是这样处理的。 $GOPATH目录下约定有三个子目录： src目录：存放源代码（如.go，.c，.h，.s等文件）。 按照Go默认约定，src目录是go run，go install等命令的当前工作路径（即在此路径下执行上述命令）。 src也是用户代码存放的主要目录，所有的源代码都存放在这个目录下面，一般一个项目和一个目录对应。 当在GOPATH模式下运行时是这样处理的，但是Go官方在Go 1.11版本后不再推荐使用GOPATH模式编写Go代码，因此src目录无用处。 pkg目录：存放编译时生成的中间文件（比如：.a）。 bin目录：存放编译后生成的可执行文件，比如后面安装的delve插件或多版本go软件就是在这个目录里。 管理Go安装 安装多个Go版本 在同一台机器上安装多个Go版本。例如，我们可能希望在多个Go版本上测试代码。 注意：需要使用这种形式安装需要先安装git。 多版本go安装步骤 要安装其他Go版本，运行go install命令，指定要安装的版本的下载位置。如下示例安装版本1.10.7： go install golang.org/dl/go1.10.7@latest这里使用go install编译并安装指定的包来实现多版本go安裝，生成后的可执行文件在bin目录下（$GOPATH/bin）。 go1.10.7 download下载，需要切换到$GOPATH/bin下去执行，生成的安装路径在/root/sdk/go1.10.7。 1 2 $ go install golang.org/dl/go1.10.7@latest # 安装并编译go1.10.7版本 $ go1.10.7 download 要使用新下载的版本运行命令，如下所示： 1 2 $ go1.10.7 version go version go1.10.7 linux/amd64 当你安装了多个版本时，可以使用如下命令查看每个版本的安装位置： 1 $ go1.10.7 env GOROOT 要卸载下载的版本时，只需要删除其由GOROOT环境变量和go.X.Y.Z二进制文件指定的安装目录即可。 卸载Go 使用如下所描述的步骤从系统中删除Go。 Linux / macOS / FreeBSD 删除go目录：通常是/usr/local/go目录。 从PATH环境变量中删除Go bin目录。 在Linux和FreeBSD下，编辑/etc/profile或$HOME/.profile。 如果您使用macOS软件包安装了Go，请删除/etc/paths.d/go文件。 Windows 删除Go的最简单方法是通过Windows控制面板中的 Add/Remove 程序： 在控制面板中，双击Add/Remove程序。 在Add/Remove程序中，选择要卸载的软件，单击卸载，然后按照提示进行操作。 要使用工具删除Go，您还可以使用命令行： 通过运行以下命令使用命令行卸载：msiexec /x go{{version}}.windows-{{cpu-arch}}.msi /q 注意：对 Windows 使用此卸载过程将自动删除由原始安装创建的 Windows 环境变量。 ",
+  "wordCount" : "175",
   "inLanguage": "zh",
   "image":"https://heliu.site/posts/golang/install/images/install-cover.png","datePublished": "2019-01-14T00:00:00Z",
   "dateModified": "2022-03-22T00:00:00Z",
@@ -257,7 +257,7 @@
     <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
     <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
     <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
-</svg><span>168字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>175字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="12" r="9"></circle>
@@ -387,19 +387,19 @@
 <ol>
 <li>首先需要下载Go语言安装包。
 <ul>
-<li>下载地址：<code>https://golang.org/dl/</code>。（中国大陆可能访问不到）</li>
-<li>国内下载地址：<code>https://golang.google.cn/dl/</code>。</li>
+<li>下载地址：<a href="https://golang.org/dl/" target="_blank" rel="noopener">https://golang.org/dl/</a>。（中国大陆可能访问不到）</li>
+<li>国内下载地址：<a href="https://golang.google.cn/dl/" target="_blank" rel="noopener">https://golang.google.cn/dl/</a>。</li>
 </ul>
 </li>
-<li>官方安装教程：<code>https://golang.google.cn/doc/install</code>。
+<li>官方安装教程：<a href="https://golang.google.cn/doc/install" target="_blank" rel="noopener">https://golang.google.cn/doc/install</a>。
 <ul>
-<li>官方的教程很详细（<code>https://golang.google.cn/doc</code>）。</li>
+<li>官方的教程很详细（<a href="https://golang.google.cn/doc" target="_blank" rel="noopener">https://golang.google.cn/doc</a>）。</li>
 </ul>
 </li>
 </ol>
 <h3 id="linux">Linux<a hidden class="anchor" aria-hidden="true" href="#linux">#</a></h3>
 <ol>
-<li>UNIX/Linux/Mac OS和FreeBSD系统可以使用如下源码安装方法。</li>
+<li>UNIX / Linux / Mac OS和FreeBSD系统可以使用如下源码安装方法。</li>
 <li>Mac系统下可以使用以<code>.pkg</code>为扩展名的安装包直接双击来完成安装，安装目录在<code>/usr/local/go/</code>下。</li>
 </ol>
 
@@ -411,8 +411,8 @@
 <li>下载安装包<code>wget https://golang.google.cn/dl/go1.17.3.linux-amd64.tar.gz</code>。</li>
 </ol>
 <ul>
-<li><code>32-bit Linux</code>下载安装包<code>https://golang.google.cn/dl/go1.17.3.linux-386.tar.gz</code>。</li>
-<li><code>64-bit Linux</code>下载安装包<code>https://golang.google.cn/dl/go1.17.3.linux-amd64.tar.gz</code>。</li>
+<li><code>32-bit Linux</code>下载安装包 <a href="https://golang.google.cn/dl/go1.17.3.linux-386.tar.gz" target="_blank" rel="noopener">https://golang.google.cn/dl/go1.17.3.linux-386.tar.gz</a>。</li>
+<li><code>64-bit Linux</code>下载安装包 <a href="https://golang.google.cn/dl/go1.17.3.linux-amd64.tar.gz" target="_blank" rel="noopener">https://golang.google.cn/dl/go1.17.3.linux-amd64.tar.gz</a>。</li>
 </ul>
 <ol start="2">
 <li>删除老版本（如果存在则执行，不存在则忽略）<code>rm -rf /usr/local/go</code>。</li>
@@ -469,7 +469,7 @@
 
 <h3 id="windows">Windows<a hidden class="anchor" aria-hidden="true" href="#windows">#</a></h3>
 <ol>
-<li>下载 <code>https://golang.google.cn/dl/go1.17.3.windows-amd64.zip</code>，直接解压到安装目录。
+<li>下载 <a href="https://golang.google.cn/dl/go1.17.3.windows-amd64.zip" target="_blank" rel="noopener">https://golang.google.cn/dl/go1.17.3.windows-amd64.zip</a>，直接解压到安装目录。
 <ul>
 <li>如<code>D:\Go</code>，然后把<code>D:\Go\bin</code>目录添加到<code>PATH</code>环境变量中。</li>
 </ul>
@@ -480,7 +480,7 @@
 <li><code>GOROOT=D:\GO\</code>。</li>
 </ul>
 </li>
-<li>也可以选择<code>https://golang.google.cn/dl/go1.17.3.windows-amd64.msi</code>，双击运行程序，根据提示来操作安装。</li>
+<li>也可以选择 <a href="https://golang.google.cn/dl/go1.17.3.windows-amd64.msi" target="_blank" rel="noopener">https://golang.google.cn/dl/go1.17.3.windows-amd64.msi</a>，双击运行程序，根据提示来操作安装。</li>
 </ol>
 <h2 id="gorootgopath">GOROOT、GOPATH<a hidden class="anchor" aria-hidden="true" href="#gorootgopath">#</a></h2>
 <h3 id="goroot">GOROOT<a hidden class="anchor" aria-hidden="true" href="#goroot">#</a></h3>

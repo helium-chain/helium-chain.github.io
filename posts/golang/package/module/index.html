@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>go modules | Helium</title>
+<meta name="keywords" content="golang, 包管理">
+<meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
+<meta name="author" content="helium">
+<link rel="canonical" href="https://heliu.site/posts/golang/package/module/">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://heliu.site/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/package/module/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono-nl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.6.0/style.css" />
+    <style>
+        body {
+            font-family: "LXGW WenKai Lite", sans-serif;
+            font-family: "LXGW WenKai Screen", sans-serif;
+        }
+    </style>
+</head>
+</html>
+
+  
+
+<meta property="og:title" content="go modules" />
+<meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://heliu.site/posts/golang/package/module/" />
+<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2020-03-21T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-03-21T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:title" content="go modules"/>
+<meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Article",
+      "item": "https://heliu.site/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "golang 合集",
+      "item": "https://heliu.site/posts/golang/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "第4章 包管理",
+      "item": "https://heliu.site/posts/golang/package/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  4 ,
+      "name": "go modules",
+      "item": "https://heliu.site/posts/golang/package/module/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "go modules",
+  "name": "go modules",
+  "description": "💥本文章所有相关go代码参考自go 1.18+版本",
+  "keywords": [
+    "golang", "包管理"
+  ],
+  "articleBody": " 用法：go mod [arguments]。 command支持命令列表： 命令 go mod 作用 go mod init 生成 go.mod 文件 go mod download 下载 go.mod 文件中指明的所有依赖 go mod tidy 整理现有的依赖 go mod graph 查看现有的依赖结构 go mod edit 编辑 go.mod 文件 go mod vendor 导出项目所有的依赖到vendor目录 go mod verify 校验一个模块是否被篡改过 go mod why 查看为什么需要依赖某模块 go mod init 用法：go mod init [module-path]。 示例： # 初始化当前目录并创建一个go.mod文件，模块路径根据其他条件推断判断 $ go mod init # 初始化当前目录并创建一个go.mod文件，模块路径为example.com/m $ go mod init example.com/m 介绍： go mod init命令在当前目录中初始化并写入一个新的go.mod文件，实际上创建了一个以当前目录为根的新模块。 go.mod文件必须不存在时执行上面命令，否则会提示go.mod文件已存在提示。 如当前存在一个空项目demo，在demo目录下执行go mod init gitee.com/bms/demo，会生成如下go.mod文件，当前go版本是go1.16.3。 module gitee.com/bms/demo go 1.16 init接受一个可选参数，即新模块的模块路径，有关选择模块路径的说明，请参阅模块路径。 如果省略了模块路径参数，init将尝试使用.go文件、vendoring工具配置文件和当前目录（如果在GOPATH中）中的导入注释来推断模块路径。 如果存在vendoring工具的配置文件，init将尝试从中导入模块需求。 init支持以下配置文件： GLOCKFILE (Glock) Godeps/Godeps.json (Godeps) Gopkg.lock (dep) dependencies.tsv (godeps) glide.lock (glide) vendor.conf (trash) vendor.yml (govend) vendor/manifest (gvt) vendor/vendor.json (govendor) Vendoring工具配置文件无法始终以完美的保真度进行翻译。 例如，同一个仓库中的多个包在不同版本中导入，而仓库中只包含一个模块，那么导入的go.mod就只能需要一个版本的模块。 您可能希望运行go list -m all以检查构建列表中的所有版本，并运行go mod tidy以添加缺少的需求并删除未使用的需求。 go mod download 将命名的模块下载到模块缓存中（模块缓存参考官方模块参考文档）。 参数可以是模块路径或模块模式，选择主模块的依赖项或表单的版本查询path@version。 不带参数，download适用于主模块的所有依赖项。 该go命令将在正常执行期间根据需要自动下载模块。 go mod download命令主要用于预填充模块缓存或加载要由模块代理服务的数据。 默认情况下，download不向标准输出写入任何内容。它将进度消息和错误打印到标准错误。 用法：go mod download [-json] [-x] [modules] -json： -json：download将一系列JSON对象打印到标准输出，描述每个下载的模块（或失败） 对应如下结构： type Module struct { Path string // 模块路径 Version string // 模块版本 Error string // 错误模板描述 Info string // 缓存的 .info 文件的绝对路径 GoMod string // 缓存 .mod 文件的绝对路径 Zip string // 缓存的 .zip 文件的绝对路径 Dir string // 缓存源根目录的绝对路径 Sum string // checksum路径，版本（比如在go.sum） GoModSum string // go.mod的checksum（比如在go.sum） -x：download打印命令download执行到标准错误 示例： $ go mod download -json -x gitee.com/phpbms/demo { \"Path\": \"gitee.com/phpbms/demo\", \"Version\": \"v0.0.0-20211021090521-71a745ffbccb\", \"Info\": \"/mnt/g/Go/worker/pkg/mod/cache/download/gitee.com/phpbms/demo/@v/v0.0.0-20211021090521-71a745ffbccb.info\", \"GoMod\": \"/mnt/g/Go/worker/pkg/mod/cache/download/gitee.com/phpbms/demo/@v/v0.0.0-20211021090521-71a745ffbccb.mod\", \"Zip\": \"/mnt/g/Go/worker/pkg/mod/cache/download/gitee.com/phpbms/demo/@v/v0.0.0-20211021090521-71a745ffbccb.zip\", \"Dir\": \"/mnt/g/Go/worker/pkg/mod/gitee.com/phpbms/demo@v0.0.0-20211021090521-71a745ffbccb\", \"Sum\": \"h1:JJlXgKY8MUQtOlnSHtbIsHtRU9DNbxx9NUgpsDt3pQA=\", \"GoModSum\": \"h1:6H8vzSoXg8Ey2gdfFaP7ToLmbOnfc04IAcuTFDKqSV8=\" } go mod tidy go mod tidy确保go.mod文件与模块中的源代码匹配。 它添加了构建当前模块的包和依赖项所需的任何缺失的模块要求，并删除了对不提供任何相关包的模块的要求。 它还向go.sum添加任何缺失的条目并删除不必要的条目。 go mod tidy通过递归加载主模块中的所有包以及它们导入的所有包来工作，这包括测试导入的包（包括其他模块中的测试）。 go mod tidy就像启用了所有构建标记一样，因此它会考虑特定于平台的源文件和需要自定义构建标记的文件，即使这些源文件通常不会被构建。 有一个例外：忽略构建标记未启用，因此不会考虑具有构建约束【// +build ignore】的文件。 请注意，go mod tidy不会考虑主模块中名为testdata或名称以.或_除非这些包是由其他包显式导入的。 一旦go mod tidy加载了这组包，它会确保提供一个或多个包的每个模块在主模块的go.mod文件中都有一个require指令，或者如果主模块在go 1.16或更低版本 - 是必需的另一个必需的模块。 go mod tidy将添加对每个缺失模块的最新版本的要求（有关最新版本的定义，请参阅版本查询），go mod tidy将删除不提供上述集合中任何包的模块的require指令。 go mod tidy还可以添加或删除require 指令的// indirect，// indirect间接注释表示模块不提供由主模块中的包导入的包。 用法：go mod tidy [-e] [-v] [-go=version] [-compat=version]。 介绍： -e：(在Go 1.16中添加)在加载包时遇到错误时尝试继续。 -v：将有关已删除模块的信息打印到标准错误。 -go=：将go指令更新为指定的版本，根据该版本启用或禁用模块图修剪和延迟模块加载（并根据需要添加或删除// indirect间接注释）。 -compat=：当模块图由go指令中指示的版本之前的Go版本加载时，go mod tidy将检查所选版本的模块是否不会更改。还可以通过-compat标志显式指定版本检查的兼容性。 go mod graph 以文本形式打印模块需求图。 用法：go mod graph [-go=version]。 介绍： 模块图中的每个顶点代表一个模块的特定版本，图中的每条边代表对依赖项的最低版本的要求。 go mod graph打印图形的边缘，每行一个。 每行有两个空格分隔的字段：模块版本及其依赖项之一。 每个模块版本都标识为path@version形式的字符串。 主模块没有@version后缀，因为它没有版本。 -go=：go mod graph报告给定Go版本加载的模块图，而不是go.mod文件中的go指令指示的版本。 有关如何选择版本的更多信息，请参阅最小版本选择(MVS)。 另请参阅go list -m以打印选定的版本，并查看go mod why以了解为什么需要模块。 example.com/main example.com/a@v1.1.0 example.com/main example.com/b@v1.2.0 example.com/a@v1.1.0 example.com/b@v1.1.1 example.com/a@v1.1.0 example.com/c@v1.3.0 example.com/b@v1.1.0 example.com/c@v1.1.0 example.com/b@v1.2.0 example.com/c@v1.2.0 go mod edit 该命令提供了一个用于编辑和格式化go.mod文件的命令行界面，主要供工具和脚本使用。 go mod edit只读取一个go.mod文件，它不查找有关其他模块的信息。 默认情况下，go mod edit读取和写入go.mod主模块的文件，但可以在编辑标志后指定不同的目标文件。 用法：go mod edit [editing flags] [-fmt|-print|-json] [go.mod] editing flags：指定编辑操作选项：(editing flags可以重复使用，按给定的顺序) -module：更改模块的路径(go.mod文件的module行)，修改module行模块名称。 -go=version：设置go.mod文件的Go版本。 -require=path@version：添加指定的模块路径和版本上的要求，会覆盖go.mod上的任何现有要求path。 -droprequire=path：删除指定的模块路径和版本上的要求。 -exclude=path@version：增加给定的模块路径，-exclude=path@version如果该排除已存在， 则为空操作。 -dropexclude=path@version：放弃对给定的模块路径和版本的排除。 -replace=old[@v]=new[@v]：添加了给定模块路径和版本对的替换。 如果省略old@v则添加左侧没有版本的替换，这适用于旧模块路径的所有版本。 如果省略new@v则新路径应该是本地模块根目录，而不是模块路径。 注意：-replace覆盖的任何冗余替换old[@v]，因此省略@v将删除特定版本的替换。 -dropreplace=old[@v]：丢弃给定模块路径和版本对的替换。 如果@v提供了，则删除给定版本的替换,左侧没有版本的现有替代品仍可更换模块。 如果@v省略 ，则删除没有版本的替换。 -retract=version：添加回收对于给定的版本，其可以是一个单一的版本（如v1.2.3）或间隔（等[v1.1.0,v1.2.0]）。 注意：-retract标志不能为retract指令添加基本原理注释。 -dropretract=version：删除回收对于给定的版本。 -fmt、-print、-json：额外标志来控制输出。 -fmt：重新格式化go.mod文件而不进行其他更改。 使用或重写go.mod文件的任何其他修改也暗示了这种重新格式化。 唯一需要此标志的情况是没有指定其他标志，如go mod edit -fmt。 -print：go.mod以其文本格式打印final ，而不是将其写回磁盘（就是打印go.mod文件内容）。 -json：go.mod以 JSON 格式打印最终结果，而不是以文本格式将其写回磁盘go mod edit -json。 // json打印格式 { \"Module\": { \"Path\": \"mymod\" }, \"Go\": \"1.17\", \"Require\": [ { \"Path\": \"gitee.com/phpbms/demo\", \"Version\": \"v0.0.0-20211021090521-71a745ffbccb\", \"Indirect\": true } ], \"Exclude\": null, \"Replace\": null, \"Retract\": null } // 对应相关结构体 type Module struct { Path string Version string } type GoMod struct { Module Module Go string Require []Require Exclude []Module Replace []Replace } type Require struct { Path string Version string Indirect bool } type Replace struct { Old Module New Module } type Retract struct { Low string High string Rationale string } 示例： # 添加替换指令 $ go mod edit -replace example.com/a@v1.0.0=./a # 删除替换指令 $ go mod edit -dropreplace example.com/a@v1.0.0 # 设置go版本，添加需求，打印文件而不是写入磁盘 $ go mod edit -go=1.14 -require=example.com/m@v1.0.0 -print # 格式化 go.mod 文件 $ go mod edit -fmt # 格式化并打印不同的 .mod 文件 $ go mod edit -print tools.mod # 打印 go.mod 文件的 JSON 表示 $ go mod edit -json # 所有命令使用 $ go mod edit -module=mydemo1 -go=1.16 -require=gitee.com/phpbms/demo/v3@v3.0.0 -exclude=gitee.com/phpbms/demo/v3@v3.0.1 -replace=gitee.com/phpbms/demo/v2@v2.0.1=gitee.com/phpbms/demo/v2@v2.0.0 -retract=v1.1.1 -print ./go.mod # 修改go版本，从之前的 go 1.20 修改为 go 1.21rc2 $ go mod edit -go 1.21rc2 go mod vendor 在主模块的根目录中构造一个名为vendor的目录，该目录包含支持主模块中包的构建和测试所需的所有包的副本。 不包括仅通过主模块之外的包测试导入的包。 与go mod tidy和其他模块命令一样，在构建vendor目录时不考虑除了ignore之外的构建约束。 当启用vendoring时，go命令将从vendor目录加载包，而不是将模块从其源下载到模块缓存中，并使用那些下载副本的包。 go mod vendor还会创建文件vendor/modules.txt，其中包含vendor包的列表以及从中复制它们的模块版本。 当启用vendoring时，此清单用作模块版本信息的来源，如go list -m和go version -m所报告的。 当go命令读取vendor/modules.txt时，它会检查模块版本是否与go.mod一致。 如果go.mod在vendor/modules.txt生成后发生了变化，则应再次运行go mod vendor。 请注意，go mod vendor会在重新构建之前删除vendor目录（如果它存在）。 不应对vendor的软件包进行本地更改。 go命令不会检查vendor目录中的包是否未被修改，但是可以通过运行go mod vendor并检查没有进行任何更改来验证vendor目录的完整性。 使用：go mod vendor [-e] [-v]。 -e：（在Go 1.16中添加）在加载包时遇到错误时尝试继续。 -v：将vendor模块和包的名称打印为标准错误。 go mod verify 检查存储在模块缓存中的主模块的依赖项自下载以来没有被修改。 执行此检查，对每个下载的module.zip文件和提取的目录进行散列然后将这些散列与首次下载模块时记录的散列进行比较。 go mod verify 检查构建列表中的每个模块（可以使用go list -m all打印所有模块）。 如果所有模块都未修改，则go mod verify 打印all modules verified否则，它将报告哪些模块已更改并以非零状态退出。 注意：所有模块感知命令都会验证主模块的go.sum文件中的哈希值是否与为下载到模块缓存中的模块记录的哈希值匹配。 如果go.sum中缺少哈希（例如，因为模块是第一次使用），则go命令使用校验和数据库验证其哈希。 除非模块路径与GOPRIVATE或GONOSUMDB匹配。 go mod verify不会为不在缓存中的模块下载内容，也不会使用go.sum文件来验证模块内容。 但是，go mod verify可能会下载go.mod文件以执行最少的版本选择。 它将使用go.sum来验证这些文件，并且可能会为丢失的哈希添加go.sum条目。 用法：go mod verify。 $ go mod verify all modules verified go mod why go mod why在导入图中显示从主模块到每个列出的包的最短路径。 用法：go mod why [-m] [-vendor] packages...。 -m：go mod why将其参数视为模块列表。 go mod why会打印每个模块中任何包的路径。 请注意，即使使用-m，go mod why查询包图，而不是go mod graph打印的模块图。 -vendor：go mod why忽略主模块之外的包测试中的导入（就像go mod vendor所做的那样）。 默认情况下， go mod why会考虑与all模式匹配的包图。 这个标志在Go 1.16之后在声明go 1.16或更高版本的模块中无效（使用go.mod中的go指令），因为all的含义已更改以匹配go mod供应商匹配的包集。 示例： 输出是一个节序列，每个在命令行上命名的包或模块都有一个节，用空行分隔。 每节以注释行开头，以#开头，给出目标包或模块。 后续行给出了通过导入图的路径，每行一个包。 如果包或模块不是从主模块引用的，则该节将显示一个带括号的注释，表明该事实。 $ go mod why golang.org/x/text/language golang.org/x/text/encoding # golang.org/x/text/language rsc.io/quote rsc.io/sampler golang.org/x/text/language # golang.org/x/text/encoding (main module does not need package golang.org/x/text/encoding) ",
+  "wordCount" : "651",
+  "inLanguage": "zh",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2020-03-21T00:00:00Z",
+  "dateModified": "2020-03-21T00:00:00Z",
+  "author":[{
+    "@type": "Person",
+    "name": "helium"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://heliu.site/posts/golang/package/module/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Helium",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://heliu.site/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+                    height="35">Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://heliu.site/" title="主页">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/posts" title="文章">
+                    <span>Article</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/archives" title="时间轴">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/tags/" title="标签">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/support" title="打赏">
+                    <span>🫶Help</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+
+<article class="post" autonumbering>
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">golang 合集</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/package/">第4章 包管理</a></div>
+    <h1 class="post-title entry-hint-parent">
+      go modules
+    </h1>
+    <div class="post-description">
+      💥本文章所有相关go代码参考自go 1.18&#43;版本
+    </div>
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2020-03-21</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2020-03-21</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select: text;">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="user-select: text;"></path>
+    <polyline points="14 2 14 8 20 8" style="user-select: text;"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
+    <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
+    <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
+</svg><span>651字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="9"></circle>
+    <polyline points="12 7 12 12 15 15"></polyline>
+</svg><span>4分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+</svg><span>helium</span></span>
+      <span class="x-post-meta-item">
+        &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
+        <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
+            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/" target="_blank" rel="noopener">包管理</a>
+        </ul>
+      </span>
+      
+      <span id="busuanzi_container_page_pv" class="x-post-meta-item">
+        &nbsp;<svg t="1720844685710" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="27237" width="200" height="200"><path d="M739.754667 574.08c-121.386667 45.610667-208.469333 169.813333-208.64 316.16 0 33.408 4.693333 65.493333 13.141333 95.914667H94.122667c-26.453333-43.52-41.685333-91.946667-41.685334-143.189334 0-185.173333 192.896-335.104 430.805334-335.104 96.256 0 184.832 24.746667 256.512 66.218667z m-280.490667-114.986667a214.869333 214.869333 0 0 1-214.869333-215.04A215.04 215.04 0 0 1 459.264 28.842667a215.04 215.04 0 0 1 215.04 215.210666 215.04 215.04 0 0 1-215.04 215.04zM974.506667 641.28c9.856 0 17.834667 7.466667 17.834666 16.64v59.989333c-0.341333 8.789333-7.850667 15.786667-17.28 16.085334-9.856 0.341333-18.176-6.826667-18.517333-16.085334v-20.053333l-99.114667 91.093333-0.256 0.256a18.474667 18.474667 0 0 1-14.848 4.352h-0.768a18.176 18.176 0 0 1-9.344-4.608l-0.938666-0.981333-85.930667-80.042667-123.562667 115.072a18.773333 18.773333 0 0 1-25.216 0 15.786667 15.786667 0 0 1 0-23.466666l136.149334-126.848 0.725333-0.597334a18.645333 18.645333 0 0 1 24.362667 0.512l87.253333 81.237334 86.058667-79.232h-21.248c-9.386667-0.298667-16.938667-7.338667-17.28-16.085334-0.341333-9.173333 7.381333-16.896 17.28-17.237333h64.64z m-367.146667 240h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v72.192a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042667-16.042666v-72.192c0-8.874667 7.210667-16.042667 16.042667-16.042667z m110.805333-106.666667h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v178.858667a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042666v-178.858667c0-8.874667 7.168-16.042667 16.042666-16.042667z m106.538667 80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v99.413333a16.042667 16.042667 0 0 1-16.042667 16.042667H824.746667a16.042667 16.042667 0 0 1-16.042667-16.042667v-99.413333c0-8.874667 7.168-16.042667 16.042667-16.042667z m110.165333-80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v179.413333a16.042667 16.042667 0 0 1-16.042667 16.042667h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042667v-179.413333c0-8.874667 7.210667-16.042667 16.042666-16.042667z" fill="#999999" p-id="27238"></path></svg>
+        <span id="busuanzi_value_page_pv"></span>
+      </span>
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#go-mod-init" aria-label="go mod init"><code>go mod init</code></a></li>
+                    <li>
+                        <a href="#go-mod-download" aria-label="go mod download"><code>go mod download</code></a></li>
+                    <li>
+                        <a href="#go-mod-tidy" aria-label="go mod tidy"><code>go mod tidy</code></a></li>
+                    <li>
+                        <a href="#go-mod-graph" aria-label="go mod graph"><code>go mod graph</code></a></li>
+                    <li>
+                        <a href="#go-mod-edit" aria-label="go mod edit"><code>go mod edit</code></a></li>
+                    <li>
+                        <a href="#go-mod-vendor" aria-label="go mod vendor"><code>go mod vendor</code></a></li>
+                    <li>
+                        <a href="#go-mod-verify" aria-label="go mod verify"><code>go mod verify</code></a></li>
+                    <li>
+                        <a href="#go-mod-why" aria-label="go mod why"><code>go mod why</code></a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+  <div class="post-content"><ol>
+<li>用法：<strong><code>go mod &lt;command&gt; [arguments]</code></strong>。</li>
+<li><code>command</code>支持命令列表：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">命令 <code>go mod &lt;command&gt;</code></th>
+<th style="text-align:center">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong><code>go mod init</code></strong></td>
+<td style="text-align:center">生成 <code>go.mod</code> 文件</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>go mod download</code></strong></td>
+<td style="text-align:center">下载 <code>go.mod</code> 文件中指明的所有依赖</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>go mod tidy</code></strong></td>
+<td style="text-align:center">整理现有的依赖</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>go mod graph</code></strong></td>
+<td style="text-align:center">查看现有的依赖结构</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>go mod edit</code></strong></td>
+<td style="text-align:center">编辑 <code>go.mod</code> 文件</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>go mod vendor</code></strong></td>
+<td style="text-align:center">导出项目所有的依赖到<code>vendor</code>目录</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>go mod verify</code></strong></td>
+<td style="text-align:center">校验一个模块是否被篡改过</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong><code>go mod why</code></strong></td>
+<td style="text-align:center">查看为什么需要依赖某模块</td>
+</tr>
+</tbody>
+</table>
+<h2 id="go-mod-init"><code>go mod init</code><a hidden class="anchor" aria-hidden="true" href="#go-mod-init">#</a></h2>
+<ol>
+<li>用法：<strong><code>go mod init [module-path]</code></strong>。</li>
+<li>示例：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="c1"># 初始化当前目录并创建一个go.mod文件，模块路径根据其他条件推断判断</span>
+</span></span><span class="line"><span class="cl">$ go mod init
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 初始化当前目录并创建一个go.mod文件，模块路径为example.com/m</span>
+</span></span><span class="line"><span class="cl">$ go mod init example.com/m
+</span></span></code></pre></div><ol start="3">
+<li>介绍：
+<ul>
+<li><code>go mod init</code>命令<strong>在当前目录中初始化并写入一个新的<code>go.mod</code>文件</strong>，实际上创建了一个以当前目录为根的新模块。</li>
+<li><code>go.mod</code>文件必须不存在时执行上面命令，否则会提示go.mod文件已存在提示。</li>
+<li>如当前存在一个空项目<code>demo</code>，在<code>demo</code>目录下执行<code>go mod init gitee.com/bms/demo</code>，会生成如下<code>go.mod</code>文件，当前<code>go</code>版本是<code>go1.16.3</code>。</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-mod" data-lang="mod"><span class="line"><span class="cl"><span class="n">module</span> <span class="n">gitee</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">bms</span><span class="o">/</span><span class="n">demo</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">go</span> <span class="mf">1.16</span>
+</span></span></code></pre></div><ol start="4">
+<li><code>init</code>接受一个可选参数，即新模块的模块路径，有关选择模块路径的说明，请参阅模块路径。</li>
+<li>如果省略了模块路径参数，<code>init</code>将尝试使用<code>.go</code>文件、<code>vendoring</code>工具配置文件和当前目录（如果在<code>GOPATH</code>中）中的导入注释来推断模块路径。</li>
+<li>如果存在<code>vendoring</code>工具的配置文件，<code>init</code>将尝试从中导入模块需求。</li>
+<li><code>init</code>支持以下配置文件：
+<ul>
+<li><code>GLOCKFILE</code> (Glock)</li>
+<li><code>Godeps/Godeps.json</code> (Godeps)</li>
+<li><code>Gopkg.lock</code> (dep)</li>
+<li><code>dependencies.tsv</code> (godeps)</li>
+<li><code>glide.lock</code> (glide)</li>
+<li><code>vendor.conf</code> (trash)</li>
+<li><code>vendor.yml</code> (govend)</li>
+<li><code>vendor/manifest</code> (gvt)</li>
+<li><code>vendor/vendor.json</code> (govendor)</li>
+</ul>
+</li>
+<li><code>Vendoring</code>工具配置文件无法始终以完美的保真度进行翻译。
+<ul>
+<li>例如，同一个仓库中的多个包在不同版本中导入，而仓库中只包含一个模块，那么导入的<code>go.mod</code>就只能需要一个版本的模块。</li>
+<li>您可能希望运行<code>go list -m all</code>以检查构建列表中的所有版本，并运行<code>go mod tidy</code>以添加缺少的需求并删除未使用的需求。</li>
+</ul>
+</li>
+</ol>
+<h2 id="go-mod-download"><code>go mod download</code><a hidden class="anchor" aria-hidden="true" href="#go-mod-download">#</a></h2>
+<ol>
+<li>将命名的模块下载到<a href="https://golang.google.cn/ref/mod#glos-module-cache" target="_blank" rel="noopener">模块缓存</a>中（模块缓存参考官方模块参考文档）。</li>
+<li>参数可以是模块路径或模块模式，选择主模块的依赖项或表单的<a href="https://golang.google.cn/ref/mod#version-queries" target="_blank" rel="noopener">版本查询</a><code>path@version</code>。</li>
+<li>不带参数，<code>download</code>适用于<a href="https://golang.google.cn/ref/mod#glos-main-module" target="_blank" rel="noopener">主模块</a>的所有依赖项。</li>
+<li>该<code>go</code>命令将在正常执行期间根据需要自动下载模块。</li>
+<li><code>go mod download</code>命令主要用于预填充模块缓存或加载要由<a href="https://golang.google.cn/ref/mod#glos-module-proxy" target="_blank" rel="noopener">模块代理</a>服务的数据。</li>
+<li>默认情况下，<code>download</code>不向标准输出写入任何内容。它将进度消息和错误打印到标准错误。</li>
+</ol>
+
+
+<p><details >
+  <summary markdown="span">用法：<strong><code>go mod download [-json] [-x] [modules]</code></strong></summary>
+  <blockquote>
+<ol>
+<li><code>-json</code>：
+<ul>
+<li><strong>-json</strong>：<code>download</code>将一系列JSON对象打印到标准输出，描述每个下载的模块（或失败）</li>
+<li>对应如下结构：</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">Module</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">Path</span>     <span class="kt">string</span> <span class="c1">// 模块路径
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">Version</span>  <span class="kt">string</span> <span class="c1">// 模块版本
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">Error</span>    <span class="kt">string</span> <span class="c1">// 错误模板描述
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">Info</span>     <span class="kt">string</span> <span class="c1">// 缓存的 .info 文件的绝对路径
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">GoMod</span>    <span class="kt">string</span> <span class="c1">// 缓存 .mod 文件的绝对路径
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">Zip</span>      <span class="kt">string</span> <span class="c1">// 缓存的 .zip 文件的绝对路径
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">Dir</span>      <span class="kt">string</span> <span class="c1">// 缓存源根目录的绝对路径
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">Sum</span>      <span class="kt">string</span> <span class="c1">// checksum路径，版本（比如在go.sum）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">GoModSum</span> <span class="kt">string</span> <span class="c1">// go.mod的checksum（比如在go.sum）
+</span></span></span></code></pre></div><ol start="2">
+<li><code>-x</code>：<code>download</code>打印命令<code>download</code>执行到标准错误</li>
+</ol>
+</blockquote>
+
+</details></p>
+
+<ol start="7">
+<li>示例：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ go mod download -json -x gitee.com/phpbms/demo
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">    &#34;Path&#34;: &#34;gitee.com/phpbms/demo&#34;,
+</span></span><span class="line"><span class="cl">    &#34;Version&#34;: &#34;v0.0.0-20211021090521-71a745ffbccb&#34;,
+</span></span><span class="line"><span class="cl">    &#34;Info&#34;: &#34;/mnt/g/Go/worker/pkg/mod/cache/download/gitee.com/phpbms/demo/@v/v0.0.0-20211021090521-71a745ffbccb.info&#34;,
+</span></span><span class="line"><span class="cl">    &#34;GoMod&#34;: &#34;/mnt/g/Go/worker/pkg/mod/cache/download/gitee.com/phpbms/demo/@v/v0.0.0-20211021090521-71a745ffbccb.mod&#34;,
+</span></span><span class="line"><span class="cl">    &#34;Zip&#34;: &#34;/mnt/g/Go/worker/pkg/mod/cache/download/gitee.com/phpbms/demo/@v/v0.0.0-20211021090521-71a745ffbccb.zip&#34;,
+</span></span><span class="line"><span class="cl">    &#34;Dir&#34;: &#34;/mnt/g/Go/worker/pkg/mod/gitee.com/phpbms/demo@v0.0.0-20211021090521-71a745ffbccb&#34;,
+</span></span><span class="line"><span class="cl">    &#34;Sum&#34;: &#34;h1:JJlXgKY8MUQtOlnSHtbIsHtRU9DNbxx9NUgpsDt3pQA=&#34;,
+</span></span><span class="line"><span class="cl">    &#34;GoModSum&#34;: &#34;h1:6H8vzSoXg8Ey2gdfFaP7ToLmbOnfc04IAcuTFDKqSV8=&#34;
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><h2 id="go-mod-tidy"><code>go mod tidy</code><a hidden class="anchor" aria-hidden="true" href="#go-mod-tidy">#</a></h2>
+<ol>
+<li><code>go mod tidy</code>确保<code>go.mod</code>文件与模块中的源代码匹配。
+<ul>
+<li>它添加了构建当前模块的包和依赖项所需的任何缺失的模块要求，并删除了对不提供任何相关包的模块的要求。</li>
+<li>它还向<code>go.sum</code>添加任何缺失的条目并删除不必要的条目。</li>
+</ul>
+</li>
+<li><code>go mod tidy</code>通过递归加载主模块中的所有包以及它们导入的所有包来工作，这包括测试导入的包（包括其他模块中的测试）。</li>
+<li><code>go mod tidy</code>就像启用了所有构建标记一样，因此它会考虑特定于平台的源文件和需要自定义构建标记的文件，即使这些源文件通常不会被构建。</li>
+<li>有一个例外：忽略构建标记未启用，因此不会考虑具有构建约束【<code>// +build ignore</code>】的文件。</li>
+<li>请注意，<code>go mod tidy</code>不会考虑主模块中名为<code>testdata</code>或名称以<code>.</code>或<code>_</code>除非这些包是由其他包显式导入的。</li>
+<li>一旦<code>go mod tidy</code>加载了这组包，它会确保提供一个或多个包的每个模块在主模块的<code>go.mod</code>文件中都有一个<code>require</code>指令，或者如果主模块在<code>go 1.16</code>或更低版本 - 是必需的另一个必需的模块。</li>
+<li><code>go mod tidy</code>将添加对每个缺失模块的最新版本的要求（有关最新版本的定义，请参阅版本查询），<code>go mod tidy</code>将删除不提供上述集合中任何包的模块的<code>require</code>指令。</li>
+<li><code>go mod tidy</code>还可以添加或删除<code>require</code> 指令的<code>// indirect</code>，<code>// indirect</code>间接注释表示模块不提供由主模块中的包导入的包。</li>
+<li>用法：<strong><code>go mod tidy [-e] [-v] [-go=version] [-compat=version]</code></strong>。</li>
+<li>介绍：
+<ul>
+<li><strong><code>-e</code></strong>：(在<code>Go 1.16</code>中添加)在加载包时遇到错误时尝试继续。</li>
+<li><strong><code>-v</code></strong>：将有关已删除模块的信息打印到标准错误。</li>
+<li><strong><code>-go=</code></strong>：将<code>go</code>指令更新为指定的版本，根据该版本启用或禁用模块图修剪和延迟模块加载（并根据需要添加或删除<code>// indirect</code>间接注释）。</li>
+<li><strong><code>-compat=</code></strong>：当模块图由<code>go</code>指令中指示的版本之前的<code>Go</code>版本加载时，<code>go mod tidy</code>将检查所选版本的模块是否不会更改。还可以通过<code>-compat</code>标志显式指定版本检查的兼容性。</li>
+</ul>
+</li>
+</ol>
+<h2 id="go-mod-graph"><code>go mod graph</code><a hidden class="anchor" aria-hidden="true" href="#go-mod-graph">#</a></h2>
+<ol>
+<li>以文本形式打印<a href="https://golang.google.cn/ref/mod#glos-module-graph" target="_blank" rel="noopener">模块需求图</a>。</li>
+<li>用法：<code>go mod graph [-go=version]</code>。</li>
+<li>介绍：
+<ol>
+<li>模块图中的每个顶点代表一个模块的特定版本，图中的每条边代表对依赖项的最低版本的要求。</li>
+<li><code>go mod graph</code>打印图形的边缘，每行一个。
+<ul>
+<li>每行有两个空格分隔的字段：模块版本及其依赖项之一。</li>
+<li>每个模块版本都标识为<code>path@version</code>形式的字符串。</li>
+<li>主模块没有<code>@version</code>后缀，因为它没有版本。</li>
+</ul>
+</li>
+<li><strong>-go=</strong>：<code>go mod graph</code>报告给定<code>Go</code>版本加载的模块图，而不是<code>go.mod</code>文件中的<code>go</code>指令指示的版本。</li>
+<li>有关如何选择版本的更多信息，请参阅最小版本选择(<code>MVS</code>)。
+<ul>
+<li>另请参阅<code>go list -m</code>以打印选定的版本，并查看<code>go mod why</code>以了解为什么需要模块。</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">example.com/main example.com/a@v1.1.0
+</span></span><span class="line"><span class="cl">example.com/main example.com/b@v1.2.0
+</span></span><span class="line"><span class="cl">example.com/a@v1.1.0 example.com/b@v1.1.1
+</span></span><span class="line"><span class="cl">example.com/a@v1.1.0 example.com/c@v1.3.0
+</span></span><span class="line"><span class="cl">example.com/b@v1.1.0 example.com/c@v1.1.0
+</span></span><span class="line"><span class="cl">example.com/b@v1.2.0 example.com/c@v1.2.0
+</span></span></code></pre></div><h2 id="go-mod-edit"><code>go mod edit</code><a hidden class="anchor" aria-hidden="true" href="#go-mod-edit">#</a></h2>
+<ol>
+<li>该命令提供了一个用于编辑和格式化<code>go.mod</code>文件的命令行界面，主要供工具和脚本使用。</li>
+<li><code>go mod edit</code>只读取一个<code>go.mod</code>文件，它不查找有关其他模块的信息。</li>
+<li>默认情况下，<code>go mod edit</code>读取和写入<code>go.mod</code>主模块的文件，但可以在编辑标志后指定不同的目标文件。</li>
+</ol>
+
+
+<p><details >
+  <summary markdown="span">用法：<strong><code>go mod edit [editing flags] [-fmt|-print|-json] [go.mod]</code></strong></summary>
+  <blockquote>
+<ul>
+<li><strong>editing flags</strong>：指定编辑操作选项：(<code>editing flags</code>可以重复使用，按给定的顺序)
+<ol>
+<li><strong>-module</strong>：更改模块的路径(<code>go.mod</code>文件的<code>module</code>行)，修改<code>module</code>行模块名称。</li>
+<li><strong>-go=version</strong>：设置<code>go.mod</code>文件的<code>Go</code>版本。</li>
+<li><strong>-require=path@version</strong>：添加指定的模块路径和版本上的要求，会覆盖<code>go.mod</code>上的任何现有要求<code>path</code>。</li>
+<li><strong>-droprequire=path</strong>：删除指定的模块路径和版本上的要求。</li>
+<li><strong>-exclude=path@version</strong>：增加给定的模块路径，<code>-exclude=path@version</code>如果该排除已存在， 则为空操作。</li>
+<li><strong>-dropexclude=path@version</strong>：放弃对给定的模块路径和版本的排除。</li>
+<li><strong>-replace=old[@v]=new[@v]</strong>：添加了给定模块路径和版本对的替换。
+<ul>
+<li>如果省略<code>old@v</code>则添加左侧没有版本的替换，这适用于旧模块路径的所有版本。</li>
+<li>如果省略<code>new@v</code>则新路径应该是本地模块根目录，而不是模块路径。</li>
+<li>注意：<code>-replace</code>覆盖的任何冗余替换<code>old[@v]</code>，因此省略<code>@v</code>将删除特定版本的替换。</li>
+</ul>
+</li>
+<li><strong>-dropreplace=old[@v]</strong>：丢弃给定模块路径和版本对的替换。
+<ul>
+<li>如果<code>@v</code>提供了，则删除给定版本的替换,左侧没有版本的现有替代品仍可更换模块。</li>
+<li>如果<code>@v</code>省略 ，则删除没有版本的替换。</li>
+</ul>
+</li>
+<li><strong>-retract=version</strong>：添加回收对于给定的版本，其可以是一个单一的版本（如<code>v1.2.3</code>）或间隔（等<code>[v1.1.0,v1.2.0]</code>）。
+<ul>
+<li>注意：<code>-retract</code>标志不能为<code>retract</code>指令添加基本原理注释。</li>
+</ul>
+</li>
+<li><strong>-dropretract=version</strong>：删除回收对于给定的版本。</li>
+</ol>
+</li>
+<li><strong>-fmt、-print、-json</strong>：额外标志来控制输出。
+<ol>
+<li><strong>-fmt</strong>：重新格式化<code>go.mod</code>文件而不进行其他更改。
+<ul>
+<li>使用或重写<code>go.mod</code>文件的任何其他修改也暗示了这种重新格式化。</li>
+<li>唯一需要此标志的情况是没有指定其他标志，如<code>go mod edit -fmt</code>。</li>
+</ul>
+</li>
+<li><strong>-print</strong>：<code>go.mod</code>以其文本格式打印final ，而不是将其写回磁盘（就是打印<code>go.mod</code>文件内容）。</li>
+<li><strong>-json</strong>：<code>go.mod</code>以 JSON 格式打印最终结果，而不是以文本格式将其写回磁盘<code>go mod edit -json</code>。</li>
+</ol>
+</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">// json打印格式
+</span></span><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">  &#34;Module&#34;: {
+</span></span><span class="line"><span class="cl">      &#34;Path&#34;: &#34;mymod&#34;
+</span></span><span class="line"><span class="cl">  },
+</span></span><span class="line"><span class="cl">  &#34;Go&#34;: &#34;1.17&#34;,
+</span></span><span class="line"><span class="cl">  &#34;Require&#34;: [
+</span></span><span class="line"><span class="cl">      {
+</span></span><span class="line"><span class="cl">          &#34;Path&#34;: &#34;gitee.com/phpbms/demo&#34;,
+</span></span><span class="line"><span class="cl">          &#34;Version&#34;: &#34;v0.0.0-20211021090521-71a745ffbccb&#34;,
+</span></span><span class="line"><span class="cl">          &#34;Indirect&#34;: true
+</span></span><span class="line"><span class="cl">      }
+</span></span><span class="line"><span class="cl">  ],
+</span></span><span class="line"><span class="cl">  &#34;Exclude&#34;: null,
+</span></span><span class="line"><span class="cl">  &#34;Replace&#34;: null,
+</span></span><span class="line"><span class="cl">  &#34;Retract&#34;: null
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 对应相关结构体
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Module</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Path</span>    <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Version</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">GoMod</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Module</span>  <span class="nx">Module</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Go</span>      <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Require</span> <span class="p">[]</span><span class="nx">Require</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Exclude</span> <span class="p">[]</span><span class="nx">Module</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Replace</span> <span class="p">[]</span><span class="nx">Replace</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">Require</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Path</span>     <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Version</span>  <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Indirect</span> <span class="kt">bool</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">Replace</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Old</span> <span class="nx">Module</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">New</span> <span class="nx">Module</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">Retract</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Low</span>       <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">High</span>      <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Rationale</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div></blockquote>
+
+</details></p>
+
+<ol start="4">
+<li>示例：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="c1"># 添加替换指令</span>
+</span></span><span class="line"><span class="cl">$ go mod edit -replace example.com/a@v1.0.0<span class="o">=</span>./a
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 删除替换指令</span>
+</span></span><span class="line"><span class="cl">$ go mod edit -dropreplace example.com/a@v1.0.0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 设置go版本，添加需求，打印文件而不是写入磁盘</span>
+</span></span><span class="line"><span class="cl">$ go mod edit -go<span class="o">=</span>1.14 -require<span class="o">=</span>example.com/m@v1.0.0 -print
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 格式化 go.mod 文件</span>
+</span></span><span class="line"><span class="cl">$ go mod edit -fmt
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 格式化并打印不同的 .mod 文件</span>
+</span></span><span class="line"><span class="cl">$ go mod edit -print tools.mod
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 打印 go.mod 文件的 JSON 表示</span>
+</span></span><span class="line"><span class="cl">$ go mod edit -json
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 所有命令使用</span>
+</span></span><span class="line"><span class="cl">$ go mod edit -module<span class="o">=</span>mydemo1 -go<span class="o">=</span>1.16 -require<span class="o">=</span>gitee.com/phpbms/demo/v3@v3.0.0 -exclude<span class="o">=</span>gitee.com/phpbms/demo/v3@v3.0.1 -replace<span class="o">=</span>gitee.com/phpbms/demo/v2@v2.0.1<span class="o">=</span>gitee.com/phpbms/demo/v2@v2.0.0 -retract<span class="o">=</span>v1.1.1 -print ./go.mod
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 修改go版本，从之前的 go 1.20 修改为 go 1.21rc2</span>
+</span></span><span class="line"><span class="cl">$ go mod edit -go 1.21rc2
+</span></span></code></pre></div><h2 id="go-mod-vendor"><code>go mod vendor</code><a hidden class="anchor" aria-hidden="true" href="#go-mod-vendor">#</a></h2>
+<ol>
+<li><strong>在主模块的根目录中构造一个名为<code>vendor</code>的目录，该目录包含支持主模块中包的构建和测试所需的所有包的副本</strong>。
+<ul>
+<li>不包括仅通过主模块之外的包测试导入的包。</li>
+<li>与<code>go mod tidy</code>和其他模块命令一样，在构建<code>vendor</code>目录时不考虑除了<code>ignore</code>之外的构建约束。</li>
+</ul>
+</li>
+<li>当启用<code>vendoring</code>时，<code>go</code>命令将从<code>vendor</code>目录加载包，而不是将模块从其源下载到模块缓存中，并使用那些下载副本的包。</li>
+<li><code>go mod vendor</code>还会创建文件<code>vendor/modules.txt</code>，其中包含<code>vendor</code>包的列表以及从中复制它们的模块版本。
+<ul>
+<li>当启用<code>vendoring</code>时，此清单用作模块版本信息的来源，如<code>go list -m</code>和<code>go version -m</code>所报告的。</li>
+<li>当<code>go</code>命令读取<code>vendor/modules.txt</code>时，它会检查模块版本是否与<code>go.mod</code>一致。</li>
+<li>如果<code>go.mod</code>在<code>vendor/modules.txt</code>生成后发生了变化，则应再次运行<code>go mod vendor</code>。</li>
+</ul>
+</li>
+<li>请注意，<code>go mod vendor</code>会在重新构建之前删除<code>vendor</code>目录（如果它存在）。
+<ul>
+<li>不应对<code>vendor</code>的软件包进行本地更改。</li>
+<li><code>go</code>命令不会检查<code>vendor</code>目录中的包是否未被修改，但是可以通过运行<code>go mod vendor</code>并检查没有进行任何更改来验证<code>vendor</code>目录的完整性。</li>
+</ul>
+</li>
+<li>使用：<strong><code>go mod vendor [-e] [-v]</code></strong>。
+<ul>
+<li><strong>-e</strong>：（在<code>Go 1.16</code>中添加）在加载包时遇到错误时尝试继续。</li>
+<li><strong>-v</strong>：将<code>vendor</code>模块和包的名称打印为标准错误。</li>
+</ul>
+</li>
+</ol>
+<h2 id="go-mod-verify"><code>go mod verify</code><a hidden class="anchor" aria-hidden="true" href="#go-mod-verify">#</a></h2>
+<ol>
+<li><strong>检查存储在模块缓存中的主模块的依赖项自下载以来没有被修改</strong>。</li>
+<li>执行此检查，对每个下载的<code>module.zip</code>文件和提取的目录进行散列然后将这些散列与首次下载模块时记录的散列进行比较。</li>
+<li><code>go mod verify</code> 检查构建列表中的每个模块（可以使用<code>go list -m all</code>打印所有模块）。</li>
+<li>如果所有模块都未修改，则<code>go mod verify</code> 打印<code>all modules verified</code>否则，它将报告哪些模块已更改并以非零状态退出。</li>
+<li>注意：所有模块感知命令都会验证主模块的<code>go.sum</code>文件中的哈希值是否与为下载到模块缓存中的模块记录的哈希值匹配。</li>
+<li>如果<code>go.sum</code>中缺少哈希（例如，因为模块是第一次使用），则go命令使用校验和数据库验证其哈希。
+<ul>
+<li>除非模块路径与<code>GOPRIVATE</code>或<code>GONOSUMDB</code>匹配。</li>
+</ul>
+</li>
+<li><code>go mod verify</code>不会为不在缓存中的模块下载内容，也不会使用<code>go.sum</code>文件来验证模块内容。</li>
+<li>但是，<code>go mod verify</code>可能会下载<code>go.mod</code>文件以执行最少的版本选择。</li>
+<li>它将使用<code>go.sum</code>来验证这些文件，并且可能会为丢失的哈希添加<code>go.sum</code>条目。</li>
+<li>用法：<strong><code>go mod verify</code></strong>。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ go mod verify
+</span></span><span class="line"><span class="cl">all modules verified
+</span></span></code></pre></div><h2 id="go-mod-why"><code>go mod why</code><a hidden class="anchor" aria-hidden="true" href="#go-mod-why">#</a></h2>
+<ol>
+<li><code>go mod why</code>在导入图中显示从主模块到每个列出的包的最短路径。</li>
+<li>用法：<strong><code>go mod why [-m] [-vendor] packages...</code></strong>。
+<ul>
+<li><strong>-m</strong>：<code>go mod why</code>将其参数视为模块列表。
+<ul>
+<li><code>go mod why</code>会打印每个模块中任何包的路径。</li>
+<li>请注意，即使使用<code>-m</code>，<code>go mod why</code>查询包图，而不是<code>go mod graph</code>打印的模块图。</li>
+</ul>
+</li>
+<li><strong>-vendor</strong>：<code>go mod why</code>忽略主模块之外的包测试中的导入（就像<code>go mod vendor</code>所做的那样）。
+<ul>
+<li>默认情况下， <code>go mod why</code>会考虑与<code>all</code>模式匹配的包图。</li>
+<li>这个标志在<code>Go 1.16</code>之后在声明<code>go 1.16</code>或更高版本的模块中无效（使用<code>go.mod</code>中的<code>go</code>指令），因为<code>all</code>的含义已更改以匹配<code>go mod</code>供应商匹配的包集。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>示例：
+<ul>
+<li>输出是一个节序列，每个在命令行上命名的包或模块都有一个节，用空行分隔。</li>
+<li>每节以注释行开头，以<code>#</code>开头，给出目标包或模块。</li>
+<li>后续行给出了通过导入图的路径，每行一个包。</li>
+<li>如果包或模块不是从主模块引用的，则该节将显示一个带括号的注释，表明该事实。</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ go mod why golang.org/x/text/language golang.org/x/text/encoding
+</span></span><span class="line"><span class="cl"><span class="c1"># golang.org/x/text/language</span>
+</span></span><span class="line"><span class="cl">rsc.io/quote
+</span></span><span class="line"><span class="cl">rsc.io/sampler
+</span></span><span class="line"><span class="cl">golang.org/x/text/language
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># golang.org/x/text/encoding</span>
+</span></span><span class="line"><span class="cl"><span class="o">(</span>main module does not need package golang.org/x/text/encoding<span class="o">)</span>
+</span></span></code></pre></div>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
+      <li><a href="https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/">包管理</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://heliu.site/posts/golang/package/bag/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>package</span>
+  </a>
+  <a class="next" href="https://heliu.site/posts/golang/package/work/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>go work</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    
+    <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv">
+        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    </span>
+    <span id="busuanzi_container_site_uv">
+        本站访客数<span id="busuanzi_value_site_uv"></span>人次
+    </span>
+    </div>
+        <span>Copyright © 2020-2024 <a href="#">heliu's blog</a>. All rights reserved</span>  
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'Copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'Done';
+            setTimeout(() => {
+                copybutton.innerHTML = 'Copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
