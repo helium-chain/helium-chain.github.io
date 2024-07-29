@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Helium</title>
+    <link>https://helium-chain.github.io/</link>
+    <description>Recent content on Helium</description>
+    <image>
+      <title>Helium</title>
+      <url>https://helium-chain.github.io/favicon-32x32.png</url>
+      <link>https://helium-chain.github.io/favicon-32x32.png</link>
+    </image>
+    <generator>Hugo -- 0.128.2</generator>
+    <language>zh</language>
+    <copyright>Copyright © 2020-2024 heliu&#39;s blog. All rights reserved</copyright>
+    <lastBuildDate>Sat, 27 Jul 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://helium-chain.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>sync.Pool</title>
+      <link>https://helium-chain.github.io/posts/golang/sync/pool/</link>
+      <pubDate>Sun, 14 Jul 2024 20:32:54 +0800</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/sync/pool/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18版本</description>
+    </item>
+    <item>
+      <title>sync.RwMutex</title>
+      <link>https://helium-chain.github.io/posts/golang/sync/rwmutex/</link>
+      <pubDate>Sun, 14 Jul 2024 15:53:47 +0800</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/sync/rwmutex/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18版本</description>
+    </item>
+    <item>
+      <title>sync.Once</title>
+      <link>https://helium-chain.github.io/posts/golang/sync/once/</link>
+      <pubDate>Sun, 14 Jul 2024 13:10:26 +0800</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/sync/once/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18版本</description>
+    </item>
+    <item>
+      <title>acme.sh</title>
+      <link>https://helium-chain.github.io/posts/ssl/acme/</link>
+      <pubDate>Wed, 03 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/ssl/acme/</guid>
+      <description>acme.sh 实现了 acme 协议, 可以从 letsencrypt 生成免费的证书。</description>
+    </item>
+    <item>
+      <title>sync.Mutex</title>
+      <link>https://helium-chain.github.io/posts/golang/sync/mutex/</link>
+      <pubDate>Tue, 10 Mar 2020 17:42:36 +0800</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/sync/mutex/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18版本</description>
+    </item>
+    <item>
+      <title>type</title>
+      <link>https://helium-chain.github.io/posts/golang/type/typ/</link>
+      <pubDate>Sat, 22 Feb 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/type/typ/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Install Golang</title>
+      <link>https://helium-chain.github.io/posts/golang/install/install/</link>
+      <pubDate>Mon, 14 Jan 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/install/install/</guid>
+      <description>Go 软件安装。</description>
+    </item>
+    <item>
+      <title>sync.WaitGroup</title>
+      <link>https://helium-chain.github.io/posts/golang/sync/waitgroup/</link>
+      <pubDate>Mon, 13 Jul 2020 22:00:10 +0800</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/sync/waitgroup/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18版本</description>
+    </item>
+    <item>
+      <title>内置类型</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/type/</link>
+      <pubDate>Wed, 23 Jan 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/type/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>变量</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/variable/</link>
+      <pubDate>Sun, 27 Jan 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/variable/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>常量</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/const/</link>
+      <pubDate>Wed, 06 Feb 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/const/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>运算符</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/operator/</link>
+      <pubDate>Tue, 19 Feb 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/operator/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>字面量</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/literal/</link>
+      <pubDate>Sat, 23 Feb 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/literal/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>类型零值</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/zero/</link>
+      <pubDate>Sun, 10 Mar 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/zero/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>作用域</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/scope/</link>
+      <pubDate>Sun, 24 Mar 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/scope/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>指针</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/pointer/</link>
+      <pubDate>Fri, 19 Apr 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/pointer/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>字符串</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/string/</link>
+      <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/string/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>字符串(内存布局)</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/string-memory/</link>
+      <pubDate>Tue, 21 May 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/string-memory/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>字符串(&#43;拼接)</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/string-splice/</link>
+      <pubDate>Thu, 27 Jun 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/string-splice/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>字符串(类型结构)</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/string-type/</link>
+      <pubDate>Mon, 29 Jul 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/string-type/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>流程控制(条件语句)</title>
+      <link>https://helium-chain.github.io/posts/golang/process/if/</link>
+      <pubDate>Fri, 02 Aug 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/process/if/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>流程控制(循环语句)</title>
+      <link>https://helium-chain.github.io/posts/golang/process/for/</link>
+      <pubDate>Fri, 20 Sep 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/process/for/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>流程控制(range迭代)</title>
+      <link>https://helium-chain.github.io/posts/golang/process/range/</link>
+      <pubDate>Sat, 05 Oct 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/process/range/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>流程控制(switch)</title>
+      <link>https://helium-chain.github.io/posts/golang/process/switch/</link>
+      <pubDate>Sun, 27 Oct 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/process/switch/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>流程控制(select)</title>
+      <link>https://helium-chain.github.io/posts/golang/process/select/</link>
+      <pubDate>Fri, 20 Dec 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/process/select/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>package</title>
+      <link>https://helium-chain.github.io/posts/golang/package/bag/</link>
+      <pubDate>Sun, 23 Feb 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/package/bag/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>go modules</title>
+      <link>https://helium-chain.github.io/posts/golang/package/module/</link>
+      <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/package/module/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>go work</title>
+      <link>https://helium-chain.github.io/posts/golang/package/work/</link>
+      <pubDate>Mon, 23 Mar 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/package/work/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>模块相关环境变量</title>
+      <link>https://helium-chain.github.io/posts/golang/package/env/</link>
+      <pubDate>Sun, 05 Apr 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/package/env/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>go.work 文件</title>
+      <link>https://helium-chain.github.io/posts/golang/package/go-work/</link>
+      <pubDate>Thu, 23 Apr 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/package/go-work/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>go.mod 文件</title>
+      <link>https://helium-chain.github.io/posts/golang/package/go-mod/</link>
+      <pubDate>Fri, 08 May 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/package/go-mod/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>工作区使用</title>
+      <link>https://helium-chain.github.io/posts/golang/package/use-work/</link>
+      <pubDate>Sat, 30 May 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/package/use-work/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>创建模块</title>
+      <link>https://helium-chain.github.io/posts/golang/package/use-mod/</link>
+      <pubDate>Thu, 18 Jun 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/package/use-mod/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>开发和发布模块</title>
+      <link>https://helium-chain.github.io/posts/golang/package/publish-mod/</link>
+      <pubDate>Sun, 28 Jun 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/package/publish-mod/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>数组使用</title>
+      <link>https://helium-chain.github.io/posts/golang/array/use/</link>
+      <pubDate>Mon, 09 Mar 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/array/use/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>数组的内存布局</title>
+      <link>https://helium-chain.github.io/posts/golang/array/memory/</link>
+      <pubDate>Sat, 25 Jul 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/array/memory/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>数组的元类型</title>
+      <link>https://helium-chain.github.io/posts/golang/array/meta/</link>
+      <pubDate>Tue, 25 May 2021 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/array/meta/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Slice(使用)</title>
+      <link>https://helium-chain.github.io/posts/golang/slice/use/</link>
+      <pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/slice/use/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Slice(原理)</title>
+      <link>https://helium-chain.github.io/posts/golang/slice/theory/</link>
+      <pubDate>Wed, 02 Sep 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/slice/theory/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>边界检查</title>
+      <link>https://helium-chain.github.io/posts/golang/slice/check/</link>
+      <pubDate>Sat, 22 Aug 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/slice/check/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>append()</title>
+      <link>https://helium-chain.github.io/posts/golang/slice/append/</link>
+      <pubDate>Mon, 26 Oct 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/slice/append/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>copy()</title>
+      <link>https://helium-chain.github.io/posts/golang/slice/copy/</link>
+      <pubDate>Sat, 07 Nov 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/slice/copy/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Map(使用)</title>
+      <link>https://helium-chain.github.io/posts/golang/map/use/</link>
+      <pubDate>Wed, 20 Jan 2021 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/map/use/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Map(原理)</title>
+      <link>https://helium-chain.github.io/posts/golang/map/theory/</link>
+      <pubDate>Wed, 27 Jan 2021 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/map/theory/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Map 元类型</title>
+      <link>https://helium-chain.github.io/posts/golang/map/meta/</link>
+      <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/map/meta/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>函数使用</title>
+      <link>https://helium-chain.github.io/posts/golang/func/use/</link>
+      <pubDate>Fri, 12 Mar 2021 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/func/use/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Go 执行流程</title>
+      <link>https://helium-chain.github.io/posts/golang/goroutine/flow/</link>
+      <pubDate>Sat, 27 Jul 2024 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/goroutine/flow/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Linux epoll</title>
+      <link>https://helium-chain.github.io/posts/golang/netpoll/linux/</link>
+      <pubDate>Sat, 20 Jul 2024 21:28:31 +0800</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/netpoll/linux/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Golang epoll</title>
+      <link>https://helium-chain.github.io/posts/golang/netpoll/epoll/</link>
+      <pubDate>Sat, 20 Jul 2024 21:59:40 +0800</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/netpoll/epoll/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>打赏</title>
+      <link>https://helium-chain.github.io/support/</link>
+      <pubDate>Sun, 15 Mar 2020 11:30:03 +0000</pubDate>
+      <guid>https://helium-chain.github.io/support/</guid>
+      <description> 🔥如果觉得我的文章对您有用，帮我买杯☕。您的支持将鼓励我继续创作。🎉🎉🎉
+wechat alipay </description>
+    </item>
+  </channel>
+</rss>

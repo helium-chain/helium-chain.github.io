@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>第2章 基础类型 on Helium</title>
+    <link>https://helium-chain.github.io/posts/golang/basic/</link>
+    <description>Recent content in 第2章 基础类型 on Helium</description>
+    <image>
+      <title>Helium</title>
+      <url>https://helium-chain.github.io/favicon-32x32.png</url>
+      <link>https://helium-chain.github.io/favicon-32x32.png</link>
+    </image>
+    <generator>Hugo -- 0.128.2</generator>
+    <language>zh</language>
+    <copyright>Copyright © 2020-2024 heliu&#39;s blog. All rights reserved</copyright>
+    <lastBuildDate>Fri, 21 Jul 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://helium-chain.github.io/posts/golang/basic/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>内置类型</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/type/</link>
+      <pubDate>Wed, 23 Jan 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/type/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>变量</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/variable/</link>
+      <pubDate>Sun, 27 Jan 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/variable/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>常量</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/const/</link>
+      <pubDate>Wed, 06 Feb 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/const/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>运算符</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/operator/</link>
+      <pubDate>Tue, 19 Feb 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/operator/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>字面量</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/literal/</link>
+      <pubDate>Sat, 23 Feb 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/literal/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>类型零值</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/zero/</link>
+      <pubDate>Sun, 10 Mar 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/zero/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>作用域</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/scope/</link>
+      <pubDate>Sun, 24 Mar 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/scope/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>指针</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/pointer/</link>
+      <pubDate>Fri, 19 Apr 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/pointer/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>字符串</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/string/</link>
+      <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/string/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>字符串(内存布局)</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/string-memory/</link>
+      <pubDate>Tue, 21 May 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/string-memory/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>字符串(&#43;拼接)</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/string-splice/</link>
+      <pubDate>Thu, 27 Jun 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/string-splice/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>字符串(类型结构)</title>
+      <link>https://helium-chain.github.io/posts/golang/basic/string-type/</link>
+      <pubDate>Mon, 29 Jul 2019 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/basic/string-type/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+  </channel>
+</rss>

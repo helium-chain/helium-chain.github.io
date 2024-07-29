@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>函数 on Helium</title>
+    <link>https://helium-chain.github.io/tags/%E5%87%BD%E6%95%B0/</link>
+    <description>Recent content in 函数 on Helium</description>
+    <image>
+      <title>Helium</title>
+      <url>https://helium-chain.github.io/favicon-32x32.png</url>
+      <link>https://helium-chain.github.io/favicon-32x32.png</link>
+    </image>
+    <generator>Hugo -- 0.128.2</generator>
+    <language>zh</language>
+    <copyright>Copyright © 2020-2024 heliu&#39;s blog. All rights reserved</copyright>
+    <lastBuildDate>Thu, 23 Jun 2022 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://helium-chain.github.io/tags/%E5%87%BD%E6%95%B0/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>函数使用</title>
+      <link>https://helium-chain.github.io/posts/golang/func/use/</link>
+      <pubDate>Fri, 12 Mar 2021 00:00:00 +0000</pubDate>
+      <guid>https://helium-chain.github.io/posts/golang/func/use/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+  </channel>
+</rss>
