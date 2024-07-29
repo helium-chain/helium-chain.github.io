@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2020-2024 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Sun, 21 Jul 2024 19:12:39 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 27 Jul 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://heliu.site/tags/golang/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>sync.Pool</title>
@@ -34,6 +34,13 @@
       <pubDate>Sun, 14 Jul 2024 13:10:26 +0800</pubDate>
       <guid>https://heliu.site/posts/golang/sync/once/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18版本</description>
+    </item>
+    <item>
+      <title>acme.sh</title>
+      <link>https://heliu.site/posts/ssl/acme/</link>
+      <pubDate>Wed, 03 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/ssl/acme/</guid>
+      <description>acme.sh 实现了 acme 协议, 可以从 letsencrypt 生成免费的证书。</description>
     </item>
     <item>
       <title>sync.Mutex</title>
@@ -267,17 +274,73 @@
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
+      <title>Slice(使用)</title>
+      <link>https://heliu.site/posts/golang/slice/use/</link>
+      <pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/slice/use/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
       <title>Slice(原理)</title>
       <link>https://heliu.site/posts/golang/slice/theory/</link>
-      <pubDate>Sun, 21 Jul 2024 17:58:15 +0800</pubDate>
+      <pubDate>Wed, 02 Sep 2020 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/slice/theory/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>边界检查</title>
       <link>https://heliu.site/posts/golang/slice/check/</link>
-      <pubDate>Sun, 21 Jul 2024 19:12:39 +0800</pubDate>
+      <pubDate>Sat, 22 Aug 2020 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/slice/check/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>append()</title>
+      <link>https://heliu.site/posts/golang/slice/append/</link>
+      <pubDate>Mon, 26 Oct 2020 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/slice/append/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>copy()</title>
+      <link>https://heliu.site/posts/golang/slice/copy/</link>
+      <pubDate>Sat, 07 Nov 2020 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/slice/copy/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Map(使用)</title>
+      <link>https://heliu.site/posts/golang/map/use/</link>
+      <pubDate>Wed, 20 Jan 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/map/use/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Map(原理)</title>
+      <link>https://heliu.site/posts/golang/map/theory/</link>
+      <pubDate>Wed, 27 Jan 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/map/theory/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Map 元类型</title>
+      <link>https://heliu.site/posts/golang/map/meta/</link>
+      <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/map/meta/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>函数使用</title>
+      <link>https://heliu.site/posts/golang/func/use/</link>
+      <pubDate>Fri, 12 Mar 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/func/use/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>Go 执行流程</title>
+      <link>https://heliu.site/posts/golang/goroutine/flow/</link>
+      <pubDate>Sat, 27 Jul 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/goroutine/flow/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
