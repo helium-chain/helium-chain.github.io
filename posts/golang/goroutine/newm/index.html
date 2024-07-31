@@ -131,8 +131,8 @@
   "keywords": [
     "golang", "Goroutine"
   ],
-  "articleBody": "唤醒工作线程 去尝试唤醒工作线程条件：atomic.Load(\u0026sched.npidle) != 0 \u0026\u0026 atomic.Load(\u0026sched.nmspinning) == 0。 atomic.Load(\u0026sched.npidle) != 0：有空闲的P。 atomic.Load(\u0026sched.nmspinning) == 0：没有工作线程正在尝试从其他工作线程的本地队列偷取goroutine。(就是没有spinning自旋的goroutine时) 唤醒空闲的P和M由wakep()函数完成。 wakep() 尝试添加一个P来执行G。当G是可运行时调用(newproc, ready)。 wakep()函数被调用的地方：【创建g时候，在newproc()函数中，就是go关键字】，【g放回P的时候，在ready()函数中】。 newproc()函数中，也就是go关键字时，runtime.main已启动时。（这种情况发生在go关键字时） ready()函数中，该函数通过把需要唤醒的goroutine放入运行队列来唤醒它。（这种情况在g被挂在了其他地方时需要恢复到P中时） 也就是只要g被放入本地队列中，准备运行时都需要调用wakep()函数尝试利用空闲的M和P来运行它。 文件位置：go1.19.3/src/runtime/proc.go。 2420 2421 2422 2423 2424 2425 2426 2427 2428 2429 2430 2431 2432 2433 2434 2435 2436 2437 2438 2439 2440 2441 2442 2443 2444 2445 2446 2447 // Tries to add one more P to execute G's. // Called when a G is made runnable (newproc, ready). func wakep() { // 没有空闲的P，直接返回。当前所有的P都在工作。因为P的数量是固定的。 if atomic.Load(\u0026sched.npidle) == 0 { return } // be conservative about spinning threads // // 对自旋的线程持保守态度： // 1. sched.nmspinning != 0：有其他线程正在自旋（就是在其他线程中去偷取g） // 2. !atomic.Cas(\u0026sched.nmspinning, 0, 1)：通过cas操作再次确认是否有其他工作线程处于spinning状态 // 从进入wakep()判断到真正启动工作线程之前的这一段时间之内，如果已经有工作线程进入了spinning状态而在四处寻找需要运行的goroutine // 这样的话我们就没有必要再启动一个多余的工作线程出来了 // 如果cas操作成功，则继续调用startm创建一个新的或唤醒一个处于睡眠状态的工作线程出来工作 // // 1. atomic.Load(\u0026sched.nmspinning) != 0 成立：有其他工作线程正在自旋，直接return退出 // 2. atomic.Load(\u0026sched.nmspinning) == 0 成立：当前没有忙碌的工作线程 // atomic.Cas(\u0026sched.nmspinning, 0, 1) == true：当前没有忙碌的工作线程，当前可以创建工作线程，并标记sched.nmspinning=1阻止后来者 // atomic.Cas(\u0026sched.nmspinning, 0, 1) == false：当前有其他忙碌的工作线程，直接return退出 if atomic.Load(\u0026sched.nmspinning) != 0 || !atomic.Cas(\u0026sched.nmspinning, 0, 1) { return } // 程序执行到这里说明：sched.nmspinning一定被标记为1了。 startm(nil, true) } startm() 调度一些M来运行p(如果需要，创建一个M)。 如果p==nil，尝试得到一个空闲的p，如果没有空闲的p什么都不做。 可以使用m.p==nil运行，因此不允许写入障碍。 如果设置了spinning，则调用者增加了nmspinning，而startm将减少nmspinning或在新启动的M中设置m.spinning。 传递nil的P的调用方必须从不可抢占的上下文中调用。见下面对acquirem。 必须没有写障碍，因为这个可能没有P。 go:nowritebarrierrec：不允许编译器插入写屏障相关代码。 在抢占系统调用的P的时候该函数会被调用，并传入空闲的P和false参数。 参数： _p_ *p：nil表示没有指定P，否则指定P。 spinning bool：true.sched.nmspinning的值在前面被加一了。false.没有加一。 文件位置：go1.19.3/src/runtime/proc.go。 2257 2258 2259 2260 2261 2262 2263 2264 2265 2266 2267 2268 2269 2270 2271 2272 2273 2274 2275 2276 2277 2278 2279 2280 2281 2282 2283 2284 2285 2286 2287 2288 2289 2290 2291 2292 2293 2294 2295 2296 2297 2298 2299 2300 2301 2302 2303 2304 2305 2306 2307 2308 2309 2310 2311 2312 2313 2314 2315 2316 2317 2318 2319 2320 2321 2322 2323 2324 2325 2326 2327 2328 2329 2330 2331 2332 2333 2334 2335 2336 2337 2338 2339 2340 2341 2342 2343 2344 2345 2346 2347 2348 2349 2350 2351 2352 2353 2354 2355 2356 2357 2358 2359 2360 2361 2362 2363 2364 2365 2366 2367 2368 2369 2370 2371 2372 2373 2374 2375 2376 2377 2378 2379 2380 // Schedules some M to run the p (creates an M if necessary). // If p==nil, tries to get an idle P, if no idle P's does nothing. // May run with m.p==nil, so write barriers are not allowed. // If spinning is set, the caller has incremented nmspinning and startm will // either decrement nmspinning or set m.spinning in the newly started M. // // Callers passing a non-nil P must call from a non-preemptible context. See // comment on acquirem below. // // Must not have write barriers because this may be called without a P. // //go:nowritebarrierrec func startm(_p_ *p, spinning bool) { // Disable preemption. // // Every owned P must have an owner that will eventually stop it in the // event of a GC stop request. startm takes transient ownership of a P // (either from argument or pidleget below) and transfers ownership to // a started M, which will be responsible for performing the stop. // // Preemption must be disabled during this transient ownership, // otherwise the P this is running on may enter GC stop while still // holding the transient P, leaving that P in limbo and deadlocking the // STW. // // Callers passing a non-nil P must already be in non-preemptible // context, otherwise such preemption could occur on function entry to // startm. Callers passing a nil P may be preemptible, so we must // disable preemption before acquiring a P from pidleget below. mp := acquirem() // 禁止当前M被抢占 lock(\u0026sched.lock) // 锁住全局sched // 有空闲的p才会去唤醒线程 if _p_ == nil { // 如果没有指定P，则需要从P的空闲列表中获取一个P _p_ = pidleget(0) // 从P的空闲队列中获取空闲的P // 没有空闲的P，意味着所有的P都很忙不需要唤醒 if _p_ == nil {\tunlock(\u0026sched.lock) // 之前的Cas把nmspinning加一，这里需要减回来 if spinning {\t// The caller incremented nmspinning, but there are no idle Ps, // so it's okay to just undo the increment and give up. // // 正常逻辑这里不应该减成负数，否则是系统逻辑存在错误 if int32(atomic.Xadd(\u0026sched.nmspinning, -1)) \u003c 0 { throw(\"startm: negative nmspinning\") } } // 与acquirem函数呼应，并检查是否有抢占请求发生 releasem(mp)\treturn // 没有空闲的P直接返回 } } // 尝试从m空闲队列中获取正处于睡眠之中的工作线程 // 所有处于睡眠状态的m都在此队列中 nmp := mget() // 没有处于睡眠状态的工作线程，这种情况需要去创建线程 if nmp == nil {\t// No M is available, we must drop sched.lock and call newm. // However, we already own a P to assign to the M. // // Once sched.lock is released, another G (e.g., in a syscall), // could find no idle P while checkdead finds a runnable G but // no running M's because this new M hasn't started yet, thus // throwing in an apparent deadlock. // // Avoid this situation by pre-allocating the ID for the new M, // thus marking it as 'running' before we drop sched.lock. This // new M will eventually run the scheduler to execute any // queued G's. // // 这里是为需要新创建的工作线程准备工作 id := mReserveID() // 给需要创建的工作线程分配ID unlock(\u0026sched.lock) // 初始化fn函数，该函数在工作线程刚启动时会被调用 var fn func() // nil if spinning { // 如果需要标记当前工作线程是自旋状态 // The caller incremented nmspinning, so set m.spinning in the new M. // // mspinning函数就一行代码 'getg().m.spinning = true' 标记当前工作线程是自旋状态 // 因为全局的sched.nmspinning已经加一了，因此需要标记m的spinning fn = mspinning\t} newm(fn, _p_, id) // 创建新的工作线程 // Ownership transfer of _p_ committed by start in newm. // Preemption is now safe. releasem(mp) return } // 到这里说明有正在处于睡眠的工作线程 unlock(\u0026sched.lock) // 从空闲的线程队列中拿出来的 spinning 标志位存在，说明sleep时有问题 if nmp.spinning { // 系统逻辑存在问题 throw(\"startm: m is spinning\") } // 工作线程还与其他P有关，说明有问题 if nmp.nextp != 0 { // 系统逻辑存在问题 throw(\"startm: m has p\") } // 空闲的P中不应该存在g，系统逻辑存在问题 if spinning \u0026\u0026 !runqempty(_p_) {\tthrow(\"startm: p has runnable gs\") } // The caller incremented nmspinning, so set m.spinning in the new M. // // 调用者增加nmspinning，因此将m.spinning设置为新的M。因此当前这个M就是这个自旋的M nmp.spinning = spinning // 标记当前需要唤醒的工作线程 自旋的状态 // 当前M的P暂时放在nextp上 // 这里也就是为什么新创建的工作线程直接在nextp去取P，原因在这里关联的 // 因为_p_只在这里存在，因此不会存在其他工作线程使用该P。 nmp.nextp.set(_p_)\t// 唤醒工作线程，工作线程睡眠在 nmp.park 上面 notewakeup(\u0026nmp.park)\t// Ownership transfer of _p_ committed by wakeup. Preemption is now // safe. // // 唤醒提交的_p_的所有权转移。 抢占现在是安全的 // 与acquirem函数呼应，并检查是否有抢占请求发生 releasem(mp) } acquirem() m加锁禁止抢占当前m。 文件位置：go1.19.3/src/runtime/runtime1.go。 473 474 475 476 477 478 //go:nosplit func acquirem() *m { _g_ := getg() _g_.m.locks++ return _g_.m } releasem() 文件位置：go1.19.3/src/runtime/runtime1.go。 482 483 484 485 486 487 488 489 490 func releasem(mp *m) { _g_ := getg() mp.locks-- // 当前M没有锁，并且G需要被抢占 if mp.locks == 0 \u0026\u0026 _g_.preempt { // restore the preemption request in case we've cleared it in newstack _g_.stackguard0 = stackPreempt // 设置抢占标志 } } pidleget() 从sched.pidle中尝试获取一个空闲的P。 参数now int64：0则取当前时间点。 返回值： *p：返回一个空闲的P，否则为nil没有空闲的P。 int64：传入now的时间值，0则是当前时间值。 文件位置：go1.19.3/src/runtime/proc.go。 5727 5728 5729 5730 5731 5732 5733 5734 5735 5736 5737 5738 5739 5740 5741 5742 5743 5744 5745 5746 5747 5748 5749 5750 5751 5752 5753 5754 5755 5756 // pidleget tries to get a p from the _Pidle list, acquiring ownership. // // sched.lock must be held. // // May run during STW, so write barriers are not allowed. // //go:nowritebarrierrec func pidleget(now int64) (*p, int64) { // sched.lock 必须被持有 assertLockHeld(\u0026sched.lock) // 从sched.pidle上获取空闲的P _p_ := sched.pidle.ptr() if _p_ != nil { // Timer may get added at any time now. if now == 0 { now = nanotime() } // 设置timerpMask和idlepMask timerpMask.set(_p_.id) idlepMask.clear(_p_.id) // 从全局空闲的P中移除_p_ sched.pidle = _p_.link // 全局的空闲P的次数减一 atomic.Xadd(\u0026sched.npidle, -1) // limiterEvent跟踪GC CPU限制器的事件。 _p_.limiterEvent.stop(limiterEventIdle, now) } return _p_, now } mget() 尝试从sched.midle获取一个空闲的工作线程m，起来绑定P运行。 文件位置：go1.19.3/src/runtime/proc.go。 5547 5548 5549 5550 5551 5552 5553 5554 5555 5556 5557 5558 5559 5560 5561 5562 5563 5564 // Try to get an m from midle list. // sched.lock must be held. // May run during STW, so write barriers are not allowed. // //go:nowritebarrierrec func mget() *m { assertLockHeld(\u0026sched.lock) // 空闲的m在sched.midle上 mp := sched.midle.ptr() if mp != nil { // 从sched.midle上移除mp sched.midle = mp.schedlink // 空闲的m数量减一 sched.nmidle-- } return mp } mReserveID() 给新创建的工作线程分配唯一的ID。 文件位置：go1.19.3/src/runtime/proc.go。 769 770 771 772 773 774 775 776 777 778 779 780 781 782 783 784 785 786 787 788 789 790 // mReserveID returns the next ID to use for a new m. This new m is immediately // considered 'running' by checkdead. // // sched.lock must be held. func mReserveID() int64 { // sched.lock锁必须被持有 assertLockHeld(\u0026sched.lock) // 分配的ID溢出了 if sched.mnext+1 \u003c sched.mnext { throw(\"runtime: thread ID overflow\") } id := sched.mnext // 分配的ID sched.mnext++ // 下一个ID // 检查sched.mnext - sched.nmfreed \u003e sched.maxmcount // sched.maxmcount 在 runtime.main 中被设置为 10000 // sched.mnext 下一个分配的ID，该值是累加的 // sched.nmfreed 已经释放的工作线程数量 // 因此这里是检查当前已经创建的工作线程数量不能大于最大值 checkmcount() return id } notewakeup() 首先使用atomic.Xchg设置note.key值为1。 这是为了使被唤醒的线程可以通过查看该值是否等于1来确定是被其它线程唤醒还是意外从睡眠中苏醒了过来， 如果该值为1则表示是被唤醒的，可以继续工作了。 但如果该值为0则表示是意外苏醒，需要再次进入睡眠， 工作线程苏醒之后的处理逻辑我们已经在notesleep()函数中见过，所以这里略过。 文件位置：go1.19.3/src/runtime/lock_futex.go。 139 140 141 142 143 144 145 146 147 func notewakeup(n *note) { // 设置n.key = 1, 被唤醒的线程通过查看该值是否等于1来确定是被其它线程唤醒还是意外从睡眠中苏醒 old := atomic.Xchg(key32(\u0026n.key), 1) if old != 0 { // 如果旧值不是0说明系统逻辑有问题 print(\"notewakeup - double wakeup (\", old, \")\\n\") throw(\"notewakeup - double wakeup\") } futexwakeup(key32(\u0026n.key), 1) // 调用futexwakeup唤醒 } futexwakeup() 对于Linux平台来说，工作线程通过note睡眠其实是通过futex系统调用睡眠在内核之中， 所以唤醒处于睡眠状态的线程也需要通过futex系统调用进入内核来唤醒。 所以这里的futexwakeup()又继续调用包装了futex系统调用的futex()函数来实现唤醒睡眠在内核中的工作线程。 文件位置：go1.19.3/src/runtime/os_linux.go。 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 // If any procs are sleeping on addr, wake up at most cnt. //go:nosplit func futexwakeup(addr *uint32, cnt uint32) { // 调用futex函数唤醒工作线程 ret := futex(unsafe.Pointer(addr), _FUTEX_WAKE_PRIVATE, cnt, nil, nil, 0) if ret \u003e= 0 {\t// 调用成功是这里直接返回 return } // I don't know that futex wakeup can return // EAGAIN or EINTR, but if it does, it would be // safe to loop and call futex again. systemstack(func() { print(\"futexwakeup addr=\", addr, \" returned \", ret, \"\\n\") }) // 程序不会到这里来，即使到这里来了，向一个未知地址写入数据直接宕机 *(*int32)(unsafe.Pointer(uintptr(0x1006))) = 0x1006 } futex() futex()函数由汇编代码写成，前面的几条指令都在为futex系统调用准备参数， 参数准备完成之后则通过SYSCALL指令进入操作系统内核完成线程的唤醒功能。 内核在完成唤醒工作之后当前工作线程则从内核返回到futex()函数继续执行SYSCALL指令之后的代码并按函数调用链原路返回。 继续执行其它代码，而被唤醒的工作线程则由内核负责在适当的时候调度到CPU上运行。 陷入系统调用太长时间的工作线程会在监控线程中剥离P和G，具体的参看监控线程相关代码。这里没有标记工作线程陷入系统调用的标志。 应该是当前函数调用不会形成阻塞。 文件位置：go1.19.3/src/runtime/sys_linux_amd64.s。 549 550 551 552 553 554 555 556 557 558 559 560 561 562 # int64 futex(int32 *uaddr, int32 op, int32 val, # struct timespec *timeout, int32 *uaddr2, int32 val2); TEXT runtime·futex(SB),NOSPLIT,$0 #这6条指令在为futex系统调用准备参数 MOVQ addr+0(FP), DI MOVL op+8(FP), SI MOVL val+12(FP), DX MOVQ ts+16(FP), R10 MOVQ addr2+24(FP), R8 MOVL val3+32(FP), R9 MOVL $SYS_futex, AX # futex系统调用编号放入AX寄存器 SYSCALL # 系统调用，进入内核 MOVL AX, ret+40(FP) # 系统调用通过AX寄存器返回返回值，这里把返回值保存到内存之中 RET 创建工作线程 如果没有正处于休眠状态的工作线程，则需要调用newm()函数新建一个工作线程。 newm() 创建调度线程和监控线程都是通过该函数，执行该函数时都会把栈切换到g0栈，因为g0栈比较大。 该函数在以下两种情况下使用： newm(sysmon, nil, -1)：创建【监控线程】。 sysmon工作线程开始执行时首先调用的函数。（不是入口函数，newm()创建的入口函数都是固定的mstart()函数） nil表示不需要绑定P。 -1系统会自动分配一个递增的数字。（全局唯一的ID） newm(fn, _p_, id)：创建【调度线程】。 fn工作线程开始执行时首先调用的函数。（不是入口函数，newm()创建的入口函数都是固定的mstart()函数） _p_线程启动时需要绑定的P。 创建工作线程的唯一ID。 创建一个新的m。它将从对fn或调度器的调用开始。fn需要是静态的，而不是一个堆分配闭包。可以使用 m.p==nil运行，因此不允许写入障碍。 id是可选的，预分配的M的id。通过传递-1来省略。 go:nowritebarrierrec：告诉编译器该函数及里面所调用的函数都不插入写屏障代码。 参数： fn func()：新创建的工作线程启动后需要执行的函数，不能是一个堆分配的闭包，必须是一个静态的函数。 也就是所有创建的线程入口函数都是mstart()函数是线程的入口函数数，参看newosproc()函数。 _p_ *p：新创建的工作线程需要绑定的P，该值可以为 nil，表示不绑定P。 id int64：新创建的工作线程的ID值，该值可以是-1，表示系统自动分配一个递增的ID数值。 文件位置： // Create a new m. It will start off with a call to fn, or else the scheduler. // fn needs to be static and not a heap allocated closure. // May run with m.p==nil, so write barriers are not allowed. // // id is optional pre-allocated m ID. Omit by passing -1. // //go:nowritebarrierrec func newm(fn func(), _p_ *p, id int64) { // allocm adds a new M to allm, but they do not start until created by // the OS in newm1 or the template thread. // // doAllThreadsSyscall requires that every M in allm will eventually // start and be signal-able, even with a STW. // // Disable preemption here until we start the thread to ensure that // newm is not preempted between allocm and starting the new thread, // ensuring that anything added to allm is guaranteed to eventually // start. // // allocm将一个新的M添加到allm中，但是直到操作系统在newm1或模板线程中创建它们才开始。 // doAllThreadsSyscall 要求allm中的每个M最终都将启动并可发送信号，即使是STW。 // 在这里禁用抢占，直到我们启动线程，以确保newm在allocm和启动新线程之间不被抢占，确保添加到allm的任何内容最终都能启动。 acquirem()\t// 禁止当前工作线程被抢占 // allocm从堆上分配一个m结构体，并绑定M与其他相关例如allp等 mp := allocm(_p_, fn, id) mp.nextp.set(_p_)\t// 设置当前M需要用到的P mp.sigmask = initSigmask if gp := getg(); gp != nil \u0026\u0026 gp.m != nil \u0026\u0026 (gp.m.lockedExt != 0 || gp.m.incgo) \u0026\u0026 GOOS != \"plan9\" { // We're on a locked M or a thread that may have been // started by C. The kernel state of this thread may // be strange (the user may have locked it for that // purpose). We don't want to clone that into another // thread. Instead, ask a known-good thread to create // the thread for us. // // This is disabled on Plan 9. See golang.org/issue/22227. // // TODO: This may be unnecessary on Windows, which // doesn't model thread creation off fork. lock(\u0026newmHandoff.lock) if newmHandoff.haveTemplateThread == 0 { throw(\"on a locked thread with no template thread\") } mp.schedlink = newmHandoff.newm newmHandoff.newm.set(mp) if newmHandoff.waiting { newmHandoff.waiting = false notewakeup(\u0026newmHandoff.wake) } unlock(\u0026newmHandoff.lock) // The M has not started yet, but the template thread does not // participate in STW, so it will always process queued Ms and // it is safe to releasem. releasem(getg().m) return } newm1(mp) releasem(getg().m) } ",
-  "wordCount" : "1888",
+  "articleBody": "唤醒工作线程 去尝试唤醒工作线程条件：atomic.Load(\u0026sched.npidle) != 0 \u0026\u0026 atomic.Load(\u0026sched.nmspinning) == 0。 atomic.Load(\u0026sched.npidle) != 0：有空闲的P。 atomic.Load(\u0026sched.nmspinning) == 0：没有工作线程正在尝试从其他工作线程的本地队列偷取goroutine。(就是没有spinning自旋的goroutine时) 唤醒空闲的P和M由wakep()函数完成。 wakep() 尝试添加一个P来执行G。当G是可运行时调用(newproc, ready)。 wakep()函数被调用的地方：【创建g时候，在newproc()函数中，就是go关键字】，【g放回P的时候，在ready()函数中】。 newproc()函数中，也就是go关键字时，runtime.main已启动时。（这种情况发生在go关键字时） ready()函数中，该函数通过把需要唤醒的goroutine放入运行队列来唤醒它。（这种情况在g被挂在了其他地方时需要恢复到P中时） 也就是只要g被放入本地队列中，准备运行时都需要调用wakep()函数尝试利用空闲的M和P来运行它。 文件位置：go1.19.3/src/runtime/proc.go。 2420 2421 2422 2423 2424 2425 2426 2427 2428 2429 2430 2431 2432 2433 2434 2435 2436 2437 2438 2439 2440 2441 2442 2443 2444 2445 2446 2447 // Tries to add one more P to execute G's. // Called when a G is made runnable (newproc, ready). func wakep() { // 没有空闲的P，直接返回。当前所有的P都在工作。因为P的数量是固定的。 if atomic.Load(\u0026sched.npidle) == 0 { return } // be conservative about spinning threads // // 对自旋的线程持保守态度： // 1. sched.nmspinning != 0：有其他线程正在自旋（就是在其他线程中去偷取g） // 2. !atomic.Cas(\u0026sched.nmspinning, 0, 1)：通过cas操作再次确认是否有其他工作线程处于spinning状态 // 从进入wakep()判断到真正启动工作线程之前的这一段时间之内，如果已经有工作线程进入了spinning状态而在四处寻找需要运行的goroutine // 这样的话我们就没有必要再启动一个多余的工作线程出来了 // 如果cas操作成功，则继续调用startm创建一个新的或唤醒一个处于睡眠状态的工作线程出来工作 // // 1. atomic.Load(\u0026sched.nmspinning) != 0 成立：有其他工作线程正在自旋，直接return退出 // 2. atomic.Load(\u0026sched.nmspinning) == 0 成立：当前没有忙碌的工作线程 // atomic.Cas(\u0026sched.nmspinning, 0, 1) == true：当前没有忙碌的工作线程，当前可以创建工作线程，并标记sched.nmspinning=1阻止后来者 // atomic.Cas(\u0026sched.nmspinning, 0, 1) == false：当前有其他忙碌的工作线程，直接return退出 if atomic.Load(\u0026sched.nmspinning) != 0 || !atomic.Cas(\u0026sched.nmspinning, 0, 1) { return } // 程序执行到这里说明：sched.nmspinning一定被标记为1了。 startm(nil, true) } startm() 调度一些M来运行p(如果需要，创建一个M)。 如果p==nil，尝试得到一个空闲的p，如果没有空闲的p什么都不做。 可以使用m.p==nil运行，因此不允许写入障碍。 如果设置了spinning，则调用者增加了nmspinning，而startm将减少nmspinning或在新启动的M中设置m.spinning。 传递nil的P的调用方必须从不可抢占的上下文中调用。见下面对acquirem。 必须没有写障碍，因为这个可能没有P。 go:nowritebarrierrec：不允许编译器插入写屏障相关代码。 在抢占系统调用的P的时候该函数会被调用，并传入空闲的P和false参数。 参数： _p_ *p：nil表示没有指定P，否则指定P。 spinning bool：true.sched.nmspinning的值在前面被加一了。false.没有加一。 文件位置：go1.19.3/src/runtime/proc.go。 2257 2258 2259 2260 2261 2262 2263 2264 2265 2266 2267 2268 2269 2270 2271 2272 2273 2274 2275 2276 2277 2278 2279 2280 2281 2282 2283 2284 2285 2286 2287 2288 2289 2290 2291 2292 2293 2294 2295 2296 2297 2298 2299 2300 2301 2302 2303 2304 2305 2306 2307 2308 2309 2310 2311 2312 2313 2314 2315 2316 2317 2318 2319 2320 2321 2322 2323 2324 2325 2326 2327 2328 2329 2330 2331 2332 2333 2334 2335 2336 2337 2338 2339 2340 2341 2342 2343 2344 2345 2346 2347 2348 2349 2350 2351 2352 2353 2354 2355 2356 2357 2358 2359 2360 2361 2362 2363 2364 2365 2366 2367 2368 2369 2370 2371 2372 2373 2374 2375 2376 2377 2378 2379 2380 // Schedules some M to run the p (creates an M if necessary). // If p==nil, tries to get an idle P, if no idle P's does nothing. // May run with m.p==nil, so write barriers are not allowed. // If spinning is set, the caller has incremented nmspinning and startm will // either decrement nmspinning or set m.spinning in the newly started M. // // Callers passing a non-nil P must call from a non-preemptible context. See // comment on acquirem below. // // Must not have write barriers because this may be called without a P. // //go:nowritebarrierrec func startm(_p_ *p, spinning bool) { // Disable preemption. // // Every owned P must have an owner that will eventually stop it in the // event of a GC stop request. startm takes transient ownership of a P // (either from argument or pidleget below) and transfers ownership to // a started M, which will be responsible for performing the stop. // // Preemption must be disabled during this transient ownership, // otherwise the P this is running on may enter GC stop while still // holding the transient P, leaving that P in limbo and deadlocking the // STW. // // Callers passing a non-nil P must already be in non-preemptible // context, otherwise such preemption could occur on function entry to // startm. Callers passing a nil P may be preemptible, so we must // disable preemption before acquiring a P from pidleget below. mp := acquirem() // 禁止当前M被抢占 lock(\u0026sched.lock) // 锁住全局sched // 有空闲的p才会去唤醒线程 if _p_ == nil { // 如果没有指定P，则需要从P的空闲列表中获取一个P _p_ = pidleget(0) // 从P的空闲队列中获取空闲的P // 没有空闲的P，意味着所有的P都很忙不需要唤醒 if _p_ == nil {\tunlock(\u0026sched.lock) // 之前的Cas把nmspinning加一，这里需要减回来 if spinning {\t// The caller incremented nmspinning, but there are no idle Ps, // so it's okay to just undo the increment and give up. // // 正常逻辑这里不应该减成负数，否则是系统逻辑存在错误 if int32(atomic.Xadd(\u0026sched.nmspinning, -1)) \u003c 0 { throw(\"startm: negative nmspinning\") } } // 与acquirem函数呼应，并检查是否有抢占请求发生 releasem(mp)\treturn // 没有空闲的P直接返回 } } // 尝试从m空闲队列中获取正处于睡眠之中的工作线程 // 所有处于睡眠状态的m都在此队列中 nmp := mget() // 没有处于睡眠状态的工作线程，这种情况需要去创建线程 if nmp == nil {\t// No M is available, we must drop sched.lock and call newm. // However, we already own a P to assign to the M. // // Once sched.lock is released, another G (e.g., in a syscall), // could find no idle P while checkdead finds a runnable G but // no running M's because this new M hasn't started yet, thus // throwing in an apparent deadlock. // // Avoid this situation by pre-allocating the ID for the new M, // thus marking it as 'running' before we drop sched.lock. This // new M will eventually run the scheduler to execute any // queued G's. // // 这里是为需要新创建的工作线程准备工作 id := mReserveID() // 给需要创建的工作线程分配ID unlock(\u0026sched.lock) // 初始化fn函数，该函数在工作线程刚启动时会被调用 var fn func() // nil if spinning { // 如果需要标记当前工作线程是自旋状态 // The caller incremented nmspinning, so set m.spinning in the new M. // // mspinning函数就一行代码 'getg().m.spinning = true' 标记当前工作线程是自旋状态 // 因为全局的sched.nmspinning已经加一了，因此需要标记m的spinning fn = mspinning\t} newm(fn, _p_, id) // 创建新的工作线程 // Ownership transfer of _p_ committed by start in newm. // Preemption is now safe. releasem(mp) return } // 到这里说明有正在处于睡眠的工作线程 unlock(\u0026sched.lock) // 从空闲的线程队列中拿出来的 spinning 标志位存在，说明sleep时有问题 if nmp.spinning { // 系统逻辑存在问题 throw(\"startm: m is spinning\") } // 工作线程还与其他P有关，说明有问题 if nmp.nextp != 0 { // 系统逻辑存在问题 throw(\"startm: m has p\") } // 空闲的P中不应该存在g，系统逻辑存在问题 if spinning \u0026\u0026 !runqempty(_p_) {\tthrow(\"startm: p has runnable gs\") } // The caller incremented nmspinning, so set m.spinning in the new M. // // 调用者增加nmspinning，因此将m.spinning设置为新的M。因此当前这个M就是这个自旋的M nmp.spinning = spinning // 标记当前需要唤醒的工作线程 自旋的状态 // 当前M的P暂时放在nextp上 // 这里也就是为什么新创建的工作线程直接在nextp去取P，原因在这里关联的 // 因为_p_只在这里存在，因此不会存在其他工作线程使用该P。 nmp.nextp.set(_p_)\t// 唤醒工作线程，工作线程睡眠在 nmp.park 上面 notewakeup(\u0026nmp.park)\t// Ownership transfer of _p_ committed by wakeup. Preemption is now // safe. // // 唤醒提交的_p_的所有权转移。 抢占现在是安全的 // 与acquirem函数呼应，并检查是否有抢占请求发生 releasem(mp) } acquirem() m加锁禁止抢占当前m。 文件位置：go1.19.3/src/runtime/runtime1.go。 473 474 475 476 477 478 //go:nosplit func acquirem() *m { _g_ := getg() _g_.m.locks++ return _g_.m } releasem() 文件位置：go1.19.3/src/runtime/runtime1.go。 482 483 484 485 486 487 488 489 490 func releasem(mp *m) { _g_ := getg() mp.locks-- // 当前M没有锁，并且G需要被抢占 if mp.locks == 0 \u0026\u0026 _g_.preempt { // restore the preemption request in case we've cleared it in newstack _g_.stackguard0 = stackPreempt // 设置抢占标志 } } pidleget() 从sched.pidle中尝试获取一个空闲的P。 参数now int64：0则取当前时间点。 返回值： *p：返回一个空闲的P，否则为nil没有空闲的P。 int64：传入now的时间值，0则是当前时间值。 文件位置：go1.19.3/src/runtime/proc.go。 5727 5728 5729 5730 5731 5732 5733 5734 5735 5736 5737 5738 5739 5740 5741 5742 5743 5744 5745 5746 5747 5748 5749 5750 5751 5752 5753 5754 5755 5756 // pidleget tries to get a p from the _Pidle list, acquiring ownership. // // sched.lock must be held. // // May run during STW, so write barriers are not allowed. // //go:nowritebarrierrec func pidleget(now int64) (*p, int64) { // sched.lock 必须被持有 assertLockHeld(\u0026sched.lock) // 从sched.pidle上获取空闲的P _p_ := sched.pidle.ptr() if _p_ != nil { // Timer may get added at any time now. if now == 0 { now = nanotime() } // 设置timerpMask和idlepMask timerpMask.set(_p_.id) idlepMask.clear(_p_.id) // 从全局空闲的P中移除_p_ sched.pidle = _p_.link // 全局的空闲P的次数减一 atomic.Xadd(\u0026sched.npidle, -1) // limiterEvent跟踪GC CPU限制器的事件。 _p_.limiterEvent.stop(limiterEventIdle, now) } return _p_, now } mget() 尝试从sched.midle获取一个空闲的工作线程m，起来绑定P运行。 文件位置：go1.19.3/src/runtime/proc.go。 5547 5548 5549 5550 5551 5552 5553 5554 5555 5556 5557 5558 5559 5560 5561 5562 5563 5564 // Try to get an m from midle list. // sched.lock must be held. // May run during STW, so write barriers are not allowed. // //go:nowritebarrierrec func mget() *m { assertLockHeld(\u0026sched.lock) // 空闲的m在sched.midle上 mp := sched.midle.ptr() if mp != nil { // 从sched.midle上移除mp sched.midle = mp.schedlink // 空闲的m数量减一 sched.nmidle-- } return mp } mReserveID() 给新创建的工作线程分配唯一的ID。 文件位置：go1.19.3/src/runtime/proc.go。 769 770 771 772 773 774 775 776 777 778 779 780 781 782 783 784 785 786 787 788 789 790 // mReserveID returns the next ID to use for a new m. This new m is immediately // considered 'running' by checkdead. // // sched.lock must be held. func mReserveID() int64 { // sched.lock锁必须被持有 assertLockHeld(\u0026sched.lock) // 分配的ID溢出了 if sched.mnext+1 \u003c sched.mnext { throw(\"runtime: thread ID overflow\") } id := sched.mnext // 分配的ID sched.mnext++ // 下一个ID // 检查sched.mnext - sched.nmfreed \u003e sched.maxmcount // sched.maxmcount 在 runtime.main 中被设置为 10000 // sched.mnext 下一个分配的ID，该值是累加的 // sched.nmfreed 已经释放的工作线程数量 // 因此这里是检查当前已经创建的工作线程数量不能大于最大值 checkmcount() return id } notewakeup() 首先使用atomic.Xchg设置note.key值为1。 这是为了使被唤醒的线程可以通过查看该值是否等于1来确定是被其它线程唤醒还是意外从睡眠中苏醒了过来， 如果该值为1则表示是被唤醒的，可以继续工作了。 但如果该值为0则表示是意外苏醒，需要再次进入睡眠， 工作线程苏醒之后的处理逻辑我们已经在notesleep()函数中见过，所以这里略过。 文件位置：go1.19.3/src/runtime/lock_futex.go。 139 140 141 142 143 144 145 146 147 func notewakeup(n *note) { // 设置n.key = 1, 被唤醒的线程通过查看该值是否等于1来确定是被其它线程唤醒还是意外从睡眠中苏醒 old := atomic.Xchg(key32(\u0026n.key), 1) if old != 0 { // 如果旧值不是0说明系统逻辑有问题 print(\"notewakeup - double wakeup (\", old, \")\\n\") throw(\"notewakeup - double wakeup\") } futexwakeup(key32(\u0026n.key), 1) // 调用futexwakeup唤醒 } futexwakeup() 对于Linux平台来说，工作线程通过note睡眠其实是通过futex系统调用睡眠在内核之中， 所以唤醒处于睡眠状态的线程也需要通过futex系统调用进入内核来唤醒。 所以这里的futexwakeup()又继续调用包装了futex系统调用的futex()函数来实现唤醒睡眠在内核中的工作线程。 文件位置：go1.19.3/src/runtime/os_linux.go。 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 // If any procs are sleeping on addr, wake up at most cnt. //go:nosplit func futexwakeup(addr *uint32, cnt uint32) { // 调用futex函数唤醒工作线程 ret := futex(unsafe.Pointer(addr), _FUTEX_WAKE_PRIVATE, cnt, nil, nil, 0) if ret \u003e= 0 {\t// 调用成功是这里直接返回 return } // I don't know that futex wakeup can return // EAGAIN or EINTR, but if it does, it would be // safe to loop and call futex again. systemstack(func() { print(\"futexwakeup addr=\", addr, \" returned \", ret, \"\\n\") }) // 程序不会到这里来，即使到这里来了，向一个未知地址写入数据直接宕机 *(*int32)(unsafe.Pointer(uintptr(0x1006))) = 0x1006 } futex() futex()函数由汇编代码写成，前面的几条指令都在为futex系统调用准备参数， 参数准备完成之后则通过SYSCALL指令进入操作系统内核完成线程的唤醒功能。 内核在完成唤醒工作之后当前工作线程则从内核返回到futex()函数继续执行SYSCALL指令之后的代码并按函数调用链原路返回。 继续执行其它代码，而被唤醒的工作线程则由内核负责在适当的时候调度到CPU上运行。 陷入系统调用太长时间的工作线程会在监控线程中剥离P和G，具体的参看监控线程相关代码。这里没有标记工作线程陷入系统调用的标志。 应该是当前函数调用不会形成阻塞。 文件位置：go1.19.3/src/runtime/sys_linux_amd64.s。 549 550 551 552 553 554 555 556 557 558 559 560 561 562 # int64 futex(int32 *uaddr, int32 op, int32 val, # struct timespec *timeout, int32 *uaddr2, int32 val2); TEXT runtime·futex(SB),NOSPLIT,$0 #这6条指令在为futex系统调用准备参数 MOVQ addr+0(FP), DI MOVL op+8(FP), SI MOVL val+12(FP), DX MOVQ ts+16(FP), R10 MOVQ addr2+24(FP), R8 MOVL val3+32(FP), R9 MOVL $SYS_futex, AX # futex系统调用编号放入AX寄存器 SYSCALL # 系统调用，进入内核 MOVL AX, ret+40(FP) # 系统调用通过AX寄存器返回返回值，这里把返回值保存到内存之中 RET 创建工作线程 如果没有正处于休眠状态的工作线程，则需要调用newm()函数新建一个工作线程。 newm() 创建调度线程和监控线程都是通过该函数，执行该函数时都会把栈切换到g0栈，因为g0栈比较大。 该函数在以下两种情况下使用： newm(sysmon, nil, -1)：创建【监控线程】。 sysmon工作线程开始执行时首先调用的函数。（不是入口函数，newm()创建的入口函数都是固定的mstart()函数） nil表示不需要绑定P。 -1系统会自动分配一个递增的数字。（全局唯一的ID） newm(fn, _p_, id)：创建【调度线程】。 fn工作线程开始执行时首先调用的函数。（不是入口函数，newm()创建的入口函数都是固定的mstart()函数） _p_线程启动时需要绑定的P。 创建工作线程的唯一ID。 创建一个新的m。它将从对fn或调度器的调用开始。fn需要是静态的，而不是一个堆分配闭包。可以使用 m.p==nil运行，因此不允许写入障碍。 id是可选的，预分配的M的id。通过传递-1来省略。 go:nowritebarrierrec：告诉编译器该函数及里面所调用的函数都不插入写屏障代码。 参数： fn func()：新创建的工作线程启动后需要执行的函数，不能是一个堆分配的闭包，必须是一个静态的函数。 也就是所有创建的线程入口函数都是mstart()函数是线程的入口函数数，参看newosproc()函数。 _p_ *p：新创建的工作线程需要绑定的P，该值可以为 nil，表示不绑定P。 id int64：新创建的工作线程的ID值，该值可以是-1，表示系统自动分配一个递增的ID数值。 文件位置：go1.19.3/src/runtime/proc.go。 2089 2090 2091 2092 2093 2094 2095 2096 2097 2098 2099 2100 2101 2102 2103 2104 2105 2106 2107 2108 2109 2110 2111 2112 2113 2114 2115 2116 2117 2118 2119 2120 2121 2122 2123 2124 2125 2126 2127 2128 2129 2130 2131 2132 2133 2134 2135 2136 2137 2138 2139 2140 2141 2142 2143 2144 2145 2146 2147 2148 // Create a new m. It will start off with a call to fn, or else the scheduler. // fn needs to be static and not a heap allocated closure. // May run with m.p==nil, so write barriers are not allowed. // // id is optional pre-allocated m ID. Omit by passing -1. // //go:nowritebarrierrec func newm(fn func(), _p_ *p, id int64) { // allocm adds a new M to allm, but they do not start until created by // the OS in newm1 or the template thread. // // doAllThreadsSyscall requires that every M in allm will eventually // start and be signal-able, even with a STW. // // Disable preemption here until we start the thread to ensure that // newm is not preempted between allocm and starting the new thread, // ensuring that anything added to allm is guaranteed to eventually // start. // // allocm将一个新的M添加到allm中，但是直到操作系统在newm1或模板线程中创建它们才开始。 // doAllThreadsSyscall 要求allm中的每个M最终都将启动并可发送信号，即使是STW。 // 在这里禁用抢占，直到我们启动线程，以确保newm在allocm和启动新线程之间不被抢占，确保添加到allm的任何内容最终都能启动。 acquirem()\t// 禁止当前工作线程被抢占 // allocm从堆上分配一个m结构体，并绑定M与其他相关例如allp等 mp := allocm(_p_, fn, id) mp.nextp.set(_p_)\t// 设置当前M需要用到的P mp.sigmask = initSigmask if gp := getg(); gp != nil \u0026\u0026 gp.m != nil \u0026\u0026 (gp.m.lockedExt != 0 || gp.m.incgo) \u0026\u0026 GOOS != \"plan9\" { // We're on a locked M or a thread that may have been // started by C. The kernel state of this thread may // be strange (the user may have locked it for that // purpose). We don't want to clone that into another // thread. Instead, ask a known-good thread to create // the thread for us. // // This is disabled on Plan 9. See golang.org/issue/22227. // // TODO: This may be unnecessary on Windows, which // doesn't model thread creation off fork. lock(\u0026newmHandoff.lock) if newmHandoff.haveTemplateThread == 0 { throw(\"on a locked thread with no template thread\") } mp.schedlink = newmHandoff.newm newmHandoff.newm.set(mp) if newmHandoff.waiting { newmHandoff.waiting = false notewakeup(\u0026newmHandoff.wake) } unlock(\u0026newmHandoff.lock) // The M has not started yet, but the template thread does not // participate in STW, so it will always process queued Ms and // it is safe to releasem. releasem(getg().m) return } newm1(mp) releasem(getg().m) } acquirem() 文件位置：go1.19.3/src/runtime/runtime1.go。 473 474 475 476 477 478 //go:nosplit func acquirem() *m { _g_ := getg() _g_.m.locks++ return _g_.m } allocm() 分配一个不与任何线程关联的新m。如果需要，可以使用p作为分配上下文。 fn被记录为新m的m.mstartfn。id是可选的，预分配的m的id。通过传递-1来省略。 这个函数允许有写障碍，即使调用者没有，因为它借用了_p_。 go:yeswritebarrierrec：允许编译器插入写屏障相关代码，因为调用者使用的是go:nowritebarrierrec。 文件位置：go1.19.3/src/runtime/proc.go。 1706 1707 1708 1709 1710 1711 1712 1713 1714 1715 1716 1717 1718 1719 1720 1721 1722 1723 1724 1725 1726 1727 1728 1729 1730 1731 1732 1733 1734 1735 1736 1737 1738 1739 1740 1741 1742 1743 1744 1745 1746 1747 1748 1749 1750 1751 1752 1753 1754 1755 1756 1757 1758 1759 1760 1761 1762 1763 1764 1765 1766 1767 1768 1769 1770 1771 1772 1773 1774 1775 1776 1777 1778 1779 1780 1781 1782 1783 1784 1785 1786 1787 1788 1789 1790 // Allocate a new m unassociated with any thread. // Can use p for allocation context if needed. // fn is recorded as the new m's m.mstartfn. // id is optional pre-allocated m ID. Omit by passing -1. // // This function is allowed to have write barriers even if the caller // isn't because it borrows _p_. // //go:yeswritebarrierrec func allocm(_p_ *p, fn func(), id int64) *m { allocmLock.rlock() // 读加锁 // The caller owns _p_, but we may borrow (i.e., acquirep) it. We must // disable preemption to ensure it is not stolen, which would make the // caller lose ownership. acquirem() // 禁止当前M被抢占 _g_ := getg() // 当前g // 注意这里是正在执行的工作线程,在此函数中为 malloc 临时借用 p if _g_.m.p == 0 { // 如果当前M没有绑定P，则去绑定一个P // 在这个函数中暂时借用p来代替mallocs // 当前这个工作线程没有绑定p需要临时借用这个_p_，这种情况可能是sysmon线程中来的。 acquirep(_p_) // temporarily borrow p for mallocs in this function } // Release the free M list. We need to do this somewhere and // this may free up a stack we can use. // // sched.freem 存储的是等待释放的m的链表 if sched.freem != nil { // 释放需要释放的M列表 lock(\u0026sched.lock) var newList *m // freem 是一组已经运行结束的M构成的链表（不是空闲的）。 for freem := sched.freem; freem != nil; { // freeWait 释放g0和删除m是否安全(freeMRef, freeMStack, freeMWait中的一个) if freem.freeWait != 0 { next := freem.freelink freem.freelink = newList newList = freem freem = next continue } // stackfree must be on the system stack, but allocm is // reachable off the system stack transitively from // startm. // // stackfree 必须在系统栈上，但allocm从startm开始在系统栈之外是可访问的。 systemstack(func() { stackfree(freem.g0.stack) // 释放栈 }) freem = freem.freelink } sched.freem = newList unlock(\u0026sched.lock) } // 堆分配一个m mp := new(m)\t// M开始前需要执行的函数，不是M的入口函数，是执行mstart后会调用的函数。 // 1. 如果是调度线下这里存储的是mspinning()函数 // 2. 如果是监控线程存储的是sysmon()函数 mp.mstartfn = fn\t// 初始化M，主要是把m加入到allm中，m记录allm地址等 // 该函数在程序初始化过程中也被调用过 mcommoninit(mp, id)\t// In case of cgo or Solaris or illumos or Darwin, pthread_create will make us a stack. // Windows and Plan 9 will layout sched stack on OS stack. if iscgo || mStackIsSystemAllocated() { mp.g0 = malg(-1) } else { // runtime 的g0栈分配的是64kb左右大小，其他的g0栈分配的是8kb左右大小 // 关于malg函数，是来自栈相关 mp.g0 = malg(8192 * sys.StackGuardMultiplier) // 分配一个大概8Kb左右的g0作为系统栈 } mp.g0.m = mp\t// g0与m关联 if _p_ == _g_.m.p.ptr() { // 如果前面临时借用了P，这里需要还出来 releasep() // 解绑当前工作线程M和P的关联 } releasem(_g_.m) // 判断当前g是否需要被抢占，设置抢占标志 allocmLock.runlock() return mp } acquirep() 把p和当前m联系起来。 这个函数允许有写障碍，即使调用者没有，因为它立即获得_p_。 go:yeswritebarrierrec：允许编译器插入写屏障相关代码。 文件位置：go1.19.3/src/runtime/proc.go。 4938 4939 4940 4941 4942 4943 4944 4945 4946 4947 4948 4949 4950 4951 4952 4953 4954 4955 4956 4957 4958 4959 // Associate p and the current m. // // This function is allowed to have write barriers even if the caller // isn't because it immediately acquires _p_. // //go:yeswritebarrierrec func acquirep(_p_ *p) { // Do the part that isn't allowed to have write barriers. wirep(_p_)\t// 把 P 与 M 绑定起来 // Have p; write barriers now allowed. // 现在有p了；现在允许写屏障。 // Perform deferred mcache flush before this P can allocate // from a potentially stale mcache. // 在此P可以从可能不新鲜的mcache分配之前，执行延迟的mcache刷新。 _p_.mcache.prepareForSweep() if trace.enabled { traceProcStart() } } wirep是acquirep的第一步，它实际上将当前M关联到_p_。 因为我们还没有P，所以我们可以在这部分不允许写障碍。 go:nowritebarrierrec：不允许编译器插入写屏障相关代码。 文件位置：go1.19.3/src/runtime/proc.go。 4959 4960 4961 4962 4963 4964 4965 4966 4967 4968 4969 4970 4971 4972 4973 4974 4975 4976 4977 4978 4979 4980 4981 4982 4983 4984 4985 // wirep is the first step of acquirep, which actually associates the // current M to _p_. This is broken out so we can disallow write // barriers for this part, since we don't yet have a P. // //go:nowritebarrierrec //go:nosplit func wirep(_p_ *p) { _g_ := getg() // g // 这里来的m一定需要是没绑定p的。 if _g_.m.p != 0 { throw(\"wirep: already in go\") } // 当前p也是不能绑定m的，并且当前p的状态不能是 _Pidle if _p_.m != 0 || _p_.status != _Pidle { id := int64(0) if _p_.m != 0 { id = _p_.m.ptr().id } print(\"wirep: p-\u003em=\", _p_.m, \"(\", id, \") p-\u003estatus=\", _p_.status, \"\\n\") throw(\"wirep: invalid p state\") } // p 与 m 相互绑定 _g_.m.p.set(_p_) // m.p = _p_ _p_.m.set(_g_.m) // _p_.m = m _p_.status = _Prunning // 设置p的状态为运行中 } mcommoninit() 预分配的ID可以作为'ID'传递，也可以通过传递-1来省略。 文件位置：go1.19.3/src/runtime/proc.go。 785 786 787 788 789 790 791 792 793 794 795 796 797 798 799 800 801 802 803 804 805 806 807 808 809 810 811 812 813 814 815 816 817 818 819 820 821 822 823 824 825 826 827 828 829 830 831 832 833 // Pre-allocated ID may be passed as 'id', or omitted by passing -1. func mcommoninit(mp *m, id int64) { _g_ := getg() // g // g0 stack won't make sense for user (and is not necessary unwindable). if _g_ != _g_.m.g0 { // 不能是g0栈 callers(1, mp.createstack[:]) } lock(\u0026sched.lock) if id \u003e= 0 { mp.id = id } else { mp.id = mReserveID() } lo := uint32(int64Hash(uint64(mp.id), fastrandseed)) hi := uint32(int64Hash(uint64(cputicks()), ^fastrandseed)) if lo|hi == 0 { hi = 1 } // Same behavior as for 1.17. // TODO: Simplify ths. if goarch.BigEndian { mp.fastrand = uint64(lo)\u003c\u003c32 | uint64(hi) } else { mp.fastrand = uint64(hi)\u003c\u003c32 | uint64(lo) } mpreinit(mp) // 信号相关 if mp.gsignal != nil { mp.gsignal.stackguard1 = mp.gsignal.stack.lo + _StackGuard } // Add to allm so garbage collector doesn't free g-\u003em // when it is just in a register or thread-local storage. mp.alllink = allm // 记录当前m.alllink的全局allm地址 // NumCgoCall() iterates over allm w/o schedlock, // so we need to publish it safely. atomicstorep(unsafe.Pointer(\u0026allm), unsafe.Pointer(mp))\t// 把m添加到全局allm中 unlock(\u0026sched.lock) // Allocate memory to hold a cgo traceback if the cgo call crashes. if iscgo || GOOS == \"solaris\" || GOOS == \"illumos\" || GOOS == \"windows\" { mp.cgoCallers = new(cgoCallers) } } newm1() 文件位置：go1.19.3/src/runtime/proc.go。 2145 2146 2147 2148 2149 2150 2151 2152 2153 2154 2155 2156 2157 2158 2159 2160 2161 2162 2163 2164 2165 2166 2167 2168 2169 2170 func newm1(mp *m) { if iscgo { // cgo相关代码 var ts cgothreadstart if _cgo_thread_start == nil { throw(\"_cgo_thread_start missing\") } ts.g.set(mp.g0) ts.tls = (*uint64)(unsafe.Pointer(\u0026mp.tls[0])) ts.fn = unsafe.Pointer(abi.FuncPCABI0(mstart)) if msanenabled { msanwrite(unsafe.Pointer(\u0026ts), unsafe.Sizeof(ts)) } if asanenabled { asanwrite(unsafe.Pointer(\u0026ts), unsafe.Sizeof(ts)) } execLock.rlock() // Prevent process clone. asmcgocall(_cgo_thread_start, unsafe.Pointer(\u0026ts)) execLock.runlock() return } execLock.rlock() // Prevent process clone. // newosproc函数 调用clone函数创建一个系统线程 // 新建的这个系统线程将从mstart()函数开始运行。 newosproc(mp) execLock.runlock() } newosproc() 可以m.p==nil 运行，因此不允许写屏障。 文件位置：go1.19.3/src/runtime/os_linux.go。 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 // May run with m.p==nil, so write barriers are not allowed. // //go:nowritebarrier func newosproc(mp *m) { stk := unsafe.Pointer(mp.g0.stack.hi) // 获取当前新创建的M的g0栈栈顶位置 /* * note: strace gets confused if we use CLONE_PTRACE here. */ if false { print(\"newosproc stk=\", stk, \" m=\", mp, \" g=\", mp.g0, \" clone=\", abi.FuncPCABI0(clone), \" id=\", mp.id, \" ostk=\", \u0026mp, \"\\n\") } // Disable signals during clone, so that the new thread starts // with signals disabled. It will enable them in minit. // // 在克隆期间禁用信号，以便新线程以禁用信号开始。 它将在minit中启用它们。 var oset sigset sigprocmask(_SIG_SETMASK, \u0026sigset_all, \u0026oset) // cloneFlags = _CLONE_VM | /* share memory */ // 指定父子线程共享进程地址空间 // _CLONE_FS | /* share cwd, etc */ // _CLONE_FILES | /* share fd table */ // _CLONE_SIGHAND | /* share sig handler table */ // _CLONE_SYSVSEM | /* share SysV semaphore undo lists (see issue #20763) */ // _CLONE_THREAD /* revisit - okay for now */ // 创建子线程而不是子进程 // 程序的入口都是【mstart()】函数开始 ret := clone(cloneFlags, stk, unsafe.Pointer(mp), unsafe.Pointer(mp.g0), unsafe.Pointer(abi.FuncPCABI0(mstart))) sigprocmask(_SIG_SETMASK, \u0026oset, nil) // 怎么也应该出现 ret 小于0的情况 if ret \u003c 0 { print(\"runtime: failed to create new OS thread (have \", mcount(), \" already; errno=\", -ret, \")\\n\") if ret == -_EAGAIN { println(\"runtime: may need to increase max user processes (ulimit -u)\") } throw(\"newosproc\") } } clone() C函数原型：int32 clone(int32 flags, void *stk, M *mp, G *gp, void (*fn)(void))\nint32 flags：指定内核创建线程时需要的选项。 void *stk：新线程应该使用的栈： 因为即将被创建的线程与当前线程共享同一个进程地址空间，所以这里必须为子线程指定其使用的栈，否则父子线程会共享同一个栈从而造成混乱。 从上面的newosproc()函数可以看出，新线程使用的栈为m.g0.stack.lo～m.g0.stack.hi这段内存，而这段内存是newm()函数在创建m结构体对象时从进程的堆上分配而来的。 M *mp：工作线程 M 的信息记录。 G *gp：g0栈信息记录。 void (*fn)(void)：子线程程序入口函数。 上面三个参数（M *mp、G *gp、void (*fn)(void)）保存到寄存器（R13、R9、R12）中： 之所以需要在系统调用之前保存这几个参数，原因在于这几个参数目前还位于父线程的栈之中。 一旦通过系统调用把子线程创建出来之后，子线程将会使用我们在clone系统调用时给它指定的栈。 所以这里需要把这几个参数先保存到寄存器，等子线程从系统调用返回后直接在寄存器中获取这几个参数。 这里要注意的是虽然这个几个参数值保存在了父线程的寄存器之中，但创建子线程时，操作系统内核会把父线程的所有寄存器帮我们复制一份给子线程，所以当子线程开始运行时就能拿到父线程保存在寄存器中的值，从而拿到这几个参数。 文件位置：go1.19.3/src/runtime/sys_linux_amd64.s。 563 564 565 566 567 568 569 570 571 572 573 574 575 576 577 578 579 580 581 582 583 584 585 586 587 588 589 590 591 592 593 594 595 596 597 598 599 600 601 602 603 604 605 606 607 608 609 610 611 612 613 614 615 616 617 618 619 620 621 622 623 624 625 626 627 628 629 630 631 632 633 634 635 636 637 638 639 640 641 642 643 644 645 646 647 648 649 650 651 652 653 654 655 656 657 658 659 660 661 662 663 664 665 666 667 668 669 670 671 672 673 674 675 676 677 678 679 680 681 682 683 684 685 686 687 688 689 690 691 692 693 # int32 clone(int32 flags, void *stk, M *mp, G *gp, void (*fn)(void)); TEXT runtime·clone(SB),NOSPLIT,$0 # 1) 接受参数分蘖放入 DI、SI、R13、R9、R12寄存器中 # 清除 DX、R10、D8寄存器的值 # 第一个参数 flags，clone需要的参数 MOVL flags+0(FP), DI # DI = flags # 第二个参数 stk，g0栈空间 MOVQ stk+8(FP), SI # SI = stk MOVQ $0, DX # 清除DX寄存器 MOVQ $0, R10 # 清除R10寄存器 MOVQ $0, R8 # 清除R8寄存器 # Copy mp, gp, fn off parent stack for use by child. # Careful: Linux system call clobbers CX and R11. # # 从父堆栈中复制 mp、gp、fn 以供子级使用 # 小心：Linux系统调用clobbers CX和R11 # 第三个参数 mp # 在clone后子线程开始运行时，R13、R9、R12的值会被拷贝给子线程 MOVQ mp+16(FP), R13 # R13 = mp # 第四个参数 gp，这里是 g0 MOVQ gp+24(FP), R9 # R9 = gp # 第五个参数 fn，mstart()函数 MOVQ fn+32(FP), R12 # R12 = fn # 2) 判断 mp 和 gp 的值是为 nil # 判断mp==nil和g0=nil # m 如果R13为0则跳转 CMPQ R13, $0 JEQ\tnog1 # g\t如果R9为0则跳转 CMPQ R9, $0 JEQ\tnog1 # 3) 找到需要设置TLS的地址值，也就是\u0026m.tls[1] # 调用系统SYS_clone函数克隆线程 # 把m.tls地址存入R8寄存器 LEAQ m_tls(R13), R8 # R8 = TLS #ifdef GOOS_android # Android stores the TLS offset in runtime·tls_g. SUBQ runtime·tls_g(SB), R8 #else # R8 = -8(FS); R8=\u0026m.tls[1]处地址 ADDQ $8, R8\t# ELF wants to use -8(FS) #endif # 添加CLONE_SETTLS标志 ORQ $0x00080000, DI #add flag CLONE_SETTLS(0x00080000) to call clone nog1: MOVL $SYS_clone, AX # 写入clone函数标志，然后调用系统函数 # 系统调用约定寄存器 DI SI DX R10 R8 R9 参数传参 # DI = flags # SI = stk # DX = 0 # R10 = 0 # R8 = R8=\u0026m.tls[1] # R9 = gp SYSCALL # 4) 系统调用后，新创建的子线程和当前线程都会从系统调用中返回然后执行后面的代码 # # 那么从系统调用返回之后我们怎么知道哪个是父线程哪个是子线程，从而来决定它们的执行流程？ # 使用过fork系统调用的读者应该知道，我们需要通过返回值来判断父子线程： # 1. 系统调用的返回值如果是0则表示这是子线程 # 2. 不为0则表示这个是父线程 # 4.1) 父线程的处理逻辑 # In parent, return. # # 在父线程中，直接返回。 # 判断系统调用SYS_clone的返回值AX与0比较 CMPQ AX, $0 # JEQ 表示AX是0则执行 3(PC)跳过3条指令 JEQ\t3(PC) #跳转到子线程部分 # 这里是父线程直接把返回值写入栈，然后退出函数 MOVL AX, ret+40(FP)\tRET\t# 4.2) 子线程的处理逻辑，设置SP，判断mp和gp，设置mp.procid # In child, on new stack. # # 在子线程中，在new栈上。 # 新创建的子线程从这里开始，注意一下代码是在子线程中，寄存器也是子线程的 # 设置CPU栈顶寄存器指向子线程的栈顶，这条指令看起来是多余的？内核应该已经把SP设置好了 MOVQ SI, SP # If g or m are nil, skip Go-related setup. # # 如果 g 或 m 为 nil，跳过 Go-related 设置。 # m\t新创建的m结构体对象的地址，由父线程保存在R13寄存器中的值被复制到了子线程 CMPQ R13, $0 # R13 = mp JEQ\tnog2 # R13 为 0 时跳转 # g\tm.g0的地址，由父线程保存在R9寄存器中的值被复制到了子线程 CMPQ R9, $0 # R9 = gp JEQ\tnog2 # R9 为 0 时跳转 # Initialize m-\u003eprocid to Linux tid # # 将m-\u003eprocid初始化为Linux tid。 MOVL $SYS_gettid, AX\t# 通过gettid()系统调用获取线程ID（tid） SYSCALL MOVQ AX, m_procid(R13) # m.procid = tid # Set FS to point at m-\u003etls. # # 新线程刚刚创建出来，还未设置线程本地存储，即m结构体对象还未与工作线程关联起来， # 下面的指令负责设置新线程的TLS，把m对象和工作线程关联起来 # 这两行代码在go1.18中消失了，原因在于CLONE_SETTLS配合参数和R8寄存器在clone中被设置了 # LEAQ m_tls(R13), DI # 取m.tls字段的地址\t# CALL runtime·settls(SB) # In child, set up new stack get_tls(CX)\t# CX=\u0026m.tls[1]; CX=TLS MOVQ R13, g_m(R9) # g0.m = m MOVQ R9, g(CX) # m.tls[0]=\u0026g0 # R14=\u0026g0 R14寄存器主要存储当前正在运行的goroutine MOVQ R9, R14 # set g register CALL runtime·stackcheck(SB) # 检查 SP 是否在 [g-\u003estack.lo, g-\u003estack.hi) 范围内 nog2: # Call fn. This is the PC of an ABI0 function. # # 调用mstart()函数开始调度循环 CALL R12\t# 永不返回 # It shouldn't return. If it does, exit that thread. MOVL $111, DI MOVL $SYS_exit, AX SYSCALL JMP\t-3(PC) // keep exiting stackcheck() 检查SP是否在[g-\u003estack.lo, g-\u003estack.hi)范围内。 文件位置：go1.19.3/src/runtime/sys_linux_amd64.s。 1061 1062 1063 1064 1065 1066 1067 1068 1069 1070 1071 1072 1073 # check that SP is in range [g-\u003estack.lo, g-\u003estack.hi) TEXT runtime·stackcheck(SB), NOSPLIT, $0-0 get_tls(CX) # CX=TLS MOVQ g(CX), AX # AX=g0 # g0.stack.hi 与 SP 比较 CMPQ (g_stack+stack_hi)(AX), SP JHI\t2(PC) CALL runtime·abort(SB) # g0.stack.lo 与 SP 比较 CMPQ SP, (g_stack+stack_lo)(AX) JHI\t2(PC) CALL runtime·abort(SB) RET ",
+  "wordCount" : "3970",
   "inLanguage": "zh",
   "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-07-30T00:00:00Z",
   "dateModified": "2024-07-30T00:00:00Z",
@@ -261,12 +261,12 @@
     <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
     <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
     <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
-</svg><span>1888字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>3970字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="12" r="9"></circle>
     <polyline points="12 7 12 12 15 15"></polyline>
-</svg><span>9分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>19分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="7" r="4"></circle>
@@ -324,7 +324,27 @@
                         <a href="#%e5%88%9b%e5%bb%ba%e5%b7%a5%e4%bd%9c%e7%ba%bf%e7%a8%8b" aria-label="创建工作线程">创建工作线程</a><ul>
                             
                     <li>
-                        <a href="#newm" aria-label="newm()">newm()</a>
+                        <a href="#newm" aria-label="newm()">newm()</a><ul>
+                            
+                    <li>
+                        <a href="#acquirem-1" aria-label="acquirem()">acquirem()</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#allocm" aria-label="allocm()">allocm()</a><ul>
+                            
+                    <li>
+                        <a href="#acquirep" aria-label="acquirep()">acquirep()</a></li>
+                    <li>
+                        <a href="#mcommoninit" aria-label="mcommoninit()">mcommoninit()</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#newm1" aria-label="newm1()">newm1()</a></li>
+                    <li>
+                        <a href="#newosproc" aria-label="newosproc()">newosproc()</a></li>
+                    <li>
+                        <a href="#clone" aria-label="clone()">clone()</a></li>
+                    <li>
+                        <a href="#stackcheck" aria-label="stackcheck()">stackcheck()</a>
                     </li>
                 </ul>
                 </li>
@@ -1146,9 +1166,73 @@
 <li><strong><code>id int64</code></strong>：新创建的工作线程的<code>ID</code>值，该值可以是<code>-1</code>，表示系统自动分配一个递增的<code>ID</code>数值。</li>
 </ol>
 </li>
-<li>文件位置：</li>
+<li>文件位置：<code>go1.19.3/src/runtime/proc.go</code>。</li>
 </ol>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Create a new m. It will start off with a call to fn, or else the scheduler.
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">2089
+</span><span class="lnt">2090
+</span><span class="lnt">2091
+</span><span class="lnt">2092
+</span><span class="lnt">2093
+</span><span class="lnt">2094
+</span><span class="lnt">2095
+</span><span class="lnt">2096
+</span><span class="lnt">2097
+</span><span class="lnt">2098
+</span><span class="lnt">2099
+</span><span class="lnt">2100
+</span><span class="lnt">2101
+</span><span class="lnt">2102
+</span><span class="lnt">2103
+</span><span class="lnt">2104
+</span><span class="lnt">2105
+</span><span class="lnt">2106
+</span><span class="lnt">2107
+</span><span class="lnt">2108
+</span><span class="lnt">2109
+</span><span class="lnt">2110
+</span><span class="lnt">2111
+</span><span class="lnt">2112
+</span><span class="lnt">2113
+</span><span class="lnt">2114
+</span><span class="lnt">2115
+</span><span class="lnt">2116
+</span><span class="lnt">2117
+</span><span class="lnt">2118
+</span><span class="lnt">2119
+</span><span class="lnt">2120
+</span><span class="lnt">2121
+</span><span class="lnt">2122
+</span><span class="lnt">2123
+</span><span class="lnt">2124
+</span><span class="lnt">2125
+</span><span class="lnt">2126
+</span><span class="lnt">2127
+</span><span class="lnt">2128
+</span><span class="lnt">2129
+</span><span class="lnt">2130
+</span><span class="lnt">2131
+</span><span class="lnt">2132
+</span><span class="lnt">2133
+</span><span class="lnt">2134
+</span><span class="lnt">2135
+</span><span class="lnt">2136
+</span><span class="lnt">2137
+</span><span class="lnt">2138
+</span><span class="lnt">2139
+</span><span class="lnt">2140
+</span><span class="lnt">2141
+</span><span class="lnt">2142
+</span><span class="lnt">2143
+</span><span class="lnt">2144
+</span><span class="lnt">2145
+</span><span class="lnt">2146
+</span><span class="lnt">2147
+</span><span class="lnt">2148
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Create a new m. It will start off with a call to fn, or else the scheduler.
 </span></span></span><span class="line"><span class="cl"><span class="c1">// fn needs to be static and not a heap allocated closure.
 </span></span></span><span class="line"><span class="cl"><span class="c1">// May run with m.p==nil, so write barriers are not allowed.
 </span></span></span><span class="line"><span class="cl"><span class="c1">//
@@ -1208,7 +1292,922 @@
 </span></span><span class="line"><span class="cl">    <span class="nf">newm1</span><span class="p">(</span><span class="nx">mp</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="nf">releasem</span><span class="p">(</span><span class="nf">getg</span><span class="p">().</span><span class="nx">m</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="acquirem-1">acquirem()<a hidden class="anchor" aria-hidden="true" href="#acquirem-1">#</a></h4>
+<ol>
+<li>文件位置：<code>go1.19.3/src/runtime/runtime1.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">473
+</span><span class="lnt">474
+</span><span class="lnt">475
+</span><span class="lnt">476
+</span><span class="lnt">477
+</span><span class="lnt">478
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">//go:nosplit
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">acquirem</span><span class="p">()</span> <span class="o">*</span><span class="nx">m</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">locks</span><span class="o">++</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="allocm">allocm()<a hidden class="anchor" aria-hidden="true" href="#allocm">#</a></h3>
+<ol>
+<li>分配一个不与任何线程关联的新<code>m</code>。如果需要，可以使用<code>p</code>作为分配上下文。</li>
+<li><code>fn</code>被记录为新<code>m</code>的<code>m.mstartfn</code>。<code>id</code>是可选的，预分配的<code>m</code>的<code>id</code>。通过传递-1来省略。</li>
+<li>这个函数允许有写障碍，即使调用者没有，因为它借用了<code>_p_</code>。</li>
+<li><code>go:yeswritebarrierrec</code>：允许编译器插入写屏障相关代码，因为调用者使用的是<code>go:nowritebarrierrec</code>。</li>
+<li>文件位置：<code>go1.19.3/src/runtime/proc.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1706
+</span><span class="lnt">1707
+</span><span class="lnt">1708
+</span><span class="lnt">1709
+</span><span class="lnt">1710
+</span><span class="lnt">1711
+</span><span class="lnt">1712
+</span><span class="lnt">1713
+</span><span class="lnt">1714
+</span><span class="lnt">1715
+</span><span class="lnt">1716
+</span><span class="lnt">1717
+</span><span class="lnt">1718
+</span><span class="lnt">1719
+</span><span class="lnt">1720
+</span><span class="lnt">1721
+</span><span class="lnt">1722
+</span><span class="lnt">1723
+</span><span class="lnt">1724
+</span><span class="lnt">1725
+</span><span class="lnt">1726
+</span><span class="lnt">1727
+</span><span class="lnt">1728
+</span><span class="lnt">1729
+</span><span class="lnt">1730
+</span><span class="lnt">1731
+</span><span class="lnt">1732
+</span><span class="lnt">1733
+</span><span class="lnt">1734
+</span><span class="lnt">1735
+</span><span class="lnt">1736
+</span><span class="lnt">1737
+</span><span class="lnt">1738
+</span><span class="lnt">1739
+</span><span class="lnt">1740
+</span><span class="lnt">1741
+</span><span class="lnt">1742
+</span><span class="lnt">1743
+</span><span class="lnt">1744
+</span><span class="lnt">1745
+</span><span class="lnt">1746
+</span><span class="lnt">1747
+</span><span class="lnt">1748
+</span><span class="lnt">1749
+</span><span class="lnt">1750
+</span><span class="lnt">1751
+</span><span class="lnt">1752
+</span><span class="lnt">1753
+</span><span class="lnt">1754
+</span><span class="lnt">1755
+</span><span class="lnt">1756
+</span><span class="lnt">1757
+</span><span class="lnt">1758
+</span><span class="lnt">1759
+</span><span class="lnt">1760
+</span><span class="lnt">1761
+</span><span class="lnt">1762
+</span><span class="lnt">1763
+</span><span class="lnt">1764
+</span><span class="lnt">1765
+</span><span class="lnt">1766
+</span><span class="lnt">1767
+</span><span class="lnt">1768
+</span><span class="lnt">1769
+</span><span class="lnt">1770
+</span><span class="lnt">1771
+</span><span class="lnt">1772
+</span><span class="lnt">1773
+</span><span class="lnt">1774
+</span><span class="lnt">1775
+</span><span class="lnt">1776
+</span><span class="lnt">1777
+</span><span class="lnt">1778
+</span><span class="lnt">1779
+</span><span class="lnt">1780
+</span><span class="lnt">1781
+</span><span class="lnt">1782
+</span><span class="lnt">1783
+</span><span class="lnt">1784
+</span><span class="lnt">1785
+</span><span class="lnt">1786
+</span><span class="lnt">1787
+</span><span class="lnt">1788
+</span><span class="lnt">1789
+</span><span class="lnt">1790
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Allocate a new m unassociated with any thread.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Can use p for allocation context if needed.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// fn is recorded as the new m&#39;s m.mstartfn.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// id is optional pre-allocated m ID. Omit by passing -1.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// This function is allowed to have write barriers even if the caller
+</span></span></span><span class="line"><span class="cl"><span class="c1">// isn&#39;t because it borrows _p_.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">//go:yeswritebarrierrec
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">allocm</span><span class="p">(</span><span class="nx">_p_</span> <span class="o">*</span><span class="nx">p</span><span class="p">,</span> <span class="nx">fn</span> <span class="kd">func</span><span class="p">(),</span> <span class="nx">id</span> <span class="kt">int64</span><span class="p">)</span> <span class="o">*</span><span class="nx">m</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">allocmLock</span><span class="p">.</span><span class="nf">rlock</span><span class="p">()</span>  <span class="c1">// 读加锁
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// The caller owns _p_, but we may borrow (i.e., acquirep) it. We must
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// disable preemption to ensure it is not stolen, which would make the
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// caller lose ownership.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">acquirem</span><span class="p">()</span>          <span class="c1">// 禁止当前M被抢占
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>       <span class="c1">// 当前g
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 注意这里是正在执行的工作线程,在此函数中为 malloc 临时借用 p
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>   <span class="c1">// 如果当前M没有绑定P，则去绑定一个P
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// 在这个函数中暂时借用p来代替mallocs
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// 当前这个工作线程没有绑定p需要临时借用这个_p_，这种情况可能是sysmon线程中来的。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">acquirep</span><span class="p">(</span><span class="nx">_p_</span><span class="p">)</span>   <span class="c1">// temporarily borrow p for mallocs in this function
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Release the free M list. We need to do this somewhere and
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// this may free up a stack we can use.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// sched.freem 存储的是等待释放的m的链表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">freem</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span> <span class="c1">// 释放需要释放的M列表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">newList</span> <span class="o">*</span><span class="nx">m</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// freem 是一组已经运行结束的M构成的链表（不是空闲的）。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">for</span> <span class="nx">freem</span> <span class="o">:=</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">freem</span><span class="p">;</span> <span class="nx">freem</span> <span class="o">!=</span> <span class="kc">nil</span><span class="p">;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// freeWait 释放g0和删除m是否安全(freeMRef, freeMStack, freeMWait中的一个)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="k">if</span> <span class="nx">freem</span><span class="p">.</span><span class="nx">freeWait</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nx">next</span> <span class="o">:=</span> <span class="nx">freem</span><span class="p">.</span><span class="nx">freelink</span>
+</span></span><span class="line"><span class="cl">                <span class="nx">freem</span><span class="p">.</span><span class="nx">freelink</span> <span class="p">=</span> <span class="nx">newList</span>
+</span></span><span class="line"><span class="cl">                <span class="nx">newList</span> <span class="p">=</span> <span class="nx">freem</span>
+</span></span><span class="line"><span class="cl">                <span class="nx">freem</span> <span class="p">=</span> <span class="nx">next</span>
+</span></span><span class="line"><span class="cl">                <span class="k">continue</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// stackfree must be on the system stack, but allocm is
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// reachable off the system stack transitively from
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// startm.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// stackfree 必须在系统栈上，但allocm从startm开始在系统栈之外是可访问的。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="nf">systemstack</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="nf">stackfree</span><span class="p">(</span><span class="nx">freem</span><span class="p">.</span><span class="nx">g0</span><span class="p">.</span><span class="nx">stack</span><span class="p">)</span> <span class="c1">// 释放栈
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="p">})</span>
+</span></span><span class="line"><span class="cl">            <span class="nx">freem</span> <span class="p">=</span> <span class="nx">freem</span><span class="p">.</span><span class="nx">freelink</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">sched</span><span class="p">.</span><span class="nx">freem</span> <span class="p">=</span> <span class="nx">newList</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 堆分配一个m
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">mp</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">m</span><span class="p">)</span>		
+</span></span><span class="line"><span class="cl">    <span class="c1">// M开始前需要执行的函数，不是M的入口函数，是执行mstart后会调用的函数。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//  1. 如果是调度线下这里存储的是mspinning()函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//  2. 如果是监控线程存储的是sysmon()函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">mp</span><span class="p">.</span><span class="nx">mstartfn</span> <span class="p">=</span> <span class="nx">fn</span>	
+</span></span><span class="line"><span class="cl">    <span class="c1">// 初始化M，主要是把m加入到allm中，m记录allm地址等
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 该函数在程序初始化过程中也被调用过
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">mcommoninit</span><span class="p">(</span><span class="nx">mp</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span>	 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// In case of cgo or Solaris or illumos or Darwin, pthread_create will make us a stack.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Windows and Plan 9 will layout sched stack on OS stack.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">iscgo</span> <span class="o">||</span> <span class="nf">mStackIsSystemAllocated</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">mp</span><span class="p">.</span><span class="nx">g0</span> <span class="p">=</span> <span class="nf">malg</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// runtime 的g0栈分配的是64kb左右大小，其他的g0栈分配的是8kb左右大小
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// 关于malg函数，是来自栈相关
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">mp</span><span class="p">.</span><span class="nx">g0</span> <span class="p">=</span> <span class="nf">malg</span><span class="p">(</span><span class="mi">8192</span> <span class="o">*</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">StackGuardMultiplier</span><span class="p">)</span>   <span class="c1">// 分配一个大概8Kb左右的g0作为系统栈
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">mp</span><span class="p">.</span><span class="nx">g0</span><span class="p">.</span><span class="nx">m</span> <span class="p">=</span> <span class="nx">mp</span>	<span class="c1">// g0与m关联
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">_p_</span> <span class="o">==</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">()</span> <span class="p">{</span>   <span class="c1">// 如果前面临时借用了P，这里需要还出来
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">releasep</span><span class="p">()</span>              <span class="c1">// 解绑当前工作线程M和P的关联
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">releasem</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">)</span>             <span class="c1">// 判断当前g是否需要被抢占，设置抢占标志
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">allocmLock</span><span class="p">.</span><span class="nf">runlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">mp</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="acquirep">acquirep()<a hidden class="anchor" aria-hidden="true" href="#acquirep">#</a></h4>
+<ol>
+<li>把<code>p</code>和当前<code>m</code>联系起来。</li>
+<li>这个函数允许有写障碍，即使调用者没有，因为它立即获得<code>_p_</code>。</li>
+<li><code>go:yeswritebarrierrec</code>：允许编译器插入写屏障相关代码。</li>
+<li>文件位置：<code>go1.19.3/src/runtime/proc.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">4938
+</span><span class="lnt">4939
+</span><span class="lnt">4940
+</span><span class="lnt">4941
+</span><span class="lnt">4942
+</span><span class="lnt">4943
+</span><span class="lnt">4944
+</span><span class="lnt">4945
+</span><span class="lnt">4946
+</span><span class="lnt">4947
+</span><span class="lnt">4948
+</span><span class="lnt">4949
+</span><span class="lnt">4950
+</span><span class="lnt">4951
+</span><span class="lnt">4952
+</span><span class="lnt">4953
+</span><span class="lnt">4954
+</span><span class="lnt">4955
+</span><span class="lnt">4956
+</span><span class="lnt">4957
+</span><span class="lnt">4958
+</span><span class="lnt">4959
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Associate p and the current m.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// This function is allowed to have write barriers even if the caller
+</span></span></span><span class="line"><span class="cl"><span class="c1">// isn&#39;t because it immediately acquires _p_.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">//go:yeswritebarrierrec
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">acquirep</span><span class="p">(</span><span class="nx">_p_</span> <span class="o">*</span><span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Do the part that isn&#39;t allowed to have write barriers.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">wirep</span><span class="p">(</span><span class="nx">_p_</span><span class="p">)</span>	<span class="c1">// 把 P 与 M 绑定起来
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Have p; write barriers now allowed.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 现在有p了；现在允许写屏障。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Perform deferred mcache flush before this P can allocate
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// from a potentially stale mcache.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 在此P可以从可能不新鲜的mcache分配之前，执行延迟的mcache刷新。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">_p_</span><span class="p">.</span><span class="nx">mcache</span><span class="p">.</span><span class="nf">prepareForSweep</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">trace</span><span class="p">.</span><span class="nx">enabled</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">traceProcStart</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="5">
+<li>wirep是acquirep的第一步，它实际上将当前M关联到<code>_p_</code>。</li>
+<li>因为我们还没有P，所以我们可以在这部分不允许写障碍。</li>
+<li><code>go:nowritebarrierrec</code>：不允许编译器插入写屏障相关代码。</li>
+<li>文件位置：<code>go1.19.3/src/runtime/proc.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">4959
+</span><span class="lnt">4960
+</span><span class="lnt">4961
+</span><span class="lnt">4962
+</span><span class="lnt">4963
+</span><span class="lnt">4964
+</span><span class="lnt">4965
+</span><span class="lnt">4966
+</span><span class="lnt">4967
+</span><span class="lnt">4968
+</span><span class="lnt">4969
+</span><span class="lnt">4970
+</span><span class="lnt">4971
+</span><span class="lnt">4972
+</span><span class="lnt">4973
+</span><span class="lnt">4974
+</span><span class="lnt">4975
+</span><span class="lnt">4976
+</span><span class="lnt">4977
+</span><span class="lnt">4978
+</span><span class="lnt">4979
+</span><span class="lnt">4980
+</span><span class="lnt">4981
+</span><span class="lnt">4982
+</span><span class="lnt">4983
+</span><span class="lnt">4984
+</span><span class="lnt">4985
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// wirep is the first step of acquirep, which actually associates the
+</span></span></span><span class="line"><span class="cl"><span class="c1">// current M to _p_. This is broken out so we can disallow write
+</span></span></span><span class="line"><span class="cl"><span class="c1">// barriers for this part, since we don&#39;t yet have a P.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">//go:nowritebarrierrec
+</span></span></span><span class="line"><span class="cl"><span class="c1">//go:nosplit
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">wirep</span><span class="p">(</span><span class="nx">_p_</span> <span class="o">*</span><span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>   <span class="c1">// g
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 这里来的m一定需要是没绑定p的。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;wirep: already in go&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 当前p也是不能绑定m的，并且当前p的状态不能是 _Pidle
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">m</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">status</span> <span class="o">!=</span> <span class="nx">_Pidle</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">id</span> <span class="o">:=</span> <span class="nb">int64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">m</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nx">id</span> <span class="p">=</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nf">ptr</span><span class="p">().</span><span class="nx">id</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s">&#34;wirep: p-&gt;m=&#34;</span><span class="p">,</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">m</span><span class="p">,</span> <span class="s">&#34;(&#34;</span><span class="p">,</span> <span class="nx">id</span><span class="p">,</span> <span class="s">&#34;) p-&gt;status=&#34;</span><span class="p">,</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">status</span><span class="p">,</span> <span class="s">&#34;\n&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;wirep: invalid p state&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// p 与 m 相互绑定
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nx">_p_</span><span class="p">)</span>        <span class="c1">// m.p = _p_
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">_p_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">)</span>        <span class="c1">// _p_.m = m
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">_p_</span><span class="p">.</span><span class="nx">status</span> <span class="p">=</span> <span class="nx">_Prunning</span>  <span class="c1">// 设置p的状态为运行中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="mcommoninit">mcommoninit()<a hidden class="anchor" aria-hidden="true" href="#mcommoninit">#</a></h4>
+<ol>
+<li>预分配的<code>ID</code>可以作为<code>'ID'</code>传递，也可以通过传递<code>-1</code>来省略。</li>
+<li>文件位置：<code>go1.19.3/src/runtime/proc.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">785
+</span><span class="lnt">786
+</span><span class="lnt">787
+</span><span class="lnt">788
+</span><span class="lnt">789
+</span><span class="lnt">790
+</span><span class="lnt">791
+</span><span class="lnt">792
+</span><span class="lnt">793
+</span><span class="lnt">794
+</span><span class="lnt">795
+</span><span class="lnt">796
+</span><span class="lnt">797
+</span><span class="lnt">798
+</span><span class="lnt">799
+</span><span class="lnt">800
+</span><span class="lnt">801
+</span><span class="lnt">802
+</span><span class="lnt">803
+</span><span class="lnt">804
+</span><span class="lnt">805
+</span><span class="lnt">806
+</span><span class="lnt">807
+</span><span class="lnt">808
+</span><span class="lnt">809
+</span><span class="lnt">810
+</span><span class="lnt">811
+</span><span class="lnt">812
+</span><span class="lnt">813
+</span><span class="lnt">814
+</span><span class="lnt">815
+</span><span class="lnt">816
+</span><span class="lnt">817
+</span><span class="lnt">818
+</span><span class="lnt">819
+</span><span class="lnt">820
+</span><span class="lnt">821
+</span><span class="lnt">822
+</span><span class="lnt">823
+</span><span class="lnt">824
+</span><span class="lnt">825
+</span><span class="lnt">826
+</span><span class="lnt">827
+</span><span class="lnt">828
+</span><span class="lnt">829
+</span><span class="lnt">830
+</span><span class="lnt">831
+</span><span class="lnt">832
+</span><span class="lnt">833
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Pre-allocated ID may be passed as &#39;id&#39;, or omitted by passing -1.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">mcommoninit</span><span class="p">(</span><span class="nx">mp</span> <span class="o">*</span><span class="nx">m</span><span class="p">,</span> <span class="nx">id</span> <span class="kt">int64</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>           <span class="c1">// g
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// g0 stack won&#39;t make sense for user (and is not necessary unwindable).
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">_g_</span> <span class="o">!=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">g0</span> <span class="p">{</span>    <span class="c1">// 不能是g0栈
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">callers</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">mp</span><span class="p">.</span><span class="nx">createstack</span><span class="p">[:])</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">id</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">mp</span><span class="p">.</span><span class="nx">id</span> <span class="p">=</span> <span class="nx">id</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">mp</span><span class="p">.</span><span class="nx">id</span> <span class="p">=</span> <span class="nf">mReserveID</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">lo</span> <span class="o">:=</span> <span class="nb">uint32</span><span class="p">(</span><span class="nf">int64Hash</span><span class="p">(</span><span class="nb">uint64</span><span class="p">(</span><span class="nx">mp</span><span class="p">.</span><span class="nx">id</span><span class="p">),</span> <span class="nx">fastrandseed</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">hi</span> <span class="o">:=</span> <span class="nb">uint32</span><span class="p">(</span><span class="nf">int64Hash</span><span class="p">(</span><span class="nb">uint64</span><span class="p">(</span><span class="nf">cputicks</span><span class="p">()),</span> <span class="p">^</span><span class="nx">fastrandseed</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">lo</span><span class="p">|</span><span class="nx">hi</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">hi</span> <span class="p">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Same behavior as for 1.17.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// TODO: Simplify ths.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">goarch</span><span class="p">.</span><span class="nx">BigEndian</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">mp</span><span class="p">.</span><span class="nx">fastrand</span> <span class="p">=</span> <span class="nb">uint64</span><span class="p">(</span><span class="nx">lo</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="mi">32</span> <span class="p">|</span> <span class="nb">uint64</span><span class="p">(</span><span class="nx">hi</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">mp</span><span class="p">.</span><span class="nx">fastrand</span> <span class="p">=</span> <span class="nb">uint64</span><span class="p">(</span><span class="nx">hi</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="mi">32</span> <span class="p">|</span> <span class="nb">uint64</span><span class="p">(</span><span class="nx">lo</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">mpreinit</span><span class="p">(</span><span class="nx">mp</span><span class="p">)</span>            <span class="c1">// 信号相关
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">mp</span><span class="p">.</span><span class="nx">gsignal</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">mp</span><span class="p">.</span><span class="nx">gsignal</span><span class="p">.</span><span class="nx">stackguard1</span> <span class="p">=</span> <span class="nx">mp</span><span class="p">.</span><span class="nx">gsignal</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">lo</span> <span class="o">+</span> <span class="nx">_StackGuard</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Add to allm so garbage collector doesn&#39;t free g-&gt;m
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// when it is just in a register or thread-local storage.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">mp</span><span class="p">.</span><span class="nx">alllink</span> <span class="p">=</span> <span class="nx">allm</span>       <span class="c1">// 记录当前m.alllink的全局allm地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// NumCgoCall() iterates over allm w/o schedlock,
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// so we need to publish it safely.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">atomicstorep</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">allm</span><span class="p">),</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">mp</span><span class="p">))</span>	<span class="c1">// 把m添加到全局allm中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Allocate memory to hold a cgo traceback if the cgo call crashes.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">iscgo</span> <span class="o">||</span> <span class="nx">GOOS</span> <span class="o">==</span> <span class="s">&#34;solaris&#34;</span> <span class="o">||</span> <span class="nx">GOOS</span> <span class="o">==</span> <span class="s">&#34;illumos&#34;</span> <span class="o">||</span> <span class="nx">GOOS</span> <span class="o">==</span> <span class="s">&#34;windows&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">mp</span><span class="p">.</span><span class="nx">cgoCallers</span> <span class="p">=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">cgoCallers</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="newm1">newm1()<a hidden class="anchor" aria-hidden="true" href="#newm1">#</a></h3>
+<ol>
+<li>文件位置：<code>go1.19.3/src/runtime/proc.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">2145
+</span><span class="lnt">2146
+</span><span class="lnt">2147
+</span><span class="lnt">2148
+</span><span class="lnt">2149
+</span><span class="lnt">2150
+</span><span class="lnt">2151
+</span><span class="lnt">2152
+</span><span class="lnt">2153
+</span><span class="lnt">2154
+</span><span class="lnt">2155
+</span><span class="lnt">2156
+</span><span class="lnt">2157
+</span><span class="lnt">2158
+</span><span class="lnt">2159
+</span><span class="lnt">2160
+</span><span class="lnt">2161
+</span><span class="lnt">2162
+</span><span class="lnt">2163
+</span><span class="lnt">2164
+</span><span class="lnt">2165
+</span><span class="lnt">2166
+</span><span class="lnt">2167
+</span><span class="lnt">2168
+</span><span class="lnt">2169
+</span><span class="lnt">2170
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">newm1</span><span class="p">(</span><span class="nx">mp</span> <span class="o">*</span><span class="nx">m</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">iscgo</span> <span class="p">{</span>  <span class="c1">// cgo相关代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kd">var</span> <span class="nx">ts</span> <span class="nx">cgothreadstart</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="nx">_cgo_thread_start</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_thread_start missing&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">ts</span><span class="p">.</span><span class="nx">g</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nx">mp</span><span class="p">.</span><span class="nx">g0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">ts</span><span class="p">.</span><span class="nx">tls</span> <span class="p">=</span> <span class="p">(</span><span class="o">*</span><span class="kt">uint64</span><span class="p">)(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">mp</span><span class="p">.</span><span class="nx">tls</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">ts</span><span class="p">.</span><span class="nx">fn</span> <span class="p">=</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">abi</span><span class="p">.</span><span class="nf">FuncPCABI0</span><span class="p">(</span><span class="nx">mstart</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="nx">msanenabled</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">msanwrite</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ts</span><span class="p">),</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Sizeof</span><span class="p">(</span><span class="nx">ts</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="nx">asanenabled</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">asanwrite</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ts</span><span class="p">),</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Sizeof</span><span class="p">(</span><span class="nx">ts</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">execLock</span><span class="p">.</span><span class="nf">rlock</span><span class="p">()</span> <span class="c1">// Prevent process clone.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">asmcgocall</span><span class="p">(</span><span class="nx">_cgo_thread_start</span><span class="p">,</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ts</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">execLock</span><span class="p">.</span><span class="nf">runlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">execLock</span><span class="p">.</span><span class="nf">rlock</span><span class="p">()</span> <span class="c1">// Prevent process clone.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// newosproc函数 调用clone函数创建一个系统线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 新建的这个系统线程将从mstart()函数开始运行。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">newosproc</span><span class="p">(</span><span class="nx">mp</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">execLock</span><span class="p">.</span><span class="nf">runlock</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="newosproc">newosproc()<a hidden class="anchor" aria-hidden="true" href="#newosproc">#</a></h3>
+<ol>
+<li>可以<code>m.p==nil</code> 运行，因此不允许写屏障。</li>
+<li>文件位置：<code>go1.19.3/src/runtime/os_linux.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span><span class="lnt">189
+</span><span class="lnt">190
+</span><span class="lnt">191
+</span><span class="lnt">192
+</span><span class="lnt">193
+</span><span class="lnt">194
+</span><span class="lnt">195
+</span><span class="lnt">196
+</span><span class="lnt">197
+</span><span class="lnt">198
+</span><span class="lnt">199
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// May run with m.p==nil, so write barriers are not allowed.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">//go:nowritebarrier
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">newosproc</span><span class="p">(</span><span class="nx">mp</span> <span class="o">*</span><span class="nx">m</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">stk</span> <span class="o">:=</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">mp</span><span class="p">.</span><span class="nx">g0</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">hi</span><span class="p">)</span>   <span class="c1">// 获取当前新创建的M的g0栈栈顶位置
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="cm">/*
+</span></span></span><span class="line"><span class="cl"><span class="cm">     * note: strace gets confused if we use CLONE_PTRACE here.
+</span></span></span><span class="line"><span class="cl"><span class="cm">     */</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="kc">false</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s">&#34;newosproc stk=&#34;</span><span class="p">,</span> <span class="nx">stk</span><span class="p">,</span> <span class="s">&#34; m=&#34;</span><span class="p">,</span> <span class="nx">mp</span><span class="p">,</span> <span class="s">&#34; g=&#34;</span><span class="p">,</span> <span class="nx">mp</span><span class="p">.</span><span class="nx">g0</span><span class="p">,</span> <span class="s">&#34; clone=&#34;</span><span class="p">,</span> <span class="nx">abi</span><span class="p">.</span><span class="nf">FuncPCABI0</span><span class="p">(</span><span class="nx">clone</span><span class="p">),</span> <span class="s">&#34; id=&#34;</span><span class="p">,</span> <span class="nx">mp</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="s">&#34; ostk=&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">mp</span><span class="p">,</span> <span class="s">&#34;\n&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Disable signals during clone, so that the new thread starts
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// with signals disabled. It will enable them in minit.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 在克隆期间禁用信号，以便新线程以禁用信号开始。 它将在minit中启用它们。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">var</span> <span class="nx">oset</span> <span class="nx">sigset</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">sigprocmask</span><span class="p">(</span><span class="nx">_SIG_SETMASK</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">sigset_all</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">oset</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//  cloneFlags = _CLONE_VM | /* share memory */ // 指定父子线程共享进程地址空间
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//      _CLONE_FS | /* share cwd, etc */
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//      _CLONE_FILES | /* share fd table */
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//      _CLONE_SIGHAND | /* share sig handler table */
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//      _CLONE_SYSVSEM | /* share SysV semaphore undo lists (see issue #20763) */
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//      _CLONE_THREAD /* revisit - okay for now */  // 创建子线程而不是子进程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 程序的入口都是【mstart()】函数开始
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">ret</span> <span class="o">:=</span> <span class="nf">clone</span><span class="p">(</span><span class="nx">cloneFlags</span><span class="p">,</span> <span class="nx">stk</span><span class="p">,</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">mp</span><span class="p">),</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">mp</span><span class="p">.</span><span class="nx">g0</span><span class="p">),</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">abi</span><span class="p">.</span><span class="nf">FuncPCABI0</span><span class="p">(</span><span class="nx">mstart</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">sigprocmask</span><span class="p">(</span><span class="nx">_SIG_SETMASK</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">oset</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 怎么也应该出现 ret 小于0的情况
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">ret</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s">&#34;runtime: failed to create new OS thread (have &#34;</span><span class="p">,</span> <span class="nf">mcount</span><span class="p">(),</span> <span class="s">&#34; already; errno=&#34;</span><span class="p">,</span> <span class="o">-</span><span class="nx">ret</span><span class="p">,</span> <span class="s">&#34;)\n&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="nx">ret</span> <span class="o">==</span> <span class="o">-</span><span class="nx">_EAGAIN</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">println</span><span class="p">(</span><span class="s">&#34;runtime: may need to increase max user processes (ulimit -u)&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;newosproc&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="clone">clone()<a hidden class="anchor" aria-hidden="true" href="#clone">#</a></h3>
+<p><code>C</code>函数原型：<code>int32 clone(int32 flags, void *stk, M *mp, G *gp, void (*fn)(void))</code></p>
+<ol>
+<li><code>int32 flags</code>：指定内核创建线程时需要的选项。</li>
+<li><code>void *stk</code>：新线程应该使用的栈：
+<ol>
+<li>因为即将被创建的线程与当前线程共享同一个进程地址空间，所以这里必须为子线程指定其使用的栈，否则父子线程会共享同一个栈从而造成混乱。</li>
+<li>从上面的<code>newosproc()</code>函数可以看出，新线程使用的栈为<code>m.g0.stack.lo～m.g0.stack.hi</code>这段内存，而这段内存是<code>newm()</code>函数在创建<code>m</code>结构体对象时从进程的堆上分配而来的。</li>
+</ol>
+</li>
+<li><code>M *mp</code>：工作线程 <code>M</code> 的信息记录。</li>
+<li><code>G *gp</code>：<code>g0</code>栈信息记录。</li>
+<li><code>void (*fn)(void)</code>：子线程程序入口函数。</li>
+<li>上面三个参数（<code>M *mp</code>、<code>G *gp</code>、<code>void (*fn)(void)</code>）保存到寄存器（<code>R13</code>、<code>R9</code>、<code>R12</code>）中：
+<ol>
+<li>之所以需要在系统调用之前保存这几个参数，原因在于这几个参数目前还位于父线程的栈之中。</li>
+<li>一旦通过系统调用把子线程创建出来之后，子线程将会使用我们在<code>clone</code>系统调用时给它指定的栈。</li>
+<li>所以这里需要把这几个参数先保存到寄存器，等子线程从系统调用返回后直接在寄存器中获取这几个参数。</li>
+<li>这里要注意的是虽然这个几个参数值保存在了父线程的寄存器之中，但创建子线程时，操作系统内核会把父线程的所有寄存器帮我们复制一份给子线程，所以当子线程开始运行时就能拿到父线程保存在寄存器中的值，从而拿到这几个参数。</li>
+</ol>
+</li>
+<li>文件位置：<code>go1.19.3/src/runtime/sys_linux_amd64.s</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">563
+</span><span class="lnt">564
+</span><span class="lnt">565
+</span><span class="lnt">566
+</span><span class="lnt">567
+</span><span class="lnt">568
+</span><span class="lnt">569
+</span><span class="lnt">570
+</span><span class="lnt">571
+</span><span class="lnt">572
+</span><span class="lnt">573
+</span><span class="lnt">574
+</span><span class="lnt">575
+</span><span class="lnt">576
+</span><span class="lnt">577
+</span><span class="lnt">578
+</span><span class="lnt">579
+</span><span class="lnt">580
+</span><span class="lnt">581
+</span><span class="lnt">582
+</span><span class="lnt">583
+</span><span class="lnt">584
+</span><span class="lnt">585
+</span><span class="lnt">586
+</span><span class="lnt">587
+</span><span class="lnt">588
+</span><span class="lnt">589
+</span><span class="lnt">590
+</span><span class="lnt">591
+</span><span class="lnt">592
+</span><span class="lnt">593
+</span><span class="lnt">594
+</span><span class="lnt">595
+</span><span class="lnt">596
+</span><span class="lnt">597
+</span><span class="lnt">598
+</span><span class="lnt">599
+</span><span class="lnt">600
+</span><span class="lnt">601
+</span><span class="lnt">602
+</span><span class="lnt">603
+</span><span class="lnt">604
+</span><span class="lnt">605
+</span><span class="lnt">606
+</span><span class="lnt">607
+</span><span class="lnt">608
+</span><span class="lnt">609
+</span><span class="lnt">610
+</span><span class="lnt">611
+</span><span class="lnt">612
+</span><span class="lnt">613
+</span><span class="lnt">614
+</span><span class="lnt">615
+</span><span class="lnt">616
+</span><span class="lnt">617
+</span><span class="lnt">618
+</span><span class="lnt">619
+</span><span class="lnt">620
+</span><span class="lnt">621
+</span><span class="lnt">622
+</span><span class="lnt">623
+</span><span class="lnt">624
+</span><span class="lnt">625
+</span><span class="lnt">626
+</span><span class="lnt">627
+</span><span class="lnt">628
+</span><span class="lnt">629
+</span><span class="lnt">630
+</span><span class="lnt">631
+</span><span class="lnt">632
+</span><span class="lnt">633
+</span><span class="lnt">634
+</span><span class="lnt">635
+</span><span class="lnt">636
+</span><span class="lnt">637
+</span><span class="lnt">638
+</span><span class="lnt">639
+</span><span class="lnt">640
+</span><span class="lnt">641
+</span><span class="lnt">642
+</span><span class="lnt">643
+</span><span class="lnt">644
+</span><span class="lnt">645
+</span><span class="lnt">646
+</span><span class="lnt">647
+</span><span class="lnt">648
+</span><span class="lnt">649
+</span><span class="lnt">650
+</span><span class="lnt">651
+</span><span class="lnt">652
+</span><span class="lnt">653
+</span><span class="lnt">654
+</span><span class="lnt">655
+</span><span class="lnt">656
+</span><span class="lnt">657
+</span><span class="lnt">658
+</span><span class="lnt">659
+</span><span class="lnt">660
+</span><span class="lnt">661
+</span><span class="lnt">662
+</span><span class="lnt">663
+</span><span class="lnt">664
+</span><span class="lnt">665
+</span><span class="lnt">666
+</span><span class="lnt">667
+</span><span class="lnt">668
+</span><span class="lnt">669
+</span><span class="lnt">670
+</span><span class="lnt">671
+</span><span class="lnt">672
+</span><span class="lnt">673
+</span><span class="lnt">674
+</span><span class="lnt">675
+</span><span class="lnt">676
+</span><span class="lnt">677
+</span><span class="lnt">678
+</span><span class="lnt">679
+</span><span class="lnt">680
+</span><span class="lnt">681
+</span><span class="lnt">682
+</span><span class="lnt">683
+</span><span class="lnt">684
+</span><span class="lnt">685
+</span><span class="lnt">686
+</span><span class="lnt">687
+</span><span class="lnt">688
+</span><span class="lnt">689
+</span><span class="lnt">690
+</span><span class="lnt">691
+</span><span class="lnt">692
+</span><span class="lnt">693
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="c1"># int32 clone(int32 flags, void *stk, M *mp, G *gp, void (*fn)(void));
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">TEXT</span> <span class="no">runtime</span><span class="err">·</span><span class="no">clone</span><span class="p">(</span><span class="no">SB</span><span class="p">),</span><span class="no">NOSPLIT</span><span class="p">,</span><span class="no">$0</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 1) 接受参数分蘖放入 DI、SI、R13、R9、R12寄存器中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 清除 DX、R10、D8寄存器的值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 第一个参数 flags，clone需要的参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVL</span>    <span class="no">flags</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">FP</span><span class="p">),</span> <span class="no">DI</span> <span class="c1"># DI = flags
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 第二个参数 stk，g0栈空间
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVQ</span>    <span class="no">stk</span><span class="err">+</span><span class="mi">8</span><span class="p">(</span><span class="no">FP</span><span class="p">),</span> <span class="no">SI</span>   <span class="c1"># SI = stk
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVQ</span>    <span class="no">$0</span><span class="p">,</span> <span class="no">DX</span>          <span class="c1"># 清除DX寄存器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVQ</span>    <span class="no">$0</span><span class="p">,</span> <span class="no">R10</span>         <span class="c1"># 清除R10寄存器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVQ</span>    <span class="no">$0</span><span class="p">,</span> <span class="no">R8</span>          <span class="c1"># 清除R8寄存器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># Copy mp, gp, fn off parent stack for use by child.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># Careful: Linux system call clobbers CX and R11.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 从父堆栈中复制 mp、gp、fn 以供子级使用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 小心：Linux系统调用clobbers CX和R11
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 第三个参数 mp
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 在clone后子线程开始运行时，R13、R9、R12的值会被拷贝给子线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVQ</span>    <span class="no">mp</span><span class="err">+</span><span class="mi">16</span><span class="p">(</span><span class="no">FP</span><span class="p">),</span> <span class="no">R13</span>  <span class="c1"># R13 = mp
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 第四个参数 gp，这里是 g0
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVQ</span>    <span class="no">gp</span><span class="err">+</span><span class="mi">24</span><span class="p">(</span><span class="no">FP</span><span class="p">),</span> <span class="no">R9</span>   <span class="c1"># R9 = gp
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 第五个参数 fn，mstart()函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVQ</span>    <span class="no">fn</span><span class="err">+</span><span class="mi">32</span><span class="p">(</span><span class="no">FP</span><span class="p">),</span> <span class="no">R12</span>  <span class="c1"># R12 = fn
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 2) 判断 mp 和 gp 的值是为 nil
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 判断mp==nil和g0=nil
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># m 如果R13为0则跳转
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">CMPQ</span>    <span class="no">R13</span><span class="p">,</span> <span class="no">$0</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">JEQ</span>	<span class="no">nog1</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># g	如果R9为0则跳转
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">CMPQ</span>    <span class="no">R9</span><span class="p">,</span> <span class="no">$0</span>    		
+</span></span><span class="line"><span class="cl">    <span class="no">JEQ</span>	<span class="no">nog1</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 3) 找到需要设置TLS的地址值，也就是&amp;m.tls[1]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 调用系统SYS_clone函数克隆线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 把m.tls地址存入R8寄存器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">LEAQ</span>    <span class="no">m_tls</span><span class="p">(</span><span class="no">R13</span><span class="p">),</span> <span class="no">R8</span>  <span class="c1"># R8 = TLS 
+</span></span></span><span class="line"><span class="cl"><span class="c1">#ifdef GOOS_android
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># Android stores the TLS offset in runtime·tls_g.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">SUBQ</span>    <span class="no">runtime</span><span class="err">·</span><span class="no">tls_g</span><span class="p">(</span><span class="no">SB</span><span class="p">),</span> <span class="no">R8</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#else
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># R8 = -8(FS); R8=&amp;m.tls[1]处地址
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">ADDQ</span>    <span class="no">$8</span><span class="p">,</span> <span class="no">R8</span>	<span class="c1"># ELF wants to use -8(FS)
+</span></span></span><span class="line"><span class="cl"><span class="c1">#endif
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 添加CLONE_SETTLS标志
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">ORQ</span>     <span class="no">$0x00080000</span><span class="p">,</span> <span class="no">DI</span> <span class="c1">#add flag CLONE_SETTLS(0x00080000) to call clone
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nl">nog1:</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">MOVL</span>    <span class="no">$SYS_clone</span><span class="p">,</span> <span class="no">AX</span>  <span class="c1"># 写入clone函数标志，然后调用系统函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 系统调用约定寄存器 DI SI DX R10 R8 R9 参数传参
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># DI = flags
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># SI = stk
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># DX = 0
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># R10 = 0
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># R8 = R8=&amp;m.tls[1]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># R9 = gp
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">SYSCALL</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># 4) 系统调用后，新创建的子线程和当前线程都会从系统调用中返回然后执行后面的代码
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 那么从系统调用返回之后我们怎么知道哪个是父线程哪个是子线程，从而来决定它们的执行流程？
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 使用过fork系统调用的读者应该知道，我们需要通过返回值来判断父子线程：
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">#   1. 系统调用的返回值如果是0则表示这是子线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">#   2. 不为0则表示这个是父线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 4.1) 父线程的处理逻辑
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># In parent, return.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 在父线程中，直接返回。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 判断系统调用SYS_clone的返回值AX与0比较
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">CMPQ</span>    <span class="no">AX</span><span class="p">,</span> <span class="no">$0</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># JEQ 表示AX是0则执行 3(PC)跳过3条指令
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">JEQ</span>	<span class="mi">3</span><span class="p">(</span><span class="no">PC</span><span class="p">)</span>   <span class="c1">#跳转到子线程部分
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 这里是父线程直接把返回值写入栈，然后退出函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVL</span>    <span class="no">AX</span><span class="p">,</span> <span class="no">ret</span><span class="err">+</span><span class="mi">40</span><span class="p">(</span><span class="no">FP</span><span class="p">)</span>	
+</span></span><span class="line"><span class="cl">    <span class="no">RET</span>			
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1"># 4.2) 子线程的处理逻辑，设置SP，判断mp和gp，设置mp.procid
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># In child, on new stack.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">#
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 在子线程中，在new栈上。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 新创建的子线程从这里开始，注意一下代码是在子线程中，寄存器也是子线程的
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 设置CPU栈顶寄存器指向子线程的栈顶，这条指令看起来是多余的？内核应该已经把SP设置好了
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVQ</span>    <span class="no">SI</span><span class="p">,</span> <span class="no">SP</span>   
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1"># If g or m are nil, skip Go-related setup.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">#
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 如果 g 或 m 为 nil，跳过 Go-related 设置。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># m	新创建的m结构体对象的地址，由父线程保存在R13寄存器中的值被复制到了子线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">CMPQ</span>    <span class="no">R13</span><span class="p">,</span> <span class="no">$0</span> <span class="c1"># R13 = mp
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">JEQ</span>	<span class="no">nog2</span> <span class="c1"># R13 为 0 时跳转
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># g	m.g0的地址，由父线程保存在R9寄存器中的值被复制到了子线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">CMPQ</span>    <span class="no">R9</span><span class="p">,</span> <span class="no">$0</span>  <span class="c1"># R9 = gp
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">JEQ</span>	<span class="no">nog2</span> <span class="c1"># R9 为 0 时跳转
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># Initialize m-&gt;procid to Linux tid
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 将m-&gt;procid初始化为Linux tid。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVL</span>    <span class="no">$SYS_gettid</span><span class="p">,</span> <span class="no">AX</span>	<span class="c1"># 通过gettid()系统调用获取线程ID（tid）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">SYSCALL</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">MOVQ</span>    <span class="no">AX</span><span class="p">,</span> <span class="no">m_procid</span><span class="p">(</span><span class="no">R13</span><span class="p">)</span>   <span class="c1"># m.procid = tid
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl">    <span class="c1"># Set FS to point at m-&gt;tls.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 新线程刚刚创建出来，还未设置线程本地存储，即m结构体对象还未与工作线程关联起来，
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 下面的指令负责设置新线程的TLS，把m对象和工作线程关联起来
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 这两行代码在go1.18中消失了，原因在于CLONE_SETTLS配合参数和R8寄存器在clone中被设置了
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># LEAQ  m_tls(R13), DI  # 取m.tls字段的地址	
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># CALL  runtime·settls(SB)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># In child, set up new stack
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">get_tls</span><span class="p">(</span><span class="no">CX</span><span class="p">)</span>	<span class="c1"># CX=&amp;m.tls[1]; CX=TLS
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVQ</span>    <span class="no">R13</span><span class="p">,</span> <span class="no">g_m</span><span class="p">(</span><span class="no">R9</span><span class="p">)</span> <span class="c1"># g0.m = m
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVQ</span>    <span class="no">R9</span><span class="p">,</span> <span class="no">g</span><span class="p">(</span><span class="no">CX</span><span class="p">)</span>    <span class="c1"># m.tls[0]=&amp;g0
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># R14=&amp;g0 R14寄存器主要存储当前正在运行的goroutine
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVQ</span>    <span class="no">R9</span><span class="p">,</span> <span class="no">R14</span> <span class="c1"># set g register 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">CALL</span>    <span class="no">runtime</span><span class="err">·</span><span class="no">stackcheck</span><span class="p">(</span><span class="no">SB</span><span class="p">)</span>  <span class="c1"># 检查 SP 是否在 [g-&gt;stack.lo, g-&gt;stack.hi) 范围内
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl"><span class="nl">nog2:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># Call fn. This is the PC of an ABI0 function.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># 调用mstart()函数开始调度循环
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">CALL</span>    <span class="no">R12</span>	<span class="c1"># 永不返回
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># It shouldn&#39;t return. If it does, exit that thread.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVL</span>    <span class="no">$111</span><span class="p">,</span> <span class="no">DI</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">MOVL</span>    <span class="no">$SYS_exit</span><span class="p">,</span> <span class="no">AX</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">SYSCALL</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">JMP</span>	<span class="p">-</span><span class="mi">3</span><span class="p">(</span><span class="no">PC</span><span class="p">)</span>  <span class="c1">// keep exiting
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="stackcheck">stackcheck()<a hidden class="anchor" aria-hidden="true" href="#stackcheck">#</a></h3>
+<ol>
+<li>检查SP是否在<code>[g-&gt;stack.lo, g-&gt;stack.hi)</code>范围内。</li>
+<li>文件位置：<code>go1.19.3/src/runtime/sys_linux_amd64.s</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1061
+</span><span class="lnt">1062
+</span><span class="lnt">1063
+</span><span class="lnt">1064
+</span><span class="lnt">1065
+</span><span class="lnt">1066
+</span><span class="lnt">1067
+</span><span class="lnt">1068
+</span><span class="lnt">1069
+</span><span class="lnt">1070
+</span><span class="lnt">1071
+</span><span class="lnt">1072
+</span><span class="lnt">1073
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="c1"># check that SP is in range [g-&gt;stack.lo, g-&gt;stack.hi)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">TEXT</span> <span class="no">runtime</span><span class="err">·</span><span class="no">stackcheck</span><span class="p">(</span><span class="no">SB</span><span class="p">),</span> <span class="no">NOSPLIT</span><span class="p">,</span> <span class="no">$0-0</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">get_tls</span><span class="p">(</span><span class="no">CX</span><span class="p">)</span>         <span class="c1"># CX=TLS
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVQ</span>    <span class="no">g</span><span class="p">(</span><span class="no">CX</span><span class="p">),</span> <span class="no">AX</span>   <span class="c1"># AX=g0
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1"># g0.stack.hi 与 SP 比较
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">CMPQ</span>    <span class="p">(</span><span class="no">g_stack</span><span class="err">+</span><span class="no">stack_hi</span><span class="p">)(</span><span class="no">AX</span><span class="p">),</span> <span class="no">SP</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">JHI</span>	<span class="mi">2</span><span class="p">(</span><span class="no">PC</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">CALL</span>    <span class="no">runtime</span><span class="err">·</span><span class="no">abort</span><span class="p">(</span><span class="no">SB</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># g0.stack.lo 与 SP 比较
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">CMPQ</span>    <span class="no">SP</span><span class="p">,</span> <span class="p">(</span><span class="no">g_stack</span><span class="err">+</span><span class="no">stack_lo</span><span class="p">)(</span><span class="no">AX</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">JHI</span>	<span class="mi">2</span><span class="p">(</span><span class="no">PC</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">CALL</span>    <span class="no">runtime</span><span class="err">·</span><span class="no">abort</span><span class="p">(</span><span class="no">SB</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">RET</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 
   </div>
 
