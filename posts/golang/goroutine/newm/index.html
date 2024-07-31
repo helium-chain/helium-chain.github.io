@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>工作线程的唤醒和创建 | Helium</title>
+<meta name="keywords" content="golang, Goroutine">
+<meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
+<meta name="author" content="helium">
+<link rel="canonical" href="https://heliu.site/posts/golang/goroutine/newm/">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://heliu.site/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/goroutine/newm/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono-nl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.6.0/style.css" />
+    <style>
+        body {
+            font-family: "LXGW WenKai Lite", sans-serif;
+            font-family: "LXGW WenKai Screen", sans-serif;
+        }
+    </style>
+</head>
+</html>
+
+  
+
+<meta property="og:title" content="工作线程的唤醒和创建" />
+<meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://heliu.site/posts/golang/goroutine/newm/" />
+<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-07-30T00:00:00+00:00" />
+<meta property="article:modified_time" content="2024-07-30T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:title" content="工作线程的唤醒和创建"/>
+<meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Article",
+      "item": "https://heliu.site/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Golang 合集",
+      "item": "https://heliu.site/posts/golang/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "第12章 Goroutine",
+      "item": "https://heliu.site/posts/golang/goroutine/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  4 ,
+      "name": "工作线程的唤醒和创建",
+      "item": "https://heliu.site/posts/golang/goroutine/newm/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "工作线程的唤醒和创建",
+  "name": "工作线程的唤醒和创建",
+  "description": "💥本文章所有相关go代码参考自go 1.18+版本",
+  "keywords": [
+    "golang", "Goroutine"
+  ],
+  "articleBody": "唤醒工作线程 去尝试唤醒工作线程条件：atomic.Load(\u0026sched.npidle) != 0 \u0026\u0026 atomic.Load(\u0026sched.nmspinning) == 0。 atomic.Load(\u0026sched.npidle) != 0：有空闲的P。 atomic.Load(\u0026sched.nmspinning) == 0：没有工作线程正在尝试从其他工作线程的本地队列偷取goroutine。(就是没有spinning自旋的goroutine时) 唤醒空闲的P和M由wakep()函数完成。 wakep() 尝试添加一个P来执行G。当G是可运行时调用(newproc, ready)。 wakep()函数被调用的地方：【创建g时候，在newproc()函数中，就是go关键字】，【g放回P的时候，在ready()函数中】。 newproc()函数中，也就是go关键字时，runtime.main已启动时。（这种情况发生在go关键字时） ready()函数中，该函数通过把需要唤醒的goroutine放入运行队列来唤醒它。（这种情况在g被挂在了其他地方时需要恢复到P中时） 也就是只要g被放入本地队列中，准备运行时都需要调用wakep()函数尝试利用空闲的M和P来运行它。 文件位置：go1.19.3/src/runtime/proc.go。 2420 2421 2422 2423 2424 2425 2426 2427 2428 2429 2430 2431 2432 2433 2434 2435 2436 2437 2438 2439 2440 2441 2442 2443 2444 2445 2446 2447 // Tries to add one more P to execute G's. // Called when a G is made runnable (newproc, ready). func wakep() { // 没有空闲的P，直接返回。当前所有的P都在工作。因为P的数量是固定的。 if atomic.Load(\u0026sched.npidle) == 0 { return } // be conservative about spinning threads // // 对自旋的线程持保守态度： // 1. sched.nmspinning != 0：有其他线程正在自旋（就是在其他线程中去偷取g） // 2. !atomic.Cas(\u0026sched.nmspinning, 0, 1)：通过cas操作再次确认是否有其他工作线程处于spinning状态 // 从进入wakep()判断到真正启动工作线程之前的这一段时间之内，如果已经有工作线程进入了spinning状态而在四处寻找需要运行的goroutine // 这样的话我们就没有必要再启动一个多余的工作线程出来了 // 如果cas操作成功，则继续调用startm创建一个新的或唤醒一个处于睡眠状态的工作线程出来工作 // // 1. atomic.Load(\u0026sched.nmspinning) != 0 成立：有其他工作线程正在自旋，直接return退出 // 2. atomic.Load(\u0026sched.nmspinning) == 0 成立：当前没有忙碌的工作线程 // atomic.Cas(\u0026sched.nmspinning, 0, 1) == true：当前没有忙碌的工作线程，当前可以创建工作线程，并标记sched.nmspinning=1阻止后来者 // atomic.Cas(\u0026sched.nmspinning, 0, 1) == false：当前有其他忙碌的工作线程，直接return退出 if atomic.Load(\u0026sched.nmspinning) != 0 || !atomic.Cas(\u0026sched.nmspinning, 0, 1) { return } // 程序执行到这里说明：sched.nmspinning一定被标记为1了。 startm(nil, true) } startm() 调度一些M来运行p(如果需要，创建一个M)。 如果p==nil，尝试得到一个空闲的p，如果没有空闲的p什么都不做。 可以使用m.p==nil运行，因此不允许写入障碍。 如果设置了spinning，则调用者增加了nmspinning，而startm将减少nmspinning或在新启动的M中设置m.spinning。 传递nil的P的调用方必须从不可抢占的上下文中调用。见下面对acquirem。 必须没有写障碍，因为这个可能没有P。 go:nowritebarrierrec：不允许编译器插入写屏障相关代码。 在抢占系统调用的P的时候该函数会被调用，并传入空闲的P和false参数。 参数： _p_ *p：nil表示没有指定P，否则指定P。 spinning bool：true.sched.nmspinning的值在前面被加一了。false.没有加一。 文件位置：go1.19.3/src/runtime/proc.go。 2257 2258 2259 2260 2261 2262 2263 2264 2265 2266 2267 2268 2269 2270 2271 2272 2273 2274 2275 2276 2277 2278 2279 2280 2281 2282 2283 2284 2285 2286 2287 2288 2289 2290 2291 2292 2293 2294 2295 2296 2297 2298 2299 2300 2301 2302 2303 2304 2305 2306 2307 2308 2309 2310 2311 2312 2313 2314 2315 2316 2317 2318 2319 2320 2321 2322 2323 2324 2325 2326 2327 2328 2329 2330 2331 2332 2333 2334 2335 2336 2337 2338 2339 2340 2341 2342 2343 2344 2345 2346 2347 2348 2349 2350 2351 2352 2353 2354 2355 2356 2357 2358 2359 2360 2361 2362 2363 2364 2365 2366 2367 2368 2369 2370 2371 2372 2373 2374 2375 2376 2377 2378 2379 2380 // Schedules some M to run the p (creates an M if necessary). // If p==nil, tries to get an idle P, if no idle P's does nothing. // May run with m.p==nil, so write barriers are not allowed. // If spinning is set, the caller has incremented nmspinning and startm will // either decrement nmspinning or set m.spinning in the newly started M. // // Callers passing a non-nil P must call from a non-preemptible context. See // comment on acquirem below. // // Must not have write barriers because this may be called without a P. // //go:nowritebarrierrec func startm(_p_ *p, spinning bool) { // Disable preemption. // // Every owned P must have an owner that will eventually stop it in the // event of a GC stop request. startm takes transient ownership of a P // (either from argument or pidleget below) and transfers ownership to // a started M, which will be responsible for performing the stop. // // Preemption must be disabled during this transient ownership, // otherwise the P this is running on may enter GC stop while still // holding the transient P, leaving that P in limbo and deadlocking the // STW. // // Callers passing a non-nil P must already be in non-preemptible // context, otherwise such preemption could occur on function entry to // startm. Callers passing a nil P may be preemptible, so we must // disable preemption before acquiring a P from pidleget below. mp := acquirem() // 禁止当前M被抢占 lock(\u0026sched.lock) // 锁住全局sched // 有空闲的p才会去唤醒线程 if _p_ == nil { // 如果没有指定P，则需要从P的空闲列表中获取一个P _p_ = pidleget(0) // 从P的空闲队列中获取空闲的P // 没有空闲的P，意味着所有的P都很忙不需要唤醒 if _p_ == nil {\tunlock(\u0026sched.lock) // 之前的Cas把nmspinning加一，这里需要减回来 if spinning {\t// The caller incremented nmspinning, but there are no idle Ps, // so it's okay to just undo the increment and give up. // // 正常逻辑这里不应该减成负数，否则是系统逻辑存在错误 if int32(atomic.Xadd(\u0026sched.nmspinning, -1)) \u003c 0 { throw(\"startm: negative nmspinning\") } } // 与acquirem函数呼应，并检查是否有抢占请求发生 releasem(mp)\treturn // 没有空闲的P直接返回 } } // 尝试从m空闲队列中获取正处于睡眠之中的工作线程 // 所有处于睡眠状态的m都在此队列中 nmp := mget() // 没有处于睡眠状态的工作线程，这种情况需要去创建线程 if nmp == nil {\t// No M is available, we must drop sched.lock and call newm. // However, we already own a P to assign to the M. // // Once sched.lock is released, another G (e.g., in a syscall), // could find no idle P while checkdead finds a runnable G but // no running M's because this new M hasn't started yet, thus // throwing in an apparent deadlock. // // Avoid this situation by pre-allocating the ID for the new M, // thus marking it as 'running' before we drop sched.lock. This // new M will eventually run the scheduler to execute any // queued G's. // // 这里是为需要新创建的工作线程准备工作 id := mReserveID() // 给需要创建的工作线程分配ID unlock(\u0026sched.lock) // 初始化fn函数，该函数在工作线程刚启动时会被调用 var fn func() // nil if spinning { // 如果需要标记当前工作线程是自旋状态 // The caller incremented nmspinning, so set m.spinning in the new M. // // mspinning函数就一行代码 'getg().m.spinning = true' 标记当前工作线程是自旋状态 // 因为全局的sched.nmspinning已经加一了，因此需要标记m的spinning fn = mspinning\t} newm(fn, _p_, id) // 创建新的工作线程 // Ownership transfer of _p_ committed by start in newm. // Preemption is now safe. releasem(mp) return } // 到这里说明有正在处于睡眠的工作线程 unlock(\u0026sched.lock) // 从空闲的线程队列中拿出来的 spinning 标志位存在，说明sleep时有问题 if nmp.spinning { // 系统逻辑存在问题 throw(\"startm: m is spinning\") } // 工作线程还与其他P有关，说明有问题 if nmp.nextp != 0 { // 系统逻辑存在问题 throw(\"startm: m has p\") } // 空闲的P中不应该存在g，系统逻辑存在问题 if spinning \u0026\u0026 !runqempty(_p_) {\tthrow(\"startm: p has runnable gs\") } // The caller incremented nmspinning, so set m.spinning in the new M. // // 调用者增加nmspinning，因此将m.spinning设置为新的M。因此当前这个M就是这个自旋的M nmp.spinning = spinning // 标记当前需要唤醒的工作线程 自旋的状态 // 当前M的P暂时放在nextp上 // 这里也就是为什么新创建的工作线程直接在nextp去取P，原因在这里关联的 // 因为_p_只在这里存在，因此不会存在其他工作线程使用该P。 nmp.nextp.set(_p_)\t// 唤醒工作线程，工作线程睡眠在 nmp.park 上面 notewakeup(\u0026nmp.park)\t// Ownership transfer of _p_ committed by wakeup. Preemption is now // safe. // // 唤醒提交的_p_的所有权转移。 抢占现在是安全的 // 与acquirem函数呼应，并检查是否有抢占请求发生 releasem(mp) } acquirem() m加锁禁止抢占当前m。 文件位置：go1.19.3/src/runtime/runtime1.go。 473 474 475 476 477 478 //go:nosplit func acquirem() *m { _g_ := getg() _g_.m.locks++ return _g_.m } releasem() 文件位置：go1.19.3/src/runtime/runtime1.go。 482 483 484 485 486 487 488 489 490 func releasem(mp *m) { _g_ := getg() mp.locks-- // 当前M没有锁，并且G需要被抢占 if mp.locks == 0 \u0026\u0026 _g_.preempt { // restore the preemption request in case we've cleared it in newstack _g_.stackguard0 = stackPreempt // 设置抢占标志 } } pidleget() 从sched.pidle中尝试获取一个空闲的P。 参数now int64：0则取当前时间点。 返回值： *p：返回一个空闲的P，否则为nil没有空闲的P。 int64：传入now的时间值，0则是当前时间值。 文件位置：go1.19.3/src/runtime/proc.go。 5727 5728 5729 5730 5731 5732 5733 5734 5735 5736 5737 5738 5739 5740 5741 5742 5743 5744 5745 5746 5747 5748 5749 5750 5751 5752 5753 5754 5755 5756 // pidleget tries to get a p from the _Pidle list, acquiring ownership. // // sched.lock must be held. // // May run during STW, so write barriers are not allowed. // //go:nowritebarrierrec func pidleget(now int64) (*p, int64) { // sched.lock 必须被持有 assertLockHeld(\u0026sched.lock) // 从sched.pidle上获取空闲的P _p_ := sched.pidle.ptr() if _p_ != nil { // Timer may get added at any time now. if now == 0 { now = nanotime() } // 设置timerpMask和idlepMask timerpMask.set(_p_.id) idlepMask.clear(_p_.id) // 从全局空闲的P中移除_p_ sched.pidle = _p_.link // 全局的空闲P的次数减一 atomic.Xadd(\u0026sched.npidle, -1) // limiterEvent跟踪GC CPU限制器的事件。 _p_.limiterEvent.stop(limiterEventIdle, now) } return _p_, now } mget() 尝试从sched.midle获取一个空闲的工作线程m，起来绑定P运行。 文件位置：go1.19.3/src/runtime/proc.go。 5547 5548 5549 5550 5551 5552 5553 5554 5555 5556 5557 5558 5559 5560 5561 5562 5563 5564 // Try to get an m from midle list. // sched.lock must be held. // May run during STW, so write barriers are not allowed. // //go:nowritebarrierrec func mget() *m { assertLockHeld(\u0026sched.lock) // 空闲的m在sched.midle上 mp := sched.midle.ptr() if mp != nil { // 从sched.midle上移除mp sched.midle = mp.schedlink // 空闲的m数量减一 sched.nmidle-- } return mp } mReserveID() 给新创建的工作线程分配唯一的ID。 文件位置：go1.19.3/src/runtime/proc.go。 769 770 771 772 773 774 775 776 777 778 779 780 781 782 783 784 785 786 787 788 789 790 // mReserveID returns the next ID to use for a new m. This new m is immediately // considered 'running' by checkdead. // // sched.lock must be held. func mReserveID() int64 { // sched.lock锁必须被持有 assertLockHeld(\u0026sched.lock) // 分配的ID溢出了 if sched.mnext+1 \u003c sched.mnext { throw(\"runtime: thread ID overflow\") } id := sched.mnext // 分配的ID sched.mnext++ // 下一个ID // 检查sched.mnext - sched.nmfreed \u003e sched.maxmcount // sched.maxmcount 在 runtime.main 中被设置为 10000 // sched.mnext 下一个分配的ID，该值是累加的 // sched.nmfreed 已经释放的工作线程数量 // 因此这里是检查当前已经创建的工作线程数量不能大于最大值 checkmcount() return id } notewakeup() 首先使用atomic.Xchg设置note.key值为1。 这是为了使被唤醒的线程可以通过查看该值是否等于1来确定是被其它线程唤醒还是意外从睡眠中苏醒了过来， 如果该值为1则表示是被唤醒的，可以继续工作了。 但如果该值为0则表示是意外苏醒，需要再次进入睡眠， 工作线程苏醒之后的处理逻辑我们已经在notesleep()函数中见过，所以这里略过。 文件位置：go1.19.3/src/runtime/lock_futex.go。 139 140 141 142 143 144 145 146 147 func notewakeup(n *note) { // 设置n.key = 1, 被唤醒的线程通过查看该值是否等于1来确定是被其它线程唤醒还是意外从睡眠中苏醒 old := atomic.Xchg(key32(\u0026n.key), 1) if old != 0 { // 如果旧值不是0说明系统逻辑有问题 print(\"notewakeup - double wakeup (\", old, \")\\n\") throw(\"notewakeup - double wakeup\") } futexwakeup(key32(\u0026n.key), 1) // 调用futexwakeup唤醒 } futexwakeup() 对于Linux平台来说，工作线程通过note睡眠其实是通过futex系统调用睡眠在内核之中， 所以唤醒处于睡眠状态的线程也需要通过futex系统调用进入内核来唤醒。 所以这里的futexwakeup()又继续调用包装了futex系统调用的futex()函数来实现唤醒睡眠在内核中的工作线程。 文件位置：go1.19.3/src/runtime/os_linux.go。 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 // If any procs are sleeping on addr, wake up at most cnt. //go:nosplit func futexwakeup(addr *uint32, cnt uint32) { // 调用futex函数唤醒工作线程 ret := futex(unsafe.Pointer(addr), _FUTEX_WAKE_PRIVATE, cnt, nil, nil, 0) if ret \u003e= 0 {\t// 调用成功是这里直接返回 return } // I don't know that futex wakeup can return // EAGAIN or EINTR, but if it does, it would be // safe to loop and call futex again. systemstack(func() { print(\"futexwakeup addr=\", addr, \" returned \", ret, \"\\n\") }) // 程序不会到这里来，即使到这里来了，向一个未知地址写入数据直接宕机 *(*int32)(unsafe.Pointer(uintptr(0x1006))) = 0x1006 } futex() futex()函数由汇编代码写成，前面的几条指令都在为futex系统调用准备参数， 参数准备完成之后则通过SYSCALL指令进入操作系统内核完成线程的唤醒功能。 内核在完成唤醒工作之后当前工作线程则从内核返回到futex()函数继续执行SYSCALL指令之后的代码并按函数调用链原路返回。 继续执行其它代码，而被唤醒的工作线程则由内核负责在适当的时候调度到CPU上运行。 陷入系统调用太长时间的工作线程会在监控线程中剥离P和G，具体的参看监控线程相关代码。这里没有标记工作线程陷入系统调用的标志。 应该是当前函数调用不会形成阻塞。 文件位置：go1.19.3/src/runtime/sys_linux_amd64.s。 549 550 551 552 553 554 555 556 557 558 559 560 561 562 # int64 futex(int32 *uaddr, int32 op, int32 val, # struct timespec *timeout, int32 *uaddr2, int32 val2); TEXT runtime·futex(SB),NOSPLIT,$0 #这6条指令在为futex系统调用准备参数 MOVQ addr+0(FP), DI MOVL op+8(FP), SI MOVL val+12(FP), DX MOVQ ts+16(FP), R10 MOVQ addr2+24(FP), R8 MOVL val3+32(FP), R9 MOVL $SYS_futex, AX # futex系统调用编号放入AX寄存器 SYSCALL # 系统调用，进入内核 MOVL AX, ret+40(FP) # 系统调用通过AX寄存器返回返回值，这里把返回值保存到内存之中 RET 创建工作线程 如果没有正处于休眠状态的工作线程，则需要调用newm()函数新建一个工作线程。 newm() 创建调度线程和监控线程都是通过该函数，执行该函数时都会把栈切换到g0栈，因为g0栈比较大。 该函数在以下两种情况下使用： newm(sysmon, nil, -1)：创建【监控线程】。 sysmon工作线程开始执行时首先调用的函数。（不是入口函数，newm()创建的入口函数都是固定的mstart()函数） nil表示不需要绑定P。 -1系统会自动分配一个递增的数字。（全局唯一的ID） newm(fn, _p_, id)：创建【调度线程】。 fn工作线程开始执行时首先调用的函数。（不是入口函数，newm()创建的入口函数都是固定的mstart()函数） _p_线程启动时需要绑定的P。 创建工作线程的唯一ID。 创建一个新的m。它将从对fn或调度器的调用开始。fn需要是静态的，而不是一个堆分配闭包。可以使用 m.p==nil运行，因此不允许写入障碍。 id是可选的，预分配的M的id。通过传递-1来省略。 go:nowritebarrierrec：告诉编译器该函数及里面所调用的函数都不插入写屏障代码。 参数： fn func()：新创建的工作线程启动后需要执行的函数，不能是一个堆分配的闭包，必须是一个静态的函数。 也就是所有创建的线程入口函数都是mstart()函数是线程的入口函数数，参看newosproc()函数。 _p_ *p：新创建的工作线程需要绑定的P，该值可以为 nil，表示不绑定P。 id int64：新创建的工作线程的ID值，该值可以是-1，表示系统自动分配一个递增的ID数值。 文件位置： // Create a new m. It will start off with a call to fn, or else the scheduler. // fn needs to be static and not a heap allocated closure. // May run with m.p==nil, so write barriers are not allowed. // // id is optional pre-allocated m ID. Omit by passing -1. // //go:nowritebarrierrec func newm(fn func(), _p_ *p, id int64) { // allocm adds a new M to allm, but they do not start until created by // the OS in newm1 or the template thread. // // doAllThreadsSyscall requires that every M in allm will eventually // start and be signal-able, even with a STW. // // Disable preemption here until we start the thread to ensure that // newm is not preempted between allocm and starting the new thread, // ensuring that anything added to allm is guaranteed to eventually // start. // // allocm将一个新的M添加到allm中，但是直到操作系统在newm1或模板线程中创建它们才开始。 // doAllThreadsSyscall 要求allm中的每个M最终都将启动并可发送信号，即使是STW。 // 在这里禁用抢占，直到我们启动线程，以确保newm在allocm和启动新线程之间不被抢占，确保添加到allm的任何内容最终都能启动。 acquirem()\t// 禁止当前工作线程被抢占 // allocm从堆上分配一个m结构体，并绑定M与其他相关例如allp等 mp := allocm(_p_, fn, id) mp.nextp.set(_p_)\t// 设置当前M需要用到的P mp.sigmask = initSigmask if gp := getg(); gp != nil \u0026\u0026 gp.m != nil \u0026\u0026 (gp.m.lockedExt != 0 || gp.m.incgo) \u0026\u0026 GOOS != \"plan9\" { // We're on a locked M or a thread that may have been // started by C. The kernel state of this thread may // be strange (the user may have locked it for that // purpose). We don't want to clone that into another // thread. Instead, ask a known-good thread to create // the thread for us. // // This is disabled on Plan 9. See golang.org/issue/22227. // // TODO: This may be unnecessary on Windows, which // doesn't model thread creation off fork. lock(\u0026newmHandoff.lock) if newmHandoff.haveTemplateThread == 0 { throw(\"on a locked thread with no template thread\") } mp.schedlink = newmHandoff.newm newmHandoff.newm.set(mp) if newmHandoff.waiting { newmHandoff.waiting = false notewakeup(\u0026newmHandoff.wake) } unlock(\u0026newmHandoff.lock) // The M has not started yet, but the template thread does not // participate in STW, so it will always process queued Ms and // it is safe to releasem. releasem(getg().m) return } newm1(mp) releasem(getg().m) } ",
+  "wordCount" : "1888",
+  "inLanguage": "zh",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-07-30T00:00:00Z",
+  "dateModified": "2024-07-30T00:00:00Z",
+  "author":[{
+    "@type": "Person",
+    "name": "helium"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://heliu.site/posts/golang/goroutine/newm/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Helium",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://heliu.site/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+                    height="35">Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://heliu.site/" title="主页">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/posts" title="文章">
+                    <span>Article</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/archives" title="时间轴">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/tags/" title="标签">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/support" title="打赏">
+                    <span>🫶Help</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+
+<article class="post" autonumbering>
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">Golang 合集</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/goroutine/">第12章 Goroutine</a></div>
+    <h1 class="post-title entry-hint-parent">
+      工作线程的唤醒和创建
+    </h1>
+    <div class="post-description">
+      💥本文章所有相关go代码参考自go 1.18&#43;版本
+    </div>
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2024-07-30</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2024-07-30</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select: text;">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="user-select: text;"></path>
+    <polyline points="14 2 14 8 20 8" style="user-select: text;"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
+    <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
+    <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
+</svg><span>1888字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="9"></circle>
+    <polyline points="12 7 12 12 15 15"></polyline>
+</svg><span>9分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+</svg><span>helium</span></span>
+      <span class="x-post-meta-item">
+        &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
+        <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
+            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://heliu.site/tags/goroutine/" target="_blank" rel="noopener">Goroutine</a>
+        </ul>
+      </span>
+      
+      <span id="busuanzi_container_page_pv" class="x-post-meta-item">
+        &nbsp;<svg t="1720844685710" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="27237" width="200" height="200"><path d="M739.754667 574.08c-121.386667 45.610667-208.469333 169.813333-208.64 316.16 0 33.408 4.693333 65.493333 13.141333 95.914667H94.122667c-26.453333-43.52-41.685333-91.946667-41.685334-143.189334 0-185.173333 192.896-335.104 430.805334-335.104 96.256 0 184.832 24.746667 256.512 66.218667z m-280.490667-114.986667a214.869333 214.869333 0 0 1-214.869333-215.04A215.04 215.04 0 0 1 459.264 28.842667a215.04 215.04 0 0 1 215.04 215.210666 215.04 215.04 0 0 1-215.04 215.04zM974.506667 641.28c9.856 0 17.834667 7.466667 17.834666 16.64v59.989333c-0.341333 8.789333-7.850667 15.786667-17.28 16.085334-9.856 0.341333-18.176-6.826667-18.517333-16.085334v-20.053333l-99.114667 91.093333-0.256 0.256a18.474667 18.474667 0 0 1-14.848 4.352h-0.768a18.176 18.176 0 0 1-9.344-4.608l-0.938666-0.981333-85.930667-80.042667-123.562667 115.072a18.773333 18.773333 0 0 1-25.216 0 15.786667 15.786667 0 0 1 0-23.466666l136.149334-126.848 0.725333-0.597334a18.645333 18.645333 0 0 1 24.362667 0.512l87.253333 81.237334 86.058667-79.232h-21.248c-9.386667-0.298667-16.938667-7.338667-17.28-16.085334-0.341333-9.173333 7.381333-16.896 17.28-17.237333h64.64z m-367.146667 240h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v72.192a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042667-16.042666v-72.192c0-8.874667 7.210667-16.042667 16.042667-16.042667z m110.805333-106.666667h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v178.858667a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042666v-178.858667c0-8.874667 7.168-16.042667 16.042666-16.042667z m106.538667 80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v99.413333a16.042667 16.042667 0 0 1-16.042667 16.042667H824.746667a16.042667 16.042667 0 0 1-16.042667-16.042667v-99.413333c0-8.874667 7.168-16.042667 16.042667-16.042667z m110.165333-80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v179.413333a16.042667 16.042667 0 0 1-16.042667 16.042667h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042667v-179.413333c0-8.874667 7.210667-16.042667 16.042666-16.042667z" fill="#999999" p-id="27238"></path></svg>
+        <span id="busuanzi_value_page_pv"></span>
+      </span>
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#%e5%94%a4%e9%86%92%e5%b7%a5%e4%bd%9c%e7%ba%bf%e7%a8%8b" aria-label="唤醒工作线程">唤醒工作线程</a><ul>
+                            
+                    <li>
+                        <a href="#wakep" aria-label="wakep()">wakep()</a></li>
+                    <li>
+                        <a href="#startm" aria-label="startm()">startm()</a><ul>
+                            
+                    <li>
+                        <a href="#acquirem" aria-label="acquirem()">acquirem()</a></li>
+                    <li>
+                        <a href="#releasem" aria-label="releasem()">releasem()</a></li>
+                    <li>
+                        <a href="#pidleget" aria-label="pidleget()">pidleget()</a></li>
+                    <li>
+                        <a href="#mget" aria-label="mget()">mget()</a></li>
+                    <li>
+                        <a href="#mreserveid" aria-label="mReserveID()">mReserveID()</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#notewakeup" aria-label="notewakeup()">notewakeup()</a></li>
+                    <li>
+                        <a href="#futexwakeup" aria-label="futexwakeup()">futexwakeup()</a></li>
+                    <li>
+                        <a href="#futex" aria-label="futex()">futex()</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e5%88%9b%e5%bb%ba%e5%b7%a5%e4%bd%9c%e7%ba%bf%e7%a8%8b" aria-label="创建工作线程">创建工作线程</a><ul>
+                            
+                    <li>
+                        <a href="#newm" aria-label="newm()">newm()</a>
+                    </li>
+                </ul>
+                </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+  <div class="post-content"><h2 id="唤醒工作线程">唤醒工作线程<a hidden class="anchor" aria-hidden="true" href="#唤醒工作线程">#</a></h2>
+<ol>
+<li>去尝试唤醒工作线程条件：<strong><code>atomic.Load(&amp;sched.npidle) != 0 &amp;&amp; atomic.Load(&amp;sched.nmspinning) == 0</code></strong>。
+<ul>
+<li><strong><code>atomic.Load(&amp;sched.npidle) != 0</code></strong>：有空闲的<code>P</code>。</li>
+<li><strong><code>atomic.Load(&amp;sched.nmspinning) == 0</code></strong>：没有工作线程正在尝试从其他工作线程的本地队列偷取<code>goroutine</code>。(就是没有<code>spinning</code>自旋的<code>goroutine</code>时)</li>
+</ul>
+</li>
+<li>唤醒空闲的<code>P</code>和<code>M</code>由<code>wakep()</code>函数完成。</li>
+</ol>
+<h3 id="wakep">wakep()<a hidden class="anchor" aria-hidden="true" href="#wakep">#</a></h3>
+<ol>
+<li>尝试添加一个<code>P</code>来执行<code>G</code>。当<code>G</code>是可运行时调用(<code>newproc, ready</code>)。</li>
+<li><code>wakep()</code>函数被调用的地方：【创建<code>g</code>时候，在<code>newproc()</code>函数中，就是<code>go</code>关键字】，【<code>g</code>放回<code>P</code>的时候，在<code>ready()</code>函数中】。
+<ul>
+<li><code>newproc()</code>函数中，也就是<code>go</code>关键字时，<code>runtime.main</code>已启动时。（这种情况发生在<code>go</code>关键字时）</li>
+<li><code>ready()</code>函数中，该函数通过把需要唤醒的<code>goroutine</code>放入运行队列来唤醒它。（这种情况在<code>g</code>被挂在了其他地方时需要恢复到<code>P</code>中时）</li>
+</ul>
+</li>
+<li>也就是只要<code>g</code>被放入本地队列中，准备运行时都需要调用<code>wakep()</code>函数尝试利用空闲的<code>M</code>和<code>P</code>来运行它。</li>
+<li>文件位置：<code>go1.19.3/src/runtime/proc.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">2420
+</span><span class="lnt">2421
+</span><span class="lnt">2422
+</span><span class="lnt">2423
+</span><span class="lnt">2424
+</span><span class="lnt">2425
+</span><span class="lnt">2426
+</span><span class="lnt">2427
+</span><span class="lnt">2428
+</span><span class="lnt">2429
+</span><span class="lnt">2430
+</span><span class="lnt">2431
+</span><span class="lnt">2432
+</span><span class="lnt">2433
+</span><span class="lnt">2434
+</span><span class="lnt">2435
+</span><span class="lnt">2436
+</span><span class="lnt">2437
+</span><span class="lnt">2438
+</span><span class="lnt">2439
+</span><span class="lnt">2440
+</span><span class="lnt">2441
+</span><span class="lnt">2442
+</span><span class="lnt">2443
+</span><span class="lnt">2444
+</span><span class="lnt">2445
+</span><span class="lnt">2446
+</span><span class="lnt">2447
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Tries to add one more P to execute G&#39;s.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Called when a G is made runnable (newproc, ready).
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">wakep</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 没有空闲的P，直接返回。当前所有的P都在工作。因为P的数量是固定的。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">npidle</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// be conservative about spinning threads
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 对自旋的线程持保守态度：
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 	1. sched.nmspinning != 0：有其他线程正在自旋（就是在其他线程中去偷取g）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//  2. !atomic.Cas(&amp;sched.nmspinning, 0, 1)：通过cas操作再次确认是否有其他工作线程处于spinning状态
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 从进入wakep()判断到真正启动工作线程之前的这一段时间之内，如果已经有工作线程进入了spinning状态而在四处寻找需要运行的goroutine
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 这样的话我们就没有必要再启动一个多余的工作线程出来了
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 如果cas操作成功，则继续调用startm创建一个新的或唤醒一个处于睡眠状态的工作线程出来工作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 1. atomic.Load(&amp;sched.nmspinning) != 0 成立：有其他工作线程正在自旋，直接return退出
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 2. atomic.Load(&amp;sched.nmspinning) == 0 成立：当前没有忙碌的工作线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//    atomic.Cas(&amp;sched.nmspinning, 0, 1) == true：当前没有忙碌的工作线程，当前可以创建工作线程，并标记sched.nmspinning=1阻止后来者
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//    atomic.Cas(&amp;sched.nmspinning, 0, 1) == false：当前有其他忙碌的工作线程，直接return退出
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">nmspinning</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="p">!</span><span class="nx">atomic</span><span class="p">.</span><span class="nf">Cas</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">nmspinning</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 程序执行到这里说明：sched.nmspinning一定被标记为1了。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">startm</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="startm">startm()<a hidden class="anchor" aria-hidden="true" href="#startm">#</a></h3>
+<ol>
+<li>调度一些<code>M</code>来运行<code>p</code>(如果需要，创建一个<code>M</code>)。</li>
+<li>如果<code>p==nil</code>，尝试得到一个空闲的<code>p</code>，如果没有空闲的<code>p</code>什么都不做。</li>
+<li>可以使用<code>m.p==nil</code>运行，因此不允许写入障碍。</li>
+<li>如果设置了<code>spinning</code>，则调用者增加了<code>nmspinning</code>，而<code>startm</code>将减少<code>nmspinning</code>或在新启动的<code>M</code>中设置<code>m.spinning</code>。</li>
+<li>传递<code>nil</code>的P的调用方必须从不可抢占的上下文中调用。见下面对<code>acquirem</code>。</li>
+<li>必须没有写障碍，因为这个可能没有<code>P</code>。</li>
+<li><code>go:nowritebarrierrec</code>：不允许编译器插入写屏障相关代码。</li>
+<li>在抢占系统调用的<code>P</code>的时候该函数会被调用，并传入空闲的<code>P</code>和<code>false</code>参数。</li>
+<li>参数：
+<ul>
+<li><code>_p_ *p</code>：<code>nil</code>表示没有指定<code>P</code>，否则指定<code>P</code>。</li>
+<li><code>spinning bool</code>：<code>true</code>.<code>sched.nmspinning</code>的值在前面被加一了。<code>false</code>.没有加一。</li>
+</ul>
+</li>
+<li>文件位置：<code>go1.19.3/src/runtime/proc.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">2257
+</span><span class="lnt">2258
+</span><span class="lnt">2259
+</span><span class="lnt">2260
+</span><span class="lnt">2261
+</span><span class="lnt">2262
+</span><span class="lnt">2263
+</span><span class="lnt">2264
+</span><span class="lnt">2265
+</span><span class="lnt">2266
+</span><span class="lnt">2267
+</span><span class="lnt">2268
+</span><span class="lnt">2269
+</span><span class="lnt">2270
+</span><span class="lnt">2271
+</span><span class="lnt">2272
+</span><span class="lnt">2273
+</span><span class="lnt">2274
+</span><span class="lnt">2275
+</span><span class="lnt">2276
+</span><span class="lnt">2277
+</span><span class="lnt">2278
+</span><span class="lnt">2279
+</span><span class="lnt">2280
+</span><span class="lnt">2281
+</span><span class="lnt">2282
+</span><span class="lnt">2283
+</span><span class="lnt">2284
+</span><span class="lnt">2285
+</span><span class="lnt">2286
+</span><span class="lnt">2287
+</span><span class="lnt">2288
+</span><span class="lnt">2289
+</span><span class="lnt">2290
+</span><span class="lnt">2291
+</span><span class="lnt">2292
+</span><span class="lnt">2293
+</span><span class="lnt">2294
+</span><span class="lnt">2295
+</span><span class="lnt">2296
+</span><span class="lnt">2297
+</span><span class="lnt">2298
+</span><span class="lnt">2299
+</span><span class="lnt">2300
+</span><span class="lnt">2301
+</span><span class="lnt">2302
+</span><span class="lnt">2303
+</span><span class="lnt">2304
+</span><span class="lnt">2305
+</span><span class="lnt">2306
+</span><span class="lnt">2307
+</span><span class="lnt">2308
+</span><span class="lnt">2309
+</span><span class="lnt">2310
+</span><span class="lnt">2311
+</span><span class="lnt">2312
+</span><span class="lnt">2313
+</span><span class="lnt">2314
+</span><span class="lnt">2315
+</span><span class="lnt">2316
+</span><span class="lnt">2317
+</span><span class="lnt">2318
+</span><span class="lnt">2319
+</span><span class="lnt">2320
+</span><span class="lnt">2321
+</span><span class="lnt">2322
+</span><span class="lnt">2323
+</span><span class="lnt">2324
+</span><span class="lnt">2325
+</span><span class="lnt">2326
+</span><span class="lnt">2327
+</span><span class="lnt">2328
+</span><span class="lnt">2329
+</span><span class="lnt">2330
+</span><span class="lnt">2331
+</span><span class="lnt">2332
+</span><span class="lnt">2333
+</span><span class="lnt">2334
+</span><span class="lnt">2335
+</span><span class="lnt">2336
+</span><span class="lnt">2337
+</span><span class="lnt">2338
+</span><span class="lnt">2339
+</span><span class="lnt">2340
+</span><span class="lnt">2341
+</span><span class="lnt">2342
+</span><span class="lnt">2343
+</span><span class="lnt">2344
+</span><span class="lnt">2345
+</span><span class="lnt">2346
+</span><span class="lnt">2347
+</span><span class="lnt">2348
+</span><span class="lnt">2349
+</span><span class="lnt">2350
+</span><span class="lnt">2351
+</span><span class="lnt">2352
+</span><span class="lnt">2353
+</span><span class="lnt">2354
+</span><span class="lnt">2355
+</span><span class="lnt">2356
+</span><span class="lnt">2357
+</span><span class="lnt">2358
+</span><span class="lnt">2359
+</span><span class="lnt">2360
+</span><span class="lnt">2361
+</span><span class="lnt">2362
+</span><span class="lnt">2363
+</span><span class="lnt">2364
+</span><span class="lnt">2365
+</span><span class="lnt">2366
+</span><span class="lnt">2367
+</span><span class="lnt">2368
+</span><span class="lnt">2369
+</span><span class="lnt">2370
+</span><span class="lnt">2371
+</span><span class="lnt">2372
+</span><span class="lnt">2373
+</span><span class="lnt">2374
+</span><span class="lnt">2375
+</span><span class="lnt">2376
+</span><span class="lnt">2377
+</span><span class="lnt">2378
+</span><span class="lnt">2379
+</span><span class="lnt">2380
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Schedules some M to run the p (creates an M if necessary).
+</span></span></span><span class="line"><span class="cl"><span class="c1">// If p==nil, tries to get an idle P, if no idle P&#39;s does nothing.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// May run with m.p==nil, so write barriers are not allowed.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// If spinning is set, the caller has incremented nmspinning and startm will
+</span></span></span><span class="line"><span class="cl"><span class="c1">// either decrement nmspinning or set m.spinning in the newly started M.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Callers passing a non-nil P must call from a non-preemptible context. See
+</span></span></span><span class="line"><span class="cl"><span class="c1">// comment on acquirem below.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Must not have write barriers because this may be called without a P.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">//go:nowritebarrierrec
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">startm</span><span class="p">(</span><span class="nx">_p_</span> <span class="o">*</span><span class="nx">p</span><span class="p">,</span> <span class="nx">spinning</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Disable preemption.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Every owned P must have an owner that will eventually stop it in the
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// event of a GC stop request. startm takes transient ownership of a P
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// (either from argument or pidleget below) and transfers ownership to
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// a started M, which will be responsible for performing the stop.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Preemption must be disabled during this transient ownership,
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// otherwise the P this is running on may enter GC stop while still
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// holding the transient P, leaving that P in limbo and deadlocking the
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// STW.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Callers passing a non-nil P must already be in non-preemptible
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// context, otherwise such preemption could occur on function entry to
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// startm. Callers passing a nil P may be preemptible, so we must
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// disable preemption before acquiring a P from pidleget below.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">mp</span> <span class="o">:=</span> <span class="nf">acquirem</span><span class="p">()</span>    <span class="c1">// 禁止当前M被抢占
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>   <span class="c1">// 锁住全局sched
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 有空闲的p才会去唤醒线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">_p_</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>     <span class="c1">// 如果没有指定P，则需要从P的空闲列表中获取一个P
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">_p_</span> <span class="p">=</span> <span class="nf">pidleget</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>   <span class="c1">// 从P的空闲队列中获取空闲的P
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// 没有空闲的P，意味着所有的P都很忙不需要唤醒
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="nx">_p_</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>	
+</span></span><span class="line"><span class="cl">            <span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// 之前的Cas把nmspinning加一，这里需要减回来
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="k">if</span> <span class="nx">spinning</span> <span class="p">{</span>	
+</span></span><span class="line"><span class="cl">                <span class="c1">// The caller incremented nmspinning, but there are no idle Ps,
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                <span class="c1">// so it&#39;s okay to just undo the increment and give up.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                <span class="c1">// 正常逻辑这里不应该减成负数，否则是系统逻辑存在错误
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                <span class="k">if</span> <span class="nb">int32</span><span class="p">(</span><span class="nx">atomic</span><span class="p">.</span><span class="nf">Xadd</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">nmspinning</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;startm: negative nmspinning&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// 与acquirem函数呼应，并检查是否有抢占请求发生
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="nf">releasem</span><span class="p">(</span><span class="nx">mp</span><span class="p">)</span>	
+</span></span><span class="line"><span class="cl">            <span class="k">return</span>  <span class="c1">// 没有空闲的P直接返回
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 尝试从m空闲队列中获取正处于睡眠之中的工作线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 所有处于睡眠状态的m都在此队列中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">nmp</span> <span class="o">:=</span> <span class="nf">mget</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 没有处于睡眠状态的工作线程，这种情况需要去创建线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">nmp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>	
+</span></span><span class="line"><span class="cl">        <span class="c1">// No M is available, we must drop sched.lock and call newm.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// However, we already own a P to assign to the M.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// Once sched.lock is released, another G (e.g., in a syscall),
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// could find no idle P while checkdead finds a runnable G but
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// no running M&#39;s because this new M hasn&#39;t started yet, thus
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// throwing in an apparent deadlock.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// Avoid this situation by pre-allocating the ID for the new M,
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// thus marking it as &#39;running&#39; before we drop sched.lock. This
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// new M will eventually run the scheduler to execute any
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// queued G&#39;s.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// 这里是为需要新创建的工作线程准备工作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">id</span> <span class="o">:=</span> <span class="nf">mReserveID</span><span class="p">()</span>      <span class="c1">// 给需要创建的工作线程分配ID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// 初始化fn函数，该函数在工作线程刚启动时会被调用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kd">var</span> <span class="nx">fn</span> <span class="kd">func</span><span class="p">()</span>   <span class="c1">// nil
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="nx">spinning</span> <span class="p">{</span>   <span class="c1">// 如果需要标记当前工作线程是自旋状态
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// The caller incremented nmspinning, so set m.spinning in the new M.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// mspinning函数就一行代码 &#39;getg().m.spinning = true&#39; 标记当前工作线程是自旋状态
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// 因为全局的sched.nmspinning已经加一了，因此需要标记m的spinning
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="nx">fn</span> <span class="p">=</span> <span class="nx">mspinning</span>	
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">newm</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">_p_</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span>   <span class="c1">// 创建新的工作线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// Ownership transfer of _p_ committed by start in newm.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// Preemption is now safe.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">releasem</span><span class="p">(</span><span class="nx">mp</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// 到这里说明有正在处于睡眠的工作线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 从空闲的线程队列中拿出来的 spinning 标志位存在，说明sleep时有问题
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">nmp</span><span class="p">.</span><span class="nx">spinning</span> <span class="p">{</span> <span class="c1">// 系统逻辑存在问题
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;startm: m is spinning&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 工作线程还与其他P有关，说明有问题
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">nmp</span><span class="p">.</span><span class="nx">nextp</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span> <span class="c1">// 系统逻辑存在问题
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;startm: m has p&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 空闲的P中不应该存在g，系统逻辑存在问题
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">spinning</span> <span class="o">&amp;&amp;</span> <span class="p">!</span><span class="nf">runqempty</span><span class="p">(</span><span class="nx">_p_</span><span class="p">)</span> <span class="p">{</span>	
+</span></span><span class="line"><span class="cl">        <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;startm: p has runnable gs&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// The caller incremented nmspinning, so set m.spinning in the new M.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 调用者增加nmspinning，因此将m.spinning设置为新的M。因此当前这个M就是这个自旋的M
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">nmp</span><span class="p">.</span><span class="nx">spinning</span> <span class="p">=</span> <span class="nx">spinning</span> <span class="c1">// 标记当前需要唤醒的工作线程 自旋的状态
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 当前M的P暂时放在nextp上
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 这里也就是为什么新创建的工作线程直接在nextp去取P，原因在这里关联的
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 因为_p_只在这里存在，因此不会存在其他工作线程使用该P。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">nmp</span><span class="p">.</span><span class="nx">nextp</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nx">_p_</span><span class="p">)</span>	
+</span></span><span class="line"><span class="cl">    <span class="c1">// 唤醒工作线程，工作线程睡眠在 nmp.park 上面
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">notewakeup</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">nmp</span><span class="p">.</span><span class="nx">park</span><span class="p">)</span>	
+</span></span><span class="line"><span class="cl">    <span class="c1">// Ownership transfer of _p_ committed by wakeup. Preemption is now
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// safe.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 唤醒提交的_p_的所有权转移。 抢占现在是安全的
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 与acquirem函数呼应，并检查是否有抢占请求发生
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">releasem</span><span class="p">(</span><span class="nx">mp</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="acquirem">acquirem()<a hidden class="anchor" aria-hidden="true" href="#acquirem">#</a></h4>
+<ol>
+<li><code>m</code>加锁禁止抢占当前<code>m</code>。</li>
+<li>文件位置：<code>go1.19.3/src/runtime/runtime1.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">473
+</span><span class="lnt">474
+</span><span class="lnt">475
+</span><span class="lnt">476
+</span><span class="lnt">477
+</span><span class="lnt">478
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">//go:nosplit
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">acquirem</span><span class="p">()</span> <span class="o">*</span><span class="nx">m</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">locks</span><span class="o">++</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="releasem">releasem()<a hidden class="anchor" aria-hidden="true" href="#releasem">#</a></h4>
+<ol>
+<li>文件位置：<code>go1.19.3/src/runtime/runtime1.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">482
+</span><span class="lnt">483
+</span><span class="lnt">484
+</span><span class="lnt">485
+</span><span class="lnt">486
+</span><span class="lnt">487
+</span><span class="lnt">488
+</span><span class="lnt">489
+</span><span class="lnt">490
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">releasem</span><span class="p">(</span><span class="nx">mp</span> <span class="o">*</span><span class="nx">m</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">mp</span><span class="p">.</span><span class="nx">locks</span><span class="o">--</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 当前M没有锁，并且G需要被抢占
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">mp</span><span class="p">.</span><span class="nx">locks</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">preempt</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// restore the preemption request in case we&#39;ve cleared it in newstack
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">_g_</span><span class="p">.</span><span class="nx">stackguard0</span> <span class="p">=</span> <span class="nx">stackPreempt</span> <span class="c1">// 设置抢占标志
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="pidleget">pidleget()<a hidden class="anchor" aria-hidden="true" href="#pidleget">#</a></h4>
+<ol>
+<li>从<code>sched.pidle</code>中尝试获取一个空闲的<code>P</code>。</li>
+<li>参数<code>now int64</code>：0则取当前时间点。</li>
+<li>返回值：
+<ul>
+<li><code>*p</code>：返回一个空闲的<code>P</code>，否则为<code>nil</code>没有空闲的<code>P</code>。</li>
+<li><code>int64</code>：传入<code>now</code>的时间值，0则是当前时间值。</li>
+</ul>
+</li>
+<li>文件位置：<code>go1.19.3/src/runtime/proc.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">5727
+</span><span class="lnt">5728
+</span><span class="lnt">5729
+</span><span class="lnt">5730
+</span><span class="lnt">5731
+</span><span class="lnt">5732
+</span><span class="lnt">5733
+</span><span class="lnt">5734
+</span><span class="lnt">5735
+</span><span class="lnt">5736
+</span><span class="lnt">5737
+</span><span class="lnt">5738
+</span><span class="lnt">5739
+</span><span class="lnt">5740
+</span><span class="lnt">5741
+</span><span class="lnt">5742
+</span><span class="lnt">5743
+</span><span class="lnt">5744
+</span><span class="lnt">5745
+</span><span class="lnt">5746
+</span><span class="lnt">5747
+</span><span class="lnt">5748
+</span><span class="lnt">5749
+</span><span class="lnt">5750
+</span><span class="lnt">5751
+</span><span class="lnt">5752
+</span><span class="lnt">5753
+</span><span class="lnt">5754
+</span><span class="lnt">5755
+</span><span class="lnt">5756
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// pidleget tries to get a p from the _Pidle list, acquiring ownership.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// sched.lock must be held.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// May run during STW, so write barriers are not allowed.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">//go:nowritebarrierrec
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">pidleget</span><span class="p">(</span><span class="nx">now</span> <span class="kt">int64</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">p</span><span class="p">,</span> <span class="kt">int64</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// sched.lock 必须被持有
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">assertLockHeld</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 从sched.pidle上获取空闲的P
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">_p_</span> <span class="o">:=</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">pidle</span><span class="p">.</span><span class="nf">ptr</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">_p_</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Timer may get added at any time now.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="nx">now</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nx">now</span> <span class="p">=</span> <span class="nf">nanotime</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 设置timerpMask和idlepMask
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">timerpMask</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">idlepMask</span><span class="p">.</span><span class="nb">clear</span><span class="p">(</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 从全局空闲的P中移除_p_
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">sched</span><span class="p">.</span><span class="nx">pidle</span> <span class="p">=</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">link</span> 
+</span></span><span class="line"><span class="cl">        <span class="c1">// 全局的空闲P的次数减一
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">atomic</span><span class="p">.</span><span class="nf">Xadd</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">npidle</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// limiterEvent跟踪GC CPU限制器的事件。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">_p_</span><span class="p">.</span><span class="nx">limiterEvent</span><span class="p">.</span><span class="nf">stop</span><span class="p">(</span><span class="nx">limiterEventIdle</span><span class="p">,</span> <span class="nx">now</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">_p_</span><span class="p">,</span> <span class="nx">now</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="mget">mget()<a hidden class="anchor" aria-hidden="true" href="#mget">#</a></h4>
+<ol>
+<li>尝试从<code>sched.midle</code>获取一个空闲的工作线程<code>m</code>，起来绑定<code>P</code>运行。</li>
+<li>文件位置：<code>go1.19.3/src/runtime/proc.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">5547
+</span><span class="lnt">5548
+</span><span class="lnt">5549
+</span><span class="lnt">5550
+</span><span class="lnt">5551
+</span><span class="lnt">5552
+</span><span class="lnt">5553
+</span><span class="lnt">5554
+</span><span class="lnt">5555
+</span><span class="lnt">5556
+</span><span class="lnt">5557
+</span><span class="lnt">5558
+</span><span class="lnt">5559
+</span><span class="lnt">5560
+</span><span class="lnt">5561
+</span><span class="lnt">5562
+</span><span class="lnt">5563
+</span><span class="lnt">5564
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Try to get an m from midle list.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// sched.lock must be held.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// May run during STW, so write barriers are not allowed.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">//go:nowritebarrierrec
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">mget</span><span class="p">()</span> <span class="o">*</span><span class="nx">m</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">assertLockHeld</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 空闲的m在sched.midle上
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">mp</span> <span class="o">:=</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">midle</span><span class="p">.</span><span class="nf">ptr</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">mp</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 从sched.midle上移除mp
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">sched</span><span class="p">.</span><span class="nx">midle</span> <span class="p">=</span> <span class="nx">mp</span><span class="p">.</span><span class="nx">schedlink</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 空闲的m数量减一
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">sched</span><span class="p">.</span><span class="nx">nmidle</span><span class="o">--</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">mp</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="mreserveid">mReserveID()<a hidden class="anchor" aria-hidden="true" href="#mreserveid">#</a></h4>
+<ol>
+<li>给新创建的工作线程分配唯一的<code>ID</code>。</li>
+<li>文件位置：<code>go1.19.3/src/runtime/proc.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">769
+</span><span class="lnt">770
+</span><span class="lnt">771
+</span><span class="lnt">772
+</span><span class="lnt">773
+</span><span class="lnt">774
+</span><span class="lnt">775
+</span><span class="lnt">776
+</span><span class="lnt">777
+</span><span class="lnt">778
+</span><span class="lnt">779
+</span><span class="lnt">780
+</span><span class="lnt">781
+</span><span class="lnt">782
+</span><span class="lnt">783
+</span><span class="lnt">784
+</span><span class="lnt">785
+</span><span class="lnt">786
+</span><span class="lnt">787
+</span><span class="lnt">788
+</span><span class="lnt">789
+</span><span class="lnt">790
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// mReserveID returns the next ID to use for a new m. This new m is immediately
+</span></span></span><span class="line"><span class="cl"><span class="c1">// considered &#39;running&#39; by checkdead.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// sched.lock must be held.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">mReserveID</span><span class="p">()</span> <span class="kt">int64</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// sched.lock锁必须被持有
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">assertLockHeld</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 分配的ID溢出了
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">mnext</span><span class="o">+</span><span class="mi">1</span> <span class="p">&lt;</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">mnext</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;runtime: thread ID overflow&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">id</span> <span class="o">:=</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">mnext</span> <span class="c1">// 分配的ID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">sched</span><span class="p">.</span><span class="nx">mnext</span><span class="o">++</span> <span class="c1">// 下一个ID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 检查sched.mnext - sched.nmfreed &gt; sched.maxmcount
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// sched.maxmcount 在 runtime.main 中被设置为 10000
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// sched.mnext 下一个分配的ID，该值是累加的
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// sched.nmfreed 已经释放的工作线程数量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 因此这里是检查当前已经创建的工作线程数量不能大于最大值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">checkmcount</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">id</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="notewakeup">notewakeup()<a hidden class="anchor" aria-hidden="true" href="#notewakeup">#</a></h3>
+<ol>
+<li>首先使用<code>atomic.Xchg</code>设置<code>note.key</code>值为1。</li>
+<li>这是为了使被唤醒的线程可以通过查看该值是否等于1来确定是被其它线程唤醒还是意外从睡眠中苏醒了过来，</li>
+<li>如果该值为1则表示是被唤醒的，可以继续工作了。</li>
+<li>但如果该值为0则表示是意外苏醒，需要再次进入睡眠，</li>
+<li>工作线程苏醒之后的处理逻辑我们已经在<code>notesleep</code>()函数中见过，所以这里略过。</li>
+<li>文件位置：<code>go1.19.3/src/runtime/lock_futex.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">notewakeup</span><span class="p">(</span><span class="nx">n</span> <span class="o">*</span><span class="nx">note</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 设置n.key = 1, 被唤醒的线程通过查看该值是否等于1来确定是被其它线程唤醒还是意外从睡眠中苏醒
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">old</span> <span class="o">:=</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Xchg</span><span class="p">(</span><span class="nf">key32</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">n</span><span class="p">.</span><span class="nx">key</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">old</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>   <span class="c1">// 如果旧值不是0说明系统逻辑有问题
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nb">print</span><span class="p">(</span><span class="s">&#34;notewakeup - double wakeup (&#34;</span><span class="p">,</span> <span class="nx">old</span><span class="p">,</span> <span class="s">&#34;)\n&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;notewakeup - double wakeup&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">futexwakeup</span><span class="p">(</span><span class="nf">key32</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">n</span><span class="p">.</span><span class="nx">key</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="c1">// 调用futexwakeup唤醒
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="futexwakeup">futexwakeup()<a hidden class="anchor" aria-hidden="true" href="#futexwakeup">#</a></h3>
+<ol>
+<li>对于<code>Linux</code>平台来说，工作线程通过<code>note</code>睡眠其实是通过<code>futex</code>系统调用睡眠在内核之中，</li>
+<li>所以唤醒处于睡眠状态的线程也需要通过<code>futex</code>系统调用进入内核来唤醒。</li>
+<li>所以这里的<code>futexwakeup()</code>又继续调用包装了<code>futex</code>系统调用的<code>futex()</code>函数来实现唤醒睡眠在内核中的工作线程。</li>
+<li>文件位置：<code>go1.19.3/src/runtime/os_linux.go</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span><span class="lnt">91
+</span><span class="lnt">92
+</span><span class="lnt">93
+</span><span class="lnt">94
+</span><span class="lnt">95
+</span><span class="lnt">96
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// If any procs are sleeping on addr, wake up at most cnt.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//go:nosplit
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">futexwakeup</span><span class="p">(</span><span class="nx">addr</span> <span class="o">*</span><span class="kt">uint32</span><span class="p">,</span> <span class="nx">cnt</span> <span class="kt">uint32</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 调用futex函数唤醒工作线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">ret</span> <span class="o">:=</span> <span class="nf">futex</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">addr</span><span class="p">),</span> <span class="nx">_FUTEX_WAKE_PRIVATE</span><span class="p">,</span> <span class="nx">cnt</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">ret</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="p">{</span>	<span class="c1">// 调用成功是这里直接返回
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">return</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// I don&#39;t know that futex wakeup can return
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// EAGAIN or EINTR, but if it does, it would be
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// safe to loop and call futex again.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">systemstack</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s">&#34;futexwakeup addr=&#34;</span><span class="p">,</span> <span class="nx">addr</span><span class="p">,</span> <span class="s">&#34; returned &#34;</span><span class="p">,</span> <span class="nx">ret</span><span class="p">,</span> <span class="s">&#34;\n&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 程序不会到这里来，即使到这里来了，向一个未知地址写入数据直接宕机
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="kt">int32</span><span class="p">)(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nb">uintptr</span><span class="p">(</span><span class="mh">0x1006</span><span class="p">)))</span> <span class="p">=</span> <span class="mh">0x1006</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="futex">futex()<a hidden class="anchor" aria-hidden="true" href="#futex">#</a></h3>
+<ol>
+<li><code>futex()</code>函数由汇编代码写成，前面的几条指令都在为<code>futex</code>系统调用准备参数，</li>
+<li>参数准备完成之后则通过<code>SYSCALL</code>指令进入操作系统内核完成线程的唤醒功能。</li>
+<li>内核在完成唤醒工作之后当前工作线程则从内核返回到<code>futex()</code>函数继续执行<code>SYSCALL</code>指令之后的代码并按函数调用链原路返回。</li>
+<li>继续执行其它代码，而被唤醒的工作线程则由内核负责在适当的时候调度到<code>CPU</code>上运行。</li>
+<li>陷入系统调用太长时间的工作线程会在监控线程中剥离<code>P</code>和<code>G</code>，具体的参看监控线程相关代码。这里没有标记工作线程陷入系统调用的标志。</li>
+<li>应该是当前函数调用不会形成阻塞。</li>
+<li>文件位置：<code>go1.19.3/src/runtime/sys_linux_amd64.s</code>。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">549
+</span><span class="lnt">550
+</span><span class="lnt">551
+</span><span class="lnt">552
+</span><span class="lnt">553
+</span><span class="lnt">554
+</span><span class="lnt">555
+</span><span class="lnt">556
+</span><span class="lnt">557
+</span><span class="lnt">558
+</span><span class="lnt">559
+</span><span class="lnt">560
+</span><span class="lnt">561
+</span><span class="lnt">562
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-asm" data-lang="asm"><span class="line"><span class="cl"><span class="c1"># int64 futex(int32 *uaddr, int32 op, int32 val,
+</span></span></span><span class="line"><span class="cl"><span class="c1">#   struct timespec *timeout, int32 *uaddr2, int32 val2);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nf">TEXT</span> <span class="no">runtime</span><span class="err">·</span><span class="no">futex</span><span class="p">(</span><span class="no">SB</span><span class="p">),</span><span class="no">NOSPLIT</span><span class="p">,</span><span class="no">$0</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#这6条指令在为futex系统调用准备参数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVQ</span>    <span class="no">addr</span><span class="err">+</span><span class="mi">0</span><span class="p">(</span><span class="no">FP</span><span class="p">),</span> <span class="no">DI</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">MOVL</span>    <span class="no">op</span><span class="err">+</span><span class="mi">8</span><span class="p">(</span><span class="no">FP</span><span class="p">),</span> <span class="no">SI</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">MOVL</span>    <span class="no">val</span><span class="err">+</span><span class="mi">12</span><span class="p">(</span><span class="no">FP</span><span class="p">),</span> <span class="no">DX</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">MOVQ</span>    <span class="no">ts</span><span class="err">+</span><span class="mi">16</span><span class="p">(</span><span class="no">FP</span><span class="p">),</span> <span class="no">R10</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">MOVQ</span>    <span class="no">addr2</span><span class="err">+</span><span class="mi">24</span><span class="p">(</span><span class="no">FP</span><span class="p">),</span> <span class="no">R8</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">MOVL</span>    <span class="no">val3</span><span class="err">+</span><span class="mi">32</span><span class="p">(</span><span class="no">FP</span><span class="p">),</span> <span class="no">R9</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">MOVL</span>    <span class="no">$SYS_futex</span><span class="p">,</span> <span class="no">AX</span>  <span class="c1"># futex系统调用编号放入AX寄存器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">SYSCALL</span>                 <span class="c1"># 系统调用，进入内核
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">MOVL</span>    <span class="no">AX</span><span class="p">,</span> <span class="no">ret</span><span class="err">+</span><span class="mi">40</span><span class="p">(</span><span class="no">FP</span><span class="p">)</span>  <span class="c1"># 系统调用通过AX寄存器返回返回值，这里把返回值保存到内存之中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">RET</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="创建工作线程">创建工作线程<a hidden class="anchor" aria-hidden="true" href="#创建工作线程">#</a></h2>
+<ol>
+<li>如果没有正处于休眠状态的工作线程，则需要调用<code>newm()</code>函数新建一个工作线程。</li>
+</ol>
+<h3 id="newm">newm()<a hidden class="anchor" aria-hidden="true" href="#newm">#</a></h3>
+<ol>
+<li>创建调度线程和监控线程都是通过该函数，执行该函数时都会把栈切换到<code>g0</code>栈，因为<code>g0</code>栈比较大。</li>
+<li>该函数在以下两种情况下使用：
+<ol>
+<li><strong>newm(sysmon, nil, -1)</strong>：创建【<strong>监控线程</strong>】。
+<ul>
+<li><code>sysmon</code>工作线程开始执行时首先调用的函数。（不是入口函数，<code>newm()</code>创建的入口函数都是固定的<code>mstart()</code>函数）</li>
+<li><code>nil</code>表示不需要绑定<code>P</code>。</li>
+<li><code>-1</code>系统会自动分配一个递增的数字。（全局唯一的<code>ID</code>）</li>
+</ul>
+</li>
+<li><strong>newm(fn, <code>_p_</code>, id)</strong>：创建【<strong>调度线程</strong>】。
+<ul>
+<li><code>fn</code>工作线程开始执行时首先调用的函数。（不是入口函数，<code>newm()</code>创建的入口函数都是固定的<code>mstart()</code>函数）</li>
+<li><code>_p_</code>线程启动时需要绑定的<code>P</code>。</li>
+<li>创建工作线程的唯一<code>ID</code>。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>创建一个新的<code>m</code>。它将从对<strong>fn</strong>或<strong>调度器的调用</strong>开始。fn需要是静态的，而不是一个堆分配闭包。可以使用 <code>m.p==nil</code>运行，因此不允许写入障碍。</li>
+<li><code>id</code>是可选的，预分配的<code>M</code>的<code>id</code>。通过传递<code>-1</code>来省略。</li>
+<li><code>go:nowritebarrierrec</code>：告诉编译器该函数及里面所调用的函数都不插入写屏障代码。</li>
+<li>参数：
+<ol>
+<li><strong><code>fn func()</code></strong>：新创建的工作线程启动后需要执行的函数，不能是一个堆分配的闭包，必须是一个静态的函数。
+<ul>
+<li>也就是所有创建的线程入口函数都是mstart()函数是线程的入口函数数，参看<code>newosproc()</code>函数。</li>
+</ul>
+</li>
+<li><strong><code>_p_ *p</code></strong>：新创建的工作线程需要绑定的<code>P</code>，该值可以为 <code>nil</code>，表示不绑定<code>P</code>。</li>
+<li><strong><code>id int64</code></strong>：新创建的工作线程的<code>ID</code>值，该值可以是<code>-1</code>，表示系统自动分配一个递增的<code>ID</code>数值。</li>
+</ol>
+</li>
+<li>文件位置：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Create a new m. It will start off with a call to fn, or else the scheduler.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// fn needs to be static and not a heap allocated closure.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// May run with m.p==nil, so write barriers are not allowed.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// id is optional pre-allocated m ID. Omit by passing -1.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 
+</span></span></span><span class="line"><span class="cl"><span class="c1">//go:nowritebarrierrec
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">newm</span><span class="p">(</span><span class="nx">fn</span> <span class="kd">func</span><span class="p">(),</span> <span class="nx">_p_</span> <span class="o">*</span><span class="nx">p</span><span class="p">,</span> <span class="nx">id</span> <span class="kt">int64</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// allocm adds a new M to allm, but they do not start until created by
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// the OS in newm1 or the template thread.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// doAllThreadsSyscall requires that every M in allm will eventually
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// start and be signal-able, even with a STW.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Disable preemption here until we start the thread to ensure that
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// newm is not preempted between allocm and starting the new thread,
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// ensuring that anything added to allm is guaranteed to eventually
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// start.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// allocm将一个新的M添加到allm中，但是直到操作系统在newm1或模板线程中创建它们才开始。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// doAllThreadsSyscall 要求allm中的每个M最终都将启动并可发送信号，即使是STW。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 在这里禁用抢占，直到我们启动线程，以确保newm在allocm和启动新线程之间不被抢占，确保添加到allm的任何内容最终都能启动。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">acquirem</span><span class="p">()</span>	<span class="c1">// 禁止当前工作线程被抢占
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// allocm从堆上分配一个m结构体，并绑定M与其他相关例如allp等
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">mp</span> <span class="o">:=</span> <span class="nf">allocm</span><span class="p">(</span><span class="nx">_p_</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">mp</span><span class="p">.</span><span class="nx">nextp</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nx">_p_</span><span class="p">)</span>	<span class="c1">// 设置当前M需要用到的P
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">mp</span><span class="p">.</span><span class="nx">sigmask</span> <span class="p">=</span> <span class="nx">initSigmask</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">gp</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">();</span> <span class="nx">gp</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="o">&amp;&amp;</span> <span class="nx">gp</span><span class="p">.</span><span class="nx">m</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">gp</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">lockedExt</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">gp</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">incgo</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">GOOS</span> <span class="o">!=</span> <span class="s">&#34;plan9&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// We&#39;re on a locked M or a thread that may have been
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// started by C. The kernel state of this thread may
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// be strange (the user may have locked it for that
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// purpose). We don&#39;t want to clone that into another
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// thread. Instead, ask a known-good thread to create
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// the thread for us.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// This is disabled on Plan 9. See golang.org/issue/22227.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// TODO: This may be unnecessary on Windows, which
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// doesn&#39;t model thread creation off fork.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">newmHandoff</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="nx">newmHandoff</span><span class="p">.</span><span class="nx">haveTemplateThread</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;on a locked thread with no template thread&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">mp</span><span class="p">.</span><span class="nx">schedlink</span> <span class="p">=</span> <span class="nx">newmHandoff</span><span class="p">.</span><span class="nx">newm</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">newmHandoff</span><span class="p">.</span><span class="nx">newm</span><span class="p">.</span><span class="nf">set</span><span class="p">(</span><span class="nx">mp</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="nx">newmHandoff</span><span class="p">.</span><span class="nx">waiting</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nx">newmHandoff</span><span class="p">.</span><span class="nx">waiting</span> <span class="p">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">notewakeup</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">newmHandoff</span><span class="p">.</span><span class="nx">wake</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">newmHandoff</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// The M has not started yet, but the template thread does not
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// participate in STW, so it will always process queued Ms and
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// it is safe to releasem.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nf">releasem</span><span class="p">(</span><span class="nf">getg</span><span class="p">().</span><span class="nx">m</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">newm1</span><span class="p">(</span><span class="nx">mp</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">releasem</span><span class="p">(</span><span class="nf">getg</span><span class="p">().</span><span class="nx">m</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
+      <li><a href="https://heliu.site/tags/goroutine/">Goroutine</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://heliu.site/posts/golang/goroutine/sysmon/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>sysmon 监控线程</span>
+  </a>
+  <a class="next" href="https://heliu.site/posts/golang/netpoll/linux/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>Linux epoll</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    
+    <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv">
+        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    </span>
+    <span id="busuanzi_container_site_uv">
+        本站访客数<span id="busuanzi_value_site_uv"></span>人次
+    </span>
+    </div>
+        <span>Copyright © 2024 蜀ICP备2024091074号 <a href="#">heliu's blog</a>. All rights reserved</span>  
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'Copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'Done';
+            setTimeout(() => {
+                copybutton.innerHTML = 'Copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
