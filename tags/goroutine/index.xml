@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Tue, 30 Jul 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 31 Jul 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://heliu.site/tags/goroutine/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Go 执行流程</title>
@@ -54,6 +54,20 @@
       <link>https://heliu.site/posts/golang/goroutine/newm/</link>
       <pubDate>Tue, 30 Jul 2024 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/goroutine/newm/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>主动让出调度</title>
+      <link>https://heliu.site/posts/golang/goroutine/gosched/</link>
+      <pubDate>Wed, 31 Jul 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/goroutine/gosched/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>被动让出调度</title>
+      <link>https://heliu.site/posts/golang/goroutine/retake/</link>
+      <pubDate>Wed, 31 Jul 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/goroutine/retake/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
   </channel>
