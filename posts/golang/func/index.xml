@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Mon, 05 Aug 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 06 Aug 2024 10:12:44 +0800</lastBuildDate>
     <atom:link href="https://heliu.site/posts/golang/func/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>函数使用</title>
@@ -40,6 +40,27 @@
       <link>https://heliu.site/posts/golang/func/value/</link>
       <pubDate>Sat, 03 Aug 2024 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/func/value/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>defer(使用)</title>
+      <link>https://heliu.site/posts/golang/func/defer-use/</link>
+      <pubDate>Mon, 05 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/func/defer-use/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>defer(原理)</title>
+      <link>https://heliu.site/posts/golang/func/defer-theory/</link>
+      <pubDate>Tue, 06 Aug 2024 10:12:44 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/func/defer-theory/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>painc、recover(原理)</title>
+      <link>https://heliu.site/posts/golang/func/painc-theory/</link>
+      <pubDate>Tue, 06 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/func/painc-theory/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
   </channel>

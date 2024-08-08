@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Mon, 05 Aug 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 06 Aug 2024 10:12:44 +0800</lastBuildDate>
     <atom:link href="https://heliu.site/tags/golang/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>sync.Pool</title>
@@ -34,13 +34,6 @@
       <pubDate>Sun, 14 Jul 2024 13:10:26 +0800</pubDate>
       <guid>https://heliu.site/posts/golang/sync/once/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18版本</description>
-    </item>
-    <item>
-      <title>acme.sh</title>
-      <link>https://heliu.site/posts/ssl/acme/</link>
-      <pubDate>Wed, 03 Jan 2024 00:00:00 +0000</pubDate>
-      <guid>https://heliu.site/posts/ssl/acme/</guid>
-      <description>acme.sh 实现了 acme 协议, 可以从 letsencrypt 生成免费的证书。</description>
     </item>
     <item>
       <title>sync.Mutex</title>
@@ -69,6 +62,13 @@
       <pubDate>Mon, 13 Jul 2020 22:00:10 +0800</pubDate>
       <guid>https://heliu.site/posts/golang/sync/waitgroup/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18版本</description>
+    </item>
+    <item>
+      <title>acme.sh</title>
+      <link>https://heliu.site/posts/ssl/acme/</link>
+      <pubDate>Wed, 03 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/ssl/acme/</guid>
+      <description>acme.sh 实现了 acme 协议, 可以从 letsencrypt 生成免费的证书。</description>
     </item>
     <item>
       <title>内置类型</title>
@@ -155,11 +155,25 @@
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
+      <title>linux 安装 docker</title>
+      <link>https://heliu.site/posts/docker/install/</link>
+      <pubDate>Fri, 07 Jan 2022 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/docker/install/</guid>
+      <description>centos7 安装 docker。</description>
+    </item>
+    <item>
       <title>流程控制(条件语句)</title>
       <link>https://heliu.site/posts/golang/process/if/</link>
       <pubDate>Fri, 02 Aug 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/process/if/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>docker 用法</title>
+      <link>https://heliu.site/posts/docker/use/</link>
+      <pubDate>Sun, 23 Jan 2022 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/docker/use/</guid>
+      <description>docker 常用命令。</description>
     </item>
     <item>
       <title>流程控制(循环语句)</title>
@@ -169,11 +183,25 @@
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
+      <title>Dockerfile</title>
+      <link>https://heliu.site/posts/docker/file/</link>
+      <pubDate>Mon, 14 Feb 2022 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/docker/file/</guid>
+      <description>dockerfile 命令。</description>
+    </item>
+    <item>
       <title>流程控制(range迭代)</title>
       <link>https://heliu.site/posts/golang/process/range/</link>
       <pubDate>Sat, 05 Oct 2019 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/process/range/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>linux 安装 docker-compose</title>
+      <link>https://heliu.site/posts/docker/compose-install/</link>
+      <pubDate>Tue, 07 Jun 2022 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/docker/compose-install/</guid>
+      <description>centos7 安装 docker-compose</description>
     </item>
     <item>
       <title>流程控制(switch)</title>
@@ -355,6 +383,27 @@
       <link>https://heliu.site/posts/golang/func/value/</link>
       <pubDate>Sat, 03 Aug 2024 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/golang/func/value/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>defer(使用)</title>
+      <link>https://heliu.site/posts/golang/func/defer-use/</link>
+      <pubDate>Mon, 05 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/func/defer-use/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>defer(原理)</title>
+      <link>https://heliu.site/posts/golang/func/defer-theory/</link>
+      <pubDate>Tue, 06 Aug 2024 10:12:44 +0800</pubDate>
+      <guid>https://heliu.site/posts/golang/func/defer-theory/</guid>
+      <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
+    </item>
+    <item>
+      <title>painc、recover(原理)</title>
+      <link>https://heliu.site/posts/golang/func/painc-theory/</link>
+      <pubDate>Tue, 06 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/golang/func/painc-theory/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
