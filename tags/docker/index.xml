@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Tue, 07 Jun 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 08 Jun 2022 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://heliu.site/tags/docker/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>linux 安装 docker</title>
@@ -41,6 +41,13 @@
       <pubDate>Tue, 07 Jun 2022 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/docker/compose-install/</guid>
       <description>centos7 安装 docker-compose</description>
+    </item>
+    <item>
+      <title>docker-compose</title>
+      <link>https://heliu.site/posts/docker/compose/</link>
+      <pubDate>Wed, 08 Jun 2022 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/docker/compose/</guid>
+      <description>docker-compose 介绍。</description>
     </item>
   </channel>
 </rss>

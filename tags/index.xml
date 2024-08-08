@@ -106,9 +106,16 @@
       <description></description>
     </item>
     <item>
+      <title>Redis</title>
+      <link>https://heliu.site/tags/redis/</link>
+      <pubDate>Thu, 27 Apr 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/tags/redis/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>Docker</title>
       <link>https://heliu.site/tags/docker/</link>
-      <pubDate>Tue, 07 Jun 2022 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 08 Jun 2022 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/tags/docker/</guid>
       <description></description>
     </item>
