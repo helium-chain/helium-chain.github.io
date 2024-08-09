@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>redis 持久化 | Helium</title>
+<meta name="keywords" content="golang, redis">
+<meta name="description" content="💥本文章所有相关都是基于linux。">
+<meta name="author" content="helium">
+<link rel="canonical" href="https://heliu.site/posts/redis/persistence/">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://heliu.site/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/redis/persistence/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono-nl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.6.0/style.css" />
+    <style>
+        body {
+            font-family: "LXGW WenKai Lite", sans-serif;
+            font-family: "LXGW WenKai Screen", sans-serif;
+        }
+    </style>
+</head>
+</html>
+
+  
+
+<meta property="og:title" content="redis 持久化" />
+<meta property="og:description" content="💥本文章所有相关都是基于linux。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://heliu.site/posts/redis/persistence/" />
+<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-05-08T00:00:00+00:00" />
+<meta property="article:modified_time" content="2023-05-08T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:title" content="redis 持久化"/>
+<meta name="twitter:description" content="💥本文章所有相关都是基于linux。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Article",
+      "item": "https://heliu.site/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Redis",
+      "item": "https://heliu.site/posts/redis/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "redis 持久化",
+      "item": "https://heliu.site/posts/redis/persistence/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "redis 持久化",
+  "name": "redis 持久化",
+  "description": "💥本文章所有相关都是基于linux。",
+  "keywords": [
+    "golang", "redis"
+  ],
+  "articleBody": " redis 支持两种持久化方案：RDB、AOF持久化。 RDB 持久化 RDB全称Redis Database Backup file（Redis数据备份文件），也被叫做Redis数据快照。简单来说就是把内存中的所有数据都记录到磁盘中。 当Redis实例故障重启后，从磁盘读取快照文件，恢复数据。快照文件称为RDB文件，默认是保存在当前运行目录。 执行时机 RDB持久化在四种情况下会执行： 执行save命令。 执行bgsave命令。 Redis停机时。 触发RDB条件时。 save 命令 执行下save命令，可以立即执行一次RDB。 save命令会导致主进程执行RDB，这个过程中其它所有命令都会被阻塞。只有在数据迁移时可能用到。 $ save ok bgsave 命令 bgsave 命令可以异步执行RDB。 bgsave 命令执行后会开启独立进程完成RDB，主进程可以持续处理用户请求，不受影响。 $ bgsave Background saving started 停机时 Redis停机时会执行一次save命令，实现RDB持久化。 触发RDB条件 Redis内部有触发RDB的机制，可以在redis.conf文件中找到，格式如下： # 如果是save \"\" 则表示禁用RDB # 900秒内，如果至少有1个key被修改，则执行bgsave save 900 1 # 300秒内，如果至少有10个key被修改，则执行bgsave save 300 10 # 60秒内，如果至少有10000个key被修改，则执行bgsave save 60 10000 RDB的其它配置也可以在redis.conf文件中设置。 # 是否压缩 ,建议不开启 # 压缩也会消耗cpu，磁盘的话不值钱 rdbcompression yes # 备份的RDB文件名称 dbfilename dump.rdb # 备份文件保存的路径目录 dir ./ RDB 原理 bgsave开始时会fork主进程得到子进程，子进程共享主进程的内存数据。完成fork后读取内存数据并写入 RDB 文件。 fork采用的是copy-on-write技术： 当主进程执行读操作时，访问共享内存。 当主进程执行写操作时，则会拷贝一份数据，执行写操作。 总结 RDB方式bgsave的基本流程？ fork主进程得到一个子进程，共享内存空间。 子进程读取内存数据并写入新的RDB文件。 用新RDB文件替换旧的RDB文件。 RDB会在什么时候执行？save 60 1000代表什么含义？ 默认是服务停止时。 代表60秒内至少执行1000次修改则触发RDB。 RDB的缺点？ RDB执行间隔时间长，两次RDB之间写入数据有丢失的风险。 fork子进程、压缩、写出RDB文件都比较耗时。 AOF 持久化 AOF 原理 AOF全称为Append Only File（追加文件）。Redis处理的每一个写命令都会记录在AOF文件，可以看做是命令日志文件。 AOF 配置 AOF默认是关闭的，需要修改redis.conf配置文件来开启AOF。 # 是否开启AOF功能，默认是no appendonly yes # AOF文件的名称 appendfilename \"appendonly.aof\" AOF的命令记录的频率也可以通过redis.conf文件来配。 # 表示每执行一次写命令，立即记录到AOF文件 appendfsync always # 写命令执行完先放入AOF缓冲区，然后表示每隔1秒将缓冲区数据写到AOF文件，是默认方案 appendfsync everysec # 写命令执行完先放入AOF缓冲区，由操作系统决定何时将缓冲区内容写回磁盘 appendfsync no 三种策略对比。 配置 刷盘时机 优点 缺点 always 同步刷盘 可靠性高，几乎不丢数据 性能影响大 everysec 每秒刷盘 性能适中 最多丢失1秒数据 no 操作系统控制 性能最好 可靠性较差，可能丢失大量数据 AOF 文件重写 因为是记录命令，AOF文件会比RDB文件大的多。而且AOF会记录对同一个key的多次写操作，但只有最后一次写操作才有意义。 通过执行bgrewriteaof命令，可以让AOF文件执行重写功能，用最少的命令达到相同效果。 AOF原本有三个命令，但是set count 20 和 set count 12 都是对num的操作，第二次会覆盖第一次的值，因此第一个命令记录下来没有意义。 所以重写命令后，AOF文件内容就是：mset count 12 age 18。 Redis也会在触发阈值时自动去重写AOF文件。阈值也可以在redis.conf中配置。 # AOF文件比上次文件 增长超过多少百分比则触发重写 auto-aof-rewrite-percentage 100 # AOF文件体积最小多大以上才触发重写 auto-aof-rewrite-min-size 64mb RDB 与 AOF 对比 RDB和AOF各有自己的优缺点，如果对数据安全性要求较高，在实际开发中往往会结合两者来使用。 RDB AOF 持久化方式 定时对整个内存做快照 记录每一次执行的命令 数据完整性 不完整，两次备份之间会丢失 相对完整，取决于刷盘策略 文件大小 会有压缩，文件体积小 记录命令，文件体积很大 宕机恢复速度 很快 慢 数据恢复优先级 低，因为数据完整性不如AOF 高，因为数据完整性更高 系统资源占用 高，大量CPU和内存消耗 低，主要时磁盘IO资源，但AOF重写时会占用大量CPU和内存资源 使用场景 可以容忍数分钟的数据丢失，追求更快的启动速度 对数据安全性要求较高常见 ",
+  "wordCount" : "196",
+  "inLanguage": "zh",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2023-05-08T00:00:00Z",
+  "dateModified": "2023-05-08T00:00:00Z",
+  "author":[{
+    "@type": "Person",
+    "name": "helium"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://heliu.site/posts/redis/persistence/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Helium",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://heliu.site/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+                    height="35">Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://heliu.site/" title="主页">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/posts" title="文章">
+                    <span>Article</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/archives" title="时间轴">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/tags/" title="标签">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/support" title="打赏">
+                    <span>🫶Help</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+
+<article class="post" autonumbering>
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/redis/">Redis</a></div>
+    <h1 class="post-title entry-hint-parent">
+      redis 持久化
+    </h1>
+    <div class="post-description">
+      💥本文章所有相关都是基于linux。
+    </div>
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2023-05-08</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2023-05-08</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select: text;">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="user-select: text;"></path>
+    <polyline points="14 2 14 8 20 8" style="user-select: text;"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
+    <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
+    <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
+</svg><span>196字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="9"></circle>
+    <polyline points="12 7 12 12 15 15"></polyline>
+</svg><span>1分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+</svg><span>helium</span></span>
+      <span class="x-post-meta-item">
+        &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
+        <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
+            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://heliu.site/tags/redis/" target="_blank" rel="noopener">Redis</a>
+        </ul>
+      </span>
+      
+      <span id="busuanzi_container_page_pv" class="x-post-meta-item">
+        &nbsp;<svg t="1720844685710" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="27237" width="200" height="200"><path d="M739.754667 574.08c-121.386667 45.610667-208.469333 169.813333-208.64 316.16 0 33.408 4.693333 65.493333 13.141333 95.914667H94.122667c-26.453333-43.52-41.685333-91.946667-41.685334-143.189334 0-185.173333 192.896-335.104 430.805334-335.104 96.256 0 184.832 24.746667 256.512 66.218667z m-280.490667-114.986667a214.869333 214.869333 0 0 1-214.869333-215.04A215.04 215.04 0 0 1 459.264 28.842667a215.04 215.04 0 0 1 215.04 215.210666 215.04 215.04 0 0 1-215.04 215.04zM974.506667 641.28c9.856 0 17.834667 7.466667 17.834666 16.64v59.989333c-0.341333 8.789333-7.850667 15.786667-17.28 16.085334-9.856 0.341333-18.176-6.826667-18.517333-16.085334v-20.053333l-99.114667 91.093333-0.256 0.256a18.474667 18.474667 0 0 1-14.848 4.352h-0.768a18.176 18.176 0 0 1-9.344-4.608l-0.938666-0.981333-85.930667-80.042667-123.562667 115.072a18.773333 18.773333 0 0 1-25.216 0 15.786667 15.786667 0 0 1 0-23.466666l136.149334-126.848 0.725333-0.597334a18.645333 18.645333 0 0 1 24.362667 0.512l87.253333 81.237334 86.058667-79.232h-21.248c-9.386667-0.298667-16.938667-7.338667-17.28-16.085334-0.341333-9.173333 7.381333-16.896 17.28-17.237333h64.64z m-367.146667 240h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v72.192a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042667-16.042666v-72.192c0-8.874667 7.210667-16.042667 16.042667-16.042667z m110.805333-106.666667h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v178.858667a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042666v-178.858667c0-8.874667 7.168-16.042667 16.042666-16.042667z m106.538667 80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v99.413333a16.042667 16.042667 0 0 1-16.042667 16.042667H824.746667a16.042667 16.042667 0 0 1-16.042667-16.042667v-99.413333c0-8.874667 7.168-16.042667 16.042667-16.042667z m110.165333-80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v179.413333a16.042667 16.042667 0 0 1-16.042667 16.042667h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042667v-179.413333c0-8.874667 7.210667-16.042667 16.042666-16.042667z" fill="#999999" p-id="27238"></path></svg>
+        <span id="busuanzi_value_page_pv"></span>
+      </span>
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#rdb-%e6%8c%81%e4%b9%85%e5%8c%96" aria-label="RDB 持久化">RDB 持久化</a><ul>
+                            
+                    <li>
+                        <a href="#%e6%89%a7%e8%a1%8c%e6%97%b6%e6%9c%ba" aria-label="执行时机">执行时机</a><ul>
+                            
+                    <li>
+                        <a href="#save-%e5%91%bd%e4%bb%a4" aria-label="save 命令">save 命令</a></li>
+                    <li>
+                        <a href="#bgsave-%e5%91%bd%e4%bb%a4" aria-label="bgsave 命令">bgsave 命令</a></li>
+                    <li>
+                        <a href="#%e5%81%9c%e6%9c%ba%e6%97%b6" aria-label="停机时">停机时</a></li>
+                    <li>
+                        <a href="#%e8%a7%a6%e5%8f%91rdb%e6%9d%a1%e4%bb%b6" aria-label="触发RDB条件">触发RDB条件</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#rdb-%e5%8e%9f%e7%90%86" aria-label="RDB 原理">RDB 原理</a></li>
+                    <li>
+                        <a href="#%e6%80%bb%e7%bb%93" aria-label="总结">总结</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#aof-%e6%8c%81%e4%b9%85%e5%8c%96" aria-label="AOF 持久化">AOF 持久化</a><ul>
+                            
+                    <li>
+                        <a href="#aof-%e5%8e%9f%e7%90%86" aria-label="AOF 原理">AOF 原理</a></li>
+                    <li>
+                        <a href="#aof-%e9%85%8d%e7%bd%ae" aria-label="AOF 配置">AOF 配置</a></li>
+                    <li>
+                        <a href="#aof-%e6%96%87%e4%bb%b6%e9%87%8d%e5%86%99" aria-label="AOF 文件重写">AOF 文件重写</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#rdb-%e4%b8%8e-aof-%e5%af%b9%e6%af%94" aria-label="RDB 与 AOF 对比">RDB 与 AOF 对比</a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+  <div class="post-content"><ul>
+<li>redis 支持两种持久化方案：RDB、AOF持久化。</li>
+</ul>
+<h2 id="rdb-持久化">RDB 持久化<a hidden class="anchor" aria-hidden="true" href="#rdb-持久化">#</a></h2>
+<ol>
+<li>RDB全称Redis Database Backup file（Redis数据备份文件），也被叫做Redis数据快照。简单来说就是把内存中的所有数据都记录到磁盘中。</li>
+<li>当Redis实例故障重启后，从磁盘读取快照文件，恢复数据。快照文件称为RDB文件，默认是保存在当前运行目录。</li>
+</ol>
+<h3 id="执行时机">执行时机<a hidden class="anchor" aria-hidden="true" href="#执行时机">#</a></h3>
+<ol>
+<li>RDB持久化在四种情况下会执行：
+<ul>
+<li>执行save命令。</li>
+<li>执行bgsave命令。</li>
+<li>Redis停机时。</li>
+<li>触发RDB条件时。</li>
+</ul>
+</li>
+</ol>
+<h4 id="save-命令">save 命令<a hidden class="anchor" aria-hidden="true" href="#save-命令">#</a></h4>
+<ol>
+<li>执行下save命令，可以立即执行一次RDB。</li>
+<li>save命令会导致主进程执行RDB，这个过程中其它<strong>所有</strong>命令都会被<strong>阻塞</strong>。只有在数据迁移时可能用到。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ save
+</span></span><span class="line"><span class="cl">ok
+</span></span></code></pre></div><h4 id="bgsave-命令">bgsave 命令<a hidden class="anchor" aria-hidden="true" href="#bgsave-命令">#</a></h4>
+<ol>
+<li>bgsave 命令可以异步执行RDB。</li>
+<li>bgsave 命令执行后会开启独立进程完成RDB，主进程可以持续处理用户请求，不受影响。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ bgsave
+</span></span><span class="line"><span class="cl">Background saving started
+</span></span></code></pre></div><h4 id="停机时">停机时<a hidden class="anchor" aria-hidden="true" href="#停机时">#</a></h4>
+<ol>
+<li>Redis停机时会执行一次save命令，实现RDB持久化。</li>
+</ol>
+<h4 id="触发rdb条件">触发RDB条件<a hidden class="anchor" aria-hidden="true" href="#触发rdb条件">#</a></h4>
+<ol>
+<li>Redis内部有触发RDB的机制，可以在redis.conf文件中找到，格式如下：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1"># 如果是save &#34;&#34; 则表示禁用RDB</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 900秒内，如果至少有1个key被修改，则执行bgsave</span>
+</span></span><span class="line"><span class="cl"><span class="na">save 900 1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 300秒内，如果至少有10个key被修改，则执行bgsave</span>
+</span></span><span class="line"><span class="cl"><span class="na">save 300 10</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 60秒内，如果至少有10000个key被修改，则执行bgsave</span>
+</span></span><span class="line"><span class="cl"><span class="na">save 60 10000</span>
+</span></span></code></pre></div><ol start="2">
+<li>RDB的其它配置也可以在redis.conf文件中设置。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1"># 是否压缩 ,建议不开启</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 压缩也会消耗cpu，磁盘的话不值钱</span>
+</span></span><span class="line"><span class="cl"><span class="na">rdbcompression yes</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 备份的RDB文件名称</span>
+</span></span><span class="line"><span class="cl"><span class="na">dbfilename dump.rdb  </span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 备份文件保存的路径目录</span>
+</span></span><span class="line"><span class="cl"><span class="na">dir ./ </span>
+</span></span></code></pre></div><h3 id="rdb-原理">RDB 原理<a hidden class="anchor" aria-hidden="true" href="#rdb-原理">#</a></h3>
+<ol>
+<li>bgsave开始时会fork主进程得到子进程，子进程共享主进程的内存数据。完成fork后读取内存数据并写入 RDB 文件。</li>
+<li>fork采用的是copy-on-write技术：
+<ul>
+<li>当主进程执行读操作时，访问共享内存。</li>
+<li>当主进程执行写操作时，则会拷贝一份数据，执行写操作。</li>
+</ul>
+</li>
+</ol>
+<p><img loading="lazy" src="../images/redis-004.png" alt=""  />
+</p>
+<h3 id="总结">总结<a hidden class="anchor" aria-hidden="true" href="#总结">#</a></h3>
+<ol>
+<li>RDB方式bgsave的基本流程？
+<ul>
+<li>fork主进程得到一个子进程，共享内存空间。</li>
+<li>子进程读取内存数据并写入新的RDB文件。</li>
+<li>用新RDB文件替换旧的RDB文件。</li>
+</ul>
+</li>
+<li>RDB会在什么时候执行？save 60 1000代表什么含义？
+<ul>
+<li>默认是服务停止时。</li>
+<li>代表60秒内至少执行1000次修改则触发RDB。</li>
+</ul>
+</li>
+<li>RDB的缺点？
+<ul>
+<li>RDB执行间隔时间长，两次RDB之间写入数据有丢失的风险。</li>
+<li>fork子进程、压缩、写出RDB文件都比较耗时。</li>
+</ul>
+</li>
+</ol>
+<h2 id="aof-持久化">AOF 持久化<a hidden class="anchor" aria-hidden="true" href="#aof-持久化">#</a></h2>
+<h3 id="aof-原理">AOF 原理<a hidden class="anchor" aria-hidden="true" href="#aof-原理">#</a></h3>
+<ol>
+<li>AOF全称为Append Only File（追加文件）。Redis处理的每一个写命令都会记录在AOF文件，可以看做是命令日志文件。</li>
+</ol>
+<p><img loading="lazy" src="../images/redis-005.png" alt=""  />
+</p>
+<h3 id="aof-配置">AOF 配置<a hidden class="anchor" aria-hidden="true" href="#aof-配置">#</a></h3>
+<ol>
+<li>AOF默认是关闭的，需要修改redis.conf配置文件来开启AOF。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1"># 是否开启AOF功能，默认是no</span>
+</span></span><span class="line"><span class="cl"><span class="na">appendonly yes</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># AOF文件的名称</span>
+</span></span><span class="line"><span class="cl"><span class="na">appendfilename &#34;appendonly.aof&#34;</span>
+</span></span></code></pre></div><ol start="2">
+<li>AOF的命令记录的频率也可以通过redis.conf文件来配。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1"># 表示每执行一次写命令，立即记录到AOF文件</span>
+</span></span><span class="line"><span class="cl"><span class="na">appendfsync always</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 写命令执行完先放入AOF缓冲区，然后表示每隔1秒将缓冲区数据写到AOF文件，是默认方案</span>
+</span></span><span class="line"><span class="cl"><span class="na">appendfsync everysec</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 写命令执行完先放入AOF缓冲区，由操作系统决定何时将缓冲区内容写回磁盘</span>
+</span></span><span class="line"><span class="cl"><span class="na">appendfsync no</span>
+</span></span></code></pre></div><ol start="3">
+<li>三种策略对比。</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">配置</th>
+<th style="text-align:center">刷盘时机</th>
+<th style="text-align:center">优点</th>
+<th style="text-align:center">缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">always</td>
+<td style="text-align:center">同步刷盘</td>
+<td style="text-align:center">可靠性高，几乎不丢数据</td>
+<td style="text-align:center">性能影响大</td>
+</tr>
+<tr>
+<td style="text-align:center">everysec</td>
+<td style="text-align:center">每秒刷盘</td>
+<td style="text-align:center">性能适中</td>
+<td style="text-align:center">最多丢失1秒数据</td>
+</tr>
+<tr>
+<td style="text-align:center">no</td>
+<td style="text-align:center">操作系统控制</td>
+<td style="text-align:center">性能最好</td>
+<td style="text-align:center">可靠性较差，可能丢失大量数据</td>
+</tr>
+</tbody>
+</table>
+<h3 id="aof-文件重写">AOF 文件重写<a hidden class="anchor" aria-hidden="true" href="#aof-文件重写">#</a></h3>
+<ol>
+<li>因为是记录命令，AOF文件会比RDB文件大的多。而且AOF会记录对同一个key的多次写操作，但只有最后一次写操作才有意义。</li>
+<li>通过执行<strong>bgrewriteaof</strong>命令，可以让AOF文件执行重写功能，用最少的命令达到相同效果。
+<ul>
+<li>AOF原本有三个命令，但是set count 20 和 set count 12 都是对num的操作，第二次会覆盖第一次的值，因此第一个命令记录下来没有意义。</li>
+<li>所以重写命令后，AOF文件内容就是：mset count 12 age 18。</li>
+</ul>
+</li>
+</ol>
+<p><img loading="lazy" src="../images/redis-006.png" alt=""  />
+</p>
+<ol start="3">
+<li>Redis也会在触发阈值时自动去重写AOF文件。阈值也可以在redis.conf中配置。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1"># AOF文件比上次文件 增长超过多少百分比则触发重写</span>
+</span></span><span class="line"><span class="cl"><span class="na">auto-aof-rewrite-percentage 100</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># AOF文件体积最小多大以上才触发重写 </span>
+</span></span><span class="line"><span class="cl"><span class="na">auto-aof-rewrite-min-size 64mb </span>
+</span></span></code></pre></div><h2 id="rdb-与-aof-对比">RDB 与 AOF 对比<a hidden class="anchor" aria-hidden="true" href="#rdb-与-aof-对比">#</a></h2>
+<ol>
+<li>RDB和AOF各有自己的优缺点，如果对数据安全性要求较高，在实际开发中往往会<strong>结合</strong>两者来使用。</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">RDB</th>
+<th style="text-align:center">AOF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">持久化方式</td>
+<td style="text-align:center">定时对整个内存做快照</td>
+<td style="text-align:center">记录每一次执行的命令</td>
+</tr>
+<tr>
+<td style="text-align:center">数据完整性</td>
+<td style="text-align:center">不完整，两次备份之间会丢失</td>
+<td style="text-align:center">相对完整，取决于刷盘策略</td>
+</tr>
+<tr>
+<td style="text-align:center">文件大小</td>
+<td style="text-align:center">会有压缩，文件体积小</td>
+<td style="text-align:center">记录命令，文件体积很大</td>
+</tr>
+<tr>
+<td style="text-align:center">宕机恢复速度</td>
+<td style="text-align:center">很快</td>
+<td style="text-align:center">慢</td>
+</tr>
+<tr>
+<td style="text-align:center">数据恢复优先级</td>
+<td style="text-align:center">低，因为数据完整性不如AOF</td>
+<td style="text-align:center">高，因为数据完整性更高</td>
+</tr>
+<tr>
+<td style="text-align:center">系统资源占用</td>
+<td style="text-align:center">高，大量CPU和内存消耗</td>
+<td style="text-align:center">低，主要时磁盘IO资源，但AOF重写时会占用大量CPU和内存资源</td>
+</tr>
+<tr>
+<td style="text-align:center">使用场景</td>
+<td style="text-align:center">可以容忍数分钟的数据丢失，追求更快的启动速度</td>
+<td style="text-align:center">对数据安全性要求较高常见</td>
+</tr>
+</tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
+      <li><a href="https://heliu.site/tags/redis/">Redis</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://heliu.site/posts/redis/memory/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>redis 内存回收</span>
+  </a>
+  <a class="next" href="https://heliu.site/posts/redis/slave/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>redis 主从同步</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    
+    <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv">
+        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    </span>
+    <span id="busuanzi_container_site_uv">
+        本站访客数<span id="busuanzi_value_site_uv"></span>人次
+    </span>
+    </div>
+        <span>Copyright © 2024 蜀ICP备2024091074号 <a href="#">heliu's blog</a>. All rights reserved</span>  
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'Copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'Done';
+            setTimeout(() => {
+                copybutton.innerHTML = 'Copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

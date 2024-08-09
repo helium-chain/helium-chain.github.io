@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Thu, 27 Apr 2023 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 23 May 2023 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://heliu.site/posts/redis/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>redis 网络模型</title>
@@ -26,6 +26,20 @@
       <link>https://heliu.site/posts/redis/memory/</link>
       <pubDate>Thu, 27 Apr 2023 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/redis/memory/</guid>
+      <description>💥本文章所有相关都是基于linux。</description>
+    </item>
+    <item>
+      <title>redis 持久化</title>
+      <link>https://heliu.site/posts/redis/persistence/</link>
+      <pubDate>Mon, 08 May 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/persistence/</guid>
+      <description>💥本文章所有相关都是基于linux。</description>
+    </item>
+    <item>
+      <title>redis 主从同步</title>
+      <link>https://heliu.site/posts/redis/slave/</link>
+      <pubDate>Tue, 23 May 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/slave/</guid>
       <description>💥本文章所有相关都是基于linux。</description>
     </item>
   </channel>
