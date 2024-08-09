@@ -530,28 +530,91 @@
       <link>https://heliu.site/posts/redis/theory/</link>
       <pubDate>Sat, 08 Apr 2023 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/redis/theory/</guid>
-      <description>💥本文章所有相关都是基于linux。</description>
+      <description>redis IO多路复用。</description>
     </item>
     <item>
       <title>redis 内存回收</title>
       <link>https://heliu.site/posts/redis/memory/</link>
       <pubDate>Thu, 27 Apr 2023 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/redis/memory/</guid>
-      <description>💥本文章所有相关都是基于linux。</description>
+      <description>redis 内存回收策略。</description>
     </item>
     <item>
       <title>redis 持久化</title>
       <link>https://heliu.site/posts/redis/persistence/</link>
       <pubDate>Mon, 08 May 2023 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/redis/persistence/</guid>
-      <description>💥本文章所有相关都是基于linux。</description>
+      <description>redis 数据持久化。</description>
     </item>
     <item>
       <title>redis 主从同步</title>
       <link>https://heliu.site/posts/redis/slave/</link>
       <pubDate>Tue, 23 May 2023 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/redis/slave/</guid>
-      <description>💥本文章所有相关都是基于linux。</description>
+      <description>redis 主从同步。</description>
+    </item>
+    <item>
+      <title>redis 哨兵</title>
+      <link>https://heliu.site/posts/redis/sentinel/</link>
+      <pubDate>Fri, 02 Jun 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/sentinel/</guid>
+      <description>redis 哨兵机制。</description>
+    </item>
+    <item>
+      <title>redis 分片集群</title>
+      <link>https://heliu.site/posts/redis/cluster/</link>
+      <pubDate>Wed, 21 Jun 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/cluster/</guid>
+      <description>redis 分片集群原理和搭建。</description>
+    </item>
+    <item>
+      <title>redis 通用命令</title>
+      <link>https://heliu.site/posts/redis/command/</link>
+      <pubDate>Thu, 02 Mar 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/command/</guid>
+      <description>redis 命令介绍。</description>
+    </item>
+    <item>
+      <title>redis string</title>
+      <link>https://heliu.site/posts/redis/string/</link>
+      <pubDate>Sun, 12 Mar 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/string/</guid>
+      <description>redis string介绍。</description>
+    </item>
+    <item>
+      <title>redis hash</title>
+      <link>https://heliu.site/posts/redis/hash/</link>
+      <pubDate>Mon, 27 Mar 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/hash/</guid>
+      <description>redis hash介绍。</description>
+    </item>
+    <item>
+      <title>redis list</title>
+      <link>https://heliu.site/posts/redis/list/</link>
+      <pubDate>Sun, 09 Apr 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/list/</guid>
+      <description>redis list介绍。</description>
+    </item>
+    <item>
+      <title>redis set</title>
+      <link>https://heliu.site/posts/redis/set/</link>
+      <pubDate>Thu, 27 Apr 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/set/</guid>
+      <description>redis set介绍。</description>
+    </item>
+    <item>
+      <title>redis sortSet</title>
+      <link>https://heliu.site/posts/redis/sortset/</link>
+      <pubDate>Tue, 09 May 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/sortset/</guid>
+      <description>redis sortSet介绍。</description>
+    </item>
+    <item>
+      <title>redis bitmap</title>
+      <link>https://heliu.site/posts/redis/bitmap/</link>
+      <pubDate>Mon, 29 May 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/bitmap/</guid>
+      <description>redis bitmap命令介绍。</description>
     </item>
   </channel>
 </rss>
