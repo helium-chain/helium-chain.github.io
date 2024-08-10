@@ -617,6 +617,20 @@
       <description>redis bitmap命令介绍。</description>
     </item>
     <item>
+      <title>redis 数据结构</title>
+      <link>https://heliu.site/posts/redis/struct/</link>
+      <pubDate>Wed, 09 Aug 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/struct/</guid>
+      <description>redis 数据结构介绍。</description>
+    </item>
+    <item>
+      <title>redis 场景</title>
+      <link>https://heliu.site/posts/redis/use/</link>
+      <pubDate>Sat, 26 Aug 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/use/</guid>
+      <description>redis 使用场景。</description>
+    </item>
+    <item>
       <title>打赏</title>
       <link>https://heliu.site/support/</link>
       <pubDate>Sun, 15 Mar 2020 11:30:03 +0000</pubDate>
