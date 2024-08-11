@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>mysql 索引 | Helium</title>
+<meta name="keywords" content="mysql">
+<meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
+<meta name="author" content="helium">
+<link rel="canonical" href="https://heliu.site/posts/mysql/tree/">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://heliu.site/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/mysql/tree/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono-nl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.6.0/style.css" />
+    <style>
+        body {
+            font-family: "LXGW WenKai Lite", sans-serif;
+            font-family: "LXGW WenKai Screen", sans-serif;
+        }
+    </style>
+</head>
+</html>
+
+  
+
+<meta property="og:title" content="mysql 索引" />
+<meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://heliu.site/posts/mysql/tree/" />
+<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-04-29T00:00:00+00:00" />
+<meta property="article:modified_time" content="2022-04-29T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:title" content="mysql 索引"/>
+<meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Article",
+      "item": "https://heliu.site/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Mysql",
+      "item": "https://heliu.site/posts/mysql/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "mysql 索引",
+      "item": "https://heliu.site/posts/mysql/tree/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "mysql 索引",
+  "name": "mysql 索引",
+  "description": "💥本文章所有相关go代码参考自go 1.18+版本",
+  "keywords": [
+    "mysql"
+  ],
+  "articleBody": "B+Tree 所有的数据都会出现在叶子节点。 叶子节点形成一个单向链表。 非叶子节点仅仅起到索引数据作用，具体的数据都是在叶子节点存放的。 MySQL索引数据结构对经典的B+Tree进行了优化。在原B+Tree的基础上，增加一个指向相邻叶子节点 的链表指针，就形成了带有顺序指针的B+Tree，提高区间访问的性能，利于排序。 索引分类 在MySQL数据库，将索引的具体类型主要分为以下几类：主键索引、唯一索引、常规索引、全文索引。 分类 含义 特点 关键字 主键索引 针对于表中主键创建的索引 默认自动创建, 只能有一个 PRIMARY 唯一索引 避免同一个表中某数据列中的值重复 可以有多个 UNIQUE 常规索引 快速定位特定数据 可以有多个 全文索引 全文索引查找的是文本中的关键词，而不是比较索引中的值 可以有多个 FULLTEXT 而在InnoDB存储引擎中，根据索引的存储形式，又可以分为以下两种： ——————分类—————— 含义 特点 聚集索引(Clustered Index) 将数据存储与索引放到了一块，索引结构的叶子节点保存了行数据 必须有,而且只有一个 二级索引(Secondary Index) 将数据与索引分开存储，索引结构的叶子节点关联的是对应的主键 可以存在多个 聚集索引选取规则： 如果存在主键，主键索引就是聚集索引。 如果不存在主键，将使用第一个唯一（UNIQUE）索引作为聚集索引。 如果表没有主键，或没有合适的唯一索引，则InnoDB会自动生成一个rowid作为隐藏的聚集索引。 聚集索引和二级索引的具体结构如下： 聚集索引的叶子节点下挂的是这一行的数据。 二级索引的叶子节点下挂的是该字段值对应的主键值。 InnoDB主键索引的B+tree高度为多高呢? 一行数据大小为1k，一页中可以存储16行这样的数据。InnoDB的指针占用6个字节的空间，主键即使为bigint，占用字节数为8。 如果树的高度为2，则可以存储 18000 多条记录。 如果树的高度为3，则可以存储 2200w 左右的记录。 索引语法 创建索引。 CREATE [ UNIQUE | FULLTEXT ] INDEX index_name ON table_name (index_col_name,... ); -- name字段为姓名字段，该字段的值可能会重复，为该字段创建索引。 CREATE INDEX idx_user_name ON tb_user(name); -- phone手机号字段的值，是非空，且唯一的，为该字段创建唯一索引。 CREATE UNIQUE INDEX idx_user_phone ON tb_user(phone); -- 为profession、age、status创建联合索引。 CREATE INDEX idx_user_pro_age_sta ON tb_user(profession,age,status); -- 为email建立合适的索引来提升查询效率。 CREATE INDEX idx_email ON tb_user(email); 查看索引。 SHOW INDEX FROM table_name; 删除索引。 DROP INDEX index_name ON table_name; SQL性能分析 SQL执行频率 MySQL 客户端连接成功后，通过 show [session|global] status 命令可以提供服务器状态信息。 通过如下指令，可以查看当前数据库的INSERT、UPDATE、DELETE、SELECT的访问频次： -- session 是查看当前会话; -- global 是查询全局数据; SHOW GLOBAL STATUS LIKE 'Com_______'; -- Com_delete: 删除次数 -- Com_insert: 插入次数 -- Com_select: 查询次数 -- Com_update: 更新次数 慢查询日志 慢查询日志记录了所有执行时间超过指定参数（long_query_time，单位：秒，默认10秒）的所有SQL语句的日志。 MySQL的慢查询日志默认没有开启，我们可以查看一下系统变量 slow_query_log。 show variables like 'slow_query_log'; -- OFF-关闭 ON-开启 如果要开启慢查询日志，需要在MySQL的配置文件（/etc/my.cnf）中配置如下信息：(重启mysql) # 开启MySQL慢日志查询开关 slow_query_log=1 # 设置慢日志的时间为2秒，SQL语句执行时间超过2秒，就会视为慢查询，记录慢查询日志 long_query_time=2 检查慢查询日志：慢日志文件是 localhost-slow.log。 $ tail -f localhost-slow.log profile详情 show profiles 能够在做SQL优化时帮助我们了解时间都耗费到哪里去了。 通过have_profiling参数，能够看到当前MySQL是否支持profile操作。 SELECT @@have_profiling; -- Yes-支持 SELECT @@profiling; -- 0-关闭 -- 开启，session/global级别开启profiling SET profiling = 1; 查看每一条sql耗时情况： -- 查看所有sql show profiles; -- 查看指定sql，Query_ID show profile for query 12; explain EXPLAIN 或者 DESC命令获取 MySQL 如何执行 SELECT 语句的信息，包括在 SELECT 语句执行过程中表如何连接和连接的顺序。 -- 直接在select语句之前加上关键字 explain / desc EXPLAIN SELECT 字段列表 FROM 表名 WHERE 条件 ; Explain 执行计划中各个字段的含义: 字段 含义 id select查询的序列号，表示查询中执行select子句或者是操作表的顺序(id相同，执行顺序从上到下；id不同，值越大，越先执行) select_type 表示 SELECT 的类型，常见的取值有 SIMPLE（简单表，即不使用表连接或者子查询）、PRIMARY（主查询，即外层的查询）、UNION（UNION 中的第二个或者后面的查询语句）、SUBQUERY（SELECT/WHERE之后包含了子查询）等 type 表示连接类型，性能由好到差的连接类型为NULL、system、const、eq_ref、ref、range、index、all possible_key 显示可能应用在这张表上的索引，一个或多个 key 实际使用的索引，如果为NULL，则没有使用索引 key_len 表示索引中使用的字节数，该值为索引字段最大可能长度，并非实际使用长度，在不损失精确性的前提下，长度越短越好 rows MySQL认为必须要执行查询的行数，在innodb引擎的表中，是一个估计值，可能并不总是准确的 filtered 表示返回结果的行数占需读取行数的百分比， filtered的值越大越好 索引使用 最左前缀法则 如果索引了多列（联合索引），要遵守最左前缀法则。 最左前缀法则指的是查询从索引的最左列开始，并且不跳过索引中的列。 如果跳跃某一列，索引将会部分失效(后面的字段索引失效)。 注意：最左前缀法则中指的最左边的列，是指在查询时，联合索引的最左边的字段(即是第一个字段)必须存在，与我们编写SQL时，条件编写的先后顺序无关。 范围查询 联合索引中，出现范围查询(\u003e,\u003c)，范围查询右侧的列索引失效。 -- tb_user 表存在联合索引 (profession, age, status) -- 下面sql中age使用了\u003e符号导致status索引失效，但是profession, age索引还是有用 explain select * from tb_user where profession = '软件工程' and age \u003e 30 and status = '0'; 在业务允许的情况下，尽可能的使用类似于 \u003e= 或 \u003c= 这类的范围查询，而避免使用 \u003e 或 \u003c。 -- 这种情况下，所有索引都生效了 explain select * from tb_user where profession = '软件工程' and age \u003e= 30 and status = '0'; 索引失效 索引列运算 不要在索引列上进行运算操作，索引将失效。 -- tb_user表phone是单字段索引，因为使用了函数导致失效 explain select * from tb_user where substring(phone,10,2) = '15'; 字符串不加引号 字符串类型字段使用时，不加引号，索引将失效。 如果字符串不加单引号，对于查询结果，没什么影响，但是数据库存在隐式类型转换，索引将失效。 -- tb_user表phone是单字段索引，类型是varchar explain select * from tb_user where phone = '17799990015'; -- 没加引号，索引失效 explain select * from tb_user where phone = 17799990015; 模糊查询 如果仅仅是尾部模糊匹配，索引不会失效。如果是头部模糊匹配，索引失效。 -- profession 索引生效 explain select * from tb_user where profession like '软件%'; -- profession 索引失效 explain select * from tb_user where profession like '%工程'; -- profession 索引失效 explain select * from tb_user where profession like '%工%'; or连接条件 用or分割开的条件， 如果or前的条件中的列有索引，而后面的列中没有索引，那么涉及的索引都不会被用到。 当or连接的条件，左右两侧字段都有索引时，索引才会生效。 -- id是主键，age没有索引，该sql不会使用任何索引 explain select * from tb_user where id = 10 or age = 23; -- phone是普通索引，age没有索引，该sql不会使用任何索引 explain select * from tb_user where phone = '17799990017' or age = 23; 数据分布影响 如果MySQL评估使用索引比全表更慢，则不使用索引。 -- 不会使用 phone 索引，因为全表扫描更快 select * from tb_user where phone \u003e= '17799990005'; -- 会使用 phone 索引 select * from tb_user where phone \u003e= '17799990015'; 因为MySQL在查询时，会评估使用索引的效率与走全表扫描的效率，如果走全表扫描更快，则放弃索引，走全表扫描。 因为索引是用来索引少量数据的，如果通过索引查询返回大批量的数据，则还不如走全表扫描来的快，此时索引就会失效。 is null 与 is not null 操作是否走索引？ 查询时MySQL会评估，走索引快，还是全表扫描快，如果全表扫描更快，则放弃索引走全表扫描。 因此，is null 、is not null是否走索引，得具体情况具体分析，并不是固定的。 explain select * from tb_user where profession is null; explain select * from tb_user where profession is not null; SQL提示 SQL提示，是优化数据库的一个重要手段，简单来说，就是在SQL语句中加入一些人为的提示来达到优化操作的目的。 use index ： 建议MySQL使用哪一个索引完成此次查询（仅仅是建议，mysql内部还会再次进行评估）。 explain select * from tb_user use index(idx_user_pro) where profession = 'xsss'; ignore index：忽略指定的索引。 explain select * from tb_user ignore index(idx_user_pro) where profession = 'xsss'; force index：强制使用索引。 explain select * from tb_user force index(idx_user_pro) where profession = 'xsss'; 覆盖索引 覆盖索引是指查询使用了索引，并且需要返回的列，在该索引中已经全部能够找到。 尽量使用覆盖索引，减少select *。 一张表, 有四个字段(id, username, password, status), 由于数据量大, 需要对以下SQL语句进行优化, 该如何进行才是最优方案: -- 针对于 username, password建立联合索引 -- sql为: create index idx_user_name_pass on tb_user(username,password); select id,username,password from tb_user where username ='st'; 前缀索引 当字段类型为字符串（varchar，text，longtext等）时，有时候需要索引很长的字符串，这会让索引变得很大，查询时，浪费大量的磁盘IO， 影响查询效率。 此时可以只将字符串的一部分前缀，建立索引，这样可以大大节约索引空间，从而提高索引效率。 create index idx_xxxx on table_name(column(n)); -- 为tb_user表的email字段，建立长度为5的前缀索引 create index idx_email_5 on tb_user(email(5)); 前缀长度，可以根据索引的选择性来决定，而选择性是指不重复的索引值（基数）和数据表的记录总数的比值，索引选择性越高则查询效率越高， 唯一索引的选择性是1，这是最好的索引选择性，性能也是最好的。 select count(distinct email) / count(*) from tb_user ; select count(distinct substring(email,1,5)) / count(*) from tb_user ; 单列索引与联合索引 单列索引：即一个索引只包含单个列。查询条件中有多个单列索引只会选择一个。 联合索引：即一个索引包含了多个列。 在业务场景中，如果存在多个查询条件，考虑针对于查询字段建立索引时，建议建立联合索引，而非单列索引。 索引设计原则 针对于数据量较大，且查询比较频繁的表建立索引。 针对于常作为查询条件（where）、排序（order by）、分组（group by）操作的字段建立索引。 尽量选择区分度高的列作为索引，尽量建立唯一索引，区分度越高，使用索引的效率越高。 如果是字符串类型的字段，字段的长度较长，可以针对于字段的特点，建立前缀索引。 尽量使用联合索引，减少单列索引，查询时，联合索引很多时候可以覆盖索引，节省存储空间，避免回表，提高查询效率。 要控制索引的数量，索引并不是多多益善，索引越多，维护索引结构的代价也就越大，会影响增删改的效率。 如果索引列不能存储NULL值，请在创建表时使用NOT NULL约束它。当优化器知道每列是否包含NULL值时，它可以更好地确定哪个索引最有效地用于查询。 ",
+  "wordCount" : "598",
+  "inLanguage": "zh",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2022-04-29T00:00:00Z",
+  "dateModified": "2022-04-29T00:00:00Z",
+  "author":[{
+    "@type": "Person",
+    "name": "helium"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://heliu.site/posts/mysql/tree/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Helium",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://heliu.site/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+                    height="35">Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://heliu.site/" title="主页">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/posts" title="文章">
+                    <span>Article</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/archives" title="时间轴">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/tags/" title="标签">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/support" title="打赏">
+                    <span>🫶Help</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+
+<article class="post" autonumbering>
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/mysql/">Mysql</a></div>
+    <h1 class="post-title entry-hint-parent">
+      mysql 索引
+    </h1>
+    <div class="post-description">
+      💥本文章所有相关go代码参考自go 1.18&#43;版本
+    </div>
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2022-04-29</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2022-04-29</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select: text;">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="user-select: text;"></path>
+    <polyline points="14 2 14 8 20 8" style="user-select: text;"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
+    <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
+    <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
+</svg><span>598字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="9"></circle>
+    <polyline points="12 7 12 12 15 15"></polyline>
+</svg><span>3分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+</svg><span>helium</span></span>
+      <span class="x-post-meta-item">
+        &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
+        <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
+            <a href="https://heliu.site/tags/mysql/" target="_blank" rel="noopener">Mysql</a>
+        </ul>
+      </span>
+      
+      <span id="busuanzi_container_page_pv" class="x-post-meta-item">
+        &nbsp;<svg t="1720844685710" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="27237" width="200" height="200"><path d="M739.754667 574.08c-121.386667 45.610667-208.469333 169.813333-208.64 316.16 0 33.408 4.693333 65.493333 13.141333 95.914667H94.122667c-26.453333-43.52-41.685333-91.946667-41.685334-143.189334 0-185.173333 192.896-335.104 430.805334-335.104 96.256 0 184.832 24.746667 256.512 66.218667z m-280.490667-114.986667a214.869333 214.869333 0 0 1-214.869333-215.04A215.04 215.04 0 0 1 459.264 28.842667a215.04 215.04 0 0 1 215.04 215.210666 215.04 215.04 0 0 1-215.04 215.04zM974.506667 641.28c9.856 0 17.834667 7.466667 17.834666 16.64v59.989333c-0.341333 8.789333-7.850667 15.786667-17.28 16.085334-9.856 0.341333-18.176-6.826667-18.517333-16.085334v-20.053333l-99.114667 91.093333-0.256 0.256a18.474667 18.474667 0 0 1-14.848 4.352h-0.768a18.176 18.176 0 0 1-9.344-4.608l-0.938666-0.981333-85.930667-80.042667-123.562667 115.072a18.773333 18.773333 0 0 1-25.216 0 15.786667 15.786667 0 0 1 0-23.466666l136.149334-126.848 0.725333-0.597334a18.645333 18.645333 0 0 1 24.362667 0.512l87.253333 81.237334 86.058667-79.232h-21.248c-9.386667-0.298667-16.938667-7.338667-17.28-16.085334-0.341333-9.173333 7.381333-16.896 17.28-17.237333h64.64z m-367.146667 240h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v72.192a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042667-16.042666v-72.192c0-8.874667 7.210667-16.042667 16.042667-16.042667z m110.805333-106.666667h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v178.858667a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042666v-178.858667c0-8.874667 7.168-16.042667 16.042666-16.042667z m106.538667 80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v99.413333a16.042667 16.042667 0 0 1-16.042667 16.042667H824.746667a16.042667 16.042667 0 0 1-16.042667-16.042667v-99.413333c0-8.874667 7.168-16.042667 16.042667-16.042667z m110.165333-80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v179.413333a16.042667 16.042667 0 0 1-16.042667 16.042667h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042667v-179.413333c0-8.874667 7.210667-16.042667 16.042666-16.042667z" fill="#999999" p-id="27238"></path></svg>
+        <span id="busuanzi_value_page_pv"></span>
+      </span>
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#btree" aria-label="B&#43;Tree">B+Tree</a></li>
+                    <li>
+                        <a href="#%e7%b4%a2%e5%bc%95%e5%88%86%e7%b1%bb" aria-label="索引分类">索引分类</a></li>
+                    <li>
+                        <a href="#%e7%b4%a2%e5%bc%95%e8%af%ad%e6%b3%95" aria-label="索引语法">索引语法</a></li>
+                    <li>
+                        <a href="#sql%e6%80%a7%e8%83%bd%e5%88%86%e6%9e%90" aria-label="SQL性能分析">SQL性能分析</a><ul>
+                            
+                    <li>
+                        <a href="#sql%e6%89%a7%e8%a1%8c%e9%a2%91%e7%8e%87" aria-label="SQL执行频率">SQL执行频率</a></li>
+                    <li>
+                        <a href="#%e6%85%a2%e6%9f%a5%e8%af%a2%e6%97%a5%e5%bf%97" aria-label="慢查询日志">慢查询日志</a></li>
+                    <li>
+                        <a href="#profile%e8%af%a6%e6%83%85" aria-label="profile详情">profile详情</a></li>
+                    <li>
+                        <a href="#explain" aria-label="explain">explain</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e7%b4%a2%e5%bc%95%e4%bd%bf%e7%94%a8" aria-label="索引使用">索引使用</a><ul>
+                            
+                    <li>
+                        <a href="#%e6%9c%80%e5%b7%a6%e5%89%8d%e7%bc%80%e6%b3%95%e5%88%99" aria-label="最左前缀法则">最左前缀法则</a></li>
+                    <li>
+                        <a href="#%e8%8c%83%e5%9b%b4%e6%9f%a5%e8%af%a2" aria-label="范围查询">范围查询</a></li>
+                    <li>
+                        <a href="#%e7%b4%a2%e5%bc%95%e5%a4%b1%e6%95%88" aria-label="索引失效">索引失效</a><ul>
+                            
+                    <li>
+                        <a href="#%e7%b4%a2%e5%bc%95%e5%88%97%e8%bf%90%e7%ae%97" aria-label="索引列运算">索引列运算</a></li>
+                    <li>
+                        <a href="#%e5%ad%97%e7%ac%a6%e4%b8%b2%e4%b8%8d%e5%8a%a0%e5%bc%95%e5%8f%b7" aria-label="字符串不加引号">字符串不加引号</a></li>
+                    <li>
+                        <a href="#%e6%a8%a1%e7%b3%8a%e6%9f%a5%e8%af%a2" aria-label="模糊查询">模糊查询</a></li>
+                    <li>
+                        <a href="#or%e8%bf%9e%e6%8e%a5%e6%9d%a1%e4%bb%b6" aria-label="or连接条件">or连接条件</a></li>
+                    <li>
+                        <a href="#%e6%95%b0%e6%8d%ae%e5%88%86%e5%b8%83%e5%bd%b1%e5%93%8d" aria-label="数据分布影响">数据分布影响</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#sql%e6%8f%90%e7%a4%ba" aria-label="SQL提示">SQL提示</a></li>
+                    <li>
+                        <a href="#%e8%a6%86%e7%9b%96%e7%b4%a2%e5%bc%95" aria-label="覆盖索引">覆盖索引</a></li>
+                    <li>
+                        <a href="#%e5%89%8d%e7%bc%80%e7%b4%a2%e5%bc%95" aria-label="前缀索引">前缀索引</a></li>
+                    <li>
+                        <a href="#%e5%8d%95%e5%88%97%e7%b4%a2%e5%bc%95%e4%b8%8e%e8%81%94%e5%90%88%e7%b4%a2%e5%bc%95" aria-label="单列索引与联合索引">单列索引与联合索引</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e7%b4%a2%e5%bc%95%e8%ae%be%e8%ae%a1%e5%8e%9f%e5%88%99" aria-label="索引设计原则">索引设计原则</a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+  <div class="post-content"><h2 id="btree">B+Tree<a hidden class="anchor" aria-hidden="true" href="#btree">#</a></h2>
+<ol>
+<li>所有的数据都会出现在叶子节点。</li>
+<li>叶子节点形成一个单向链表。</li>
+<li>非叶子节点仅仅起到索引数据作用，具体的数据都是在叶子节点存放的。</li>
+</ol>
+<p><img loading="lazy" src="../images/mysql-005.png" alt=""  />
+</p>
+<ol start="4">
+<li>MySQL索引数据结构对经典的B+Tree进行了优化。在原B+Tree的基础上，增加一个指向相邻叶子节点
+的链表指针，就形成了带有顺序指针的B+Tree，提高区间访问的性能，利于排序。</li>
+</ol>
+<p><img loading="lazy" src="../images/mysql-006.png" alt=""  />
+</p>
+<h2 id="索引分类">索引分类<a hidden class="anchor" aria-hidden="true" href="#索引分类">#</a></h2>
+<ol>
+<li>在MySQL数据库，将索引的具体类型主要分为以下几类：主键索引、唯一索引、常规索引、全文索引。</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">分类</th>
+<th style="text-align:center">含义</th>
+<th style="text-align:center">特点</th>
+<th style="text-align:center">关键字</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">主键索引</td>
+<td style="text-align:center">针对于表中主键创建的索引</td>
+<td style="text-align:center">默认自动创建, 只能有一个</td>
+<td style="text-align:center">PRIMARY</td>
+</tr>
+<tr>
+<td style="text-align:center">唯一索引</td>
+<td style="text-align:center">避免同一个表中某数据列中的值重复</td>
+<td style="text-align:center">可以有多个</td>
+<td style="text-align:center">UNIQUE</td>
+</tr>
+<tr>
+<td style="text-align:center">常规索引</td>
+<td style="text-align:center">快速定位特定数据</td>
+<td style="text-align:center">可以有多个</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">全文索引</td>
+<td style="text-align:center">全文索引查找的是文本中的关键词，而不是比较索引中的值</td>
+<td style="text-align:center">可以有多个</td>
+<td style="text-align:center">FULLTEXT</td>
+</tr>
+</tbody>
+</table>
+<ol start="2">
+<li>而在InnoDB存储引擎中，根据索引的存储形式，又可以分为以下两种：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;分类&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</th>
+<th style="text-align:center">含义</th>
+<th style="text-align:center">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">聚集索引(Clustered Index)</td>
+<td style="text-align:center">将数据存储与索引放到了一块，索引结构的叶子节点保存了行数据</td>
+<td style="text-align:center">必须有,而且只有一个</td>
+</tr>
+<tr>
+<td style="text-align:center">二级索引(Secondary Index)</td>
+<td style="text-align:center">将数据与索引分开存储，索引结构的叶子节点关联的是对应的主键</td>
+<td style="text-align:center">可以存在多个</td>
+</tr>
+</tbody>
+</table>
+<ol start="3">
+<li>聚集索引选取规则：
+<ul>
+<li>如果存在主键，主键索引就是聚集索引。</li>
+<li>如果不存在主键，将使用第一个唯一（UNIQUE）索引作为聚集索引。</li>
+<li>如果表没有主键，或没有合适的唯一索引，则InnoDB会自动生成一个rowid作为隐藏的聚集索引。</li>
+</ul>
+</li>
+<li>聚集索引和二级索引的具体结构如下：
+<ul>
+<li>聚集索引的叶子节点下挂的是这一行的数据。</li>
+<li>二级索引的叶子节点下挂的是该字段值对应的主键值。</li>
+</ul>
+</li>
+</ol>
+<p><img loading="lazy" src="../images/mysql-007.png" alt=""  />
+</p>
+<ol start="5">
+<li>InnoDB主键索引的B+tree高度为多高呢?
+<ul>
+<li>一行数据大小为1k，一页中可以存储16行这样的数据。InnoDB的指针占用6个字节的空间，主键即使为bigint，占用字节数为8。</li>
+<li>如果树的高度为2，则可以存储 18000 多条记录。</li>
+<li>如果树的高度为3，则可以存储 2200w 左右的记录。</li>
+</ul>
+</li>
+</ol>
+<h2 id="索引语法">索引语法<a hidden class="anchor" aria-hidden="true" href="#索引语法">#</a></h2>
+<ol>
+<li>创建索引。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">CREATE</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">FULLTEXT</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">index_name</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">table_name</span><span class="w"> </span><span class="p">(</span><span class="n">index_col_name</span><span class="p">,...</span><span class="w"> </span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- name字段为姓名字段，该字段的值可能会重复，为该字段创建索引。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_user_name</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">tb_user</span><span class="p">(</span><span class="n">name</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- phone手机号字段的值，是非空，且唯一的，为该字段创建唯一索引。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_user_phone</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">tb_user</span><span class="p">(</span><span class="n">phone</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- 为profession、age、status创建联合索引。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_user_pro_age_sta</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">tb_user</span><span class="p">(</span><span class="n">profession</span><span class="p">,</span><span class="n">age</span><span class="p">,</span><span class="n">status</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- 为email建立合适的索引来提升查询效率。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_email</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">tb_user</span><span class="p">(</span><span class="n">email</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></div><ol start="2">
+<li>查看索引。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="k">table_name</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><ol start="3">
+<li>删除索引。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">DROP</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">index_name</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">table_name</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><h2 id="sql性能分析">SQL性能分析<a hidden class="anchor" aria-hidden="true" href="#sql性能分析">#</a></h2>
+<h3 id="sql执行频率">SQL执行频率<a hidden class="anchor" aria-hidden="true" href="#sql执行频率">#</a></h3>
+<ol>
+<li>MySQL 客户端连接成功后，通过 show [session|global] status 命令可以提供服务器状态信息。</li>
+<li>通过如下指令，可以查看当前数据库的INSERT、UPDATE、DELETE、SELECT的访问频次：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- session 是查看当前会话;
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- global 是查询全局数据;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">SHOW</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w"> </span><span class="n">STATUS</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;Com_______&#39;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- Com_delete: 删除次数
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- Com_insert: 插入次数
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- Com_select: 查询次数
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- Com_update: 更新次数
+</span></span></span></code></pre></div><h3 id="慢查询日志">慢查询日志<a hidden class="anchor" aria-hidden="true" href="#慢查询日志">#</a></h3>
+<ol>
+<li>慢查询日志记录了所有执行时间超过指定参数（long_query_time，单位：秒，默认10秒）的所有SQL语句的日志。</li>
+<li>MySQL的慢查询日志默认没有开启，我们可以查看一下系统变量 slow_query_log。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">show</span><span class="w"> </span><span class="n">variables</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="s1">&#39;slow_query_log&#39;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- OFF-关闭 ON-开启
+</span></span></span></code></pre></div><ol start="3">
+<li>如果要开启慢查询日志，需要在MySQL的配置文件（/etc/my.cnf）中配置如下信息：(重启mysql)</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1"># 开启MySQL慢日志查询开关</span>
+</span></span><span class="line"><span class="cl"><span class="na">slow_query_log</span><span class="o">=</span><span class="s">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 设置慢日志的时间为2秒，SQL语句执行时间超过2秒，就会视为慢查询，记录慢查询日志</span>
+</span></span><span class="line"><span class="cl"><span class="na">long_query_time</span><span class="o">=</span><span class="s">2</span>
+</span></span></code></pre></div><ol start="4">
+<li>检查慢查询日志：慢日志文件是 localhost-slow.log。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ tail -f localhost-slow.log
+</span></span></code></pre></div><h3 id="profile详情">profile详情<a hidden class="anchor" aria-hidden="true" href="#profile详情">#</a></h3>
+<ol>
+<li>show profiles 能够在做SQL优化时帮助我们了解时间都耗费到哪里去了。</li>
+<li>通过have_profiling参数，能够看到当前MySQL是否支持profile操作。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">@@</span><span class="n">have_profiling</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- Yes-支持
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">SELECT</span><span class="w"> </span><span class="o">@@</span><span class="n">profiling</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- 0-关闭
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- 开启，session/global级别开启profiling
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">SET</span><span class="w"> </span><span class="n">profiling</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><ol start="3">
+<li>查看每一条sql耗时情况：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 查看所有sql
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">show</span><span class="w"> </span><span class="n">profiles</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- 查看指定sql，Query_ID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">show</span><span class="w"> </span><span class="n">profile</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">query</span><span class="w"> </span><span class="mi">12</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><h3 id="explain">explain<a hidden class="anchor" aria-hidden="true" href="#explain">#</a></h3>
+<ol>
+<li>EXPLAIN 或者 DESC命令获取 MySQL 如何执行 SELECT 语句的信息，包括在 SELECT 语句执行过程中表如何连接和连接的顺序。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 直接在select语句之前加上关键字 explain / desc
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="err">字段列表</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="err">表名</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="err">条件</span><span class="w"> </span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><ol start="2">
+<li>Explain 执行计划中各个字段的含义:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">字段</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">id</td>
+<td style="text-align:left">select查询的序列号，表示查询中执行select子句或者是操作表的顺序(id相同，执行顺序从上到下；id不同，值越大，越先执行)</td>
+</tr>
+<tr>
+<td style="text-align:center">select_type</td>
+<td style="text-align:left">表示 SELECT 的类型，常见的取值有 SIMPLE（简单表，即不使用表连接或者子查询）、PRIMARY（主查询，即外层的查询）、UNION（UNION 中的第二个或者后面的查询语句）、SUBQUERY（SELECT/WHERE之后包含了子查询）等</td>
+</tr>
+<tr>
+<td style="text-align:center">type</td>
+<td style="text-align:left">表示连接类型，性能由好到差的连接类型为NULL、system、const、eq_ref、ref、range、index、all</td>
+</tr>
+<tr>
+<td style="text-align:center">possible_key</td>
+<td style="text-align:left">显示可能应用在这张表上的索引，一个或多个</td>
+</tr>
+<tr>
+<td style="text-align:center">key</td>
+<td style="text-align:left">实际使用的索引，如果为NULL，则没有使用索引</td>
+</tr>
+<tr>
+<td style="text-align:center">key_len</td>
+<td style="text-align:left">表示索引中使用的字节数，该值为索引字段最大可能长度，并非实际使用长度，在不损失精确性的前提下，长度越短越好</td>
+</tr>
+<tr>
+<td style="text-align:center">rows</td>
+<td style="text-align:left">MySQL认为必须要执行查询的行数，在innodb引擎的表中，是一个估计值，可能并不总是准确的</td>
+</tr>
+<tr>
+<td style="text-align:center">filtered</td>
+<td style="text-align:left">表示返回结果的行数占需读取行数的百分比， filtered的值越大越好</td>
+</tr>
+</tbody>
+</table>
+<h2 id="索引使用">索引使用<a hidden class="anchor" aria-hidden="true" href="#索引使用">#</a></h2>
+<h3 id="最左前缀法则">最左前缀法则<a hidden class="anchor" aria-hidden="true" href="#最左前缀法则">#</a></h3>
+<ol>
+<li>如果索引了多列（联合索引），要遵守最左前缀法则。</li>
+<li>最左前缀法则指的是查询从索引的最左列开始，并且不跳过索引中的列。</li>
+<li>如果跳跃某一列，索引将会部分失效(后面的字段索引失效)。</li>
+<li>注意：最左前缀法则中指的最左边的列，是指在查询时，联合索引的最左边的字段(即是第一个字段)必须存在，与我们编写SQL时，条件编写的先后顺序无关。</li>
+</ol>
+<h3 id="范围查询">范围查询<a hidden class="anchor" aria-hidden="true" href="#范围查询">#</a></h3>
+<ol>
+<li>联合索引中，出现范围查询(&gt;,&lt;)，范围查询右侧的列索引失效。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- tb_user 表存在联合索引 (profession, age, status)
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 下面sql中age使用了&gt;符号导致status索引失效，但是profession, age索引还是有用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">profession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;软件工程&#39;</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;0&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><ol start="2">
+<li>在业务允许的情况下，尽可能的使用类似于 &gt;= 或 &lt;= 这类的范围查询，而避免使用 &gt; 或 &lt;。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 这种情况下，所有索引都生效了
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">profession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;软件工程&#39;</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">30</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;0&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><h3 id="索引失效">索引失效<a hidden class="anchor" aria-hidden="true" href="#索引失效">#</a></h3>
+<h4 id="索引列运算">索引列运算<a hidden class="anchor" aria-hidden="true" href="#索引列运算">#</a></h4>
+<ol>
+<li>不要在索引列上进行运算操作，索引将失效。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- tb_user表phone是单字段索引，因为使用了函数导致失效
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="k">substring</span><span class="p">(</span><span class="n">phone</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;15&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><h4 id="字符串不加引号">字符串不加引号<a hidden class="anchor" aria-hidden="true" href="#字符串不加引号">#</a></h4>
+<ol>
+<li>字符串类型字段使用时，不加引号，索引将失效。</li>
+<li>如果字符串不加单引号，对于查询结果，没什么影响，但是数据库存在隐式类型转换，索引将失效。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- tb_user表phone是单字段索引，类型是varchar
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">phone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;17799990015&#39;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- 没加引号，索引失效
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">phone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">17799990015</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><h4 id="模糊查询">模糊查询<a hidden class="anchor" aria-hidden="true" href="#模糊查询">#</a></h4>
+<ol>
+<li>如果仅仅是尾部模糊匹配，索引不会失效。如果是头部模糊匹配，索引失效。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- profession 索引生效
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">profession</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="s1">&#39;软件%&#39;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- profession 索引失效
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">profession</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="s1">&#39;%工程&#39;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- profession 索引失效
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">profession</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="s1">&#39;%工%&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><h4 id="or连接条件">or连接条件<a hidden class="anchor" aria-hidden="true" href="#or连接条件">#</a></h4>
+<ol>
+<li>用or分割开的条件， 如果or前的条件中的列有索引，而后面的列中没有索引，那么涉及的索引都不会被用到。</li>
+<li>当or连接的条件，左右两侧字段都有索引时，索引才会生效。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- id是主键，age没有索引，该sql不会使用任何索引
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">23</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- phone是普通索引，age没有索引，该sql不会使用任何索引
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">phone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;17799990017&#39;</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">23</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><h4 id="数据分布影响">数据分布影响<a hidden class="anchor" aria-hidden="true" href="#数据分布影响">#</a></h4>
+<ol>
+<li>如果MySQL评估使用索引比全表更慢，则不使用索引。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 不会使用 phone 索引，因为全表扫描更快
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">phone</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="s1">&#39;17799990005&#39;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- 会使用 phone 索引
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">phone</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="s1">&#39;17799990015&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><ol start="2">
+<li>因为MySQL在查询时，会评估使用索引的效率与走全表扫描的效率，如果走全表扫描更快，则放弃索引，走全表扫描。</li>
+<li>因为索引是用来索引少量数据的，如果通过索引查询返回大批量的数据，则还不如走全表扫描来的快，此时索引就会失效。</li>
+<li>is null 与 is not null 操作是否走索引？
+<ul>
+<li>查询时MySQL会评估，走索引快，还是全表扫描快，如果全表扫描更快，则放弃索引走全表扫描。</li>
+<li>因此，is null 、is not null是否走索引，得具体情况具体分析，并不是固定的。</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">profession</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">profession</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><h3 id="sql提示">SQL提示<a hidden class="anchor" aria-hidden="true" href="#sql提示">#</a></h3>
+<ol>
+<li>SQL提示，是优化数据库的一个重要手段，简单来说，就是在SQL语句中加入一些人为的提示来达到优化操作的目的。</li>
+<li>use index ： 建议MySQL使用哪一个索引完成此次查询（仅仅是建议，mysql内部还会再次进行评估）。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="n">use</span><span class="w"> </span><span class="k">index</span><span class="p">(</span><span class="n">idx_user_pro</span><span class="p">)</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">profession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;xsss&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><ol start="3">
+<li>ignore index：忽略指定的索引。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">ignore</span><span class="w"> </span><span class="k">index</span><span class="p">(</span><span class="n">idx_user_pro</span><span class="p">)</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">profession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;xsss&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><ol start="4">
+<li>force index：强制使用索引。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">explain</span><span class="w"> </span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">force</span><span class="w"> </span><span class="k">index</span><span class="p">(</span><span class="n">idx_user_pro</span><span class="p">)</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">profession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;xsss&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><h3 id="覆盖索引">覆盖索引<a hidden class="anchor" aria-hidden="true" href="#覆盖索引">#</a></h3>
+<ol>
+<li>覆盖索引是指查询使用了索引，并且需要返回的列，在该索引中已经全部能够找到。</li>
+<li>尽量使用覆盖索引，减少select *。</li>
+<li>一张表, 有四个字段(id, username, password, status), 由于数据量大, 需要对以下SQL语句进行优化, 该如何进行才是最优方案:</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 针对于 username, password建立联合索引
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- sql为: create index idx_user_name_pass on tb_user(username,password);
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">select</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="n">username</span><span class="p">,</span><span class="n">password</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="o">=</span><span class="s1">&#39;st&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><h3 id="前缀索引">前缀索引<a hidden class="anchor" aria-hidden="true" href="#前缀索引">#</a></h3>
+<ol>
+<li>当字段类型为字符串（varchar，text，longtext等）时，有时候需要索引很长的字符串，这会让索引变得很大，查询时，浪费大量的磁盘IO， 影响查询效率。</li>
+<li>此时可以只将字符串的一部分前缀，建立索引，这样可以大大节约索引空间，从而提高索引效率。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">create</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="n">idx_xxxx</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="k">table_name</span><span class="p">(</span><span class="k">column</span><span class="p">(</span><span class="n">n</span><span class="p">));</span><span class="w">
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 为tb_user表的email字段，建立长度为5的前缀索引
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">create</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="n">idx_email_5</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">tb_user</span><span class="p">(</span><span class="n">email</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span><span class="w">
+</span></span></span></code></pre></div><ol start="3">
+<li>前缀长度，可以根据索引的选择性来决定，而选择性是指不重复的索引值（基数）和数据表的记录总数的比值，索引选择性越高则查询效率越高， 唯一索引的选择性是1，这是最好的索引选择性，性能也是最好的。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="k">distinct</span><span class="w"> </span><span class="n">email</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="k">distinct</span><span class="w"> </span><span class="k">substring</span><span class="p">(</span><span class="n">email</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tb_user</span><span class="w"> </span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p><img loading="lazy" src="../images/mysql-008.png" alt=""  />
+</p>
+<h3 id="单列索引与联合索引">单列索引与联合索引<a hidden class="anchor" aria-hidden="true" href="#单列索引与联合索引">#</a></h3>
+<ol>
+<li>单列索引：即一个索引只包含单个列。查询条件中有多个单列索引只会选择一个。</li>
+<li>联合索引：即一个索引包含了多个列。</li>
+<li>在业务场景中，如果存在多个查询条件，考虑针对于查询字段建立索引时，建议建立联合索引，而非单列索引。</li>
+</ol>
+<p><img loading="lazy" src="../images/mysql-009.png" alt=""  />
+</p>
+<h2 id="索引设计原则">索引设计原则<a hidden class="anchor" aria-hidden="true" href="#索引设计原则">#</a></h2>
+<ol>
+<li>针对于数据量较大，且查询比较频繁的表建立索引。</li>
+<li>针对于常作为查询条件（where）、排序（order by）、分组（group by）操作的字段建立索引。</li>
+<li>尽量选择区分度高的列作为索引，尽量建立唯一索引，区分度越高，使用索引的效率越高。</li>
+<li>如果是字符串类型的字段，字段的长度较长，可以针对于字段的特点，建立前缀索引。</li>
+<li>尽量使用联合索引，减少单列索引，查询时，联合索引很多时候可以覆盖索引，节省存储空间，避免回表，提高查询效率。</li>
+<li>要控制索引的数量，索引并不是多多益善，索引越多，维护索引结构的代价也就越大，会影响增删改的效率。</li>
+<li>如果索引列不能存储NULL值，请在创建表时使用NOT NULL约束它。当优化器知道每列是否包含NULL值时，它可以更好地确定哪个索引最有效地用于查询。</li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://heliu.site/tags/mysql/">Mysql</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://heliu.site/posts/mysql/transaction/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>mysql 事务</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    
+    <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv">
+        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    </span>
+    <span id="busuanzi_container_site_uv">
+        本站访客数<span id="busuanzi_value_site_uv"></span>人次
+    </span>
+    </div>
+        <span>Copyright © 2024 蜀ICP备2024091074号 <a href="#">heliu's blog</a>. All rights reserved</span>  
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'Copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'Done';
+            setTimeout(() => {
+                copybutton.innerHTML = 'Copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
