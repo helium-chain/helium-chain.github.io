@@ -125,7 +125,7 @@
   "keywords": [
     "docker"
   ],
-  "articleBody": " Docker-Compose 项目是Docker官方的开源项目，负责实现对Docker容器集群的快速编排。 Docker-Compose 项目由 Python 编写，调用 Docker 服务提供的API来对容器进行管理。因此，只要所操作的平台支持 Docker API，就可以在其上利用它来进行编排管理。 允许用户通过一个docker-compose.yml模板文件（YAML 格式）来定义一组相关联的应用容器为一个项目（project）。 模板文件默认路径是当前目录下的docker-compose.yml，可以使用.yml或.yaml作为文件扩展名。 标准模板文件应该包含version、services、networks 三大部分，最关键的是services和networks两个部分。 docker-compose.yml varsion 指定本 yml 依从的 compose 哪个版本制定的。 services image 指定镜像名称或镜像ID。 如果镜像不存在，将尝试从互联网拉取这个镜像，例如：image: ubuntu、image: a4bc65fd。 指定服务的镜像名，若本地不存在，则会去仓库拉取这个镜像。 services: redis6: image: redis:6.2.3 build 指定 Dockerfile 所在文件夹的路径。 它会利用他自动构建这个镜像，然后使用这个镜像。 services: redis6: # 绝对路径 build: /path/to/build/dir services: redis6: # 相对路径，只要上下文确定就可以读取到Dockerfile。 build: ./dir 设定上下文根目录，然后以该目录为准指定Dockerfile。 services: redis6: # 相对路径，只要上下文确定就可以读取到Dockerfile。 build: context: ../ dockerfile: path/of/Dockerfile build都是一个目录，如果要指定Dockerfile文件需要在build标签的子级标签中使用dockerfile标签指定。 如果同时指定image和build两个标签，那么Compose会构建镜像并且把镜像命名为image值指定的名字。 context context选项可以是Dockerfile的文件路径，也可以是到链接到git仓库的url，当提供的值是相对路径时，被解析为相对于撰写文件的路径，此目录也是发送到Docker守护进程的context。 services: redis6: # 相对路径，只要上下文确定就可以读取到Dockerfile。 build: context: ./dir dockerfile 使用dockerfile文件来构建，必须指定构建路径。 services: redis6: # 相对路径，只要上下文确定就可以读取到Dockerfile。 build: context: . dockerfile: Dockerfile-alternate command 覆盖容器启动后默认执行的命令。 services: redis6: image: redis:6.2.3 command: redis-server /etc/redis/redis.conf ports ports用于映射端口的标签。 使用 HOST:CONTAINER 格式或者只是指定容器的端口，宿主机会随机映射端口。 当使用 HOST:CONTAINER 格式来映射端口时，如果使用的容器端口小于60可能会得到错误得结果，因为YAML将会解析xx:yy这种数字格式为60进制。所以建议采用字符串格式。 services: redis6: ports: - \"3000\" - \"8000:8000\" - \"49100:22\" - \"127.0.0.1:8001:8001\" container_name 容器名称格式是：\u003c项目名称\u003e\u003c服务名称\u003e\u003c序号\u003e。 可以自定义项目名称、服务名称，但如果想完全控制容器的命名，可以使用标签指定： services: redis6: image: redis:6.2.3 container_name: redis6 depends_on 一般项目容器启动的顺序是有要求的，如果直接从上到下启动容器，必然会因为容器依赖问题而启动失败。 例如在没启动数据库容器的时候启动应用容器，应用容器会因为找不到数据库而退出。 depends_on标签用于解决容器的依赖、启动先后的问题。 version: '2' services: web: build: . depends_on: - db - redis redis: image: redis db: image: postgres 上述YAML文件定义的容器会先启动redis和db两个服务，最后才启动 web 服务。 PID 将PID模式设置为主机PID模式，跟主机系统共享进程命名空间。容器使用pid标签将能够访问和操纵其他容器和宿主机的名称空间。 pid: \"host\" extra_hosts 添加主机名的标签，会在/etc/hosts文件中添加一些记录。 extra_hosts: - \"somehost:162.242.195.82\" - \"otherhost:50.31.209.229\" 启动后查看容器内部hosts： 162.242.195.82 somehost 50.31.209.229 otherhost volumes 挂载一个目录或者一个已存在的数据卷容器，可以直接使用 [HOST:CONTAINER] 格式，或者使用 [HOST:CONTAINER:ro] 格式，后者对于容器来说，数据卷是只读的，可以有效保护宿主机的文件系统。 数据卷指定路径可以是相对路径，使用 . 或者 .. 来指定相对目录。 volumes: // 只是指定一个路径，Docker 会自动在创建一个数据卷（这个路径是容器内部的）。 - /var/lib/mysql // 使用绝对路径挂载数据卷 - /opt/data:/var/lib/mysql // 以 Compose 配置文件为中心的相对路径作为数据卷挂载到容器。 - ./cache:/tmp/cache // 使用用户的相对路径（~/ 表示的目录是 /home/\u003c用户目录\u003e/ 或者 /root/）。 - ~/configs:/etc/configs/:ro // 已经存在的命名的数据卷。 - datavolume:/var/lib/mysql 如果不使用宿主机的路径，可以指定一个volume_driver。 volumes_from 从另一个服务或容器挂载其数据卷： volumes_from: - service_name - container_name dns 自定义DNS服务器。可以是一个值，也可以是一个列表。 dns：8.8.8.8 dns： - 8.8.8.8 - 9.9.9.9 expose 暴露端口，但不映射到宿主机，只允许能被连接的服务访问。仅可以指定内部端口为参数，如下所示： expose: - \"3000\" - \"8000\" links 链接到其它服务中的容器。使用服务名称（同时作为别名），或者服务名称:服务别名（如 SERVICE:ALIAS），例如 links: - db - db:database - redis 示例 version: '3.9' services: redis6: image: redis:6.2.3 container_name: redis6 privileged: true restart: unless-stopped command: redis-server /etc/redis/redis.conf #ports: # - \"6379:6379\" volumes: - /app/docker/redis7/data:/data - ./docker/redis/redis.conf:/etc/redis/redis.conf - /etc/localtime:/etc/localtime:ro logging: driver: \"json-file\" options: max-size: \"20m\" max-file: \"3\" healthcheck: test: [ \"CMD\", \"redis-cli\", \"ping\" ] interval: 10s timeout: 1s retries: 3 network_mode: \"container:nginx20\" depends_on: - nginx20 mysql8: image: mysql:8.0.19 container_name: mysql8 privileged: true restart: unless-stopped environment: TZ: Asia/Shanghai MYSQL_ROOT_PASSWORD: 123456 MYSQL_DATABASE: test character-set-server: utf8mb4 collation-server: utf8mb4_general_ci default-authentication-plugin: mysql_native_password volumes: - ./docker/mysql/initdb:/docker-entrypoint-initdb.d - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf - /app/docker/mysql8/data:/var/lib/mysql - /etc/localtime:/etc/localtime:ro #ports: # - \"3306:3306\" logging: driver: \"json-file\" options: max-size: \"20m\" max-file: \"3\" healthcheck: test: [ \"CMD\", \"mysqladmin\" ,\"ping\", \"-h\", \"localhost\", \"--silent\" ] interval: 10s timeout: 10s retries: 3 network_mode: \"container:nginx20\" depends_on: - nginx20 nginx20: image: nginx:${NGINX_VERSION:-1.20.2} container_name: nginx20 privileged: true restart: unless-stopped ports: - \"80:80\" - \"443:443\" - \"3306:3306\" - \"6379:6379\" - \"8080:8080\" - \"8888:8888\" volumes: - ./docker/nginx/html:/usr/share/nginx/html - ./docker/nginx/cert:/etc/nginx/cert - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf - ./docker/nginx/conf.d:/etc/nginx/conf.d - /app/docker/nginx/logs:/var/log/nginx environment: - TZ=Asia/Shanghai healthcheck: test: [ \"CMD\", \"curl\", \"-f\", \"http://localhost\" ] interval: 30s timeout: 10s retries: 3 networks: - default_net api: container_name: greet-api build: context: ./greet/api dockerfile: Dockerfile privileged: true command: [ \"/app/wait-for-it.sh\", \"localhost:3306\", \"-t\", \"30\", \"--\", \"/app/wait-for-it.sh\", \"localhost:6379\", \"-t\", \"30\", \"--\", \"/app/main\" ] depends_on: - nginx20 - mysql8 - redis6 #ports: # - \"8888:8888\" network_mode: \"container:nginx20\" networks: default_net: driver: bridge ",
+  "articleBody": " Docker-Compose 项目是Docker官方的开源项目，负责实现对Docker容器集群的快速编排。 Docker-Compose 项目由 Python 编写，调用 Docker 服务提供的API来对容器进行管理。因此，只要所操作的平台支持 Docker API，就可以在其上利用它来进行编排管理。 允许用户通过一个docker-compose.yml模板文件（YAML 格式）来定义一组相关联的应用容器为一个项目（project）。 模板文件默认路径是当前目录下的docker-compose.yml，可以使用.yml或.yaml作为文件扩展名。 标准模板文件应该包含version、services、networks 三大部分，最关键的是services和networks两个部分。 docker-compose.yml version 指定本 yml 依从的 compose 哪个版本制定的。 services image 指定镜像名称或镜像ID。 如果镜像不存在，将尝试从互联网拉取这个镜像，例如：image: ubuntu、image: a4bc65fd。 指定服务的镜像名，若本地不存在，则会去仓库拉取这个镜像。 services: redis6: image: redis:6.2.3 build 指定 Dockerfile 所在文件夹的路径。 它会利用他自动构建这个镜像，然后使用这个镜像。 services: redis6: # 绝对路径 build: /path/to/build/dir services: redis6: # 相对路径，只要上下文确定就可以读取到Dockerfile。 build: ./dir 设定上下文根目录，然后以该目录为准指定Dockerfile。 services: redis6: # 相对路径，只要上下文确定就可以读取到Dockerfile。 build: context: ../ dockerfile: path/of/Dockerfile build都是一个目录，如果要指定Dockerfile文件需要在build标签的子级标签中使用dockerfile标签指定。 如果同时指定image和build两个标签，那么Compose会构建镜像并且把镜像命名为image值指定的名字。 context context选项可以是Dockerfile的文件路径，也可以是到链接到git仓库的url，当提供的值是相对路径时，被解析为相对于撰写文件的路径，此目录也是发送到Docker守护进程的context。 services: redis6: # 相对路径，只要上下文确定就可以读取到Dockerfile。 build: context: ./dir dockerfile 使用dockerfile文件来构建，必须指定构建路径。 services: redis6: # 相对路径，只要上下文确定就可以读取到Dockerfile。 build: context: . dockerfile: Dockerfile-alternate command 覆盖容器启动后默认执行的命令。 services: redis6: image: redis:6.2.3 command: redis-server /etc/redis/redis.conf ports ports用于映射端口的标签。 使用 HOST:CONTAINER 格式或者只是指定容器的端口，宿主机会随机映射端口。 当使用 HOST:CONTAINER 格式来映射端口时，如果使用的容器端口小于60可能会得到错误得结果，因为YAML将会解析xx:yy这种数字格式为60进制。所以建议采用字符串格式。 services: redis6: ports: - \"3000\" - \"8000:8000\" - \"49100:22\" - \"127.0.0.1:8001:8001\" container_name 容器名称格式是：\u003c项目名称\u003e\u003c服务名称\u003e\u003c序号\u003e。 可以自定义项目名称、服务名称，但如果想完全控制容器的命名，可以使用标签指定： services: redis6: image: redis:6.2.3 container_name: redis6 depends_on 一般项目容器启动的顺序是有要求的，如果直接从上到下启动容器，必然会因为容器依赖问题而启动失败。 例如在没启动数据库容器的时候启动应用容器，应用容器会因为找不到数据库而退出。 depends_on标签用于解决容器的依赖、启动先后的问题。 version: '2' services: web: build: . depends_on: - db - redis redis: image: redis db: image: postgres 上述YAML文件定义的容器会先启动redis和db两个服务，最后才启动 web 服务。 PID 将PID模式设置为主机PID模式，跟主机系统共享进程命名空间。容器使用pid标签将能够访问和操纵其他容器和宿主机的名称空间。 pid: \"host\" extra_hosts 添加主机名的标签，会在/etc/hosts文件中添加一些记录。 extra_hosts: - \"somehost:162.242.195.82\" - \"otherhost:50.31.209.229\" 启动后查看容器内部hosts： 162.242.195.82 somehost 50.31.209.229 otherhost volumes 挂载一个目录或者一个已存在的数据卷容器，可以直接使用 [HOST:CONTAINER] 格式，或者使用 [HOST:CONTAINER:ro] 格式，后者对于容器来说，数据卷是只读的，可以有效保护宿主机的文件系统。 数据卷指定路径可以是相对路径，使用 . 或者 .. 来指定相对目录。 volumes: // 只是指定一个路径，Docker 会自动在创建一个数据卷（这个路径是容器内部的）。 - /var/lib/mysql // 使用绝对路径挂载数据卷 - /opt/data:/var/lib/mysql // 以 Compose 配置文件为中心的相对路径作为数据卷挂载到容器。 - ./cache:/tmp/cache // 使用用户的相对路径（~/ 表示的目录是 /home/\u003c用户目录\u003e/ 或者 /root/）。 - ~/configs:/etc/configs/:ro // 已经存在的命名的数据卷。 - datavolume:/var/lib/mysql 如果不使用宿主机的路径，可以指定一个volume_driver。 volumes_from 从另一个服务或容器挂载其数据卷： volumes_from: - service_name - container_name dns 自定义DNS服务器。可以是一个值，也可以是一个列表。 dns：8.8.8.8 dns： - 8.8.8.8 - 9.9.9.9 expose 暴露端口，但不映射到宿主机，只允许能被连接的服务访问。仅可以指定内部端口为参数，如下所示： expose: - \"3000\" - \"8000\" links 链接到其它服务中的容器。使用服务名称（同时作为别名），或者服务名称:服务别名（如 SERVICE:ALIAS），例如 links: - db - db:database - redis 示例 version: '3.9' services: redis6: image: redis:6.2.3 container_name: redis6 privileged: true restart: unless-stopped command: redis-server /etc/redis/redis.conf #ports: # - \"6379:6379\" volumes: - /app/docker/redis7/data:/data - ./docker/redis/redis.conf:/etc/redis/redis.conf - /etc/localtime:/etc/localtime:ro logging: driver: \"json-file\" options: max-size: \"20m\" max-file: \"3\" healthcheck: test: [ \"CMD\", \"redis-cli\", \"ping\" ] interval: 10s timeout: 1s retries: 3 network_mode: \"container:nginx20\" depends_on: - nginx20 mysql8: image: mysql:8.0.19 container_name: mysql8 privileged: true restart: unless-stopped environment: TZ: Asia/Shanghai MYSQL_ROOT_PASSWORD: 123456 MYSQL_DATABASE: test character-set-server: utf8mb4 collation-server: utf8mb4_general_ci default-authentication-plugin: mysql_native_password volumes: - ./docker/mysql/initdb:/docker-entrypoint-initdb.d - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf - /app/docker/mysql8/data:/var/lib/mysql - /etc/localtime:/etc/localtime:ro #ports: # - \"3306:3306\" logging: driver: \"json-file\" options: max-size: \"20m\" max-file: \"3\" healthcheck: test: [ \"CMD\", \"mysqladmin\" ,\"ping\", \"-h\", \"localhost\", \"--silent\" ] interval: 10s timeout: 10s retries: 3 network_mode: \"container:nginx20\" depends_on: - nginx20 nginx20: image: nginx:${NGINX_VERSION:-1.20.2} container_name: nginx20 privileged: true restart: unless-stopped ports: - \"80:80\" - \"443:443\" - \"3306:3306\" - \"6379:6379\" - \"8080:8080\" - \"8888:8888\" volumes: - ./docker/nginx/html:/usr/share/nginx/html - ./docker/nginx/cert:/etc/nginx/cert - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf - ./docker/nginx/conf.d:/etc/nginx/conf.d - /app/docker/nginx/logs:/var/log/nginx environment: - TZ=Asia/Shanghai healthcheck: test: [ \"CMD\", \"curl\", \"-f\", \"http://localhost\" ] interval: 30s timeout: 10s retries: 3 networks: - default_net api: container_name: greet-api build: context: ./greet/api dockerfile: Dockerfile privileged: true command: [ \"/app/wait-for-it.sh\", \"localhost:3306\", \"-t\", \"30\", \"--\", \"/app/wait-for-it.sh\", \"localhost:6379\", \"-t\", \"30\", \"--\", \"/app/main\" ] depends_on: - nginx20 - mysql8 - redis6 #ports: # - \"8888:8888\" network_mode: \"container:nginx20\" networks: default_net: driver: bridge ",
   "wordCount" : "442",
   "inLanguage": "zh",
   "image": "https://heliu.site/favicon-32x32.png","datePublished": "2022-06-08T00:00:00Z",
@@ -288,7 +288,7 @@
                         <a href="#docker-composeyml" aria-label="docker-compose.yml">docker-compose.yml</a><ul>
                             
                     <li>
-                        <a href="#varsion" aria-label="varsion">varsion</a></li>
+                        <a href="#version" aria-label="version">version</a></li>
                     <li>
                         <a href="#services" aria-label="services">services</a><ul>
                             
@@ -305,8 +305,7 @@
                     <li>
                         <a href="#command" aria-label="command">command</a></li>
                     <li>
-                        <a href="#ports" aria-label="ports">ports</a></li></ul>
-                    </li>
+                        <a href="#ports" aria-label="ports">ports</a></li>
                     <li>
                         <a href="#container_name" aria-label="container_name">container_name</a></li>
                     <li>
@@ -325,6 +324,7 @@
                         <a href="#expose" aria-label="expose">expose</a></li>
                     <li>
                         <a href="#links" aria-label="links">links</a></li></ul>
+                    </li></ul>
                     </li>
                     <li>
                         <a href="#%e7%a4%ba%e4%be%8b" aria-label="示例">示例</a>
@@ -401,7 +401,7 @@
 <li>标准模板文件应该包含version、services、networks 三大部分，最关键的是services和networks两个部分。</li>
 </ul>
 <h2 id="docker-composeyml">docker-compose.yml<a hidden class="anchor" aria-hidden="true" href="#docker-composeyml">#</a></h2>
-<h3 id="varsion">varsion<a hidden class="anchor" aria-hidden="true" href="#varsion">#</a></h3>
+<h3 id="version">version<a hidden class="anchor" aria-hidden="true" href="#version">#</a></h3>
 <ol>
 <li>指定本 yml 依从的 compose 哪个版本制定的。</li>
 </ol>
@@ -481,7 +481,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="s2">&#34;8000:8000&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="s2">&#34;49100:22&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="s2">&#34;127.0.0.1:8001:8001&#34;</span><span class="w">
-</span></span></span></code></pre></div><h3 id="container_name">container_name<a hidden class="anchor" aria-hidden="true" href="#container_name">#</a></h3>
+</span></span></span></code></pre></div><h4 id="container_name">container_name<a hidden class="anchor" aria-hidden="true" href="#container_name">#</a></h4>
 <ol>
 <li>容器名称格式是：&lt;项目名称&gt;&lt;服务名称&gt;&lt;序号&gt;。</li>
 <li>可以自定义项目名称、服务名称，但如果想完全控制容器的命名，可以使用标签指定：</li>
@@ -490,7 +490,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">redis6</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">redis:6.2.3</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l">redis6</span><span class="w">
-</span></span></span></code></pre></div><h3 id="depends_on">depends_on<a hidden class="anchor" aria-hidden="true" href="#depends_on">#</a></h3>
+</span></span></span></code></pre></div><h4 id="depends_on">depends_on<a hidden class="anchor" aria-hidden="true" href="#depends_on">#</a></h4>
 <ol>
 <li>一般项目容器启动的顺序是有要求的，如果直接从上到下启动容器，必然会因为容器依赖问题而启动失败。</li>
 <li>例如在没启动数据库容器的时候启动应用容器，应用容器会因为找不到数据库而退出。</li>
@@ -510,12 +510,12 @@
 </span></span></span></code></pre></div><ol start="4">
 <li>上述YAML文件定义的容器会先启动redis和db两个服务，最后才启动 web 服务。</li>
 </ol>
-<h3 id="pid">PID<a hidden class="anchor" aria-hidden="true" href="#pid">#</a></h3>
+<h4 id="pid">PID<a hidden class="anchor" aria-hidden="true" href="#pid">#</a></h4>
 <ol>
 <li>将PID模式设置为主机PID模式，跟主机系统共享进程命名空间。容器使用pid标签将能够访问和操纵其他容器和宿主机的名称空间。</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="cl"><span class="nt">pid</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;host&#34;</span><span class="w">
-</span></span></span></code></pre></div><h3 id="extra_hosts">extra_hosts<a hidden class="anchor" aria-hidden="true" href="#extra_hosts">#</a></h3>
+</span></span></span></code></pre></div><h4 id="extra_hosts">extra_hosts<a hidden class="anchor" aria-hidden="true" href="#extra_hosts">#</a></h4>
 <ol>
 <li>添加主机名的标签，会在/etc/hosts文件中添加一些记录。</li>
 </ol>
@@ -527,7 +527,7 @@
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">162.242.195.82  somehost
 </span></span><span class="line"><span class="cl">50.31.209.229   otherhost
-</span></span></code></pre></div><h3 id="volumes">volumes<a hidden class="anchor" aria-hidden="true" href="#volumes">#</a></h3>
+</span></span></code></pre></div><h4 id="volumes">volumes<a hidden class="anchor" aria-hidden="true" href="#volumes">#</a></h4>
 <ol>
 <li>挂载一个目录或者一个已存在的数据卷容器，可以直接使用 [HOST:CONTAINER] 格式，或者使用 [HOST:CONTAINER:ro] 格式，后者对于容器来说，数据卷是只读的，可以有效保护宿主机的文件系统。</li>
 <li>数据卷指定路径可以是相对路径，使用 . 或者 .. 来指定相对目录。</li>
@@ -546,14 +546,14 @@
 </span></span></span></code></pre></div><ol start="3">
 <li>如果不使用宿主机的路径，可以指定一个volume_driver。</li>
 </ol>
-<h3 id="volumes_from">volumes_from<a hidden class="anchor" aria-hidden="true" href="#volumes_from">#</a></h3>
+<h4 id="volumes_from">volumes_from<a hidden class="anchor" aria-hidden="true" href="#volumes_from">#</a></h4>
 <ol>
 <li>从另一个服务或容器挂载其数据卷：</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="cl"><span class="nt">volumes_from</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">service_name    </span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">container_name</span><span class="w">
-</span></span></span></code></pre></div><h3 id="dns">dns<a hidden class="anchor" aria-hidden="true" href="#dns">#</a></h3>
+</span></span></span></code></pre></div><h4 id="dns">dns<a hidden class="anchor" aria-hidden="true" href="#dns">#</a></h4>
 <ol>
 <li>自定义DNS服务器。可以是一个值，也可以是一个列表。</li>
 </ol>
@@ -561,14 +561,14 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">dns：</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="m">8.8.8.8</span><span class="w">    
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="m">9.9.9.9</span><span class="w">
-</span></span></span></code></pre></div><h3 id="expose">expose<a hidden class="anchor" aria-hidden="true" href="#expose">#</a></h3>
+</span></span></span></code></pre></div><h4 id="expose">expose<a hidden class="anchor" aria-hidden="true" href="#expose">#</a></h4>
 <ol>
 <li>暴露端口，但不映射到宿主机，只允许能被连接的服务访问。仅可以指定内部端口为参数，如下所示：</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="cl"><span class="nt">expose</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="s2">&#34;3000&#34;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="s2">&#34;8000&#34;</span><span class="w">
-</span></span></span></code></pre></div><h3 id="links">links<a hidden class="anchor" aria-hidden="true" href="#links">#</a></h3>
+</span></span></span></code></pre></div><h4 id="links">links<a hidden class="anchor" aria-hidden="true" href="#links">#</a></h4>
 <ol>
 <li>链接到其它服务中的容器。使用服务名称（同时作为别名），或者服务名称:服务别名（如 SERVICE:ALIAS），例如</li>
 </ol>
