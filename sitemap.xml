@@ -36,6 +36,7 @@
     <lastmod>2024-05-03T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://heliu.site/posts/nginx/</loc>
+    <lastmod>2021-05-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://heliu.site/posts/golang/slice/</loc>
     <lastmod>2024-01-21T00:00:00+00:00</lastmod>
@@ -361,6 +362,15 @@
     <loc>https://heliu.site/posts/mysql/mycat/</loc>
     <lastmod>2022-10-03T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://heliu.site/posts/nginx/install/</loc>
+    <lastmod>2021-04-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/nginx/conf/</loc>
+    <lastmod>2021-04-16T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/nginx/server/</loc>
+    <lastmod>2021-05-11T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://heliu.site/posts/</loc>
     <lastmod>2024-08-06T10:12:44+08:00</lastmod>
   </url><url>
@@ -426,6 +436,9 @@
   </url><url>
     <loc>https://heliu.site/tags/%E6%95%B0%E7%BB%84/</loc>
     <lastmod>2024-05-03T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/tags/nginx/</loc>
+    <lastmod>2021-05-11T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://heliu.site/tags/%E5%AD%97%E5%85%B8/</loc>
     <lastmod>2024-04-27T00:00:00+00:00</lastmod>

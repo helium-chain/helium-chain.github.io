@@ -708,6 +708,27 @@
       <description>mysql mycat 分库分表中间件。</description>
     </item>
     <item>
+      <title>nginx 安装部署</title>
+      <link>https://heliu.site/posts/nginx/install/</link>
+      <pubDate>Thu, 15 Apr 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/nginx/install/</guid>
+      <description>nginx 架构、目录结构、相关命令。</description>
+    </item>
+    <item>
+      <title>nginx nginx.cnf</title>
+      <link>https://heliu.site/posts/nginx/conf/</link>
+      <pubDate>Fri, 16 Apr 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/nginx/conf/</guid>
+      <description>nginx 全局块、events块、http块指令介绍。</description>
+    </item>
+    <item>
+      <title>nginx server块</title>
+      <link>https://heliu.site/posts/nginx/server/</link>
+      <pubDate>Tue, 11 May 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/nginx/server/</guid>
+      <description>nginx 防盗链、Rewrite。</description>
+    </item>
+    <item>
       <title>打赏</title>
       <link>https://heliu.site/support/</link>
       <pubDate>Sun, 15 Mar 2020 11:30:03 +0000</pubDate>

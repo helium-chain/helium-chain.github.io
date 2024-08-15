@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Nginx on Helium</title>
-    <link>https://heliu.site/posts/nginx/</link>
+    <link>https://heliu.site/tags/nginx/</link>
     <description>Recent content in Nginx on Helium</description>
     <image>
       <title>Helium</title>
@@ -13,7 +13,7 @@
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
     <lastBuildDate>Tue, 11 May 2021 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://heliu.site/posts/nginx/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://heliu.site/tags/nginx/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>nginx 安装部署</title>
       <link>https://heliu.site/posts/nginx/install/</link>
