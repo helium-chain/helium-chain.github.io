@@ -7,7 +7,7 @@
 <meta name="robots" content="index, follow">
 <title>nginx server块 | Helium</title>
 <meta name="keywords" content="nginx">
-<meta name="description" content="nginx 防盗链、Rewrite。">
+<meta name="description" content="nginx server块介绍。">
 <meta name="author" content="helium">
 <link rel="canonical" href="https://heliu.site/posts/nginx/server/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
@@ -75,7 +75,7 @@
   
 
 <meta property="og:title" content="nginx server块" />
-<meta property="og:description" content="nginx 防盗链、Rewrite。" />
+<meta property="og:description" content="nginx server块介绍。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://heliu.site/posts/nginx/server/" />
 <meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
@@ -86,7 +86,7 @@
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
 <meta name="twitter:title" content="nginx server块"/>
-<meta name="twitter:description" content="nginx 防盗链、Rewrite。"/>
+<meta name="twitter:description" content="nginx server块介绍。"/>
 
 
 <script type="application/ld+json">
@@ -121,12 +121,12 @@
   "@type": "BlogPosting",
   "headline": "nginx server块",
   "name": "nginx server块",
-  "description": "nginx 防盗链、Rewrite。",
+  "description": "nginx server块介绍。",
   "keywords": [
     "nginx"
   ],
-  "articleBody": "server块 listen指令 用来配置监听端口。 语法：默认 listen *:80 | *:8000 listen address[:port] [default_server]...; listen port [default_server]...; 示例： # listen localhost:8000 监听指定的IP和端口 listen 127.0.0.1:8000; # 监听指定IP的所有端口 listen 127.0.0.1; # 监听指定端口上的连接(常用) listen 8000 # 监听指定端口上的连接 listen *:8000; default_server属性是标识符，用来将此虚拟主机设置成默认主机。 所谓的默认主机指的是如果没有匹配到对应的address:port，则会默认执行的。如果不指定默认使用的是第一个server。 server{ listen 8080; server_name 127.0.0.1; location /{ root html; index index.html; } } server{ # default_server 设置默认主机 listen 8080 default_server; server_name localhost; default_type text/plain; return 444 'This is a error request'; } server_name指令 设置虚拟主机服务名称。常用 127.0.0.1、localhost、www.heliu.site、heliu.site。 语法：server_name name …;，name可以提供多个中间用空格分隔。 server_name的配置方式有三种，分别是：精确匹配、通配符匹配、正则表达式匹配。 匹配顺序： 首先匹配，精确匹配server_name。 其次匹配，通配符在开始时匹配server_name。 然后匹配，通配符在结束时匹配server_name。 接着匹配，正则表达式匹配server_name。 最后匹配，默认的default_server处理，如果没有指定默认找第一个server。 精确匹配 server { listen 80; server_name heliu.site www.heliu.site; } 通配符配置 server_name中支持通配符\"*\",但需要注意的是通配符不能出现在域名的中间，只能出现在首段或尾段。 server { listen 80; server_name *.heliu.site www.heliu.*; } 正则表达式匹配 server_name中可以使用正则表达式，并且使用~作为正则表达式字符串的开始标记。 常见正则表达式： 代码 说明 ^ 匹配搜索字符串开始位置 $ 匹配搜索字符串结束位置 . 匹配除换行符\\n之外的任何单个字符 \\ 转义字符，将下一个字符标记为特殊字符 [xyz] 字符集，与任意一个指定字符匹配 [a-z] 字符范围，匹配指定范围内的任何字符 \\w 与以下任意字符匹配 A-Z a-z 0-9 和下划线,等效于[A-Za-z0-9_] \\d 数字字符匹配，等效于[0-9] {n} 正好匹配n次 {n,} 至少匹配n次 {n,m} 匹配至少n次至多m次 * 零次或多次，等效于{0,} + 一次或多次，等效于{1,} ? 零次或一次，等效于{0,1} server{ listen 80; # ~后面不能加空格，括号可以取值 server_name ~^www\\.(\\w+)\\.com$; default_type text/plain; return 200 $1 $2 ..; } location指令 设置请求的URI。 语法：location [ = | ~ | ~* | ^~ | @ ] uri{...} uri变量是待匹配的请求字符串，可以不包含正则表达式，也可以包含正则表达式，那么nginx服务器在搜索匹配location的时候，是先使用不包含正则表达式进行匹配，找到一个匹配度最高的一个，然后在通过包含正则表达式的进行匹配，如果能匹配到直接访问，匹配不到，就使用刚才匹配度最高的那个location来处理请求。 location 匹配 不带符号 要求必须以指定模式开始。 server { listen 80; server_name 127.0.0.1; location /abc{ default_type text/plain; return 200 \"access success\"; } } # 以下都能匹配到 # http://192.168.200.133/abc # http://192.168.200.133/abc?p1=TOM # http://192.168.200.133/abc/ # http://192.168.200.133/abcdef = 前缀 用于不包含正则表达式的uri前，必须与指定的模式精确匹配。 server { listen 80; server_name 127.0.0.1; location =/abc{ default_type text/plain; return 200 \"access success\"; } } # 可以匹配到 # http://192.168.200.133/abc # http://192.168.200.133/abc?p1=TOM # 匹配不到 # http://192.168.200.133/abc/ # http://192.168.200.133/abcdef ~ 和 ~* 前缀 ~ ： 用于表示当前uri中包含了正则表达式，并且区分大小写。 ~*：用于表示当前uri中包含了正则表达式，并且不区分大小写。 如果uri包含了正则表达式，需要用上述两个符合来标识。 server { listen 80; server_name 127.0.0.1; location ~^/abc\\w${ default_type text/plain; return 200 \"access success\"; } } server { listen 80; server_name 127.0.0.1; location ~*^/abc\\w${ default_type text/plain; return 200 \"access success\"; } } ^~ 前缀 用于不包含正则表达式的uri前，功能和不加符号的一致，唯一不同的是，如果模式匹配，那么就停止搜索其他模式了。 server { listen 80; server_name 127.0.0.1; location ^~/abc{ default_type text/plain; return 200 \"access success\"; } } root指令 设置请求的根目录。 可以在 http、server、location 中。 —————–语法—————– 默认值 示例 root path html root html path 为Nginx服务器接收到请求以后查找资源的根目录路径。 alias指令 更改location的URI。 —————–语法—————– 默认值 示例 alias path alias /usr/local/nginx/htm path为修改后的根路径。 root和alias指令的区别 在/usr/local/nginx/html目录下创建一个 images目录,并在目录下放入一张图片mv.png图片。 location /images { root /usr/local/nginx/html; } # 访问图片的路径为: http://127.0.0.1/images/mv.png 能成功 如果把root改为alias。 location /images { alias /usr/local/nginx/html; } # 再次访问上述地址，页面会出现404的错误，因为地址不对 oot的处理结果是: root路径+location路径，/usr/local/nginx/html/images/mv.png。 alias的处理结果是:使用alias路径替换location路径，/usr/local/nginx/html/mv.png。 修改成这样，alias /usr/local/nginx/html/images;就能访问到。 如果location路径是以/结尾,则alias也必须是以/结尾，root没有要求。 location /images/ { alias /usr/local/nginx/html/images; } # 访问就会出问题，查看错误日志还是路径不对，所以需要把alias后面加上 / index指令 设置网站的默认首页。 可以在 http、server、location 中。 —————–语法—————– 默认值 示例 index file … index.html index index.html index后面可以跟多个设置，如果访问的时候没有指定具体访问的资源，则会依次进行查找，找到第一个为止。 location / { root /usr/local/nginx/html; index index.html index.htm; } # 访问该location的时候，可以通过 http://ip:port/， # 地址后面如果不添加任何内容，则默认依次访问index.html和index.htm， # 找到第一个来进行返回 ",
-  "wordCount" : "381",
+  "articleBody": "server块 listen指令 用来配置监听端口。 语法：默认 listen *:80 | *:8000 listen address[:port] [default_server]...; listen port [default_server]...; 示例： # listen localhost:8000 监听指定的IP和端口 listen 127.0.0.1:8000; # 监听指定IP的所有端口 listen 127.0.0.1; # 监听指定端口上的连接(常用) listen 8000 # 监听指定端口上的连接 listen *:8000; default_server属性是标识符，用来将此虚拟主机设置成默认主机。 所谓的默认主机指的是如果没有匹配到对应的address:port，则会默认执行的。如果不指定默认使用的是第一个server。 server{ listen 8080; server_name 127.0.0.1; location /{ root html; index index.html; } } server{ # default_server 设置默认主机 listen 8080 default_server; server_name localhost; default_type text/plain; return 444 'This is a error request'; } server_name指令 设置虚拟主机服务名称。常用 127.0.0.1、localhost、www.heliu.site、heliu.site。 语法：server_name name …;，name可以提供多个中间用空格分隔。 server_name的配置方式有三种，分别是：精确匹配、通配符匹配、正则表达式匹配。 匹配顺序： 首先匹配，精确匹配server_name。 其次匹配，通配符在开始时匹配server_name。 然后匹配，通配符在结束时匹配server_name。 接着匹配，正则表达式匹配server_name。 最后匹配，默认的default_server处理，如果没有指定默认找第一个server。 精确匹配 server { listen 80; server_name heliu.site www.heliu.site; } 通配符配置 server_name中支持通配符\"*\",但需要注意的是通配符不能出现在域名的中间，只能出现在首段或尾段。 server { listen 80; server_name *.heliu.site www.heliu.*; } 正则表达式匹配 server_name中可以使用正则表达式，并且使用~作为正则表达式字符串的开始标记。 常见正则表达式： 代码 说明 ^ 匹配搜索字符串开始位置 $ 匹配搜索字符串结束位置 . 匹配除换行符\\n之外的任何单个字符 \\ 转义字符，将下一个字符标记为特殊字符 [xyz] 字符集，与任意一个指定字符匹配 [a-z] 字符范围，匹配指定范围内的任何字符 \\w 与以下任意字符匹配 A-Z a-z 0-9 和下划线,等效于[A-Za-z0-9_] \\d 数字字符匹配，等效于[0-9] {n} 正好匹配n次 {n,} 至少匹配n次 {n,m} 匹配至少n次至多m次 * 零次或多次，等效于{0,} + 一次或多次，等效于{1,} ? 零次或一次，等效于{0,1} server{ listen 80; # ~后面不能加空格，括号可以取值 server_name ~^www\\.(\\w+)\\.com$; default_type text/plain; return 200 $1 $2 ..; } location指令 设置请求的URI。 语法：location [ = | ~ | ~* | ^~ | @ ] uri{...} uri变量是待匹配的请求字符串，可以不包含正则表达式，也可以包含正则表达式，那么nginx服务器在搜索匹配location的时候，是先使用不包含正则表达式进行匹配，找到一个匹配度最高的一个，然后在通过包含正则表达式的进行匹配，如果能匹配到直接访问，匹配不到，就使用刚才匹配度最高的那个location来处理请求。 location 匹配 不带符号 要求必须以指定模式开始。 server { listen 80; server_name 127.0.0.1; location /abc{ default_type text/plain; return 200 \"access success\"; } } # 以下都能匹配到 # http://192.168.200.133/abc # http://192.168.200.133/abc?p1=TOM # http://192.168.200.133/abc/ # http://192.168.200.133/abcdef = 前缀 用于不包含正则表达式的uri前，必须与指定的模式精确匹配。 server { listen 80; server_name 127.0.0.1; location =/abc{ default_type text/plain; return 200 \"access success\"; } } # 可以匹配到 # http://192.168.200.133/abc # http://192.168.200.133/abc?p1=TOM # 匹配不到 # http://192.168.200.133/abc/ # http://192.168.200.133/abcdef ~ 和 ~* 前缀 ~ ： 用于表示当前uri中包含了正则表达式，并且区分大小写。 ~*：用于表示当前uri中包含了正则表达式，并且不区分大小写。 如果uri包含了正则表达式，需要用上述两个符合来标识。 server { listen 80; server_name 127.0.0.1; location ~^/abc\\w${ default_type text/plain; return 200 \"access success\"; } } server { listen 80; server_name 127.0.0.1; location ~*^/abc\\w${ default_type text/plain; return 200 \"access success\"; } } ^~ 前缀 用于不包含正则表达式的uri前，功能和不加符号的一致，唯一不同的是，如果模式匹配，那么就停止搜索其他模式了。 server { listen 80; server_name 127.0.0.1; location ^~/abc{ default_type text/plain; return 200 \"access success\"; } } @ 前缀 使用location的@符合完成错误信息展示。 server{ error_page 404 @jump_to_error; location @jump_to_error { default_type text/plain; return 404 'Not Found Page...'; } } root指令 设置请求的根目录。 可以在 http、server、location 中。 —————–语法—————– 默认值 示例 root path html root html path 为Nginx服务器接收到请求以后查找资源的根目录路径。 alias指令 更改location的URI。 —————–语法—————– 默认值 示例 alias path alias /usr/local/nginx/htm path为修改后的根路径。 root和alias指令的区别 在/usr/local/nginx/html目录下创建一个 images目录,并在目录下放入一张图片mv.png图片。 location /images { root /usr/local/nginx/html; } # 访问图片的路径为: http://127.0.0.1/images/mv.png 能成功 如果把root改为alias。 location /images { alias /usr/local/nginx/html; } # 再次访问上述地址，页面会出现404的错误，因为地址不对 oot的处理结果是: root路径+location路径，/usr/local/nginx/html/images/mv.png。 alias的处理结果是:使用alias路径替换location路径，/usr/local/nginx/html/mv.png。 修改成这样，alias /usr/local/nginx/html/images;就能访问到。 如果location路径是以/结尾,则alias也必须是以/结尾，root没有要求。 location /images/ { alias /usr/local/nginx/html/images; } # 访问就会出问题，查看错误日志还是路径不对，所以需要把alias后面加上 / index指令 设置网站的默认首页。 可以在 http、server、location 中。 —————–语法—————– 默认值 示例 index file … index.html index index.html index后面可以跟多个设置，如果访问的时候没有指定具体访问的资源，则会依次进行查找，找到第一个为止。 location / { root /usr/local/nginx/html; index index.html index.htm; } # 访问该location的时候，可以通过 http://ip:port/， # 地址后面如果不添加任何内容，则默认依次访问index.html和index.htm， # 找到第一个来进行返回 error_page指令 设置网站的错误页面。可以在 http、server、location 中。 语法：error_page code … [=[response]] uri。 可以指定具体跳转的地址。 server { error_page 404 http://www.baidu.cn; } 指定重定向地址。 server{ error_page 404 /50x.html; error_page 500 502 503 504 /50x.html; location =/50x.html{ root html; } } 使用location的@符合完成错误信息展示。 server{ error_page 404 @jump_to_error; location @jump_to_error { default_type text/plain; return 404 'Not Found Page...'; } } =[response]的作用是用来将相应代码更改为另外一个。 server{ error_page 404 =200 /50x.html; location =/50x.html{ root html; } } ",
+  "wordCount" : "462",
   "inLanguage": "zh",
   "image": "https://heliu.site/favicon-32x32.png","datePublished": "2021-05-11T00:00:00Z",
   "dateModified": "2021-05-11T00:00:00Z",
@@ -252,12 +252,12 @@
     <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
     <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
     <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
-</svg><span>381字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>462字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="12" r="9"></circle>
     <polyline points="12 7 12 12 15 15"></polyline>
-</svg><span>2分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>3分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="7" r="4"></circle>
@@ -312,17 +312,20 @@
                     <li>
                         <a href="#-%e5%92%8c--%e5%89%8d%e7%bc%80" aria-label="~ 和 ~* 前缀">~ 和 ~* 前缀</a></li>
                     <li>
-                        <a href="#-%e5%89%8d%e7%bc%80-1" aria-label="^~ 前缀">^~ 前缀</a></li></ul>
+                        <a href="#-%e5%89%8d%e7%bc%80-1" aria-label="^~ 前缀">^~ 前缀</a></li>
+                    <li>
+                        <a href="#-%e5%89%8d%e7%bc%80-2" aria-label="@ 前缀">@ 前缀</a></li></ul>
                     </li>
                     <li>
                         <a href="#root%e6%8c%87%e4%bb%a4" aria-label="root指令">root指令</a></li>
                     <li>
                         <a href="#alias%e6%8c%87%e4%bb%a4" aria-label="alias指令">alias指令</a></li>
                     <li>
-                        <a href="#index%e6%8c%87%e4%bb%a4" aria-label="index指令">index指令</a>
+                        <a href="#index%e6%8c%87%e4%bb%a4" aria-label="index指令">index指令</a></li></ul>
                     </li>
-                </ul>
-                </li>
+                    <li>
+                        <a href="#error_page%e6%8c%87%e4%bb%a4" aria-label="error_page指令">error_page指令</a>
+                    </li>
                 </ul>
                 </li>
                 </ul>
@@ -618,6 +621,17 @@ listen port [default_server]...;
 </span></span><span class="line"><span class="cl">        return 200 &#34;access success&#34;;
 </span></span><span class="line"><span class="cl">    }
 </span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><h5 id="-前缀-2">@ 前缀<a hidden class="anchor" aria-hidden="true" href="#-前缀-2">#</a></h5>
+<ol>
+<li>使用location的@符合完成错误信息展示。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">server{
+</span></span><span class="line"><span class="cl">    error_page 404 @jump_to_error;
+</span></span><span class="line"><span class="cl">    location @jump_to_error {
+</span></span><span class="line"><span class="cl">        default_type text/plain;
+</span></span><span class="line"><span class="cl">        return 404 &#39;Not Found Page...&#39;;
+</span></span><span class="line"><span class="cl">    }
+</span></span><span class="line"><span class="cl">}
 </span></span></code></pre></div><h4 id="root指令">root指令<a hidden class="anchor" aria-hidden="true" href="#root指令">#</a></h4>
 <ol>
 <li>设置请求的根目录。</li>
@@ -733,6 +747,44 @@ listen port [default_server]...;
 </span></span><span class="line"><span class="cl"># 访问该location的时候，可以通过 http://ip:port/，
 </span></span><span class="line"><span class="cl"># 地址后面如果不添加任何内容，则默认依次访问index.html和index.htm，
 </span></span><span class="line"><span class="cl"># 找到第一个来进行返回
+</span></span></code></pre></div><h3 id="error_page指令">error_page指令<a hidden class="anchor" aria-hidden="true" href="#error_page指令">#</a></h3>
+<ol>
+<li>设置网站的错误页面。可以在 http、server、location 中。</li>
+<li>语法：<strong>error_page code &hellip; [=[response]] uri</strong>。</li>
+<li>可以指定具体跳转的地址。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">server {
+</span></span><span class="line"><span class="cl">    error_page 404 http://www.baidu.cn;
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><ol start="4">
+<li>指定重定向地址。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">server{
+</span></span><span class="line"><span class="cl">    error_page 404 /50x.html;
+</span></span><span class="line"><span class="cl">    error_page 500 502 503 504 /50x.html;
+</span></span><span class="line"><span class="cl">    location =/50x.html{
+</span></span><span class="line"><span class="cl">        root html;
+</span></span><span class="line"><span class="cl">    }
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><ol start="5">
+<li>使用location的@符合完成错误信息展示。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">server{
+</span></span><span class="line"><span class="cl">    error_page 404 @jump_to_error;
+</span></span><span class="line"><span class="cl">    location @jump_to_error {
+</span></span><span class="line"><span class="cl">        default_type text/plain;
+</span></span><span class="line"><span class="cl">        return 404 &#39;Not Found Page...&#39;;
+</span></span><span class="line"><span class="cl">    }
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><ol start="6">
+<li><code>=[response]</code>的作用是用来将相应代码更改为另外一个。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">server{
+</span></span><span class="line"><span class="cl">    error_page 404 =200 /50x.html;
+</span></span><span class="line"><span class="cl">    location =/50x.html{
+</span></span><span class="line"><span class="cl">        root html;
+</span></span><span class="line"><span class="cl">    }
+</span></span><span class="line"><span class="cl">}
 </span></span></code></pre></div>
 
   </div>
@@ -746,6 +798,11 @@ listen port [default_server]...;
     <span class="title">« 上一页</span>
     <br>
     <span>nginx nginx.cnf</span>
+  </a>
+  <a class="next" href="https://heliu.site/posts/nginx/static/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>nginx 静态资源优化</span>
   </a>
 </nav>
 

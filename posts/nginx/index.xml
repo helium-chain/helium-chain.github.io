@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Tue, 11 May 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 16 Aug 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://heliu.site/posts/nginx/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>nginx 安装部署</title>
@@ -33,7 +33,28 @@
       <link>https://heliu.site/posts/nginx/server/</link>
       <pubDate>Tue, 11 May 2021 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/nginx/server/</guid>
-      <description>nginx 防盗链、Rewrite。</description>
+      <description>nginx server块介绍。</description>
+    </item>
+    <item>
+      <title>nginx 静态资源优化</title>
+      <link>https://heliu.site/posts/nginx/static/</link>
+      <pubDate>Mon, 17 May 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/nginx/static/</guid>
+      <description>nginx 静态资源缓存、压缩、防盗链。</description>
+    </item>
+    <item>
+      <title>nginx Rewrite</title>
+      <link>https://heliu.site/posts/nginx/rewrite/</link>
+      <pubDate>Sat, 29 May 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/nginx/rewrite/</guid>
+      <description>nginx 重写地址。</description>
+    </item>
+    <item>
+      <title>nginx 反向代理</title>
+      <link>https://heliu.site/posts/nginx/proxy/</link>
+      <pubDate>Fri, 16 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/nginx/proxy/</guid>
+      <description>nginx 反向代理及SSL。</description>
     </item>
   </channel>
 </rss>
