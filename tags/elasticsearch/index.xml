@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Elasticsearch on Helium</title>
+    <link>https://heliu.site/tags/elasticsearch/</link>
+    <description>Recent content in Elasticsearch on Helium</description>
+    <image>
+      <title>Helium</title>
+      <url>https://heliu.site/favicon-32x32.png</url>
+      <link>https://heliu.site/favicon-32x32.png</link>
+    </image>
+    <generator>Hugo -- 0.128.2</generator>
+    <language>zh</language>
+    <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
+    <lastBuildDate>Fri, 27 Aug 2021 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://heliu.site/tags/elasticsearch/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>正向索引和倒排索引</title>
+      <link>https://heliu.site/posts/elasticsearch/desc/</link>
+      <pubDate>Fri, 16 Jul 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/elasticsearch/desc/</guid>
+      <description>es 正向索引和倒排索引简介。</description>
+    </item>
+    <item>
+      <title>文档和索引</title>
+      <link>https://heliu.site/posts/elasticsearch/intro/</link>
+      <pubDate>Sat, 17 Jul 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/elasticsearch/intro/</guid>
+      <description>es 文档和索引简介。</description>
+    </item>
+    <item>
+      <title>安装</title>
+      <link>https://heliu.site/posts/elasticsearch/install/</link>
+      <pubDate>Wed, 21 Jul 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/elasticsearch/install/</guid>
+      <description>elasticsearch、kibana安装简介。</description>
+    </item>
+    <item>
+      <title>mappings</title>
+      <link>https://heliu.site/posts/elasticsearch/mapping/</link>
+      <pubDate>Tue, 27 Jul 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/elasticsearch/mapping/</guid>
+      <description>索引的创建、修改、删除。</description>
+    </item>
+    <item>
+      <title>settings</title>
+      <link>https://heliu.site/posts/elasticsearch/settings/</link>
+      <pubDate>Fri, 06 Aug 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/elasticsearch/settings/</guid>
+      <description>设置当前索引的分片数，副本数等信息。</description>
+    </item>
+    <item>
+      <title>Aliases</title>
+      <link>https://heliu.site/posts/elasticsearch/aliases/</link>
+      <pubDate>Fri, 27 Aug 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/elasticsearch/aliases/</guid>
+      <description>ElasticSearch 索引别名设置。</description>
+    </item>
+  </channel>
+</rss>

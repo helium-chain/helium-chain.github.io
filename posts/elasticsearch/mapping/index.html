@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>mappings | Helium</title>
+<meta name="keywords" content="elasticsearch">
+<meta name="description" content="索引的创建、修改、删除。">
+<meta name="author" content="helium">
+<link rel="canonical" href="https://heliu.site/posts/elasticsearch/mapping/">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://heliu.site/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/elasticsearch/mapping/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono-nl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.6.0/style.css" />
+    <style>
+        body {
+            font-family: "LXGW WenKai Lite", sans-serif;
+            font-family: "LXGW WenKai Screen", sans-serif;
+        }
+    </style>
+</head>
+</html>
+
+  
+
+<meta property="og:title" content="mappings" />
+<meta property="og:description" content="索引的创建、修改、删除。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://heliu.site/posts/elasticsearch/mapping/" />
+<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-07-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-07-27T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:title" content="mappings"/>
+<meta name="twitter:description" content="索引的创建、修改、删除。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Article",
+      "item": "https://heliu.site/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "ElasticSearch 笔记",
+      "item": "https://heliu.site/posts/elasticsearch/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "mappings",
+      "item": "https://heliu.site/posts/elasticsearch/mapping/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "mappings",
+  "name": "mappings",
+  "description": "索引的创建、修改、删除。",
+  "keywords": [
+    "elasticsearch"
+  ],
+  "articleBody": " mapping是对索引库中文档的约束。 Mapping 属性 type 字段类型，常用的有 text、keyword、integer等。 index 字段是否建立倒排索引，默认为true。 false情况下不能被搜索，但支持集合分析。 index属性用于控制字段值是否应该被索引，即是否可以在搜索时使用这些值。这个属性通常与字段类型定义一起使用，特别是在创建或更新索引的映射（mapping）时。 作用： 索引：如果字段被设置为index: true（默认值），那么Elasticsearch会为该字段创建倒排索引，这使得你可以通过该字段进行搜索。 不索引：如果字段被设置为index: false，那么Elasticsearch不会为该字段创建倒排索引，因此你无法通过该字段进行搜索，但是该字段的值仍然会存储在 _source 中。 使用场景： 当你有一个字段，它的值不需要被搜索，但是你希望将其值存储在 _source 中以供后续使用，可以将index属性设置为false。 如果你希望加快索引的速度并减少索引的大小，可以选择性地索引某些字段。 与enabled属性不同，index属性可以用来控制字段是否可搜索，而enabled属性则可以完全禁用字段的索引和存储。 示例： PUT /my_index { \"mappings\": { \"properties\": { \"field1\": { \"type\": \"text\", \"index\": true // 默认值，可省略 }, \"field2\": { \"type\": \"keyword\", \"index\": false // 不可搜索，但存在于 _source 中 } } } } enable 字段是否建立倒排索引以及doc value，enabled属性是用来控制字段是否会被索引和搜索的。 可以为每个字段设置enabled属性。 作用： 索引：如果字段被设置为enabled: true（默认值），那么该字段的值会被索引，并且可以在搜索时使用。 搜索：如果字段被设置为enabled: false，那么该字段的值不会被索引，因此不能在搜索时使用，但是仍然可以在文档的源字段中看到。 使用场景： 当你有一个字段，它的数据量非常大，但你又不希望在搜索时使用它，可以将其enabled属性设置为false来节省索引空间。 在某些情况下，你可能希望只存储某些信息而不进行分析或搜索，这时候也可以将字段的enabled属性设置为false。 使用示例： PUT /my_index { \"mappings\": { \"properties\": { \"field1\": { \"type\": \"text\", \"enabled\": true // 默认值，可省略 }, \"field2\": { \"type\": \"keyword\", \"enabled\": false // 既不可搜索也不存在于 _source 中 } } } } 与index区别： 索引与存储：index控制字段是否可搜索，但不影响字段是否存储在 _source 中。enabled控制字段是否被索引和存储。 影响：设置index: false，字段仍然存储在 _source 中，但不参与搜索。设置enabled: false，字段既不索引也不存储。 使用场景：如果你希望字段不参与搜索但仍然想保留其原始值，使用index: false。如果你不希望字段以任何形式出现在Elasticsearch中，使用enabled: false。 store 默认false，字段是否额外存储，如果需要查询获取的字段只是文档中的小数据，这些字段可以store，减少IO。而且这个存储是独于 _source 的存储的。 store属性用于控制字段值是否应该被独立存储，这意味着字段值可以被单独检索，而不需要从整个文档的 _source 字段中提取。 作用： 独立存储：如果字段被设置为store: true，那么该字段的值会被独立存储在Elasticsearch中，这意味着你可以通过单独的字段检索来获取它的值。 不独立存储：如果字段被设置为store: false（默认值），那么该字段的值不会独立存储，但它仍然会作为 _source 的一部分被存储。 使用场景： 当你经常需要从Elasticsearch中检索特定字段的值，而不需要检索整个文档时，将store属性设置为true可以提高检索效率。 如果文档非常大，而你只需要访问其中的几个字段，那么独立存储这些字段可以节省磁盘空间，因为你不需要存储整个 _source。 示例： PUT /my_index { \"mappings\": { \"properties\": { \"field1\": { \"type\": \"text\", \"store\": true // 独立存储字段值 }, \"field2\": { \"type\": \"keyword\", \"store\": false // 默认值，不独立存储字段值 } } } } 注意事项： 设置store: true会增加Elasticsearch的存储需求，因为每个字段值都需要额外存储。 即使将store设置为true，如果index设置为false，该字段仍然不会被索引，因此无法用于搜索。 如果你不需要从 _source 中检索整个文档，而是只需要特定的几个字段，那么独立存储这些字段可以减少网络传输的数据量。 doc_values 默认true，优化字段排序聚合脚本访问，耗用磁盘空间。 fields 多字段特性。让一个字段拥有多个子字段类型，使得一个字段能够被多个不同的索引方式进行索引。 norms 默认为true，是否支持评分，如果字段只用来过滤和聚合分析，而不需要被评分，那么可以设置为false； type 为 text 时，默认为 true；而 type 为 keyword 时，默认为 false。 analyzer 指定索引和搜索时的分析器，如果同时指定 search_analyzer 则搜索时会优先使用 search_analyzer。 search_analyzer 指定搜索时的分析器，搜索时的优先级最高。 fielddata 默认false，针对text类型排序、聚合、脚本访问优化，尽量避免，操作昂贵。 index_options 用于设置倒排（索引）列表包含的信息，这些信息用于搜索（Search）和高亮显示： docs：只索引文档编号(Doc Number)； freqs：索引文档编号和词频率（term frequency）； positions：索引文档编号，词频率和词位置（序号）； offsets：索引文档编号，词频率，词偏移量（开始和结束位置）和词位置（序号）。 默认情况下，被分词的字符串（analyzed string）字段使用 positions，其他字段默认使用 docs。 此外，需要注意的是 index_option 是 elasticsearch 特有的设置属性；临近搜索和短语查询时，index_option 必须设置为 offsets，同时高亮也可使用 postings highlighter。记录内容越多，占用存储空间越大。 type 字符串类型 text 会做分词处理，如果一个字段要被全文搜索，应该使用text类型。 设置 text 类型后，字段内容会被分析，在生成倒排索引前，字符串会被分词器分成一个个词条。 text类型的字段不用于排序，且很少用于聚合(Terms Aggregation除外)。 keyword 不会做分词处理，只能通过精确值搜索到。 该类型适用于索引结构化的字段，通常用于过滤、排序、聚合。 注意：ES5以后，不推荐使用string类型。 数字类型 对于数字类型的字段，在满足需求情况下，尽量选择范围小的数据类型。 字段的长度越短，搜因和搜索的效率越高。 对于浮点数来说, 优先考虑使用 scaled_float 类型。 scaled_float 是通过缩放因子把浮点数变成 long 类型，比如价格只需要精确到分，price 字段的取值为 57.34，设置放大因子为 100，存储起来就是 5734。 所有的 API 都会把 price 的取值当作浮点数，事实上 Elasticsearch 底层存储的是整数类型，因为压缩整数比压缩浮点数更加节省存储空间 ——-类型——- ——-取值范围——- 说明 byte -128 ~ 127 无符号1字节 short -32768 ~ 32767 无符号2字节 integer -2^31 ~ 2^31-1 无符号4字节 long -2^63 ~ 2^63-1 无符号8字节 double 64位双精度IEE754浮点类型 双精度浮点8字节 float 32位单精度IEE754浮点类型 单精度浮点4字节 half_float 16位半精度IEE754浮点类型 2字节 scaled_float 缩放类型浮点数 8字节 日期类型 date 在 ES 中的日期可以是以下几种形式： 格式化日期的字符串，如 “2015-01-01” 或 “2015/01/01 12:10:30” 毫秒时间戳 秒级时间戳 需要注意的是，ES内部会把日期转换为 UTC（世界标准时间），并将其存储为毫秒时间戳，这样做的原因是和字符串相比，数值在存储和处理时更快。 布尔类型 boolean 如果一个字段是布尔类型，可接受的值为 true、false。 Elasticsearch 5.4 版本以前，可以接受被解释为 true 或 false 的字符串和数字，5.4 版本以后只接受 true、false、”true”、”false”。 二进制类型 binary binary 类型数据格式为base64 编码的字符串，默认「不额外存储，也不可搜索」。 范围类型 range integer_range -2^31 至 2^31-1 long_range -2^63 至 2^63-1 float_range 32-bit IEEE 754 double_range 64-bit IEEE 754 date_range 64 位整数，毫秒计时 数组类型 ES中没有专用的数组类型，默认情况下任何字段都可以包含0个或者多个值，但是一个数组中的值必须是同一种类型。 整型数组：[1,3] 嵌套数组：[1,[2,3]]，等价于 [1,2,3] 对象数组: [{“name”: “lili”, “age”: “18”}, {“name”: “liming”, “age”: “20”} ] 动态添加数据时，数组的第一个值的类型决定整个数组的类型。混合数组类型是不支持的，比如：[1，”abc”]。 数组可以包含 null 值，空数组[ ]会被当作 missing field 对待。在文档中使用 array 类型不需要提前做任何配置，默认支持 对象类型 对象类型很好理解，即JSON对象，需要注意的是，es中会对嵌套的JSON对象做扁平化处理。 例如如下数据: { \"name\":\"lili\", \"friend\":[ \"name\":\"xiaohong\" ] } // 存储的时候变成这样: { \"name\":\"lili\", \"friend.name\":\"xiaohong\" } 嵌套类型 嵌套类型是一种特殊的对象类型，es本身会对对象类型字段做扁平化处理，那么当存储的对象类型为对象数组时，会出现关联关系失效的情况。 { \"name\":\"lili\", \"friends\":[ { \"name\":\"xiaohong\", \"age\": 18 }, { \"name\":\"xiaoming\", \"age\": 20 } ] } // 处理后: { \"name\":\"lili\", \"friends.name\":[\"xiaohong\",\"xiaoming\"], \"friend.age\":[18, 20] } IP类型 ip 类型的字段用于存储 IPv4 或者 IPv6 的地址。如”192.168.1.1”或”192.168.0.0/16”。 令牌计数类型 (token_count) token_count 用于统计text分词后的词条个数，本质上是一个整数型字段。举个例子，映射中指定 name 为 text 类型，增加name.length 字段用于统计分词后词项的长度，类型为 token_count，分词器为标准分词器，命令如下： { \"mappings\": { \"my_type\": { \"properties\": { \"name\": { \"type\": \"text\", \"fields\": { \"length\": { \"type\": \"token_count\", \"analyzer\": \"standard\" } } } } } } } 索引库的CRUD 创建 基本语法： 请求方法：PUT 请求路径：/索引名称 请求参数：mapping 有这样一条文档，需要创建索引。 age：类型为 byte；参与搜索，因此需要index为true；无需分词器。 weight：类型为float；参与搜索，因此需要index为true；无需分词器。 isMarried：类型为boolean；参与搜索，因此需要index为true；无需分词器。 info：类型为字符串，需要分词，因此是text；参与搜索，因此需要index为true；分词器可以用ik_smart。 email：类型为字符串，但是不需要分词，因此是keyword；不参与搜索，因此需要index为false；无需分词器。 score：虽然是数组，但是我们只看元素的类型，类型为float；参与搜索，因此需要index为true；无需分词器。 name：类型为object，需要定义多个子属性 name.firstName；类型为字符串，但是不需要分词，因此是keyword；参与搜索，因此需要index为true；无需分词器。 name.lastName；类型为字符串，但是不需要分词，因此是keyword；参与搜索，因此需要index为true；无需分词器。 注意：所有的索引名都必须要小写。 { \"age\": 21, \"weight\": 52.4, \"isMarried\": false, \"info\": \"美好的一天从清晨开始\", \"email\": \"123456@qq.cn\", \"score\": [99.1, 95.5, 98.9], \"name\": { \"firstName\": \"三\", \"lastName\": \"张\" } } 创建demo。 PUT /users { \"mappings\": { \"properties\": { \"age\": { \"type\": \"byte\" }, \"weight\": { \"type\": \"float\" }, \"isMarried\": { \"type\": \"boolean\" }, \"info\": { \"type\": \"text\", \"analyzer\": \"ik_smart\", \"search_analyzer\": \"ik_max_smart\" }, \"email\": { \"type\": \"keyword\", \"index\": \"false\" }, \"score\": { \"type\": \"float\" } \"name\": { \"properties\": { \"firstName\": { \"type\": \"keyword\", \"index\": \"false\" }, \"lastName\": { \"type\": \"keyword\", \"index\": \"false\" } } } } } } 查询 基本语法： 请求方法：GET 请求路径：/索引名称 请求参数：无 GET /users 修改 基本语法：\n请求方法：PUT 请求路径：/索引名称/_mapping 请求参数：properties。 倒排索引结构虽然不复杂，但是一旦数据结构改变（比如改变了分词器），就需要重新创建倒排索引，这简直是灾难。因此索引库一旦创建，无法修改mapping。\n虽然无法修改mapping中已有的字段，但是却允许添加新的字段到mapping中，因为不会对倒排索引产生影响。\nPUT /users/_mapping { \"properties\": { \"score\": { \"type\": \"float\" } } } 删除 基本语法： 请求方法：DELETE 请求路径：/索引名称 请求参数：无 DELETE /users ",
+  "wordCount" : "581",
+  "inLanguage": "zh",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2021-07-27T00:00:00Z",
+  "dateModified": "2021-07-27T00:00:00Z",
+  "author":[{
+    "@type": "Person",
+    "name": "helium"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://heliu.site/posts/elasticsearch/mapping/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Helium",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://heliu.site/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+                    height="35">Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://heliu.site/" title="主页">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/posts" title="文章">
+                    <span>Article</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/archives" title="时间轴">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/tags/" title="标签">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/support" title="打赏">
+                    <span>🫶Help</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+
+<article class="post" autonumbering>
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/elasticsearch/">ElasticSearch 笔记</a></div>
+    <h1 class="post-title entry-hint-parent">
+      mappings
+    </h1>
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2021-07-27</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2021-07-27</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select: text;">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="user-select: text;"></path>
+    <polyline points="14 2 14 8 20 8" style="user-select: text;"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
+    <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
+    <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
+</svg><span>581字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="9"></circle>
+    <polyline points="12 7 12 12 15 15"></polyline>
+</svg><span>3分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+</svg><span>helium</span></span>
+      <span class="x-post-meta-item">
+        &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
+        <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
+            <a href="https://heliu.site/tags/elasticsearch/" target="_blank" rel="noopener">Elasticsearch</a>
+        </ul>
+      </span>
+      
+      <span id="busuanzi_container_page_pv" class="x-post-meta-item">
+        &nbsp;<svg t="1720844685710" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="27237" width="200" height="200"><path d="M739.754667 574.08c-121.386667 45.610667-208.469333 169.813333-208.64 316.16 0 33.408 4.693333 65.493333 13.141333 95.914667H94.122667c-26.453333-43.52-41.685333-91.946667-41.685334-143.189334 0-185.173333 192.896-335.104 430.805334-335.104 96.256 0 184.832 24.746667 256.512 66.218667z m-280.490667-114.986667a214.869333 214.869333 0 0 1-214.869333-215.04A215.04 215.04 0 0 1 459.264 28.842667a215.04 215.04 0 0 1 215.04 215.210666 215.04 215.04 0 0 1-215.04 215.04zM974.506667 641.28c9.856 0 17.834667 7.466667 17.834666 16.64v59.989333c-0.341333 8.789333-7.850667 15.786667-17.28 16.085334-9.856 0.341333-18.176-6.826667-18.517333-16.085334v-20.053333l-99.114667 91.093333-0.256 0.256a18.474667 18.474667 0 0 1-14.848 4.352h-0.768a18.176 18.176 0 0 1-9.344-4.608l-0.938666-0.981333-85.930667-80.042667-123.562667 115.072a18.773333 18.773333 0 0 1-25.216 0 15.786667 15.786667 0 0 1 0-23.466666l136.149334-126.848 0.725333-0.597334a18.645333 18.645333 0 0 1 24.362667 0.512l87.253333 81.237334 86.058667-79.232h-21.248c-9.386667-0.298667-16.938667-7.338667-17.28-16.085334-0.341333-9.173333 7.381333-16.896 17.28-17.237333h64.64z m-367.146667 240h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v72.192a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042667-16.042666v-72.192c0-8.874667 7.210667-16.042667 16.042667-16.042667z m110.805333-106.666667h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v178.858667a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042666v-178.858667c0-8.874667 7.168-16.042667 16.042666-16.042667z m106.538667 80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v99.413333a16.042667 16.042667 0 0 1-16.042667 16.042667H824.746667a16.042667 16.042667 0 0 1-16.042667-16.042667v-99.413333c0-8.874667 7.168-16.042667 16.042667-16.042667z m110.165333-80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v179.413333a16.042667 16.042667 0 0 1-16.042667 16.042667h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042667v-179.413333c0-8.874667 7.210667-16.042667 16.042666-16.042667z" fill="#999999" p-id="27238"></path></svg>
+        <span id="busuanzi_value_page_pv"></span>
+      </span>
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#mapping-%e5%b1%9e%e6%80%a7" aria-label="Mapping 属性">Mapping 属性</a><ul>
+                            
+                    <li>
+                        <a href="#type" aria-label="type">type</a></li>
+                    <li>
+                        <a href="#index" aria-label="index">index</a></li>
+                    <li>
+                        <a href="#enable" aria-label="enable">enable</a></li>
+                    <li>
+                        <a href="#store" aria-label="store">store</a></li>
+                    <li>
+                        <a href="#doc_values" aria-label="doc_values">doc_values</a></li>
+                    <li>
+                        <a href="#fields" aria-label="fields">fields</a></li>
+                    <li>
+                        <a href="#norms" aria-label="norms">norms</a></li>
+                    <li>
+                        <a href="#analyzer" aria-label="analyzer">analyzer</a></li>
+                    <li>
+                        <a href="#search_analyzer" aria-label="search_analyzer">search_analyzer</a></li>
+                    <li>
+                        <a href="#fielddata" aria-label="fielddata">fielddata</a></li>
+                    <li>
+                        <a href="#index_options" aria-label="index_options">index_options</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#type-1" aria-label="type">type</a><ul>
+                            
+                    <li>
+                        <a href="#%e5%ad%97%e7%ac%a6%e4%b8%b2%e7%b1%bb%e5%9e%8b" aria-label="字符串类型">字符串类型</a><ul>
+                            
+                    <li>
+                        <a href="#text" aria-label="text">text</a></li>
+                    <li>
+                        <a href="#keyword" aria-label="keyword">keyword</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e6%95%b0%e5%ad%97%e7%b1%bb%e5%9e%8b" aria-label="数字类型">数字类型</a></li>
+                    <li>
+                        <a href="#%e6%97%a5%e6%9c%9f%e7%b1%bb%e5%9e%8b" aria-label="日期类型">日期类型</a><ul>
+                            
+                    <li>
+                        <a href="#date" aria-label="date">date</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e5%b8%83%e5%b0%94%e7%b1%bb%e5%9e%8b" aria-label="布尔类型">布尔类型</a><ul>
+                            
+                    <li>
+                        <a href="#boolean" aria-label="boolean">boolean</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e4%ba%8c%e8%bf%9b%e5%88%b6%e7%b1%bb%e5%9e%8b" aria-label="二进制类型">二进制类型</a><ul>
+                            
+                    <li>
+                        <a href="#binary" aria-label="binary">binary</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e8%8c%83%e5%9b%b4%e7%b1%bb%e5%9e%8b" aria-label="范围类型">范围类型</a><ul>
+                            
+                    <li>
+                        <a href="#range" aria-label="range">range</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e6%95%b0%e7%bb%84%e7%b1%bb%e5%9e%8b" aria-label="数组类型">数组类型</a></li>
+                    <li>
+                        <a href="#%e5%af%b9%e8%b1%a1%e7%b1%bb%e5%9e%8b" aria-label="对象类型">对象类型</a></li>
+                    <li>
+                        <a href="#%e5%b5%8c%e5%a5%97%e7%b1%bb%e5%9e%8b" aria-label="嵌套类型">嵌套类型</a></li>
+                    <li>
+                        <a href="#ip%e7%b1%bb%e5%9e%8b" aria-label="IP类型">IP类型</a></li>
+                    <li>
+                        <a href="#%e4%bb%a4%e7%89%8c%e8%ae%a1%e6%95%b0%e7%b1%bb%e5%9e%8b-token_count" aria-label="令牌计数类型 (token_count)">令牌计数类型 (token_count)</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e7%b4%a2%e5%bc%95%e5%ba%93%e7%9a%84crud" aria-label="索引库的CRUD">索引库的CRUD</a><ul>
+                            
+                    <li>
+                        <a href="#%e5%88%9b%e5%bb%ba" aria-label="创建">创建</a></li>
+                    <li>
+                        <a href="#%e6%9f%a5%e8%af%a2" aria-label="查询">查询</a></li>
+                    <li>
+                        <a href="#%e4%bf%ae%e6%94%b9" aria-label="修改">修改</a></li>
+                    <li>
+                        <a href="#%e5%88%a0%e9%99%a4" aria-label="删除">删除</a>
+                    </li>
+                </ul>
+                </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+  <div class="post-content"><ul>
+<li>mapping是对索引库中文档的约束。</li>
+</ul>
+<h2 id="mapping-属性">Mapping 属性<a hidden class="anchor" aria-hidden="true" href="#mapping-属性">#</a></h2>
+<h3 id="type">type<a hidden class="anchor" aria-hidden="true" href="#type">#</a></h3>
+<ol>
+<li>字段类型，常用的有 text、keyword、integer等。</li>
+</ol>
+<h3 id="index">index<a hidden class="anchor" aria-hidden="true" href="#index">#</a></h3>
+<ol>
+<li>字段是否建立<strong>倒排索引</strong>，默认为true。</li>
+<li>false情况下不能被搜索，但支持集合分析。</li>
+<li>index属性用于控制字段值是否应该被索引，即是否可以在搜索时使用这些值。这个属性通常与字段类型定义一起使用，特别是在创建或更新索引的映射（mapping）时。</li>
+<li>作用：
+<ul>
+<li>索引：如果字段被设置为index: true（默认值），那么Elasticsearch会为该字段创建倒排索引，这使得你可以通过该字段进行搜索。</li>
+<li>不索引：如果字段被设置为index: false，那么Elasticsearch不会为该字段创建倒排索引，因此你无法通过该字段进行搜索，但是该字段的值仍然会存储在 _source 中。</li>
+</ul>
+</li>
+<li>使用场景：
+<ul>
+<li>当你有一个字段，它的值不需要被搜索，但是你希望将其值存储在 _source 中以供后续使用，可以将index属性设置为false。</li>
+<li>如果你希望加快索引的速度并减少索引的大小，可以选择性地索引某些字段。</li>
+</ul>
+</li>
+<li>与enabled属性不同，index属性可以用来控制字段是否可搜索，而enabled属性则可以完全禁用字段的索引和存储。</li>
+<li>示例：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="err">PUT</span> <span class="err">/my_index</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;mappings&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;field1&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;text&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;index&#34;</span><span class="p">:</span> <span class="kc">true</span>  <span class="c1">// 默认值，可省略
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="p">},</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;field2&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;keyword&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;index&#34;</span><span class="p">:</span> <span class="kc">false</span> <span class="c1">// 不可搜索，但存在于 _source 中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="enable">enable<a hidden class="anchor" aria-hidden="true" href="#enable">#</a></h3>
+<ol>
+<li>字段是否建立倒排索引以及doc value，enabled属性是用来控制字段是否会被索引和搜索的。</li>
+<li>可以为每个字段设置enabled属性。</li>
+<li>作用：
+<ul>
+<li>索引：如果字段被设置为enabled: true（默认值），那么该字段的值会被索引，并且可以在搜索时使用。</li>
+<li>搜索：如果字段被设置为enabled: false，那么该字段的值不会被索引，因此不能在搜索时使用，但是仍然可以在文档的源字段中看到。</li>
+</ul>
+</li>
+<li>使用场景：
+<ul>
+<li>当你有一个字段，它的数据量非常大，但你又不希望在搜索时使用它，可以将其enabled属性设置为false来节省索引空间。</li>
+<li>在某些情况下，你可能希望只存储某些信息而不进行分析或搜索，这时候也可以将字段的enabled属性设置为false。</li>
+</ul>
+</li>
+<li>使用示例：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="err">PUT</span> <span class="err">/my_index</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;mappings&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;field1&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;text&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;enabled&#34;</span><span class="p">:</span> <span class="kc">true</span>  <span class="c1">// 默认值，可省略
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="p">},</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;field2&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;keyword&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;enabled&#34;</span><span class="p">:</span> <span class="kc">false</span> <span class="c1">// 既不可搜索也不存在于 _source 中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="6">
+<li>与index区别：
+<ul>
+<li>索引与存储：index控制字段是否可搜索，但不影响字段是否存储在 _source 中。enabled控制字段是否被索引和存储。</li>
+<li>影响：设置index: false，字段仍然存储在 _source 中，但不参与搜索。设置enabled: false，字段既不索引也不存储。</li>
+<li>使用场景：如果你希望字段不参与搜索但仍然想保留其原始值，使用index: false。如果你不希望字段以任何形式出现在Elasticsearch中，使用enabled: false。</li>
+</ul>
+</li>
+</ol>
+<h3 id="store">store<a hidden class="anchor" aria-hidden="true" href="#store">#</a></h3>
+<ol>
+<li>默认false，字段是否额外存储，如果需要查询获取的字段只是文档中的小数据，这些字段可以store，减少IO。而且这个存储是独于 _source 的存储的。</li>
+<li>store属性用于控制字段值是否应该被独立存储，这意味着字段值可以被单独检索，而不需要从整个文档的 _source 字段中提取。</li>
+<li>作用：
+<ul>
+<li>独立存储：如果字段被设置为store: true，那么该字段的值会被独立存储在Elasticsearch中，这意味着你可以通过单独的字段检索来获取它的值。</li>
+<li>不独立存储：如果字段被设置为store: false（默认值），那么该字段的值不会独立存储，但它仍然会作为 _source 的一部分被存储。</li>
+</ul>
+</li>
+<li>使用场景：
+<ul>
+<li>当你经常需要从Elasticsearch中检索特定字段的值，而不需要检索整个文档时，将store属性设置为true可以提高检索效率。</li>
+<li>如果文档非常大，而你只需要访问其中的几个字段，那么独立存储这些字段可以节省磁盘空间，因为你不需要存储整个 _source。</li>
+</ul>
+</li>
+<li>示例：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="err">PUT</span> <span class="err">/my_index</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;mappings&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;field1&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;text&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;store&#34;</span><span class="p">:</span> <span class="kc">true</span>  <span class="c1">// 独立存储字段值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="p">},</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;field2&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;keyword&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;store&#34;</span><span class="p">:</span> <span class="kc">false</span>  <span class="c1">// 默认值，不独立存储字段值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="6">
+<li>注意事项：
+<ul>
+<li>设置store: true会增加Elasticsearch的存储需求，因为每个字段值都需要额外存储。</li>
+<li>即使将store设置为true，如果index设置为false，该字段仍然不会被索引，因此无法用于搜索。</li>
+<li>如果你不需要从 _source 中检索整个文档，而是只需要特定的几个字段，那么独立存储这些字段可以减少网络传输的数据量。</li>
+</ul>
+</li>
+</ol>
+<h3 id="doc_values">doc_values<a hidden class="anchor" aria-hidden="true" href="#doc_values">#</a></h3>
+<ol>
+<li>默认true，优化字段排序聚合脚本访问，耗用磁盘空间。</li>
+</ol>
+<h3 id="fields">fields<a hidden class="anchor" aria-hidden="true" href="#fields">#</a></h3>
+<ol>
+<li>多字段特性。让一个字段拥有多个子字段类型，使得一个字段能够被多个不同的索引方式进行索引。</li>
+</ol>
+<h3 id="norms">norms<a hidden class="anchor" aria-hidden="true" href="#norms">#</a></h3>
+<ol>
+<li>默认为true，是否支持评分，如果字段只用来过滤和聚合分析，而不需要被评分，那么可以设置为false；</li>
+<li>type 为 text 时，默认为 true；而 type 为 keyword 时，默认为 false。</li>
+</ol>
+<h3 id="analyzer">analyzer<a hidden class="anchor" aria-hidden="true" href="#analyzer">#</a></h3>
+<ol>
+<li>指定索引和搜索时的分析器，如果同时指定 search_analyzer 则搜索时会优先使用 search_analyzer。</li>
+</ol>
+<h3 id="search_analyzer">search_analyzer<a hidden class="anchor" aria-hidden="true" href="#search_analyzer">#</a></h3>
+<ol>
+<li>指定搜索时的分析器，搜索时的优先级最高。</li>
+</ol>
+<h3 id="fielddata">fielddata<a hidden class="anchor" aria-hidden="true" href="#fielddata">#</a></h3>
+<ol>
+<li>默认false，针对text类型排序、聚合、脚本访问优化，尽量避免，操作昂贵。</li>
+</ol>
+<h3 id="index_options">index_options<a hidden class="anchor" aria-hidden="true" href="#index_options">#</a></h3>
+<ol>
+<li>用于设置倒排（索引）列表包含的信息，这些信息用于搜索（Search）和高亮显示：
+<ul>
+<li>docs：只索引文档编号(Doc Number)；</li>
+<li>freqs：索引文档编号和词频率（term frequency）；</li>
+<li>positions：索引文档编号，词频率和词位置（序号）；</li>
+<li>offsets：索引文档编号，词频率，词偏移量（开始和结束位置）和词位置（序号）。</li>
+</ul>
+</li>
+<li>默认情况下，被分词的字符串（analyzed string）字段使用 positions，其他字段默认使用 docs。</li>
+<li>此外，需要注意的是 index_option 是 elasticsearch 特有的设置属性；临近搜索和短语查询时，index_option 必须设置为 offsets，同时高亮也可使用 postings highlighter。记录内容越多，占用存储空间越大。</li>
+</ol>
+<h2 id="type-1">type<a hidden class="anchor" aria-hidden="true" href="#type-1">#</a></h2>
+<h3 id="字符串类型">字符串类型<a hidden class="anchor" aria-hidden="true" href="#字符串类型">#</a></h3>
+<h4 id="text">text<a hidden class="anchor" aria-hidden="true" href="#text">#</a></h4>
+<ol>
+<li><strong>会做分词处理</strong>，如果一个字段要被全文搜索，应该使用text类型。</li>
+<li>设置 text 类型后，字段内容会被分析，在生成倒排索引前，字符串会被分词器分成一个个词条。</li>
+<li>text类型的字段不用于排序，且很少用于聚合(Terms Aggregation除外)。</li>
+</ol>
+<h4 id="keyword">keyword<a hidden class="anchor" aria-hidden="true" href="#keyword">#</a></h4>
+<ol>
+<li><strong>不会做分词处理</strong>，只能通过<strong>精确值</strong>搜索到。</li>
+<li>该类型适用于索引结构化的字段，通常用于<strong>过滤</strong>、<strong>排序</strong>、<strong>聚合</strong>。</li>
+<li>注意：ES5以后，不推荐使用string类型。</li>
+</ol>
+<h3 id="数字类型">数字类型<a hidden class="anchor" aria-hidden="true" href="#数字类型">#</a></h3>
+<ol>
+<li>对于数字类型的字段，在满足需求情况下，尽量选择范围小的数据类型。</li>
+<li>字段的长度越短，搜因和搜索的效率越高。</li>
+<li>对于浮点数来说, 优先考虑使用 scaled_float 类型。</li>
+<li>scaled_float 是通过缩放因子把浮点数变成 long 类型，比如价格只需要精确到分，price 字段的取值为 57.34，设置放大因子为 100，存储起来就是 5734。</li>
+<li>所有的 API 都会把 price 的取值当作浮点数，事实上 Elasticsearch 底层存储的是整数类型，因为压缩整数比压缩浮点数更加节省存储空间</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">&mdash;&mdash;-类型&mdash;&mdash;-</th>
+<th style="text-align:center">&mdash;&mdash;-取值范围&mdash;&mdash;-</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">byte</td>
+<td style="text-align:center">-128 ~ 127</td>
+<td style="text-align:center">无符号1字节</td>
+</tr>
+<tr>
+<td style="text-align:center">short</td>
+<td style="text-align:center">-32768 ~ 32767</td>
+<td style="text-align:center">无符号2字节</td>
+</tr>
+<tr>
+<td style="text-align:center">integer</td>
+<td style="text-align:center">-2^31 ~ 2^31-1</td>
+<td style="text-align:center">无符号4字节</td>
+</tr>
+<tr>
+<td style="text-align:center">long</td>
+<td style="text-align:center">-2^63 ~ 2^63-1</td>
+<td style="text-align:center">无符号8字节</td>
+</tr>
+<tr>
+<td style="text-align:center">double</td>
+<td style="text-align:center">64位双精度IEE754浮点类型</td>
+<td style="text-align:center">双精度浮点8字节</td>
+</tr>
+<tr>
+<td style="text-align:center">float</td>
+<td style="text-align:center">32位单精度IEE754浮点类型</td>
+<td style="text-align:center">单精度浮点4字节</td>
+</tr>
+<tr>
+<td style="text-align:center">half_float</td>
+<td style="text-align:center">16位半精度IEE754浮点类型</td>
+<td style="text-align:center">2字节</td>
+</tr>
+<tr>
+<td style="text-align:center">scaled_float</td>
+<td style="text-align:center">缩放类型浮点数</td>
+<td style="text-align:center">8字节</td>
+</tr>
+</tbody>
+</table>
+<h3 id="日期类型">日期类型<a hidden class="anchor" aria-hidden="true" href="#日期类型">#</a></h3>
+<h4 id="date">date<a hidden class="anchor" aria-hidden="true" href="#date">#</a></h4>
+<ol>
+<li>在 ES 中的日期可以是以下几种形式：
+<ul>
+<li>格式化日期的字符串，如 “2015-01-01” 或 “2015/01/01 12:10:30”</li>
+<li>毫秒时间戳</li>
+<li>秒级时间戳</li>
+</ul>
+</li>
+<li>需要注意的是，ES内部会把日期转换为 UTC（世界标准时间），并将其存储为毫秒时间戳，这样做的原因是和字符串相比，数值在存储和处理时更快。</li>
+</ol>
+<h3 id="布尔类型">布尔类型<a hidden class="anchor" aria-hidden="true" href="#布尔类型">#</a></h3>
+<h4 id="boolean">boolean<a hidden class="anchor" aria-hidden="true" href="#boolean">#</a></h4>
+<ol>
+<li>如果一个字段是布尔类型，可接受的值为 true、false。</li>
+<li>Elasticsearch 5.4 版本以前，可以接受被解释为 true 或 false 的字符串和数字，5.4 版本以后只接受 true、false、”true”、”false”。</li>
+</ol>
+<h3 id="二进制类型">二进制类型<a hidden class="anchor" aria-hidden="true" href="#二进制类型">#</a></h3>
+<h4 id="binary">binary<a hidden class="anchor" aria-hidden="true" href="#binary">#</a></h4>
+<ol>
+<li>binary 类型数据格式为base64 编码的字符串，默认「不额外存储，也不可搜索」。</li>
+</ol>
+<h3 id="范围类型">范围类型<a hidden class="anchor" aria-hidden="true" href="#范围类型">#</a></h3>
+<h4 id="range">range<a hidden class="anchor" aria-hidden="true" href="#range">#</a></h4>
+<ol>
+<li>integer_range -2^31 至 2^31-1</li>
+<li>long_range -2^63 至 2^63-1</li>
+<li>float_range 32-bit IEEE 754</li>
+<li>double_range 64-bit IEEE 754</li>
+<li>date_range 64 位整数，毫秒计时</li>
+</ol>
+<h3 id="数组类型">数组类型<a hidden class="anchor" aria-hidden="true" href="#数组类型">#</a></h3>
+<ol>
+<li>ES中没有专用的数组类型，默认情况下任何字段都可以包含0个或者多个值，但是一个数组中的值必须是同一种类型。
+<ul>
+<li>整型数组：[1,3]</li>
+<li>嵌套数组：[1,[2,3]]，等价于 [1,2,3]</li>
+<li>对象数组: [{&ldquo;name&rdquo;: &ldquo;lili&rdquo;, &ldquo;age&rdquo;: &ldquo;18&rdquo;}, {&ldquo;name&rdquo;: &ldquo;liming&rdquo;, &ldquo;age&rdquo;: &ldquo;20&rdquo;} ]</li>
+</ul>
+</li>
+<li>动态添加数据时，数组的第一个值的类型决定整个数组的类型。混合数组类型是不支持的，比如：[1，”abc”]。</li>
+<li>数组可以包含 null 值，空数组[ ]会被当作 missing field 对待。在文档中使用 array 类型不需要提前做任何配置，默认支持</li>
+</ol>
+<h3 id="对象类型">对象类型<a hidden class="anchor" aria-hidden="true" href="#对象类型">#</a></h3>
+<ol>
+<li>对象类型很好理解，即JSON对象，需要注意的是，es中会对嵌套的JSON对象做扁平化处理。</li>
+<li>例如如下数据:</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;name&#34;</span><span class="p">:</span><span class="s2">&#34;lili&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;friend&#34;</span><span class="p">:[</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;name&#34;</span><span class="err">:</span><span class="s2">&#34;xiaohong&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 存储的时候变成这样:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;name&#34;</span><span class="p">:</span><span class="s2">&#34;lili&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;friend.name&#34;</span><span class="p">:</span><span class="s2">&#34;xiaohong&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="嵌套类型">嵌套类型<a hidden class="anchor" aria-hidden="true" href="#嵌套类型">#</a></h3>
+<ol>
+<li>嵌套类型是一种特殊的对象类型，es本身会对对象类型字段做扁平化处理，那么当存储的对象类型为对象数组时，会出现关联关系失效的情况。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;name&#34;</span><span class="p">:</span><span class="s2">&#34;lili&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;friends&#34;</span><span class="p">:[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;name&#34;</span><span class="p">:</span><span class="s2">&#34;xiaohong&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;age&#34;</span><span class="p">:</span> <span class="mi">18</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;name&#34;</span><span class="p">:</span><span class="s2">&#34;xiaoming&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;age&#34;</span><span class="p">:</span> <span class="mi">20</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 处理后:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;name&#34;</span><span class="p">:</span><span class="s2">&#34;lili&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;friends.name&#34;</span><span class="p">:[</span><span class="s2">&#34;xiaohong&#34;</span><span class="p">,</span><span class="s2">&#34;xiaoming&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;friend.age&#34;</span><span class="p">:[</span><span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="ip类型">IP类型<a hidden class="anchor" aria-hidden="true" href="#ip类型">#</a></h3>
+<ol>
+<li>ip 类型的字段用于存储 IPv4 或者 IPv6 的地址。如”192.168.1.1”或”192.168.0.0/16”。</li>
+</ol>
+<h3 id="令牌计数类型-token_count">令牌计数类型 (token_count)<a hidden class="anchor" aria-hidden="true" href="#令牌计数类型-token_count">#</a></h3>
+<ol>
+<li>token_count 用于统计text分词后的词条个数，本质上是一个整数型字段。举个例子，映射中指定 name 为 text 类型，增加name.length 字段用于统计分词后词项的长度，类型为 token_count，分词器为标准分词器，命令如下：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;mappings&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;my_type&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;text&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">          <span class="nt">&#34;fields&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nt">&#34;length&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">              <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;token_count&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">              <span class="nt">&#34;analyzer&#34;</span><span class="p">:</span> <span class="s2">&#34;standard&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">          <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="索引库的crud">索引库的CRUD<a hidden class="anchor" aria-hidden="true" href="#索引库的crud">#</a></h2>
+<h3 id="创建">创建<a hidden class="anchor" aria-hidden="true" href="#创建">#</a></h3>
+<ol>
+<li>基本语法：
+<ul>
+<li>请求方法：<strong>PUT</strong></li>
+<li>请求路径：<strong>/索引名称</strong></li>
+<li>请求参数：<strong>mapping</strong></li>
+</ul>
+</li>
+<li>有这样一条文档，需要创建索引。
+<ul>
+<li>age：类型为 byte；参与搜索，因此需要index为true；无需分词器。</li>
+<li>weight：类型为float；参与搜索，因此需要index为true；无需分词器。</li>
+<li>isMarried：类型为boolean；参与搜索，因此需要index为true；无需分词器。</li>
+<li>info：类型为字符串，需要分词，因此是text；参与搜索，因此需要index为true；分词器可以用ik_smart。</li>
+<li>email：类型为字符串，但是不需要分词，因此是keyword；不参与搜索，因此需要index为false；无需分词器。</li>
+<li>score：虽然是数组，但是我们只看元素的类型，类型为float；参与搜索，因此需要index为true；无需分词器。</li>
+<li>name：类型为object，需要定义多个子属性
+<ul>
+<li>name.firstName；类型为字符串，但是不需要分词，因此是keyword；参与搜索，因此需要index为true；无需分词器。</li>
+<li>name.lastName；类型为字符串，但是不需要分词，因此是keyword；参与搜索，因此需要index为true；无需分词器。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>注意：所有的索引名都必须要小写。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;age&#34;</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;weight&#34;</span><span class="p">:</span> <span class="mf">52.4</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;isMarried&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;info&#34;</span><span class="p">:</span> <span class="s2">&#34;美好的一天从清晨开始&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;email&#34;</span><span class="p">:</span> <span class="s2">&#34;123456@qq.cn&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;score&#34;</span><span class="p">:</span> <span class="p">[</span><span class="mf">99.1</span><span class="p">,</span> <span class="mf">95.5</span><span class="p">,</span> <span class="mf">98.9</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;firstName&#34;</span><span class="p">:</span> <span class="s2">&#34;三&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;lastName&#34;</span><span class="p">:</span> <span class="s2">&#34;张&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol>
+<li>创建demo。</li>
+</ol>
+<pre tabindex="0"><code class="language-api" data-lang="api">PUT /users
+{
+    &#34;mappings&#34;: {
+        &#34;properties&#34;: {
+            &#34;age&#34;: {
+                &#34;type&#34;: &#34;byte&#34;
+            },
+            &#34;weight&#34;: {
+                &#34;type&#34;: &#34;float&#34;
+            },
+            &#34;isMarried&#34;: {
+                &#34;type&#34;: &#34;boolean&#34;
+            },
+            &#34;info&#34;: {
+                &#34;type&#34;: &#34;text&#34;,
+                &#34;analyzer&#34;: &#34;ik_smart&#34;,
+                &#34;search_analyzer&#34;: &#34;ik_max_smart&#34;
+            },
+            &#34;email&#34;: {
+                &#34;type&#34;: &#34;keyword&#34;,
+                &#34;index&#34;: &#34;false&#34;
+            },
+            &#34;score&#34;: {
+                &#34;type&#34;: &#34;float&#34;
+            }
+            &#34;name&#34;: {
+                &#34;properties&#34;: {
+                    &#34;firstName&#34;: {
+                        &#34;type&#34;: &#34;keyword&#34;,
+                        &#34;index&#34;: &#34;false&#34;
+                    },
+                    &#34;lastName&#34;: {
+                        &#34;type&#34;: &#34;keyword&#34;,
+                        &#34;index&#34;: &#34;false&#34;
+                    }
+                }
+            }
+        }
+    }
+}
+</code></pre><h3 id="查询">查询<a hidden class="anchor" aria-hidden="true" href="#查询">#</a></h3>
+<ol>
+<li>基本语法：
+<ul>
+<li>请求方法：<strong>GET</strong></li>
+<li>请求路径：<strong>/索引名称</strong></li>
+<li>请求参数：无</li>
+</ul>
+</li>
+</ol>
+<pre tabindex="0"><code class="language-api" data-lang="api">GET /users
+</code></pre><h3 id="修改">修改<a hidden class="anchor" aria-hidden="true" href="#修改">#</a></h3>
+<ol>
+<li>
+<p>基本语法：</p>
+<ul>
+<li>请求方法：<strong>PUT</strong></li>
+<li>请求路径：<strong>/索引名称/_mapping</strong></li>
+<li>请求参数：<strong>properties</strong>。</li>
+</ul>
+</li>
+<li>
+<p>倒排索引结构虽然不复杂，但是一旦数据结构改变（比如改变了分词器），就需要重新创建倒排索引，这简直是灾难。因此索引库<strong>一旦创建，无法修改mapping</strong>。</p>
+</li>
+<li>
+<p>虽然无法修改mapping中已有的字段，但是却允许添加新的字段到mapping中，因为不会对倒排索引产生影响。</p>
+</li>
+</ol>
+<pre tabindex="0"><code class="language-api" data-lang="api">PUT /users/_mapping
+{
+    &#34;properties&#34;: {
+        &#34;score&#34;: {
+            &#34;type&#34;: &#34;float&#34;
+        }
+    }
+}
+</code></pre><h3 id="删除">删除<a hidden class="anchor" aria-hidden="true" href="#删除">#</a></h3>
+<ol>
+<li>基本语法：
+<ul>
+<li>请求方法：<strong>DELETE</strong></li>
+<li>请求路径：<strong>/索引名称</strong></li>
+<li>请求参数：无</li>
+</ul>
+</li>
+</ol>
+<pre tabindex="0"><code class="language-api" data-lang="api">DELETE /users
+</code></pre>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://heliu.site/tags/elasticsearch/">Elasticsearch</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://heliu.site/posts/elasticsearch/install/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>安装</span>
+  </a>
+  <a class="next" href="https://heliu.site/posts/elasticsearch/settings/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>settings</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    
+    <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv">
+        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    </span>
+    <span id="busuanzi_container_site_uv">
+        本站访客数<span id="busuanzi_value_site_uv"></span>人次
+    </span>
+    </div>
+        <span>Copyright © 2024 蜀ICP备2024091074号 <a href="#">heliu's blog</a>. All rights reserved</span>  
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'Copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'Done';
+            setTimeout(() => {
+                copybutton.innerHTML = 'Copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
