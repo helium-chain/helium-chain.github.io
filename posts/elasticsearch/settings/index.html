@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>settings | Helium</title>
+<title>Settings | Helium</title>
 <meta name="keywords" content="elasticsearch">
 <meta name="description" content="设置当前索引的分片数，副本数等信息。">
 <meta name="author" content="helium">
@@ -74,7 +74,7 @@
 
   
 
-<meta property="og:title" content="settings" />
+<meta property="og:title" content="Settings" />
 <meta property="og:description" content="设置当前索引的分片数，副本数等信息。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://heliu.site/posts/elasticsearch/settings/" />
@@ -85,7 +85,7 @@
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
-<meta name="twitter:title" content="settings"/>
+<meta name="twitter:title" content="Settings"/>
 <meta name="twitter:description" content="设置当前索引的分片数，副本数等信息。"/>
 
 
@@ -109,7 +109,7 @@
     {
       "@type": "ListItem",
       "position":  3 ,
-      "name": "settings",
+      "name": "Settings",
       "item": "https://heliu.site/posts/elasticsearch/settings/"
     }
   ]
@@ -119,14 +119,14 @@
 {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "settings",
-  "name": "settings",
+  "headline": "Settings",
+  "name": "Settings",
   "description": "设置当前索引的分片数，副本数等信息。",
   "keywords": [
     "elasticsearch"
   ],
-  "articleBody": " setting属性用于设置当前索引的分片数，副本数等信息,常用的主要有： index.number_of_shards：索引分片数。 index.number_of_replicas：索引副本数。 index.refresh_interval：refresh频率，默认1s。当数据对实时刷新要求不那么高时，可以适当调大改值。当值=-1时，代表不会进行refresh操作，但是请保证es的虚拟机内存足够大，不然会造成内存溢出 使用示例： 1 2 3 4 5 6 7 8 9 10 PUT class_1 { \"settings\": { \"index\": { \"number_of_shards\": 3, \"number_of_replicas\": 1, \"refresh_interval\": \"3s\" } } } ES的settings分为静态设置和动态设置两种。 常用设置标记成🎈。 静态设置 只能在索引创建时设置，或者在已关闭的索引上设置。静态设置在创建索引时指定。 number_of_shards🎈 索引应具有的主分片数，默认值为1。ES支持的最大分片数默认为1024，可以通过修改index.max_number_of_shards属性修改。 该值用于指定分片数量，也就是当前索引创建几个主分片索引。number_of_shards值不推荐过大，推荐5~10。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.number_of_shards\": 1 } } shard.check_on_startup 分片在打开之前是否检查该分片是否损坏。当检测到分片损坏时，将阻止打开。 可选值： false：不检测，默认值。 checksum：只检查物理结构。 true：检查物理结构和路基损坏，相对比较消耗CPU。 fix：类同false，7.0版本后将废弃。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.shard.check_on_startup\": false } } number_of_routing_shards codec 数据存储的压缩算法，默认值LZ4，可选值best_compression，比LZ4可以获得更好的压缩比例(占用较小的磁盘空间，但是存储性能比LZ4低)。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.codec\": \"LZ4\" } } 动态设置 number_of_replicas🎈 每个主分片的副本数，默认为 1，该值必须大于等于0，创建索引后该值可以变更。 副本的数量值不宜过大。 1 2 3 4 5 6 7 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2 } } auto_expand_replicas 基于可用节点的数量自动分配副本数量,默认为 false（即禁用此功能）,可设置为：0-all。 1 2 3 4 5 6 7 8 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.auto_expand_replicas\": false } } refresh_interval🎈 执行刷新操作的频率，这使得索引的最近更改可以被搜索。默认为 1s。可以设置为 -1 以禁用刷新。 1 2 3 4 5 6 7 8 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\" } } max_result_window🎈 用于索引搜索的 from+size 的最大值。默认为 10000。 1 2 3 4 5 6 7 8 9 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_result_window\": 1000 } } max_inner_result_window 用于控制top aggregations，默认100。内部命中和顶部命中聚合占用堆内存，并且时间与from+size成正比，这限制了内存。 1 2 3 4 5 6 7 8 9 10 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_result_window\": 1000, \"index.max_inner_result_window\": 100 } } max_rescore_window 在搜索此索引中 rescore 的 window_size 的最大值。 1 2 3 4 5 6 7 8 9 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_rescore_window\": 100 } } max_docvalue_fields_search 一次查询最多包含开启doc_values字段的个数，默认为100。 1 2 3 4 5 6 7 8 9 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_docvalue_fields_search\": 100 } } max_script_fields 查询中允许的最大script_fields数量。默认为32。 1 2 3 4 5 6 7 8 9 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_script_fields\": 32 } } max_ngram_diff NGramTokenizer和NGramTokenFilter的min_gram和max_gram之间允许的最大差异。默认为1。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_ngram_diff\": 1 } } max_shingle_diff 对于ShingleTokenFilter, max_shingle_size和min_shingle_size之间允许的最大差异。默认为3。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_shingle_diff\": 3 } } blocks.read_only 索引数据、索引元数据是否只读，如果设置为true，则不能修改索引数据，也不能修改索引元数据。，false 为允许写入和元数据更改。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.blocks.read_only\": false } } blocks.read_only_allow_delete 与index.blocks.read_only基本类似，唯一的区别是允许删除动作。 1 2 3 4 5 6 7 PUT /test { \"settings\": { \"index.blocks.read_only\": false, \"index.blocks.read_only_allow_delete\": false } } blocks.read 设置为 true 可禁用对索引的读取操作。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.blocks.read\": false } } blocks.write 设设置为true以禁用对索引数据的写操作。（针对索引数据，而不是索引元数据） 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.blocks.write\": false } } blocks.metadata 设置为true，表示不允许对索引元数据进行读与写。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.blocks.metadata\": false } } max_refresh_listeners 索引的每个分片上当刷新索引时最大的可用监听器数量。这些侦听器用于实现refresh=wait_for。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_refresh_listeners\": 1 } } highlight.max_analyzed_offset 高亮显示的最大字符数。此设置仅在对没有偏移或词向量的索引的文本上适用。默认情况下，此设置在6.x中未设置，默认为-1。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_refresh_listeners\": -1 } } max_terms_count Term查询中可以使用的最大Term数。默认为65536。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_terms_count\": 65536 } } routing.allocation.enable 控制此索引的分片分配，可选值： all：默认，允许分片所有的分片 primaries：只允许分配主分片 new_primaries：仅允许分配新创建的主分片 none：不允许分配 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.routing.allocation.enable\": \"all\" } } routing.rebalance.enable 为此索引启用分片重新平衡，可选值： all：默认，允许分片重新平衡 primaries：只允许主分片重新平衡 replicas：只允许副本分片重新平衡 none：不允许分片重新平衡 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.routing.rebalance.enable\": \"all\" } } gc_deletes 允许已删除文档的版本号，扔可用于进一步版本化操作的时间长度。默认60s。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.gc_deletes\": \"60s\" } } max_regex_length Regexp Query中可以使用的正则表达式的最大长度，默认为1000。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_regex_length\": 1000 } } mapping.coerce true：默认值，强制类型转换，把json中的值转为ES中字段的数据类型，譬如，把字符串\"5\"转为integer的5。 false：当json的值与ES字段类型不匹配将会拒绝。 1 2 3 4 5 6 PUT /test { \"settings\": { \"mapping.coerce\": true } } ",
-  "wordCount" : "579",
+  "articleBody": " setting属性用于设置当前索引的分片数，副本数等信息,常用的主要有： index.number_of_shards：索引分片数。 index.number_of_replicas：索引副本数。 index.refresh_interval：refresh频率，默认1s。当数据对实时刷新要求不那么高时，可以适当调大改值。当值=-1时，代表不会进行refresh操作，但是请保证es的虚拟机内存足够大，不然会造成内存溢出 使用示例： 1 2 3 4 5 6 7 8 9 10 PUT class_1 { \"settings\": { \"index\": { \"number_of_shards\": 3, \"number_of_replicas\": 1, \"refresh_interval\": \"3s\" } } } ES的settings分为静态设置和动态设置两种。 常用设置标记成🎈。 静态设置 只能在索引创建时设置，或者在已关闭的索引上设置。静态设置在创建索引时指定。 number_of_shards🎈 索引应具有的主分片数，默认值为1。ES支持的最大分片数默认为1024，可以通过修改index.max_number_of_shards属性修改。 该值用于指定分片数量，也就是当前索引创建几个主分片索引。number_of_shards值不推荐过大，推荐5~10。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.number_of_shards\": 1 } } shard.check_on_startup 分片在打开之前是否检查该分片是否损坏。当检测到分片损坏时，将阻止打开。 可选值： false：不检测，默认值。 checksum：只检查物理结构。 true：检查物理结构和路基损坏，相对比较消耗CPU。 fix：类同false，7.0版本后将废弃。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.shard.check_on_startup\": false } } number_of_routing_shards routing_partition_size 路由分区数，如果设置了该参数，其路由算法为： (hash(_routing) + hash(_id) % index.routing_parttion_size ) % number_of_shards 如果没有设置，路由算法为：_routing默认值为_id。 hash(_routing) % number_of_shardings codec 数据存储的压缩算法，默认值LZ4，可选值best_compression，比LZ4可以获得更好的压缩比例(占用较小的磁盘空间，但是存储性能比LZ4低)。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.codec\": \"LZ4\" } } 动态设置 number_of_replicas🎈 每个主分片的副本数，默认为 1，该值必须大于等于0，创建索引后该值可以变更。 副本的数量值不宜过大。 1 2 3 4 5 6 7 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2 } } auto_expand_replicas 基于可用节点的数量自动分配副本数量,默认为 false（即禁用此功能）,可设置为：0-all。 1 2 3 4 5 6 7 8 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.auto_expand_replicas\": false } } refresh_interval🎈 执行刷新操作的频率，这使得索引的最近更改可以被搜索。默认为 1s。可以设置为 -1 以禁用刷新。 1 2 3 4 5 6 7 8 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\" } } max_result_window🎈 用于索引搜索的 from+size 的最大值。默认为 10000。 1 2 3 4 5 6 7 8 9 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_result_window\": 1000 } } max_inner_result_window 用于控制top aggregations，默认100。内部命中和顶部命中聚合占用堆内存，并且时间与from+size成正比，这限制了内存。 1 2 3 4 5 6 7 8 9 10 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_result_window\": 1000, \"index.max_inner_result_window\": 100 } } max_rescore_window 在搜索此索引中 rescore 的 window_size 的最大值。 1 2 3 4 5 6 7 8 9 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_rescore_window\": 100 } } max_docvalue_fields_search 一次查询最多包含开启doc_values字段的个数，默认为100。 1 2 3 4 5 6 7 8 9 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_docvalue_fields_search\": 100 } } max_script_fields 查询中允许的最大script_fields数量。默认为32。 1 2 3 4 5 6 7 8 9 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_script_fields\": 32 } } max_ngram_diff NGramTokenizer和NGramTokenFilter的min_gram和max_gram之间允许的最大差异。默认为1。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_ngram_diff\": 1 } } max_shingle_diff 对于ShingleTokenFilter, max_shingle_size和min_shingle_size之间允许的最大差异。默认为3。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_shingle_diff\": 3 } } blocks.read_only 索引数据、索引元数据是否只读，如果设置为true，则不能修改索引数据，也不能修改索引元数据。，false 为允许写入和元数据更改。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.blocks.read_only\": false } } blocks.read_only_allow_delete 与index.blocks.read_only基本类似，唯一的区别是允许删除动作。 1 2 3 4 5 6 7 PUT /test { \"settings\": { \"index.blocks.read_only\": false, \"index.blocks.read_only_allow_delete\": false } } blocks.read 设置为 true 可禁用对索引的读取操作。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.blocks.read\": false } } blocks.write 设设置为true以禁用对索引数据的写操作。（针对索引数据，而不是索引元数据） 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.blocks.write\": false } } blocks.metadata 设置为true，表示不允许对索引元数据进行读与写。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.blocks.metadata\": false } } max_refresh_listeners 索引的每个分片上当刷新索引时最大的可用监听器数量。这些侦听器用于实现refresh=wait_for。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_refresh_listeners\": 1 } } highlight.max_analyzed_offset 高亮显示的最大字符数。此设置仅在对没有偏移或词向量的索引的文本上适用。默认情况下，此设置在6.x中未设置，默认为-1。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_refresh_listeners\": -1 } } max_terms_count Term查询中可以使用的最大Term数。默认为65536。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_terms_count\": 65536 } } routing.allocation.enable 控制此索引的分片分配，可选值： all：默认，允许分片所有的分片 primaries：只允许分配主分片 new_primaries：仅允许分配新创建的主分片 none：不允许分配 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.routing.allocation.enable\": \"all\" } } routing.rebalance.enable 为此索引启用分片重新平衡，可选值： all：默认，允许分片重新平衡 primaries：只允许主分片重新平衡 replicas：只允许副本分片重新平衡 none：不允许分片重新平衡 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.routing.rebalance.enable\": \"all\" } } gc_deletes 允许已删除文档的版本号，扔可用于进一步版本化操作的时间长度。默认60s。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.gc_deletes\": \"60s\" } } max_regex_length Regexp Query中可以使用的正则表达式的最大长度，默认为1000。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_regex_length\": 1000 } } mapping.coerce true：默认值，强制类型转换，把json中的值转为ES中字段的数据类型，譬如，把字符串\"5\"转为integer的5。 false：当json的值与ES字段类型不匹配将会拒绝。 1 2 3 4 5 6 PUT /test { \"settings\": { \"mapping.coerce\": true } } Merging max_thread_count 当个分片节点合并的最大线程数，默认值**Math.max(1, Math.min(4, Runtime.getRuntime().availableProcessors() / 2))**如果是非SSD盘，建议设置为1。。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.merge.scheduler.max_thread_count\": 1 } } max_merged_segment 指定单个segment的最大容量，默认值5GB，可以考虑适当降低此值。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.merge.policy.max_merged_segment\": \"5GB\" } } segments_per_tier 该属性指定了每层分段的数量，取值越小则segment越少，因此需要merge的操作更多，可以考虑适当增加此值。默认为10，其应该大于等于index.merge.poliycy.max_merge_at_once。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.merge.policy.segments_per_tier\": 10 } } Show Log Search Show Log ES提供在查询阶段(Query)和数据获取阶段(Fetch)设置阈值，超过改阈值则记录日志。 查询阶段支持参数，以下值定义查询阶段(Query)阈值，分别表示执行超过10s，打印警告日志。超过5s打印info日志。 1 2 3 4 index.search.slowlog.threshold.query.warn: 10s index.search.slowlog.threshold.query.info: 5s index.search.slowlog.threshold.query.debug: 2s index.search.slowlog.threshold.query.trace: 500ms 数据获取阶段支持参数，以下定义数据获取阶段(Fetch)阈值，分别表示执行超过1s，打印警告日志。超过800ms打印info日志。 1 2 3 4 index.search.slowlog.threshold.fetch.warn: 1s index.search.slowlog.threshold.fetch.info: 800ms index.search.slowlog.threshold.fetch.debug: 500ms index.search.slowlog.threshold.fetch.trace: 200ms 日志输出级别，定义日志输出级别为info，不输出debug、trace级别的日志。注意：上述日志级别为分片日志。 1 index.search.slowlog.level: info log4j配置。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 appender.index_search_slowlog_rolling.type = RollingFile appender.index_search_slowlog_rolling.name = index_search_slowlog_rolling appender.index_search_slowlog_rolling.fileName = ${sys:es.logs}_index_search_slowlog.log appender.index_search_slowlog_rolling.layout.type = PatternLayout appender.index_search_slowlog_rolling.layout.pattern = [%d{ISO8601}][%-5p][%-25c] [%node_name]%marker %.10000m%n appender.index_search_slowlog_rolling.filePattern = ${sys:es.logs}_index_search_slowlog-%d{yyyy-MM-dd}.log #文件切割方案，属于log4j的语法 appender.index_search_slowlog_rolling.policies.type = Policies #基于时间切割，log4j还支持按大小切割，其类为SizeBasedTriggeringPolicy。 appender.index_search_slowlog_rolling.policies.time.type = TimeBasedTriggeringPolicy #1小时切割成一个文件 appender.index_search_slowlog_rolling.policies.time.interval = 1 #是否修正时间范围, 如果设置为true，则从0时开始计数 appender.index_search_slowlog_rolling.policies.time.modulate = true logger.index_search_slowlog_rolling.name = index.search.slowlog logger.index_search_slowlog_rolling.level = trace logger.index_search_slowlog_rolling.appenderRef.index_search_slowlog_rolling.ref = index_search_slowlog_rolling logger.index_search_slowlog_rolling.additivity = false Index Show Log 索引慢日志配置。 index.indexing.slowlog.source参数用来记录文档 _source字段字符的个数，默认1000，表示只记录_source的前1000个字符，可以设置为true，表示输出_source字段全部内容，设置为false，表示不记录_source字段的内容。 默认情况下，会对_source字段的输出进行格式化，通常使用一行输出，如果想阻止格式化，可以通过index.indexing.slowlog.reformat设置为false来避免。 1 2 3 4 5 6 index.indexing.slowlog.threshold.index.warn: 10s index.indexing.slowlog.threshold.index.info: 5s index.indexing.slowlog.threshold.index.debug: 2s index.indexing.slowlog.threshold.index.trace: 500ms index.indexing.slowlog.level: info index.indexing.slowlog.source: 1000 在logg4j配置文件中定义日志的输出。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 appender.index_indexing_slowlog_rolling.type = RollingFile appender.index_indexing_slowlog_rolling.name = index_indexing_slowlog_rolling appender.index_indexing_slowlog_rolling.fileName = ${sys:es.logs}_index_indexing_slowlog.log appender.index_indexing_slowlog_rolling.layout.type = PatternLayout appender.index_indexing_slowlog_rolling.layout.pattern = [%d{ISO8601}][%-5p][%-25c] [%node_name]%marker %.-10000m%n appender.index_indexing_slowlog_rolling.filePattern = ${sys:es.logs}_index_indexing_slowlog-%d{yyyy-MM-dd}.log appender.index_indexing_slowlog_rolling.policies.type = Policies appender.index_indexing_slowlog_rolling.policies.time.type = TimeBasedTriggeringPolicy appender.index_indexing_slowlog_rolling.policies.time.interval = 1 appender.index_indexing_slowlog_rolling.policies.time.modulate = true logger.index_indexing_slowlog.name = index.indexing.slowlog.index logger.index_indexing_slowlog.level = trace logger.index_indexing_slowlog.appenderRef.index_indexing_slowlog_rolling.ref = index_indexing_slowlog_rolling logger.index_indexing_slowlog.additivity = false Store index.store.type 表示存储类型，该值为静态参数，在索引创建时指定，无法更改。可选值： fs：默认文件系统实现，根据当前操作系统选择最佳存储方式 simplefs：简单的FS类型，使用随机访问文件实现文件系统存储(映射到Lucene SimpleFsDirectory)。并发性能很差(多线程会出现瓶颈)。当需要索引持久性时，通常最好使用niofs。 niofs：基于NIO实现的文件系统，该类型使用NIO在文件系统上存储碎片索引(映射到Lucene NIOFSDirectory)。它允许多个线程同时从同一个文件中读取数据。 mmapfs：基于文件内存映射机制实现的文件系统实现，该方法将文件映射到内存(MMap)来存储文件系统上的碎片索引(映射到Lucene MMapDirectory)。内存映射使用进程中与被映射文件大小相同的部分虚拟内存地址空间。可通过node.store.allow_mmapfs属性来禁用基于内存映射机制，如果节点所在的操作系统没有大量虚拟内存，则可以使用该属性明确禁止使用该文件实现。 index.store.preload 预加载数据到文件系统缓存，如果ES主机重启，则文件系统缓存将清空，此时搜索会比较慢，可以使用index.store.preload设置，通过指定文件扩展名，显示的告诉操作系统应该将哪些文件加载到内存中。 例如，配置到elasticsearch.yml文件中： 1 index.store.preload: [\"nvd\",\"dvd\"] 或者在创建索引的时候设置： 1 2 3 4 5 { \"settings\":{ \"index.store.preload\":[\"nvd\",\"dvd\"] } } Translog 由于Lucene提交的开销很大，不能每个变更就提交一次(刷写磁盘)，所以每个分片复制都有一个事务日志，称为translog。所有索引和删除操作都是在被内部Lucene索引处理只会写入translog的。在发生崩溃的情况下，当索引恢复的时候，可以通过回放translog中的数据进行恢复。 index.translog.durability translog刷盘方式，可选值：request、async。 request：即每请求一次刷盘，也就是客户端发起一个增删改操作时，会在主分片和副本分片全部刷盘成功后，才会返回成功，是ES的默认模式。 async：异步刷盘模式，此模式频率由index.translog.sync_interval设置，其默认值为5s，该模式会存在数据丢失的可能。 index.translog.sync_interval 如果index.translog.durability设置为async，用该值来设置刷盘的频率，默认为5s。 index.translog.flush_threshold_size ES强制刷新的另外一个维度，如果translog的大小达到该值，则强制将为刷盘的数据强制刷新到Lucene中，默认512M。 index.translog.retention.size 保存跨日志文件的总大小。也就是translog日志文件flush后，并不马上删除，而是保留一段时间，但最新的translog文件已经存储的内容与待删除的文件的间隔不超过改参数设置的值，默认为512M。 index.translog.retention.age 保存translog文件的最大持续时间，默认12h。 参考 https://blog.csdn.net/dwjf321/article/details/103871981 ",
+  "wordCount" : "882",
   "inLanguage": "zh",
   "image": "https://heliu.site/favicon-32x32.png","datePublished": "2021-08-06T00:00:00Z",
   "dateModified": "2021-08-06T00:00:00Z",
@@ -232,7 +232,7 @@
   <header class="post-header">
     <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/elasticsearch/">ElasticSearch 笔记</a></div>
     <h1 class="post-title entry-hint-parent">
-      settings
+      Settings
     </h1>
     <div class="post-meta">
 
@@ -252,12 +252,12 @@
     <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
     <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
     <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
-</svg><span>579字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>882字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="12" r="9"></circle>
     <polyline points="12 7 12 12 15 15"></polyline>
-</svg><span>3分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>5分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="7" r="4"></circle>
@@ -293,6 +293,8 @@
                         <a href="#shardcheck_on_startup" aria-label="shard.check_on_startup">shard.check_on_startup</a></li>
                     <li>
                         <a href="#number_of_routing_shards" aria-label="number_of_routing_shards">number_of_routing_shards</a></li>
+                    <li>
+                        <a href="#routing_partition_size" aria-label="routing_partition_size">routing_partition_size</a></li>
                     <li>
                         <a href="#codec" aria-label="codec">codec</a></li></ul>
                     </li>
@@ -344,10 +346,51 @@
                     <li>
                         <a href="#max_regex_length" aria-label="max_regex_length">max_regex_length</a></li>
                     <li>
-                        <a href="#mappingcoerce" aria-label="mapping.coerce">mapping.coerce</a>
+                        <a href="#mappingcoerce" aria-label="mapping.coerce">mapping.coerce</a></li></ul>
                     </li>
-                </ul>
-                </li>
+                    <li>
+                        <a href="#merging" aria-label="Merging">Merging</a><ul>
+                            
+                    <li>
+                        <a href="#max_thread_count" aria-label="max_thread_count">max_thread_count</a></li>
+                    <li>
+                        <a href="#max_merged_segment" aria-label="max_merged_segment">max_merged_segment</a></li>
+                    <li>
+                        <a href="#segments_per_tier" aria-label="segments_per_tier">segments_per_tier</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#show-log" aria-label="Show Log">Show Log</a><ul>
+                            
+                    <li>
+                        <a href="#search-show-log" aria-label="Search Show Log">Search Show Log</a></li>
+                    <li>
+                        <a href="#index-show-log" aria-label="Index Show Log">Index Show Log</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#store" aria-label="Store">Store</a><ul>
+                            
+                    <li>
+                        <a href="#indexstoretype" aria-label="index.store.type">index.store.type</a></li>
+                    <li>
+                        <a href="#indexstorepreload" aria-label="index.store.preload">index.store.preload</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#translog" aria-label="Translog">Translog</a><ul>
+                            
+                    <li>
+                        <a href="#indextranslogdurability" aria-label="index.translog.durability">index.translog.durability</a></li>
+                    <li>
+                        <a href="#indextranslogsync_interval" aria-label="index.translog.sync_interval">index.translog.sync_interval</a></li>
+                    <li>
+                        <a href="#indextranslogflush_threshold_size" aria-label="index.translog.flush_threshold_size">index.translog.flush_threshold_size</a></li>
+                    <li>
+                        <a href="#indextranslogretentionsize" aria-label="index.translog.retention.size">index.translog.retention.size</a></li>
+                    <li>
+                        <a href="#indextranslogretentionage" aria-label="index.translog.retention.age">index.translog.retention.age</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e5%8f%82%e8%80%83" aria-label="参考">参考</a>
+                    </li>
                 </ul>
             </div>
         </details>
@@ -510,7 +553,16 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="number_of_routing_shards">number_of_routing_shards<a hidden class="anchor" aria-hidden="true" href="#number_of_routing_shards">#</a></h3>
-<h3 id="codec">codec<a hidden class="anchor" aria-hidden="true" href="#codec">#</a></h3>
+<h3 id="routing_partition_size">routing_partition_size<a hidden class="anchor" aria-hidden="true" href="#routing_partition_size">#</a></h3>
+<ol>
+<li>路由分区数，如果设置了该参数，其路由算法为：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">(hash(_routing)  +  hash(_id) % index.routing_parttion_size  ) % number_of_shards
+</span></span></code></pre></div><ol start="2">
+<li>如果没有设置，路由算法为：_routing默认值为_id。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">hash(_routing) % number_of_shardings
+</span></span></code></pre></div><h3 id="codec">codec<a hidden class="anchor" aria-hidden="true" href="#codec">#</a></h3>
 <ol>
 <li>数据存储的压缩算法，默认值LZ4，可选值best_compression，比LZ4可以获得更好的压缩比例(占用较小的磁盘空间，但是存储性能比LZ4低)。</li>
 </ol>
@@ -1099,7 +1151,312 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
+</div><h2 id="merging">Merging<a hidden class="anchor" aria-hidden="true" href="#merging">#</a></h2>
+<h3 id="max_thread_count">max_thread_count<a hidden class="anchor" aria-hidden="true" href="#max_thread_count">#</a></h3>
+<ol>
+<li>当个分片节点合并的最大线程数，默认值**Math.max(1, Math.min(4, Runtime.getRuntime().availableProcessors() / 2))**如果是非SSD盘，建议设置为1。。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="err">PUT</span> <span class="err">/test</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;settings&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;index.merge.scheduler.max_thread_count&#34;</span><span class="p">:</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
+</div><h3 id="max_merged_segment">max_merged_segment<a hidden class="anchor" aria-hidden="true" href="#max_merged_segment">#</a></h3>
+<ol>
+<li>指定单个segment的最大容量，默认值5GB，可以考虑适当降低此值。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="err">PUT</span> <span class="err">/test</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;settings&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;index.merge.policy.max_merged_segment&#34;</span><span class="p">:</span> <span class="s2">&#34;5GB&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="segments_per_tier">segments_per_tier<a hidden class="anchor" aria-hidden="true" href="#segments_per_tier">#</a></h3>
+<ol>
+<li>该属性指定了每层分段的数量，取值越小则segment越少，因此需要merge的操作更多，可以考虑适当增加此值。默认为10，其应该大于等于index.merge.poliycy.max_merge_at_once。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="err">PUT</span> <span class="err">/test</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;settings&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;index.merge.policy.segments_per_tier&#34;</span><span class="p">:</span> <span class="mi">10</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="show-log">Show Log<a hidden class="anchor" aria-hidden="true" href="#show-log">#</a></h2>
+<h3 id="search-show-log">Search Show Log<a hidden class="anchor" aria-hidden="true" href="#search-show-log">#</a></h3>
+<ol>
+<li>ES提供在查询阶段(Query)和数据获取阶段(Fetch)设置阈值，超过改阈值则记录日志。</li>
+<li>查询阶段支持参数，以下值定义查询阶段(Query)阈值，分别表示执行超过10s，打印警告日志。超过5s打印info日志。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">index.search.slowlog.threshold.query.warn: 10s
+</span></span><span class="line"><span class="cl">index.search.slowlog.threshold.query.info: 5s
+</span></span><span class="line"><span class="cl">index.search.slowlog.threshold.query.debug: 2s
+</span></span><span class="line"><span class="cl">index.search.slowlog.threshold.query.trace: 500ms
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="3">
+<li>数据获取阶段支持参数，以下定义数据获取阶段(Fetch)阈值，分别表示执行超过1s，打印警告日志。超过800ms打印info日志。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">index.search.slowlog.threshold.fetch.warn: 1s
+</span></span><span class="line"><span class="cl">index.search.slowlog.threshold.fetch.info: 800ms
+</span></span><span class="line"><span class="cl">index.search.slowlog.threshold.fetch.debug: 500ms
+</span></span><span class="line"><span class="cl">index.search.slowlog.threshold.fetch.trace: 200ms
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="4">
+<li>日志输出级别，定义日志输出级别为info，不输出debug、trace级别的日志。注意：上述日志级别为分片日志。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">index.search.slowlog.level: info
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="5">
+<li>log4j配置。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="cl"><span class="l">appender.index_search_slowlog_rolling.type = RollingFile</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_search_slowlog_rolling.name = index_search_slowlog_rolling</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_search_slowlog_rolling.fileName = ${sys:es.logs}_index_search_slowlog.log</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_search_slowlog_rolling.layout.type = PatternLayout</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_search_slowlog_rolling.layout.pattern = [%d{ISO8601}][%-5p][%-25c] [%node_name]%marker %.10000m%n</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_search_slowlog_rolling.filePattern = ${sys:es.logs}_index_search_slowlog-%d{yyyy-MM-dd}.log</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c">#文件切割方案，属于log4j的语法</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_search_slowlog_rolling.policies.type = Policies    </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c">#基于时间切割，log4j还支持按大小切割，其类为SizeBasedTriggeringPolicy。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_search_slowlog_rolling.policies.time.type = TimeBasedTriggeringPolicy</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c">#1小时切割成一个文件</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_search_slowlog_rolling.policies.time.interval = 1                         </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c">#是否修正时间范围, 如果设置为true，则从0时开始计数</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_search_slowlog_rolling.policies.time.modulate = true                      </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">logger.index_search_slowlog_rolling.name = index.search.slowlog</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">logger.index_search_slowlog_rolling.level = trace</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">logger.index_search_slowlog_rolling.appenderRef.index_search_slowlog_rolling.ref = index_search_slowlog_rolling</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">logger.index_search_slowlog_rolling.additivity = false</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="index-show-log">Index Show Log<a hidden class="anchor" aria-hidden="true" href="#index-show-log">#</a></h3>
+<ol>
+<li>索引慢日志配置。
+<ul>
+<li>index.indexing.slowlog.source参数用来记录文档 _source字段字符的个数，默认1000，表示只记录_source的前1000个字符，可以设置为true，表示输出_source字段全部内容，设置为false，表示不记录_source字段的内容。</li>
+<li>默认情况下，会对_source字段的输出进行格式化，通常使用一行输出，如果想阻止格式化，可以通过index.indexing.slowlog.reformat设置为false来避免。</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">index.indexing.slowlog.threshold.index.warn: 10s
+</span></span><span class="line"><span class="cl">index.indexing.slowlog.threshold.index.info: 5s
+</span></span><span class="line"><span class="cl">index.indexing.slowlog.threshold.index.debug: 2s
+</span></span><span class="line"><span class="cl">index.indexing.slowlog.threshold.index.trace: 500ms
+</span></span><span class="line"><span class="cl">index.indexing.slowlog.level: info
+</span></span><span class="line"><span class="cl">index.indexing.slowlog.source: 1000 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="2">
+<li>在logg4j配置文件中定义日志的输出。</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="cl"><span class="l">appender.index_indexing_slowlog_rolling.type = RollingFile</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_indexing_slowlog_rolling.name = index_indexing_slowlog_rolling</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_indexing_slowlog_rolling.fileName = ${sys:es.logs}_index_indexing_slowlog.log</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_indexing_slowlog_rolling.layout.type = PatternLayout</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_indexing_slowlog_rolling.layout.pattern = [%d{ISO8601}][%-5p][%-25c] [%node_name]%marker %.-10000m%n</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_indexing_slowlog_rolling.filePattern = ${sys:es.logs}_index_indexing_slowlog-%d{yyyy-MM-dd}.log</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_indexing_slowlog_rolling.policies.type = Policies</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_indexing_slowlog_rolling.policies.time.type = TimeBasedTriggeringPolicy</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_indexing_slowlog_rolling.policies.time.interval = 1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">appender.index_indexing_slowlog_rolling.policies.time.modulate = true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">logger.index_indexing_slowlog.name = index.indexing.slowlog.index</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">logger.index_indexing_slowlog.level = trace</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">logger.index_indexing_slowlog.appenderRef.index_indexing_slowlog_rolling.ref = index_indexing_slowlog_rolling</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="l">logger.index_indexing_slowlog.additivity = false</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="store">Store<a hidden class="anchor" aria-hidden="true" href="#store">#</a></h2>
+<h3 id="indexstoretype">index.store.type<a hidden class="anchor" aria-hidden="true" href="#indexstoretype">#</a></h3>
+<ol>
+<li>表示存储类型，该值为静态参数，在索引创建时指定，无法更改。可选值：
+<ul>
+<li><strong>fs</strong>：默认文件系统实现，根据当前操作系统选择最佳存储方式</li>
+<li><strong>simplefs</strong>：简单的FS类型，使用随机访问文件实现文件系统存储(映射到Lucene SimpleFsDirectory)。并发性能很差(多线程会出现瓶颈)。当需要索引持久性时，通常最好使用niofs。</li>
+<li><strong>niofs</strong>：基于NIO实现的文件系统，该类型使用NIO在文件系统上存储碎片索引(映射到Lucene NIOFSDirectory)。它允许多个线程同时从同一个文件中读取数据。</li>
+<li><strong>mmapfs</strong>：基于文件内存映射机制实现的文件系统实现，该方法将文件映射到内存(MMap)来存储文件系统上的碎片索引(映射到Lucene MMapDirectory)。内存映射使用进程中与被映射文件大小相同的部分虚拟内存地址空间。可通过node.store.allow_mmapfs属性来禁用基于内存映射机制，如果节点所在的操作系统没有大量虚拟内存，则可以使用该属性明确禁止使用该文件实现。</li>
+</ul>
+</li>
+</ol>
+<h3 id="indexstorepreload">index.store.preload<a hidden class="anchor" aria-hidden="true" href="#indexstorepreload">#</a></h3>
+<ol>
+<li>预加载数据到文件系统缓存，如果ES主机重启，则文件系统缓存将清空，此时搜索会比较慢，可以使用index.store.preload设置，通过指定文件扩展名，显示的告诉操作系统应该将哪些文件加载到内存中。</li>
+<li>例如，配置到elasticsearch.yml文件中：</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="cl"><span class="nt">index.store.preload</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;nvd&#34;</span><span class="p">,</span><span class="s2">&#34;dvd&#34;</span><span class="p">]</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="3">
+<li>或者在创建索引的时候设置：</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;settings&#34;</span><span class="p">:{</span>
+</span></span><span class="line"><span class="cl">        <span class="nt">&#34;index.store.preload&#34;</span><span class="p">:[</span><span class="s2">&#34;nvd&#34;</span><span class="p">,</span><span class="s2">&#34;dvd&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="translog">Translog<a hidden class="anchor" aria-hidden="true" href="#translog">#</a></h2>
+<ol>
+<li>由于Lucene提交的开销很大，不能每个变更就提交一次(刷写磁盘)，所以每个分片复制都有一个事务日志，称为translog。所有索引和删除操作都是在被内部Lucene索引处理只会写入translog的。在发生崩溃的情况下，当索引恢复的时候，可以通过回放translog中的数据进行恢复。</li>
+</ol>
+<h3 id="indextranslogdurability">index.translog.durability<a hidden class="anchor" aria-hidden="true" href="#indextranslogdurability">#</a></h3>
+<ol>
+<li>translog刷盘方式，可选值：request、async。
+<ul>
+<li>request：即每请求一次刷盘，也就是客户端发起一个增删改操作时，会在主分片和副本分片全部刷盘成功后，才会返回成功，是ES的默认模式。</li>
+<li>async：异步刷盘模式，此模式频率由index.translog.sync_interval设置，其默认值为5s，该模式会存在数据丢失的可能。</li>
+</ul>
+</li>
+</ol>
+<h3 id="indextranslogsync_interval">index.translog.sync_interval<a hidden class="anchor" aria-hidden="true" href="#indextranslogsync_interval">#</a></h3>
+<ol>
+<li>如果index.translog.durability设置为async，用该值来设置刷盘的频率，默认为5s。</li>
+</ol>
+<h3 id="indextranslogflush_threshold_size">index.translog.flush_threshold_size<a hidden class="anchor" aria-hidden="true" href="#indextranslogflush_threshold_size">#</a></h3>
+<ol>
+<li>ES强制刷新的另外一个维度，如果translog的大小达到该值，则强制将为刷盘的数据强制刷新到Lucene中，默认512M。</li>
+</ol>
+<h3 id="indextranslogretentionsize">index.translog.retention.size<a hidden class="anchor" aria-hidden="true" href="#indextranslogretentionsize">#</a></h3>
+<ol>
+<li>保存跨日志文件的总大小。也就是translog日志文件flush后，并不马上删除，而是保留一段时间，但最新的translog文件已经存储的内容与待删除的文件的间隔不超过改参数设置的值，默认为512M。</li>
+</ol>
+<h3 id="indextranslogretentionage">index.translog.retention.age<a hidden class="anchor" aria-hidden="true" href="#indextranslogretentionage">#</a></h3>
+<ol>
+<li>保存translog文件的最大持续时间，默认12h。</li>
+</ol>
+<h2 id="参考">参考<a hidden class="anchor" aria-hidden="true" href="#参考">#</a></h2>
+<ol>
+<li><a href="https://blog.csdn.net/dwjf321/article/details/103871981" target="_blank" rel="noopener">https://blog.csdn.net/dwjf321/article/details/103871981</a></li>
+</ol>
+
 
   </div>
 
@@ -1111,7 +1468,7 @@
   <a class="prev" href="https://heliu.site/posts/elasticsearch/mapping/">
     <span class="title">« 上一页</span>
     <br>
-    <span>mappings</span>
+    <span>Mappings</span>
   </a>
   <a class="next" href="https://heliu.site/posts/elasticsearch/aliases/">
     <span class="title">下一页 »</span>

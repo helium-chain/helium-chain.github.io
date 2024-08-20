@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Fri, 27 Aug 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 20 Nov 2021 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://heliu.site/posts/elasticsearch/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>正向索引和倒排索引</title>
@@ -36,14 +36,14 @@
       <description>elasticsearch、kibana安装简介。</description>
     </item>
     <item>
-      <title>mappings</title>
+      <title>Mappings</title>
       <link>https://heliu.site/posts/elasticsearch/mapping/</link>
       <pubDate>Tue, 27 Jul 2021 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/elasticsearch/mapping/</guid>
       <description>索引的创建、修改、删除。</description>
     </item>
     <item>
-      <title>settings</title>
+      <title>Settings</title>
       <link>https://heliu.site/posts/elasticsearch/settings/</link>
       <pubDate>Fri, 06 Aug 2021 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/elasticsearch/settings/</guid>
@@ -55,6 +55,48 @@
       <pubDate>Fri, 27 Aug 2021 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/elasticsearch/aliases/</guid>
       <description>ElasticSearch 索引别名设置。</description>
+    </item>
+    <item>
+      <title>Routing</title>
+      <link>https://heliu.site/posts/elasticsearch/routing/</link>
+      <pubDate>Mon, 13 Sep 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/elasticsearch/routing/</guid>
+      <description>ElasticSearch 路由规则。</description>
+    </item>
+    <item>
+      <title>索引CURD</title>
+      <link>https://heliu.site/posts/elasticsearch/indexes/</link>
+      <pubDate>Wed, 06 Oct 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/elasticsearch/indexes/</guid>
+      <description>索引的增删改查。</description>
+    </item>
+    <item>
+      <title>文档CURD</title>
+      <link>https://heliu.site/posts/elasticsearch/document/</link>
+      <pubDate>Mon, 18 Oct 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/elasticsearch/document/</guid>
+      <description>文档增删改查。</description>
+    </item>
+    <item>
+      <title>Query</title>
+      <link>https://heliu.site/posts/elasticsearch/query/</link>
+      <pubDate>Thu, 11 Nov 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/elasticsearch/query/</guid>
+      <description>查询文档。</description>
+    </item>
+    <item>
+      <title>聚合</title>
+      <link>https://heliu.site/posts/elasticsearch/aggregate/</link>
+      <pubDate>Sat, 20 Nov 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/elasticsearch/aggregate/</guid>
+      <description>桶聚合、度量聚合、管道聚合等。</description>
+    </item>
+    <item>
+      <title>数据同步</title>
+      <link>https://heliu.site/posts/elasticsearch/sync/</link>
+      <pubDate>Sat, 30 Oct 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/elasticsearch/sync/</guid>
+      <description>Mysql数据同步ElasticSearch。</description>
     </item>
   </channel>
 </rss>
