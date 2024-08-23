@@ -631,6 +631,27 @@
       <description>redis 使用场景。</description>
     </item>
     <item>
+      <title>redis hyperLogLog</title>
+      <link>https://heliu.site/posts/redis/hyperloglog/</link>
+      <pubDate>Wed, 21 Feb 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/hyperloglog/</guid>
+      <description>redis HyperLogLog命令介绍。</description>
+    </item>
+    <item>
+      <title>redis transactions</title>
+      <link>https://heliu.site/posts/redis/transactions/</link>
+      <pubDate>Thu, 21 Dec 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/transactions/</guid>
+      <description>redis transactions命令介绍。</description>
+    </item>
+    <item>
+      <title>redis scripting</title>
+      <link>https://heliu.site/posts/redis/scripting/</link>
+      <pubDate>Thu, 28 Dec 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/scripting/</guid>
+      <description>redis Scripting命令介绍。</description>
+    </item>
+    <item>
       <title>mysql 语法</title>
       <link>https://heliu.site/posts/mysql/use/</link>
       <pubDate>Fri, 11 Mar 2022 00:00:00 +0000</pubDate>

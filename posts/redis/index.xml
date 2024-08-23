@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Sat, 26 Aug 2023 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 21 Feb 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://heliu.site/posts/redis/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>redis 网络模型</title>
@@ -118,6 +118,27 @@
       <pubDate>Sat, 26 Aug 2023 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/redis/use/</guid>
       <description>redis 使用场景。</description>
+    </item>
+    <item>
+      <title>redis hyperLogLog</title>
+      <link>https://heliu.site/posts/redis/hyperloglog/</link>
+      <pubDate>Wed, 21 Feb 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/hyperloglog/</guid>
+      <description>redis HyperLogLog命令介绍。</description>
+    </item>
+    <item>
+      <title>redis transactions</title>
+      <link>https://heliu.site/posts/redis/transactions/</link>
+      <pubDate>Thu, 21 Dec 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/transactions/</guid>
+      <description>redis transactions命令介绍。</description>
+    </item>
+    <item>
+      <title>redis scripting</title>
+      <link>https://heliu.site/posts/redis/scripting/</link>
+      <pubDate>Thu, 28 Dec 2023 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/redis/scripting/</guid>
+      <description>redis Scripting命令介绍。</description>
     </item>
   </channel>
 </rss>
