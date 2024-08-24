@@ -8,9 +8,6 @@
     <loc>https://heliu.site/posts/golang/install/</loc>
     <lastmod>2022-03-22T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://heliu.site/posts/ssl/</loc>
-    <lastmod>2024-01-03T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://heliu.site/posts/golang/basic/</loc>
     <lastmod>2023-07-21T00:00:00+00:00</lastmod>
   </url><url>
@@ -67,6 +64,9 @@
   </url><url>
     <loc>https://heliu.site/posts/golang/netpoll/</loc>
     <lastmod>2024-07-20T21:59:40+08:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/tool/</loc>
+    <lastmod>2024-01-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://heliu.site/posts/golang/sync/pool/</loc>
     <lastmod>2024-07-14T20:32:54+08:00</lastmod>
@@ -269,9 +269,6 @@
     <loc>https://heliu.site/posts/golang/netpoll/epoll/</loc>
     <lastmod>2024-07-20T21:59:40+08:00</lastmod>
   </url><url>
-    <loc>https://heliu.site/posts/ssl/acme/</loc>
-    <lastmod>2024-01-03T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://heliu.site/posts/docker/install/</loc>
     <lastmod>2022-01-07T00:00:00+00:00</lastmod>
   </url><url>
@@ -428,6 +425,12 @@
     <loc>https://heliu.site/posts/elasticsearch/sync/</loc>
     <lastmod>2021-10-30T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://heliu.site/posts/tool/acme/</loc>
+    <lastmod>2024-01-03T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/tool/git/</loc>
+    <lastmod>2024-01-21T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://heliu.site/posts/</loc>
     <lastmod>2024-08-16T00:00:00+00:00</lastmod>
   </url><url>
@@ -482,7 +485,10 @@
     <loc>https://heliu.site/tags/redis/</loc>
     <lastmod>2024-02-21T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://heliu.site/tags/ssl/</loc>
+    <loc>https://heliu.site/tags/git/</loc>
+    <lastmod>2024-01-21T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/tags/certificate/</loc>
     <lastmod>2024-01-03T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://heliu.site/tags/mycat/</loc>
