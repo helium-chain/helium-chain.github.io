@@ -125,8 +125,8 @@
   "keywords": [
     "mysql"
   ],
-  "articleBody": "插入数据 insert 如果我们需要一次性往数据库表中插入多条记录，可以从以下三个方面进行优化。 insert into tb_test values(1,'t'); insert into tb_test values(2,'c'); insert into tb_test values(3,'j'); -- ..... 优化方案一：批量插入数据 Insert into tb_test values(1,'t'),(2,'c'),(3,'j'); 优化方案二：手动控制事务 start transaction; insert into tb_test values(1,'t'),(2,'c'),(3,'j'); insert into tb_test values(4,'t'),(5,'c'),(6,'j'); insert into tb_test values(7,'t'),(8,'c'),(9,'j'); commit; 优化方案三：主键顺序插入，性能要高于乱序插入 主键乱序插入: 8 1 9 21 88 2 4 15 89 5 7 3 主键顺序插入: 1 2 3 4 5 7 8 9 15 21 88 89 大批量插入数据 如果一次性需要插入大批量数据(比如: 几百万的记录)，使用insert语句插入性能较低，此时可以使用MySQL数据库提供的load指令进行插入。 可以执行如下指令，将数据脚本文件中的数据加载到表结构中： -- 客户端连接服务端时，加上参数 -–local-infile mysql –-local-infile -u root -p -- 设置全局参数local_infile为1，开启从本地加载文件导入数据的开关 set global local_infile = 1; -- 执行load指令将准备好的数据，加载到表结构中 load data local infile '/root/sql1.log' into table tb_user fields terminated by ',' lines terminated by '\\n' ; 主键优化 满足业务需求的情况下，尽量降低主键的长度。 插入数据时，尽量选择顺序插入，选择使用AUTO_INCREMENT自增主键。 尽量不要使用UUID做主键或者是其他自然主键，如身份证号。 业务操作时，避免对主键的修改。 order by优化 MySQL的排序，有两种方式： Using filesort: 通过表的索引或全表扫描，读取满足条件的数据行，然后在排序缓冲区sort buffer中完成排序操作，所有不是通过索引直接返回排序结果的排序都叫 FileSort 排序。 Using index: 通过有序索引顺序扫描直接返回有序数据，这种情况即为 using index，不需要额外排序，操作效率高。 对于以上的两种排序方式，Using index的性能高，而Using filesort的性能低，我们在优化排序操作时，尽量要优化为 Using index。 order by优化原则： 根据排序字段建立合适的索引，多字段排序时，也遵循最左前缀法则。 尽量使用覆盖索引。 多字段排序, 一个升序一个降序，此时需要注意联合索引在创建时的规则（ASC/DESC）。 如果不可避免的出现filesort，大数据量排序时，可以适当增大排序缓冲区大小sort_buffer_size(默认256k)。 group by优化 在分组操作时，可以通过索引来提高效率。 分组操作时，索引的使用也是满足最左前缀法则的。 limit优化 在数据量比较大时，如果进行limit分页查询，在查询时，越往后，分页查询效率越低。 当在进行分页查询时，如果执行 limit 2000000,10 ，此时需要MySQL排序前2000010 记录，仅仅返回 2000000 - 2000010 的记录，其他记录丢弃，查询排序的代价非常大。 一般分页查询时，通过创建 覆盖索引 能够比较好地提高性能，可以通过覆盖索引加子查询形式进行优化。 explain select * from tb_sku t , ( select id from tb_sku order by id limit 2000000,10 ) a where t.id = a.id; count优化 如果数据量很大，在执行count操作时，是非常耗时的。 MyISAM 引擎把一个表的总行数存在了磁盘上，因此执行 count(*) 的时候会直接返回这个数，效率很高；但是如果是带条件的count，MyISAM也慢。 InnoDB 引擎就麻烦了，它执行 count(*) 的时候，需要把数据一行一行地从引擎里面读出来，然后累积计数。 select count(*) from tb_user; count用法 count() 是一个聚合函数，对于返回的结果集，一行行地判断，如果 count 函数的参数不是NULL，累计值就加 1，否则不加，最后返回累计值。 count用法 含义 count(主键) InnoDB 引擎会遍历整张表，把每一行的主键id 值都取出来，返回给服务层。服务层拿到主键后，直接按行进行累加(主键不可能为null) count(字段) 没有not null约束: InnoDB引擎会遍历整张表把每一行的字段值都取出来，返回给服务层，服务层判断是否为null，不为null，计数累加。有not null约束：InnoDB引擎会遍历整张表把每一行的字段值都取出来，返回给服务层，直接按行进行累加 count(数字) InnoDB 引擎遍历整张表，但不取值。服务层对于返回的每一行，放一个数字\"1\"进去，直接按行进行累加 count(*) InnoDB引擎并不会把全部字段取出来，而是专门做了优化，不取值，服务层直接按行进行累加 按照效率排序的话，count(字段) \u003c count(主键 id) \u003c count(1) ≈ count(*)，所以尽量使用count(*)。 update优化 我们在执行删除的SQL语句时，会锁定id为1这一行的数据，然后事务提交之后，行锁释放。 update course set name = 'php' where id = 1; 当我们开启多个事务，在执行上述的SQL时，我们发现行锁升级为了表锁。 导致该update语句的性能大大降低。 update course set name = 'javascript' where name = 'PHP'; InnoDB的行锁是针对索引加的锁，不是针对记录加的锁 ,并且该索引不能失效，否则会从行锁升级为表锁。 ",
-  "wordCount" : "245",
+  "articleBody": "插入数据 insert 如果我们需要一次性往数据库表中插入多条记录，可以从以下三个方面进行优化。 insert into tb_test values(1,'t'); insert into tb_test values(2,'c'); insert into tb_test values(3,'j'); -- ..... 优化方案一：批量插入数据 Insert into tb_test values(1,'t'),(2,'c'),(3,'j'); 优化方案二：手动控制事务 start transaction; insert into tb_test values(1,'t'),(2,'c'),(3,'j'); insert into tb_test values(4,'t'),(5,'c'),(6,'j'); insert into tb_test values(7,'t'),(8,'c'),(9,'j'); commit; 优化方案三：主键顺序插入，性能要高于乱序插入 主键乱序插入: 8 1 9 21 88 2 4 15 89 5 7 3 主键顺序插入: 1 2 3 4 5 7 8 9 15 21 88 89 大批量插入数据 如果一次性需要插入大批量数据(比如: 几百万的记录)，使用insert语句插入性能较低，此时可以使用MySQL数据库提供的load指令进行插入。 可以执行如下指令，将数据脚本文件中的数据加载到表结构中： -- 客户端连接服务端时，加上参数 -–local-infile mysql –-local-infile -u root -p -- 设置全局参数local_infile为1，开启从本地加载文件导入数据的开关 set global local_infile = 1; -- 执行load指令将准备好的数据，加载到表结构中 load data local infile '/root/sql1.log' into table tb_user fields terminated by ',' lines terminated by '\\n' ; 主键优化 满足业务需求的情况下，尽量降低主键的长度。 插入数据时，尽量选择顺序插入，选择使用AUTO_INCREMENT自增主键。 尽量不要使用UUID做主键或者是其他自然主键，如身份证号。 业务操作时，避免对主键的修改。 order by优化 MySQL的排序，有两种方式： Using filesort: 通过表的索引或全表扫描，读取满足条件的数据行，然后在排序缓冲区sort buffer中完成排序操作，所有不是通过索引直接返回排序结果的排序都叫 FileSort 排序。 Using index: 通过有序索引顺序扫描直接返回有序数据，这种情况即为 using index，不需要额外排序，操作效率高。 对于以上的两种排序方式，Using index的性能高，而Using filesort的性能低，我们在优化排序操作时，尽量要优化为 Using index。 order by优化原则： 根据排序字段建立合适的索引，多字段排序时，也遵循最左前缀法则。 尽量使用覆盖索引。 多字段排序, 一个升序一个降序，此时需要注意联合索引在创建时的规则（ASC/DESC）。 如果不可避免的出现filesort，大数据量排序时，可以适当增大排序缓冲区大小sort_buffer_size(默认256k)。 group by优化 在分组操作时，可以通过索引来提高效率。 分组操作时，索引的使用也是满足最左前缀法则的。 limit优化 在数据量比较大时，如果进行limit分页查询，在查询时，越往后，分页查询效率越低。 当在进行分页查询时，如果执行 limit 2000000,10 ，此时需要MySQL排序前2000010 记录，仅仅返回 2000000 - 2000010 的记录，其他记录丢弃，查询排序的代价非常大。 一般分页查询时，通过创建 覆盖索引 能够比较好地提高性能，可以通过覆盖索引加子查询形式进行优化。 explain select * from tb_sku t , ( select id from tb_sku order by id limit 2000000,10 ) a where t.id = a.id; count优化 如果数据量很大，在执行count操作时，是非常耗时的。 MyISAM 引擎把一个表的总行数存在了磁盘上，因此执行 count(*) 的时候会直接返回这个数，效率很高；但是如果是带条件的count，MyISAM也慢。 InnoDB 引擎就麻烦了，它执行 count(*) 的时候，需要把数据一行一行地从引擎里面读出来，然后累积计数。 select count(*) from tb_user; count用法 count() 是一个聚合函数，对于返回的结果集，一行行地判断，如果 count 函数的参数不是NULL，累计值就加 1，否则不加，最后返回累计值。 count用法 含义 count(主键) InnoDB 引擎会遍历整张表，把每一行的主键id 值都取出来，返回给服务层。服务层拿到主键后，直接按行进行累加(主键不可能为null) count(字段) 没有not null约束: InnoDB引擎会遍历整张表把每一行的字段值都取出来，返回给服务层，服务层判断是否为null，不为null，计数累加。有not null约束：InnoDB引擎会遍历整张表把每一行的字段值都取出来，返回给服务层，直接按行进行累加 count(数字) InnoDB 引擎遍历整张表，但不取值。服务层对于返回的每一行，放一个数字\"1\"进去，直接按行进行累加 count(*) InnoDB引擎并不会把全部字段取出来，而是专门做了优化，不取值，服务层直接按行进行累加 按照效率排序的话，count(字段) \u003c count(主键 id) \u003c count(1) ≈ count(*)，所以尽量使用count(*)。 update优化 我们在执行删除的SQL语句时，会锁定id为1这一行的数据，然后事务提交之后，行锁释放。 update course set name = 'php' where id = 1; 当我们开启多个事务，在执行上述的SQL时，我们发现行锁升级为了表锁。 导致该update语句的性能大大降低。 update course set name = 'javascript' where name = 'PHP'; InnoDB的行锁是针对索引加的锁，不是针对记录加的锁 ,并且该索引不能失效，否则会从行锁升级为表锁。 调整连接数量 有时候因为Mysql服务端的连接数量设置太小导致，sql查询变慢(因为很多sql在排队等待)。 MySQL数据库的默认最大连接数是100，而最大连接数可以达到16384个。 查看数据库配置的最大连接数。 show variables like '%max_connections%'; 调整连接数量，my.cnf 文件中修改。 max_connections=100 当然，也可适当调整客户端的连接数量，不然客户端数量太少也会导致sql变慢。 调整 bufer pool 用于缓存数据库中的数据和索引，以加快数据库的读取操作。 innodb_buffer_pool_size 是 MySQL 中 InnoDB 存储引擎的一个重要参数，它定义了 InnoDB 缓冲池的大小。 提高读取性能：将常用的数据和索引加载到内存缓冲池中，可以减少磁盘 I/O 操作，从而提高读取性能。因为内存的读取速度远远快于磁盘的读取速度。 减少磁盘访问：通过增大缓冲池的大小，可以将更多的数据和索引存放在内存中，减少对磁盘的访问次数，从而降低磁盘 I/O 的负载。 提高查询性能：由于数据和索引在缓冲池中的存在，查询操作可以更快速地在内存中完成，而不需要频繁地读取磁盘上的数据。 改善并发性能：缓冲池的存在可以减少对磁盘的并发访问，提高并发读取的性能，从而改善数据库的并发处理能力。 需要注意的是，设置合适的 innodb_buffer_pool_size 大小需要考虑到服务器的可用内存和数据库的工作负载。如果设置过小，可能导致频繁的磁盘 I/O，降低性能；如果设置过大，可能会占用过多的内存资源，导致其他应用程序受影响。因此，需要根据实际情况进行调整和优化。 修改 my.cnf 中的参数： # 支持 M、G，重启mysql后生效 innodb_buffer_pool_size = 128M 通过 sql 修改。 -- 全局修改，重启mysql后失效，单位字节 SET GLOBAL innodb_buffer_pool_size = 4294967296; -- 查看修改是否生效 use mysql; select @@innodb_buffer_pool_size; 查看 Buffer Pool 查看命中率，是否需要调整该值。 命中率 mysql数据库的pool可以缓存索引和行数据，值越大，IO读写就越少，如果单纯的做数据库服务，该参数可以设置到电脑物理内存的80%，但是也要根据服务器综合使用情况进行合理设置。 查看命中率参数： show status like ‘%innodb_buffer_pool_%’ -- Innodb_buffer_pool_reads: 表示从物理磁盘读取页的次数 -- Innodb_buffer_pool_read_ahead: 预读的次数 -- Innodb_buffer_pool_read_ahead_evicted: 预读的页，但是没有读取就从缓冲池中被替换的页的数量，一般用来判断预读的效率 -- Innodb_buffer_pool_read_requests: 从缓冲池中读取页的次数 计算命中率。 缓冲池命中率 = Innodb_buffer_pool_read_requests / (Innodb_buffer_pool_read_requests + Innodb_buffer_pool_reads + Innodb_buffer_pool_read_ahead) -- 通过sql计算，通常InnoDB存储引擎缓冲池的命中不应该小于99%。 SELECT ( SELECT variable_value FROM PERFORMANCE_SCHEMA.global_status WHERE variable_name = 'Innodb_buffer_pool_read_requests' ) / ( SELECT SUM( variable_value ) FROM PERFORMANCE_SCHEMA.global_status WHERE variable_name IN ( 'Innodb_buffer_pool_read_requests', 'Innodb_buffer_pool_read_ahead', 'Innodb_buffer_pool_reads' ) ) 当命中率较低的时候，说明mysql性能有所降低了，需要根据内存硬件的大小进行mysql的缓存命中率优化。 innodb_buffer_pool_instances：是一个正整数即可，不要超过服务器的cpu核数。建议可以先设置服务器CPU核数的一半。 innodb_buffer_pool_chunk_size：是一个整数的MB、GB即可。 innodb_buffer_pool_size：该值是一个计算值，innodb_buffer_pool_instances*innodb_buffer_pool_chunk_size的结果值的一个整数倍数，否则该值设计的不合理，mysql会自动根据计算规则，计算一个小于该值的一个有效值。该值的大小在服务器物理内存的50%—80%之间，还要考虑该服务器上是否有其它应用使用内存等情况。 对于mysql的innodb缓存命中率优化为：对mysql的innodb_buffer_pool_instances设置一个小于服务器CPU核数的一个正整数；对mysql的innodb_buffer_pool_chunk_size设置一个合理的MB或GB，让innodb_buffer_pool_size在该服务器物理内存的50%—80%范围内。 设计好三个参数后，修改mysql的配置文件my.cnf，然后重新启动mysql服务即可。这三个参数也是根据自己服务器和mysql存储数据情况进行不断尝试和调试的。 # 提高innodb命中率 # 32GB=8*1024MB*4，倍数为4，因此该值有效， # 服务器为16核，设计innodb_buffer_pool_instances为8 # 服务器内存64GB，设计innodb_buffer_pool_size为32GB innodb_buffer_pool_instances=8 innodb_buffer_pool_chunk_size=1024MB innodb_buffer_pool_size=32GB ",
+  "wordCount" : "386",
   "inLanguage": "zh",
   "image": "https://heliu.site/favicon-32x32.png","datePublished": "2022-06-12T00:00:00Z",
   "dateModified": "2024-06-12T00:00:00Z",
@@ -252,7 +252,7 @@
     <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
     <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
     <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
-</svg><span>245字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>386字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="12" r="9"></circle>
@@ -307,8 +307,17 @@
                         <a href="#count%e7%94%a8%e6%b3%95" aria-label="count用法">count用法</a></li></ul>
                     </li>
                     <li>
-                        <a href="#update%e4%bc%98%e5%8c%96" aria-label="update优化">update优化</a>
+                        <a href="#update%e4%bc%98%e5%8c%96" aria-label="update优化">update优化</a></li>
+                    <li>
+                        <a href="#%e8%b0%83%e6%95%b4%e8%bf%9e%e6%8e%a5%e6%95%b0%e9%87%8f" aria-label="调整连接数量">调整连接数量</a></li>
+                    <li>
+                        <a href="#%e8%b0%83%e6%95%b4-bufer-pool" aria-label="调整 bufer pool">调整 bufer pool</a><ul>
+                            
+                    <li>
+                        <a href="#%e5%91%bd%e4%b8%ad%e7%8e%87" aria-label="命中率">命中率</a>
                     </li>
+                </ul>
+                </li>
                 </ul>
             </div>
         </details>
@@ -512,7 +521,91 @@
 </span></span></span></code></pre></div><ol start="3">
 <li>InnoDB的行锁是针对索引加的锁，不是针对记录加的锁 ,并且该索引不能失效，否则会从行锁升级为表锁。</li>
 </ol>
-
+<h2 id="调整连接数量">调整连接数量<a hidden class="anchor" aria-hidden="true" href="#调整连接数量">#</a></h2>
+<ol>
+<li>有时候因为Mysql服务端的连接数量设置太小导致，sql查询变慢(因为很多sql在排队等待)。</li>
+<li>MySQL数据库的默认最大连接数是100，而最大连接数可以达到16384个。</li>
+<li>查看数据库配置的最大连接数。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">show</span><span class="w"> </span><span class="n">variables</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="s1">&#39;%max_connections%&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><ol start="4">
+<li>调整连接数量，my.cnf 文件中修改。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="na">max_connections</span><span class="o">=</span><span class="s">100</span>
+</span></span></code></pre></div><ol start="5">
+<li>当然，也可适当调整客户端的连接数量，不然客户端数量太少也会导致sql变慢。</li>
+</ol>
+<h2 id="调整-bufer-pool">调整 bufer pool<a hidden class="anchor" aria-hidden="true" href="#调整-bufer-pool">#</a></h2>
+<ol>
+<li>用于缓存数据库中的数据和索引，以加快数据库的读取操作。</li>
+<li>innodb_buffer_pool_size 是 MySQL 中 InnoDB 存储引擎的一个重要参数，它定义了 InnoDB 缓冲池的大小。
+<ul>
+<li>提高读取性能：将常用的数据和索引加载到内存缓冲池中，可以减少磁盘 I/O 操作，从而提高读取性能。因为内存的读取速度远远快于磁盘的读取速度。</li>
+<li>减少磁盘访问：通过增大缓冲池的大小，可以将更多的数据和索引存放在内存中，减少对磁盘的访问次数，从而降低磁盘 I/O 的负载。</li>
+<li>提高查询性能：由于数据和索引在缓冲池中的存在，查询操作可以更快速地在内存中完成，而不需要频繁地读取磁盘上的数据。</li>
+<li>改善并发性能：缓冲池的存在可以减少对磁盘的并发访问，提高并发读取的性能，从而改善数据库的并发处理能力。</li>
+</ul>
+</li>
+<li>需要注意的是，设置合适的 innodb_buffer_pool_size 大小需要考虑到服务器的可用内存和数据库的工作负载。如果设置过小，可能导致频繁的磁盘 I/O，降低性能；如果设置过大，可能会占用过多的内存资源，导致其他应用程序受影响。因此，需要根据实际情况进行调整和优化。</li>
+<li>修改 my.cnf 中的参数：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1"># 支持 M、G，重启mysql后生效</span>
+</span></span><span class="line"><span class="cl"><span class="na">innodb_buffer_pool_size</span> <span class="o">=</span> <span class="s">128M</span>
+</span></span></code></pre></div><ol start="5">
+<li>通过 sql 修改。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 全局修改，重启mysql后失效，单位字节
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w"> </span><span class="n">innodb_buffer_pool_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4294967296</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- 查看修改是否生效
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">use</span><span class="w"> </span><span class="n">mysql</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="o">@@</span><span class="n">innodb_buffer_pool_size</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><ol start="6">
+<li>查看 Buffer Pool 查看命中率，是否需要调整该值。</li>
+</ol>
+<h3 id="命中率">命中率<a hidden class="anchor" aria-hidden="true" href="#命中率">#</a></h3>
+<ol>
+<li>mysql数据库的pool可以缓存索引和行数据，值越大，IO读写就越少，如果单纯的做数据库服务，该参数可以设置到电脑物理内存的80%，但是也要根据服务器综合使用情况进行合理设置。</li>
+<li>查看命中率参数：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">show</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="err">‘</span><span class="o">%</span><span class="n">innodb_buffer_pool_</span><span class="o">%</span><span class="err">’</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- Innodb_buffer_pool_reads: 表示从物理磁盘读取页的次数
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- Innodb_buffer_pool_read_ahead: 预读的次数
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- Innodb_buffer_pool_read_ahead_evicted: 预读的页，但是没有读取就从缓冲池中被替换的页的数量，一般用来判断预读的效率
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- Innodb_buffer_pool_read_requests: 从缓冲池中读取页的次数
+</span></span></span></code></pre></div><ol start="3">
+<li>计算命中率。
+<ul>
+<li><strong>缓冲池命中率</strong> = Innodb_buffer_pool_read_requests / (Innodb_buffer_pool_read_requests + Innodb_buffer_pool_reads + Innodb_buffer_pool_read_ahead)</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 通过sql计算，通常InnoDB存储引擎缓冲池的命中不应该小于99%。
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">SELECT</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="p">(</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">variable_value</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">PERFORMANCE_SCHEMA</span><span class="p">.</span><span class="n">global_status</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">variable_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Innodb_buffer_pool_read_requests&#39;</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="k">SUM</span><span class="p">(</span><span class="w"> </span><span class="n">variable_value</span><span class="w"> </span><span class="p">)</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">FROM</span><span class="w"> </span><span class="n">PERFORMANCE_SCHEMA</span><span class="p">.</span><span class="n">global_status</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">WHERE</span><span class="w"> </span><span class="n">variable_name</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="s1">&#39;Innodb_buffer_pool_read_requests&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Innodb_buffer_pool_read_ahead&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Innodb_buffer_pool_reads&#39;</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w">
+</span></span></span></code></pre></div><ol start="4">
+<li>当命中率较低的时候，说明mysql性能有所降低了，需要根据内存硬件的大小进行mysql的缓存命中率优化。
+<ul>
+<li><strong>innodb_buffer_pool_instances</strong>：是一个正整数即可，不要超过服务器的cpu核数。建议可以先设置服务器CPU核数的一半。</li>
+<li><strong>innodb_buffer_pool_chunk_size</strong>：是一个整数的MB、GB即可。</li>
+<li><strong>innodb_buffer_pool_size</strong>：该值是一个计算值，innodb_buffer_pool_instances*innodb_buffer_pool_chunk_size的结果值的一个整数倍数，否则该值设计的不合理，mysql会自动根据计算规则，计算一个小于该值的一个有效值。该值的大小在服务器物理内存的50%—80%之间，还要考虑该服务器上是否有其它应用使用内存等情况。</li>
+</ul>
+</li>
+<li>对于mysql的innodb缓存命中率优化为：对mysql的innodb_buffer_pool_instances设置一个小于服务器CPU核数的一个正整数；对mysql的innodb_buffer_pool_chunk_size设置一个合理的MB或GB，让innodb_buffer_pool_size在该服务器物理内存的50%—80%范围内。</li>
+<li>设计好三个参数后，修改mysql的配置文件my.cnf，然后重新启动mysql服务即可。这三个参数也是根据自己服务器和mysql存储数据情况进行不断尝试和调试的。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="c1"># 提高innodb命中率</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 32GB=8*1024MB*4，倍数为4，因此该值有效，</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 服务器为16核，设计innodb_buffer_pool_instances为8</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 服务器内存64GB，设计innodb_buffer_pool_size为32GB</span>
+</span></span><span class="line"><span class="cl"><span class="na">innodb_buffer_pool_instances</span><span class="o">=</span><span class="s">8</span>
+</span></span><span class="line"><span class="cl"><span class="na">innodb_buffer_pool_chunk_size</span><span class="o">=</span><span class="s">1024MB</span>
+</span></span><span class="line"><span class="cl"><span class="na">innodb_buffer_pool_size</span><span class="o">=</span><span class="s">32GB</span>
+</span></span></code></pre></div>
 
   </div>
 
