@@ -855,11 +855,18 @@
       <description>acme.sh 实现了 acme 协议, 可以从 letsencrypt 生成免费的证书。</description>
     </item>
     <item>
-      <title>git</title>
+      <title>git 命令</title>
       <link>https://heliu.site/posts/tool/git/</link>
       <pubDate>Sun, 21 Jan 2024 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/tool/git/</guid>
       <description>git 命令介绍。</description>
+    </item>
+    <item>
+      <title>win 安装 wsl2</title>
+      <link>https://heliu.site/posts/tool/wsl/</link>
+      <pubDate>Sun, 28 Mar 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/tool/wsl/</guid>
+      <description>win 安装 linux 子系统。</description>
     </item>
     <item>
       <title>打赏</title>

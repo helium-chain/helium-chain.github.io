@@ -5,11 +5,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>acme.sh | Helium</title>
-<meta name="keywords" content="certificate">
-<meta name="description" content="acme.sh 实现了 acme 协议, 可以从 letsencrypt 生成免费的证书。">
+<title>win 安装 wsl2 | Helium</title>
+<meta name="keywords" content="wsl">
+<meta name="description" content="win 安装 linux 子系统。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/tool/acme/">
+<link rel="canonical" href="https://heliu.site/posts/tool/wsl/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
@@ -20,7 +20,7 @@
 <link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/tool/acme/">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/tool/wsl/">
 <noscript>
     <style>
         #theme-toggle,
@@ -74,19 +74,19 @@
 
   
 
-<meta property="og:title" content="acme.sh" />
-<meta property="og:description" content="acme.sh 实现了 acme 协议, 可以从 letsencrypt 生成免费的证书。" />
+<meta property="og:title" content="win 安装 wsl2" />
+<meta property="og:description" content="win 安装 linux 子系统。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/tool/acme/" />
+<meta property="og:url" content="https://heliu.site/posts/tool/wsl/" />
 <meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2024-01-03T00:00:00+00:00" />
-<meta property="article:modified_time" content="2024-01-03T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
+<meta property="article:published_time" content="2021-03-28T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-03-28T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
-<meta name="twitter:title" content="acme.sh"/>
-<meta name="twitter:description" content="acme.sh 实现了 acme 协议, 可以从 letsencrypt 生成免费的证书。"/>
+<meta name="twitter:title" content="win 安装 wsl2"/>
+<meta name="twitter:description" content="win 安装 linux 子系统。"/>
 
 
 <script type="application/ld+json">
@@ -109,8 +109,8 @@
     {
       "@type": "ListItem",
       "position":  3 ,
-      "name": "acme.sh",
-      "item": "https://heliu.site/posts/tool/acme/"
+      "name": "win 安装 wsl2",
+      "item": "https://heliu.site/posts/tool/wsl/"
     }
   ]
 }
@@ -119,24 +119,24 @@
 {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "acme.sh",
-  "name": "acme.sh",
-  "description": "acme.sh 实现了 acme 协议, 可以从 letsencrypt 生成免费的证书。",
+  "headline": "win 安装 wsl2",
+  "name": "win 安装 wsl2",
+  "description": "win 安装 linux 子系统。",
   "keywords": [
-    "certificate"
+    "wsl"
   ],
-  "articleBody": " Let's Encrypt 参考自 古道轻风。 Let’s Encrypt 是一个由非营利性组织 互联网安全研究小组（ISRG）提供的免费、自动化和开放的证书颁发机构（CA）。 acme.sh 参考官方 github 教程。 acme.sh 实现了 acme 协议, 可以从 letsencrypt 生成免费的证书。 本篇文章主要是根据acme.sh配置安装的，记录acme.sh配置的一些歧义地方。 安装 acme.sh 安装 acme.sh。 # 创建 .acme.sh 目录 mkdir ~/.acme.sh # 切换到 .acme.sh cd ~/.acme.sh # 执行安装命令，注意邮箱改成自己的 curl https://get.acme.sh | sh -s email=my@example.com 添加别名。 vi ~/.bashrc # 把下面这行加入到最后 # alias acme.sh=~/.acme.sh/acme.sh # 最后执行，使配置生效 source ~/.bashrc 生成证书 因为我的nginx在docker里，不确定nginx的方式能否可行。 所以采用的手动 dns 验证。我用的华为云参考https://github.com/acmesh-official/acme.sh/wiki/dnsapi2#dns_huaweicloud。 # 配置环境变量 export HUAWEICLOUD_Username=\"\" export HUAWEICLOUD_Password=\"\" export HUAWEICLOUD_DomainName=\"\" # 再执行 acme.sh --issue --dns dns_huaweicloud -d example.com -d *.example.com 安装证书 acme.sh --install-cert -d example.com \\ --key-file /path/to/keyfile/in/nginx/key.pem \\ --fullchain-file /path/to/fullchain/nginx/cert.pem \\ --reloadcmd \"docker exec -it nginx nginx -s reload\" 更新证书 $ crontab -l 44 6 * * * \"/root/.acme.sh\"/acme.sh --cron --home \"/root/.acme.sh\" \u003e /dev/null ",
-  "wordCount" : "117",
+  "articleBody": "安装 WSL2 PowerShell 开启 wsl2 使用Windows + R快捷键打开「运行」对话框，输入powershell，然后按Ctrl + Shift + Enter，以管理员权限打开 PowerShell。 执行以下命令启用 WSL 和虚拟机平台功能： Enable-WindowsOptionalFeature -Online -FeatureName $(\"Microsoft-Windows-Subsystem-Linux\",\"VirtualMachinePlatform\") 安装完成后，键入Y重启计算机。 完成以上步骤后，需要通过 Microsoft Store 获取要使用的 Linux 发行版。 如果在安装 WSL 时没有选择安装 Virtual Machine Platform，那么将使用 WSL 1。 Windows 功能开启 wsl2 使用Windows + R快捷键打开「运行」对话框，执行OptionalFeatures打开「Windows 功能」。 勾选「适用于 Linux 的 Windows 子系统」和「虚拟机平台」，然后点击「确定」。 安装完成后，点击「立即重新启动」。 系统重启完成后，请通过 Microsoft Store 来获取要使用的 Linux 发行版。 如果在安装 WSL 时没有勾选「虚拟机平台」，那么将使用 WSL 1。 更新 WSL 右键点击「开始」菜单，选择「终端管理员」，以管理员权限打开「Windows 终端」。 在 Windows PowerShell 或「命令提示符」窗口中，执行以下命令： 查看当前 WSL 版本：wsl –version 手动更新 WSL 版本：wsl –update 安装最新的预发行版（可选）：wsl –update –pre-release 如果更新之后遇到问题或出现故障，可以回滚到上一版本：wsl –update –rollback 切换 WSL 默认版本 要切换 WSL 默认版本也非常容易，在命令行中执行以下命令即可： 切换为 WSL 2：wsl –set-default-version 2 切换为 WSL 1：wsl –set-default-version 1 如无特殊需求，推荐始终使用 WSL 2，以获得最佳功能和性能。 WSL 安装 Debian # 查看可用 Linux 发行版，可能需要外网 wsl --list --online # 安装指定 Linux 发行版 (Debian) wsl --install --distribution 设置默认 如果你在 Windows 11 上为 WSL 安装了多个 Linux 发行版，可以通过以下步骤来指定默认发行版： 右键点击「开始」菜单，选择「终端管理员」，以管理员权限打开「Windows 终端」。 在 Windows PowerShell 或「命令提示符」窗口中，执行以下命令： # 查看已安装的发行版、WSL 版本信息和当前状态 wsl --list --verbose # 重新指定默认发行版 wsl --set-default 版存储位置 以下方法仅适用于 WSL 2.3.11 及更高版本。 默认情况下，WSL 会将 Linux 发行版存放在 C 盘的以下路径，其中包含了发行版的根文件系统和相关配置文件： %USERPROFILE%\\AppData\\Local\\\\Packages\\\u003c发行版的包名\u003e\\ 以前，移动发行版需要手动导出 → 将其作为新发行版导入 WSL → 然后删除原来的发行版，这 3 个步骤。但从 WSL 2.3.11 开始，微软引入了更简单的–move参数来移动发行版的底层存储。 例如，要将 Ubuntu 22.04 实例移动到 D 盘的一个专用 WSL 文件夹，可以使用以下命令： 列出已安装的发行版：wsl –list 将特定发行版移动到指定路径：wsl –manage Ubuntu-22.04 –move 参考 https://www.sysgeek.cn/install-wsl-2-windows/。 ",
+  "wordCount" : "184",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-01-03T00:00:00Z",
-  "dateModified": "2024-01-03T00:00:00Z",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2021-03-28T00:00:00Z",
+  "dateModified": "2021-03-28T00:00:00Z",
   "author":[{
     "@type": "Person",
     "name": "helium"
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/tool/acme/"
+    "@id": "https://heliu.site/posts/tool/wsl/"
   },
   "publisher": {
     "@type": "Organization",
@@ -232,7 +232,7 @@
   <header class="post-header">
     <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/tool/">工具箱</a></div>
     <h1 class="post-title entry-hint-parent">
-      acme.sh
+      win 安装 wsl2
     </h1>
     <div class="post-meta">
 
@@ -245,14 +245,14 @@
 
 
 
-<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2024-01-03</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2024-01-03</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2021-03-28</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2021-03-28</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select: text;">
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="user-select: text;"></path>
     <polyline points="14 2 14 8 20 8" style="user-select: text;"></polyline>
     <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
     <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
     <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
-</svg><span>117字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>184字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="12" r="9"></circle>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/certificate/" target="_blank" rel="noopener">Certificate</a>
+            <a href="https://heliu.site/tags/wsl/" target="_blank" rel="noopener">Wsl</a>
         </ul>
       </span>
       
@@ -285,13 +285,27 @@
 
             <div class="inner"><ul>
                     <li>
-                        <a href="#%e5%ae%89%e8%a3%85-acmesh" aria-label="安装 acme.sh">安装 acme.sh</a></li>
+                        <a href="#%e5%ae%89%e8%a3%85-wsl2" aria-label="安装 WSL2">安装 WSL2</a><ul>
+                            
                     <li>
-                        <a href="#%e7%94%9f%e6%88%90%e8%af%81%e4%b9%a6" aria-label="生成证书">生成证书</a></li>
+                        <a href="#powershell-%e5%bc%80%e5%90%af-wsl2" aria-label="PowerShell 开启 wsl2">PowerShell 开启 wsl2</a></li>
                     <li>
-                        <a href="#%e5%ae%89%e8%a3%85%e8%af%81%e4%b9%a6" aria-label="安装证书">安装证书</a></li>
+                        <a href="#windows-%e5%8a%9f%e8%83%bd%e5%bc%80%e5%90%af-wsl2" aria-label="Windows 功能开启 wsl2">Windows 功能开启 wsl2</a></li></ul>
+                    </li>
                     <li>
-                        <a href="#%e6%9b%b4%e6%96%b0%e8%af%81%e4%b9%a6" aria-label="更新证书">更新证书</a>
+                        <a href="#%e6%9b%b4%e6%96%b0-wsl" aria-label="更新 WSL">更新 WSL</a></li>
+                    <li>
+                        <a href="#%e5%88%87%e6%8d%a2-wsl-%e9%bb%98%e8%ae%a4%e7%89%88%e6%9c%ac" aria-label="切换 WSL 默认版本">切换 WSL 默认版本</a></li>
+                    <li>
+                        <a href="#wsl-%e5%ae%89%e8%a3%85-debian" aria-label="WSL 安装 Debian">WSL 安装 Debian</a><ul>
+                            
+                    <li>
+                        <a href="#%e8%ae%be%e7%bd%ae%e9%bb%98%e8%ae%a4" aria-label="设置默认">设置默认</a></li>
+                    <li>
+                        <a href="#%e7%89%88%e5%ad%98%e5%82%a8%e4%bd%8d%e7%bd%ae" aria-label="版存储位置">版存储位置</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e5%8f%82%e8%80%83" aria-label="参考">参考</a>
                     </li>
                 </ul>
             </div>
@@ -357,77 +371,98 @@
         return rect.top + win.pageYOffset;   
     }
 </script>
-  <div class="post-content"><ol>
-<li>Let's Encrypt 参考自 <a href="https://www.cnblogs.com/88223100/p/Generate-free-SSL-certificates-through-Let_s-Encrypt.html" target="_blank" rel="noopener">古道轻风</a>。
+  <div class="post-content"><h2 id="安装-wsl2">安装 WSL2<a hidden class="anchor" aria-hidden="true" href="#安装-wsl2">#</a></h2>
+<h3 id="powershell-开启-wsl2">PowerShell 开启 wsl2<a hidden class="anchor" aria-hidden="true" href="#powershell-开启-wsl2">#</a></h3>
+<ol>
+<li>使用Windows + R快捷键打开「运行」对话框，输入powershell，然后按Ctrl + Shift + Enter，以管理员权限打开 PowerShell。</li>
+<li>执行以下命令启用 WSL 和虚拟机平台功能：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">Enable-WindowsOptionalFeature -Online -FeatureName <span class="k">$(</span><span class="s2">&#34;Microsoft-Windows-Subsystem-Linux&#34;</span>,<span class="s2">&#34;VirtualMachinePlatform&#34;</span><span class="k">)</span>
+</span></span></code></pre></div><ol start="3">
+<li>安装完成后，键入Y重启计算机。</li>
+<li>完成以上步骤后，需要通过 Microsoft Store 获取要使用的 Linux 发行版。</li>
+<li>如果在安装 WSL 时没有选择安装 Virtual Machine Platform，那么将使用 WSL 1。</li>
+</ol>
+<h3 id="windows-功能开启-wsl2">Windows 功能开启 wsl2<a hidden class="anchor" aria-hidden="true" href="#windows-功能开启-wsl2">#</a></h3>
+<ol>
+<li>使用Windows + R快捷键打开「运行」对话框，执行OptionalFeatures打开「Windows 功能」。</li>
+<li>勾选「适用于 Linux 的 Windows 子系统」和「虚拟机平台」，然后点击「确定」。</li>
+<li>安装完成后，点击「立即重新启动」。</li>
+<li>系统重启完成后，请通过 Microsoft Store 来获取要使用的 Linux 发行版。</li>
+<li>如果在安装 WSL 时没有勾选「虚拟机平台」，那么将使用 WSL 1。</li>
+</ol>
+<h2 id="更新-wsl">更新 WSL<a hidden class="anchor" aria-hidden="true" href="#更新-wsl">#</a></h2>
+<ol>
+<li>右键点击「开始」菜单，选择「终端管理员」，以管理员权限打开「Windows 终端」。</li>
+<li>在 Windows PowerShell 或「命令提示符」窗口中，执行以下命令：
 <ul>
-<li>Let&rsquo;s Encrypt 是一个由非营利性组织 互联网安全研究小组（ISRG）提供的免费、自动化和开放的证书颁发机构（CA）。</li>
+<li>查看当前 WSL 版本：<strong>wsl &ndash;version</strong></li>
+<li>手动更新 WSL 版本：<strong>wsl &ndash;update</strong></li>
+<li>安装最新的预发行版（可选）：<strong>wsl &ndash;update &ndash;pre-release</strong></li>
+<li>如果更新之后遇到问题或出现故障，可以回滚到上一版本：<strong>wsl &ndash;update &ndash;rollback</strong></li>
 </ul>
 </li>
-<li>acme.sh 参考官方 <a href="https://github.com/acmesh-official/acme.sh/wiki/%E8%AF%B4%E6%98%8E" target="_blank" rel="noopener">github</a> 教程。
+</ol>
+<h2 id="切换-wsl-默认版本">切换 WSL 默认版本<a hidden class="anchor" aria-hidden="true" href="#切换-wsl-默认版本">#</a></h2>
+<ol>
+<li>要切换 WSL 默认版本也非常容易，在命令行中执行以下命令即可：
 <ul>
-<li>acme.sh 实现了 acme 协议, 可以从 letsencrypt 生成免费的证书。</li>
+<li>切换为 WSL 2：<strong>wsl &ndash;set-default-version 2</strong></li>
+<li>切换为 WSL 1：<strong>wsl &ndash;set-default-version 1</strong></li>
 </ul>
 </li>
-<li>本篇文章主要是根据<code>acme.sh</code>配置安装的，记录<code>acme.sh</code>配置的一些歧义地方。</li>
+<li>如无特殊需求，推荐始终使用 WSL 2，以获得最佳功能和性能。</li>
 </ol>
-<h2 id="安装-acmesh">安装 acme.sh<a hidden class="anchor" aria-hidden="true" href="#安装-acmesh">#</a></h2>
+<h2 id="wsl-安装-debian">WSL 安装 Debian<a hidden class="anchor" aria-hidden="true" href="#wsl-安装-debian">#</a></h2>
+<pre tabindex="0"><code class="language-wsl" data-lang="wsl"># 查看可用 Linux 发行版，可能需要外网
+wsl --list --online 
+
+# 安装指定 Linux 发行版 (Debian)
+wsl --install --distribution &lt;DistroName&gt;
+</code></pre><h3 id="设置默认">设置默认<a hidden class="anchor" aria-hidden="true" href="#设置默认">#</a></h3>
 <ol>
-<li>安装 acme.sh。</li>
-</ol>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="c1"># 创建 .acme.sh 目录</span>
-</span></span><span class="line"><span class="cl">mkdir ~/.acme.sh 
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 切换到 .acme.sh</span>
-</span></span><span class="line"><span class="cl"><span class="nb">cd</span> ~/.acme.sh
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 执行安装命令，注意邮箱改成自己的</span>
-</span></span><span class="line"><span class="cl">curl https://get.acme.sh <span class="p">|</span> sh -s <span class="nv">email</span><span class="o">=</span>my@example.com
-</span></span></code></pre></div><ol start="2">
-<li>添加别名。</li>
-</ol>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">vi ~/.bashrc
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 把下面这行加入到最后</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># alias acme.sh=~/.acme.sh/acme.sh</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 最后执行，使配置生效</span>
-</span></span><span class="line"><span class="cl"><span class="nb">source</span> ~/.bashrc
-</span></span></code></pre></div><h2 id="生成证书">生成证书<a hidden class="anchor" aria-hidden="true" href="#生成证书">#</a></h2>
+<li>如果你在 Windows 11 上为 WSL 安装了多个 Linux 发行版，可以通过以下步骤来指定默认发行版：
 <ol>
-<li>因为我的nginx在docker里，不确定nginx的方式能否可行。</li>
-<li>所以采用的手动 dns 验证。我用的华为云参考<a href="https://github.com/acmesh-official/acme.sh/wiki/dnsapi2#dns_huaweicloud" target="_blank" rel="noopener">https://github.com/acmesh-official/acme.sh/wiki/dnsapi2#dns_huaweicloud</a>。</li>
+<li>右键点击「开始」菜单，选择「终端管理员」，以管理员权限打开「Windows 终端」。</li>
+<li>在 Windows PowerShell 或「命令提示符」窗口中，执行以下命令：</li>
 </ol>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="c1"># 配置环境变量</span>
-</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">HUAWEICLOUD_Username</span><span class="o">=</span><span class="s2">&#34;&lt;Your IAM Username&gt;&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">HUAWEICLOUD_Password</span><span class="o">=</span><span class="s2">&#34;&lt;Your Password&gt;&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="nv">HUAWEICLOUD_DomainName</span><span class="o">=</span><span class="s2">&#34;&lt;Your DomainName&gt;&#34;</span>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl"># 查看已安装的发行版、WSL 版本信息和当前状态
+</span></span><span class="line"><span class="cl">wsl --list --verbose 
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 再执行 </span>
-</span></span><span class="line"><span class="cl">acme.sh --issue --dns dns_huaweicloud -d example.com -d *.example.com
-</span></span></code></pre></div><h2 id="安装证书">安装证书<a hidden class="anchor" aria-hidden="true" href="#安装证书">#</a></h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">acme.sh --install-cert -d example.com <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>--key-file       /path/to/keyfile/in/nginx/key.pem  <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>--fullchain-file /path/to/fullchain/nginx/cert.pem <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>--reloadcmd     <span class="s2">&#34;docker exec -it nginx nginx -s reload&#34;</span>
-</span></span></code></pre></div><h2 id="更新证书">更新证书<a hidden class="anchor" aria-hidden="true" href="#更新证书">#</a></h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ crontab -l
-</span></span><span class="line"><span class="cl"><span class="m">44</span> <span class="m">6</span> * * * <span class="s2">&#34;/root/.acme.sh&#34;</span>/acme.sh --cron --home <span class="s2">&#34;/root/.acme.sh&#34;</span> &gt; /dev/null
-</span></span></code></pre></div>
+</span></span><span class="line"><span class="cl"># 重新指定默认发行版
+</span></span><span class="line"><span class="cl">wsl --set-default &lt;DistroName&gt; 
+</span></span></code></pre></div><h3 id="版存储位置">版存储位置<a hidden class="anchor" aria-hidden="true" href="#版存储位置">#</a></h3>
+<ol>
+<li>以下方法仅适用于 WSL 2.3.11 及更高版本。</li>
+<li>默认情况下，WSL 会将 Linux 发行版存放在 C 盘的以下路径，其中包含了发行版的根文件系统和相关配置文件：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">%USERPROFILE%\AppData\Local\\Packages\&lt;发行版的包名&gt;\
+</span></span></code></pre></div><ol start="3">
+<li>以前，移动发行版需要手动导出 → 将其作为新发行版导入 WSL → 然后删除原来的发行版，这 3 个步骤。但从 WSL 2.3.11 开始，微软引入了更简单的&ndash;move参数来移动发行版的底层存储。</li>
+<li>例如，要将 Ubuntu 22.04 实例移动到 D 盘的一个专用 WSL 文件夹，可以使用以下命令：
+<ul>
+<li>列出已安装的发行版：<strong>wsl &ndash;list</strong></li>
+<li>将特定发行版移动到指定路径：<strong>wsl &ndash;manage Ubuntu-22.04 &ndash;move <!-- raw HTML omitted --></strong></li>
+</ul>
+</li>
+</ol>
+<h2 id="参考">参考<a hidden class="anchor" aria-hidden="true" href="#参考">#</a></h2>
+<ol>
+<li><a href="https://www.sysgeek.cn/install-wsl-2-windows/" target="_blank" rel="noopener">https://www.sysgeek.cn/install-wsl-2-windows/</a>。</li>
+</ol>
+
 
   </div>
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/certificate/">Certificate</a></li>
+      <li><a href="https://heliu.site/tags/wsl/">Wsl</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/elasticsearch/sync/">
+  <a class="prev" href="https://heliu.site/posts/tool/git/">
     <span class="title">« 上一页</span>
-    <br>
-    <span>数据同步</span>
-  </a>
-  <a class="next" href="https://heliu.site/posts/tool/git/">
-    <span class="title">下一页 »</span>
     <br>
     <span>git 命令</span>
   </a>
