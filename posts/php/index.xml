@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>PHP on Helium</title>
+    <link>https://heliu.site/posts/php/</link>
+    <description>Recent content in PHP on Helium</description>
+    <image>
+      <title>Helium</title>
+      <url>https://heliu.site/favicon-32x32.png</url>
+      <link>https://heliu.site/favicon-32x32.png</link>
+    </image>
+    <generator>Hugo -- 0.128.2</generator>
+    <language>zh</language>
+    <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
+    <lastBuildDate>Wed, 21 Aug 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://heliu.site/posts/php/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>环境安装</title>
+      <link>https://heliu.site/posts/php/install/</link>
+      <pubDate>Wed, 21 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/php/install/</guid>
+      <description>docker + php7.4 + nginx + redis + mysql 环境搭建。</description>
+    </item>
+    <item>
+      <title>Laravel 使用注意</title>
+      <link>https://heliu.site/posts/php/laravel-use/</link>
+      <pubDate>Tue, 30 Mar 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/php/laravel-use/</guid>
+      <description>laravel 使用笔记。</description>
+    </item>
+    <item>
+      <title>Carbon包</title>
+      <link>https://heliu.site/posts/php/carbon/</link>
+      <pubDate>Fri, 12 Mar 2021 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/php/carbon/</guid>
+      <description>carbon包使用介绍。</description>
+    </item>
+  </channel>
+</rss>

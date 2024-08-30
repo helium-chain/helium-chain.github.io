@@ -41,6 +41,9 @@
     <loc>https://heliu.site/posts/golang/slice/</loc>
     <lastmod>2024-01-21T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://heliu.site/posts/php/</loc>
+    <lastmod>2024-08-21T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://heliu.site/posts/golang/map/</loc>
     <lastmod>2024-04-27T00:00:00+00:00</lastmod>
   </url><url>
@@ -425,6 +428,15 @@
     <loc>https://heliu.site/posts/elasticsearch/sync/</loc>
     <lastmod>2021-10-30T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://heliu.site/posts/php/install/</loc>
+    <lastmod>2024-08-21T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/php/laravel-use/</loc>
+    <lastmod>2021-03-30T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/posts/php/carbon/</loc>
+    <lastmod>2021-03-12T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://heliu.site/posts/tool/acme/</loc>
     <lastmod>2024-01-03T00:00:00+00:00</lastmod>
   </url><url>
@@ -434,16 +446,22 @@
     <loc>https://heliu.site/posts/tool/wsl/</loc>
     <lastmod>2021-03-28T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://heliu.site/posts/tool/goland/</loc>
+    <lastmod>2021-04-18T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://heliu.site/posts/</loc>
-    <lastmod>2024-08-16T00:00:00+00:00</lastmod>
+    <lastmod>2024-08-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://heliu.site/</loc>
-    <lastmod>2024-08-16T00:00:00+00:00</lastmod>
+    <lastmod>2024-08-21T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://heliu.site/tags/nginx/</loc>
-    <lastmod>2024-08-16T00:00:00+00:00</lastmod>
+    <loc>https://heliu.site/tags/php/</loc>
+    <lastmod>2024-08-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://heliu.site/tags/</loc>
+    <lastmod>2024-08-21T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/tags/nginx/</loc>
     <lastmod>2024-08-16T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://heliu.site/tags/golang/</loc>
@@ -509,8 +527,17 @@
     <loc>https://heliu.site/tags/%E6%95%B0%E7%BB%84/</loc>
     <lastmod>2024-05-03T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://heliu.site/tags/goland/</loc>
+    <lastmod>2021-04-18T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/tags/laravel/</loc>
+    <lastmod>2021-03-30T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://heliu.site/tags/wsl/</loc>
     <lastmod>2021-03-28T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://heliu.site/tags/carbon/</loc>
+    <lastmod>2021-03-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://heliu.site/tags/%E5%AD%97%E5%85%B8/</loc>
     <lastmod>2024-04-27T00:00:00+00:00</lastmod>

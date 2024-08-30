@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Mysql 笔记 on Helium</title>
+    <title>Mysql on Helium</title>
     <link>https://heliu.site/posts/mysql/</link>
-    <description>Recent content in Mysql 笔记 on Helium</description>
+    <description>Recent content in Mysql on Helium</description>
     <image>
       <title>Helium</title>
       <url>https://heliu.site/favicon-32x32.png</url>
