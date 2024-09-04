@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>proto3 | Helium</title>
+<meta name="keywords" content="grpc">
+<meta name="description" content="proto3 文件介绍。">
+<meta name="author" content="helium">
+<link rel="canonical" href="https://heliu.site/posts/grpc/proto/">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://heliu.site/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/grpc/proto/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono-nl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.6.0/style.css" />
+    <style>
+        body {
+            font-family: "LXGW WenKai Lite", sans-serif;
+            font-family: "LXGW WenKai Screen", sans-serif;
+        }
+    </style>
+</head>
+</html>
+
+  
+
+<meta property="og:title" content="proto3" />
+<meta property="og:description" content="proto3 文件介绍。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://heliu.site/posts/grpc/proto/" />
+<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-09-01T00:00:00+00:00" />
+<meta property="article:modified_time" content="2024-09-01T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:title" content="proto3"/>
+<meta name="twitter:description" content="proto3 文件介绍。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Article",
+      "item": "https://heliu.site/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "gRPC",
+      "item": "https://heliu.site/posts/grpc/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "proto3",
+      "item": "https://heliu.site/posts/grpc/proto/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "proto3",
+  "name": "proto3",
+  "description": "proto3 文件介绍。",
+  "keywords": [
+    "grpc"
+  ],
+  "articleBody": " .proto 文件用于定义服务。以下文档关于 Proto3。 语言指南：https://protobuf.com.cn/programming-guides/proto3/ 定义消息类型 首先让我们看一个非常简单的例子。假设你要定义搜索请求消息格式， 其中每个搜索请求都有一个查询字符串、你感兴趣的特定结果页面以及每页的结果数量。这是用于定义消息类型的 .proto 文件。 文件的第一行指定您正在使用 proto3 语法：如果您不这样做，则协议缓冲区编译器将假定您正在使用 proto2。这必须是文件中的第一行非空、非注释行。 SearchRequest 消息定义指定三个字段（名称/值对），每个字段对应于您希望包含在此类消息中的每条数据。每个字段都有一个名称和一个类型。 syntax = \"proto3\"; message SearchRequest { string query = 1; int32 page_number = 2; int32 result_per_page = 3; } 指定字段类型 在前面的示例中，所有字段都是标量类型：两个整数（page_number 和 results_per_page）和一个字符串（query）。您还可以为字段指定枚举和复合类型，如其他消息类型。 分配字段编号 您必须为消息定义中的每个字段指定 1 到 536,870,911 之间的一个数字，并遵守以下限制： 给定的数字必须在该消息的所有字段中唯一。 字段编号19,000至19,999为 Protocol Buffers 实现保留。如果您在消息中使用这些保留字段编号之一，协议缓冲区编译器将发出警告。 您不能使用任何先前保留的字段编号或已分配给扩展的任何字段编号。 此编号不能在您的消息类型使用后更改，因为它标识了消息线格式中的字段。“更改”字段编号等同于删除该字段并创建一个具有相同类型但新编号的新字段。有关如何正确执行此操作，请参阅删除字段。 字段编号绝不应重复使用。切勿从保留列表中取出字段编号，以与新字段定义重复使用。请参阅重复使用字段编号的后果。 您应该使用字段编号 1 到 15 来设置最常用的字段。较低的字段编号值在有线格式中占用较小的空间。例如，范围为 1 到 15 的字段编号需要一个字节进行编码。范围为 16 到 2047 的字段编号需要两个字节。您可以在协议缓冲区编码中找到更多相关信息。 指定字段标签 消息字段可以是以下之一 optional：optional 字段处于两种可能状态之一，您可以检查该值是否已显式设置。 字段已设置，并且包含显式设置或从线路解析的值。它将序列化到线路。 字段未设置，并将返回默认值。它不会序列化到线路。 repeated：此字段类型可以在格式良好的消息中重复零次或多次。将保留重复值的顺序。 map：这是一个配对键/值字段类型。有关此字段类型的更多信息，请参阅 Maps。 如果没有应用显式字段标签，则假定默认字段标签，称为“隐式字段存在”。（您无法将字段显式设置为此状态。）格式良好的消息可以有零个或一个此字段（但不能多于一个）。您也无法确定此类型的字段是否已从线路解析。隐式存在字段将序列化到线路，除非它是默认值。有关此主题的更多信息，请参阅 字段存在。 在 proto3 中，标量数字类型的 repeated 字段默认使用 packed 编码。您可以在 Protocol Buffer 编码 中了解有关 packed 编码的更多信息。 添加更多消息类型 可以在单个 .proto 文件中定义多个消息类型。如果您要定义多个相关消息，这很有用 - 例如，如果您想定义与 SearchResponse 消息类型相对应的回复消息格式，则可以将其添加到相同的 .proto。 message SearchRequest { string query = 1; int32 page_number = 2; int32 results_per_page = 3; } message SearchResponse { ... } 合并消息会导致膨胀虽然可以在单个 .proto 文件中定义多种消息类型（例如消息、枚举和服务），但当在一个文件中定义大量具有不同依赖项的消息时，它也可能导致依赖项膨胀。建议尽可能在每个 .proto 文件中包含较少的消息类型。 添加注释 要为 .proto 文件添加注释，请使用 C/C++ 样式的 // 和 /* … */ 语法。 /* SearchRequest represents a search query, with pagination options to * indicate which results to include in the response. */ message SearchRequest { string query = 1; int32 page_number = 2; // Which page number do we want? int32 results_per_page = 3; // Number of results to return per page. } 删除字段 如果操作不当，删除字段可能会导致严重问题。 当不再需要某个字段且已从客户端代码中删除所有引用时，可以从消息中删除该字段定义。但是，必须保留已删除的字段号。如果不保留字段号，开发人员将来有可能重新使用该字段号。 还应保留字段名称，以允许消息的 JSON 和 TextFormat 编码继续进行解析。 保留字段 如果通过完全删除字段或将其注释掉来更新消息类型，则未来的开发人员可以在对类型进行自己的更新时重新使用该字段号。这可能会导致严重问题，如重新使用字段号的后果中所述。 为确保这种情况不会发生，请将已删除的字段号添加到 reserved 列表中。为确保消息的 JSON 和 TextFormat 实例仍可解析，还应将已删除的字段名称添加到 reserved 列表中。 如果任何未来的开发人员尝试使用这些保留的字段号或名称，则协议缓冲区编译器会发出警告。 message Foo { reserved 2, 15, 9 to 11; reserved \"foo\", \"bar\"; } 保留的字段号范围是包含的（9 到 11 与 9、10、11 相同）。请注意，不能在同一个 reserved 语句中混合字段名称和字段号。 从 .proto 生成什么？ 在 .proto 上运行协议缓冲区编译器时，编译器会以你选择的语言生成代码，你将需要使用该代码来处理你在文件中描述的消息类型，包括获取和设置字段值、将消息序列化到输出流以及从输入流解析消息。 对于 C++，编译器会为每个 .proto 生成一个 .h 文件和 .cc 文件，其中包含一个类，用于描述文件中所述的每种消息类型。 对于 Java，编译器会生成一个 .java 文件，其中包含一个类，用于描述每种消息类型，以及一个用于创建消息类实例的特殊 Builder 类。 对于 Kotlin，除了生成的 Java 代码之外，编译器还会为每种消息类型生成一个 .kt 文件，其中包含经过改进的 Kotlin API。这包括一个用于简化创建消息实例的 DSL、一个可空字段访问器和一个复制函数。 Python 有点不同 - Python 编译器会生成一个模块，其中包含 .proto 中每种消息类型的静态描述符，然后使用 元类 在运行时创建必要的 Python 数据访问类。 对于 Go，编译器会生成一个 .pb.go 文件，其中包含一个类型，用于描述文件中每种消息类型。 对于 Ruby，编译器会生成一个 .rb 文件，其中包含一个 Ruby 模块，该模块包含您的消息类型。 对于 Objective-C，编译器会为每个 .proto 生成一个 pbobjc.h 文件和 pbobjc.m 文件，其中包含一个类，用于描述文件中所述的每种消息类型。 对于 C#，编译器会为每个 .proto 生成一个 .cs 文件，其中包含一个类，用于描述文件中所述的每种消息类型。 对于 PHP，编译器会为文件中所述的每种消息类型生成一个 .php 消息文件，并为每个编译的 .proto 文件生成一个 .php 元数据文件。元数据文件用于将有效的消息类型加载到描述符池中。 对于 Dart，编译器会生成一个 .pb.dart 文件，其中包含一个类，用于描述文件中每种消息类型。 标量值类型 标量消息字段可以具有以下类型之一。该表显示了 .proto 文件中指定的类型，以及自动生成的类中的相应类型： .proto C++ Java/Kotlin[1] Python[3] Go Ruby C# PHP Dart double double double float float64 Float double float double float float float float float32 Float float float double int32 int32 int int int32 Fixnum or Bignum (as required) int integer int int64 int64 long int/long[4] int64 Bignum long integer/string[6] Int64 uint32 uint32 int[2] int/long[4] uint32 Fixnum or Bignum (as required) uint integer int uint64 uint64 long[2] int/long[4] uint64 Bignum ulong integer/string[6] Int64 sint32 int32 int int int32 Fixnum or Bignum (as required) int integer int sint64 int64 long int/long[4] int64 Bignum long integer/string[6] Int64 fixed32 uint32 int[2] int/long[4] uint32 Fixnum or Bignum (as required) uint integer int fixed64 uint64 long[2] int/long[4] uint64 Bignum ulong integer/string[6] Int64 sfixed32 int32 int int int32 Fixnum or Bignum (as required) int integer int sfixed64 int64 long int/long[4] int64 Bignum long integer/string[6] Int64 bool bool boolean bool bool TrueClass/FalseClass bool boolean bool string string String str/unicode[5] string String (UTF-8) string string String bytes string ByteString str (Python 2) bytes (Python 3) []byte String (ASCII-8BIT) ByteString string List 注意： int32：使用可变长度编码。对负数进行编码效率低下。如果你的字段可能有负值，请改用 sint32。 int64：使用可变长度编码。对负数进行编码效率低下。如果你的字段可能有负值，请改用 sint64。 uint32：使用可变长度编码。 uint64：使用可变长度编码。 sint32：使用可变长度编码。带符号的 int 值。这些比常规 int32 更有效地编码负数。 sint64：使用可变长度编码。带符号的 int 值。这些比常规 int64 更有效地编码负数。 fixed32：总是四个字节。如果值通常大于 2^28，则比 uint32 更有效。 fixed64：总是八个字节。如果值通常大于 2^56，则比 uint64 更有效。 sfixed32：总是四个字节。 sfixed64：总是八个字节。 string：字符串必须始终包含 UTF-8 编码或 7 位 ASCII 文本，并且不能超过 2^32。 bytes：可以包含不超过 2^32 的任意字节序列。 默认值 当解析消息时，如果编码的消息不包含特定的隐式存在元素，则访问解析对象中的相应字段将返回该字段的默认值。这些默认值是特定于类型的 对于字符串，默认值为空字符串。 对于字节，默认值为空字节。 对于布尔值，默认值是 false。 对于数字类型，默认值是零。 对于枚举，默认值是第一个定义的枚举值，它必须是 0。 对于消息字段，该字段未设置。其确切值取决于语言。有关详细信息，请参阅生成代码指南。 重复字段的默认值为空（通常是相应语言中的空列表）。 请注意，对于标量消息字段，一旦解析了消息，就无法判断某个字段是否明确设置为默认值（例如，布尔值是否设置为 false）或根本未设置：在定义消息类型时应牢记这一点。例如，如果您不希望某个布尔值在设置为 false 时开启某些行为，则不要使用该布尔值；另外请注意，如果标量消息字段已设置为其默认值，则该值不会在网络上序列化。如果浮点值或双精度值设置为 +0，则不会对其进行序列化，但 -0 被视为不同的值，并且会进行序列化。 枚举 在定义消息类型时，您可能希望其某个字段仅具有预定义值列表中的一个值。例如，假设您想为每个 SearchRequest 添加一个 corpus 字段，其中语料库可以是 UNIVERSAL、WEB、IMAGES、LOCAL、NEWS、PRODUCTS 或 VIDEO。您可以通过向消息定义中添加一个 enum 来非常简单地实现此目的，其中每个可能的枚举值都有一个常量。 在以下示例中，我们添加了一个名为 Corpus 的 enum，其中包含所有可能的值，以及一个类型为 Corpus 的字段 enum Corpus { CORPUS_UNSPECIFIED = 0; CORPUS_UNIVERSAL = 1; CORPUS_WEB = 2; CORPUS_IMAGES = 3; CORPUS_LOCAL = 4; CORPUS_NEWS = 5; CORPUS_PRODUCTS = 6; CORPUS_VIDEO = 7; } message SearchRequest { string query = 1; int32 page_number = 2; int32 results_per_page = 3; Corpus corpus = 4; } 正如您所见，Corpus 枚举的第一个常量映射到零：每个枚举定义必须包含一个常量，该常量映射到零作为其第一个元素。这是因为 必须有一个零值，以便我们可以使用 0 作为数字 默认值。 零值需要是第一个元素，以与 proto2 语义兼容，其中第一个枚举值是默认值，除非明确指定了不同的值。 您可以通过为不同的枚举常量分配相同的值来定义别名。为此，您需要将 allow_alias 选项设置为 true。否则，当找到别名时，协议缓冲区编译器会生成一条警告消息。尽管所有别名值在反序列化期间都是有效的，但在序列化时始终使用第一个值。 enum EnumAllowingAlias { option allow_alias = true; EAA_UNSPECIFIED = 0; EAA_STARTED = 1; EAA_RUNNING = 1; EAA_FINISHED = 2; } enum EnumNotAllowingAlias { ENAA_UNSPECIFIED = 0; ENAA_STARTED = 1; // ENAA_RUNNING = 1; // Uncommenting this line will cause a warning message. ENAA_FINISHED = 2; } 枚举器常量必须在 32 位整数的范围内。由于 enum 值在传输中使用 varint 编码，因此负值效率低下，因此不推荐使用。您可以像前面的示例中那样在消息定义中定义 enum，也可以在外部定义 - 这些 enum 可以重复用于 .proto 文件中的任何消息定义。您还可以使用在一个消息中声明的 enum 类型作为另一个消息中字段的类型，使用语法 MessageType.EnumType。 当您对使用 enum 的 .proto 运行协议缓冲区编译器时，生成的代码将具有相应的 enum，用于 Java、Kotlin 或 C++，或者一个特殊的 EnumDescriptor 类，用于 Python，该类用于在运行时生成的类中创建一组具有整数值的符号常量。 保留值 如果您通过完全删除枚举项或将其注释掉来 更新枚举类型，则以后的用户可以在对类型进行自己的更新时重用数字值。如果他们稍后加载相同 .proto 的旧版本，则可能会导致严重问题，包括数据损坏、隐私错误等。确保这种情况不会发生的一种方法是指定已删除条目的数字值（和/或名称，这也会导致 JSON 序列化问题）为 reserved。如果任何以后的用户尝试使用这些标识符，协议缓冲区编译器将发出警告。您可以使用 max 关键字指定保留的数字值范围达到最大可能值。 enum Foo { reserved 2, 15, 9 to 11, 40 to max; reserved \"FOO\", \"BAR\"; } 请注意，您不能在同一个 reserved 语句中混合字段名称和数字值。 使用其他消息类型 您可以使用其他消息类型作为字段类型。例如，假设您希望在每个 SearchResponse 消息中包含 Result 消息——要执行此操作，您可以在同一个 .proto 中定义一个 Result 消息类型，然后在 SearchResponse 中指定一个类型为 Result 的字段。 message SearchResponse { repeated Result results = 1; } message Result { string url = 1; string title = 2; repeated string snippets = 3; } 导入定义 在前面的示例中，Result 消息类型在与 SearchResponse 相同的文件中定义——如果您希望用作字段类型的消息类型已在另一个 .proto 文件中定义，该怎么办？ 您可以通过导入其他 .proto 文件来使用其定义。要导入另一个 .proto 的定义，您需要在文件的顶部添加一个导入语句 import \"myproject/other_protos.proto\"; 默认情况下，您只能使用直接导入的 .proto 文件中的定义。但是，有时您可能需要将 .proto 文件移动到新位置。您可以将占位符 .proto 文件放在旧位置，而不是直接移动 .proto 文件并在单个更改中更新所有调用位置，以使用 import public 概念将所有导入转发到新位置。 请注意，Java 中不提供公共导入功能。 导入 proto（其中包含 import public 语句）的任何代码都可以间接依赖 import public 依赖项。例如 // new.proto // All definitions are moved here // old.proto // This is the proto that all clients are importing. import public \"new.proto\"; import \"other.proto\"; // client.proto import \"old.proto\"; // You use definitions from old.proto and new.proto, but not other.proto 协议编译器使用 -I/–proto_path 标志在协议编译器命令行上指定的一组目录中搜索导入的文件。如果未给出标志，它将在编译器被调用的目录中查找。通常，您应该将 –proto_path 标志设置为项目的根目录，并对所有导入使用完全限定名称。 嵌套类型 您可以在其他消息类型中定义和使用消息类型，如下例所示——此处 Result 消息在 SearchResponse 消息中定义。 message SearchResponse { message Result { string url = 1; string title = 2; repeated string snippets = 3; } repeated Result results = 1; } 如果您想在父消息类型外部重新使用此消息类型，则将其称为 _Parent_._Type_ message SomeOtherMessage { SearchResponse.Result result = 1; } 您可以根据需要嵌套消息。在下面的示例中，请注意，两个名为 Inner 的嵌套类型完全独立，因为它们在不同的消息中定义 message Outer { // Level 0 message MiddleAA { // Level 1 message Inner { // Level 2 int64 ival = 1; bool booly = 2; } } message MiddleBB { // Level 1 message Inner { // Level 2 int32 ival = 1; bool booly = 2; } } } ",
+  "wordCount" : "934",
+  "inLanguage": "zh",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-09-01T00:00:00Z",
+  "dateModified": "2024-09-01T00:00:00Z",
+  "author":[{
+    "@type": "Person",
+    "name": "helium"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://heliu.site/posts/grpc/proto/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Helium",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://heliu.site/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+                    height="35">Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://heliu.site/" title="主页">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/posts" title="文章">
+                    <span>Article</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/archives" title="时间轴">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/tags/" title="标签">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/support" title="打赏">
+                    <span>🫶Help</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+
+<article class="post" autonumbering>
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/grpc/">gRPC</a></div>
+    <h1 class="post-title entry-hint-parent">
+      proto3
+    </h1>
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2024-09-01</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2024-09-01</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select: text;">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="user-select: text;"></path>
+    <polyline points="14 2 14 8 20 8" style="user-select: text;"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
+    <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
+    <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
+</svg><span>934字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="9"></circle>
+    <polyline points="12 7 12 12 15 15"></polyline>
+</svg><span>5分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+</svg><span>helium</span></span>
+      <span class="x-post-meta-item">
+        &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
+        <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
+            <a href="https://heliu.site/tags/grpc/" target="_blank" rel="noopener">Grpc</a>
+        </ul>
+      </span>
+      
+      <span id="busuanzi_container_page_pv" class="x-post-meta-item">
+        &nbsp;<svg t="1720844685710" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="27237" width="200" height="200"><path d="M739.754667 574.08c-121.386667 45.610667-208.469333 169.813333-208.64 316.16 0 33.408 4.693333 65.493333 13.141333 95.914667H94.122667c-26.453333-43.52-41.685333-91.946667-41.685334-143.189334 0-185.173333 192.896-335.104 430.805334-335.104 96.256 0 184.832 24.746667 256.512 66.218667z m-280.490667-114.986667a214.869333 214.869333 0 0 1-214.869333-215.04A215.04 215.04 0 0 1 459.264 28.842667a215.04 215.04 0 0 1 215.04 215.210666 215.04 215.04 0 0 1-215.04 215.04zM974.506667 641.28c9.856 0 17.834667 7.466667 17.834666 16.64v59.989333c-0.341333 8.789333-7.850667 15.786667-17.28 16.085334-9.856 0.341333-18.176-6.826667-18.517333-16.085334v-20.053333l-99.114667 91.093333-0.256 0.256a18.474667 18.474667 0 0 1-14.848 4.352h-0.768a18.176 18.176 0 0 1-9.344-4.608l-0.938666-0.981333-85.930667-80.042667-123.562667 115.072a18.773333 18.773333 0 0 1-25.216 0 15.786667 15.786667 0 0 1 0-23.466666l136.149334-126.848 0.725333-0.597334a18.645333 18.645333 0 0 1 24.362667 0.512l87.253333 81.237334 86.058667-79.232h-21.248c-9.386667-0.298667-16.938667-7.338667-17.28-16.085334-0.341333-9.173333 7.381333-16.896 17.28-17.237333h64.64z m-367.146667 240h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v72.192a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042667-16.042666v-72.192c0-8.874667 7.210667-16.042667 16.042667-16.042667z m110.805333-106.666667h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v178.858667a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042666v-178.858667c0-8.874667 7.168-16.042667 16.042666-16.042667z m106.538667 80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v99.413333a16.042667 16.042667 0 0 1-16.042667 16.042667H824.746667a16.042667 16.042667 0 0 1-16.042667-16.042667v-99.413333c0-8.874667 7.168-16.042667 16.042667-16.042667z m110.165333-80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v179.413333a16.042667 16.042667 0 0 1-16.042667 16.042667h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042667v-179.413333c0-8.874667 7.210667-16.042667 16.042666-16.042667z" fill="#999999" p-id="27238"></path></svg>
+        <span id="busuanzi_value_page_pv"></span>
+      </span>
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#%e5%ae%9a%e4%b9%89%e6%b6%88%e6%81%af%e7%b1%bb%e5%9e%8b" aria-label="定义消息类型">定义消息类型</a><ul>
+                            
+                    <li>
+                        <a href="#%e6%8c%87%e5%ae%9a%e5%ad%97%e6%ae%b5%e7%b1%bb%e5%9e%8b" aria-label="指定字段类型">指定字段类型</a></li>
+                    <li>
+                        <a href="#%e5%88%86%e9%85%8d%e5%ad%97%e6%ae%b5%e7%bc%96%e5%8f%b7" aria-label="分配字段编号">分配字段编号</a></li>
+                    <li>
+                        <a href="#%e6%8c%87%e5%ae%9a%e5%ad%97%e6%ae%b5%e6%a0%87%e7%ad%be" aria-label="指定字段标签">指定字段标签</a></li>
+                    <li>
+                        <a href="#%e6%b7%bb%e5%8a%a0%e6%9b%b4%e5%a4%9a%e6%b6%88%e6%81%af%e7%b1%bb%e5%9e%8b" aria-label="添加更多消息类型">添加更多消息类型</a></li>
+                    <li>
+                        <a href="#%e6%b7%bb%e5%8a%a0%e6%b3%a8%e9%87%8a" aria-label="添加注释">添加注释</a></li>
+                    <li>
+                        <a href="#%e5%88%a0%e9%99%a4%e5%ad%97%e6%ae%b5" aria-label="删除字段">删除字段</a></li>
+                    <li>
+                        <a href="#%e4%bf%9d%e7%95%99%e5%ad%97%e6%ae%b5" aria-label="保留字段">保留字段</a></li>
+                    <li>
+                        <a href="#%e4%bb%8e-proto-%e7%94%9f%e6%88%90%e4%bb%80%e4%b9%88" aria-label="从 .proto 生成什么？">从 .proto 生成什么？</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e6%a0%87%e9%87%8f%e5%80%bc%e7%b1%bb%e5%9e%8b" aria-label="标量值类型">标量值类型</a></li>
+                    <li>
+                        <a href="#%e9%bb%98%e8%ae%a4%e5%80%bc" aria-label="默认值">默认值</a></li>
+                    <li>
+                        <a href="#%e6%9e%9a%e4%b8%be" aria-label="枚举">枚举</a><ul>
+                            
+                    <li>
+                        <a href="#%e4%bf%9d%e7%95%99%e5%80%bc" aria-label="保留值">保留值</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e4%bd%bf%e7%94%a8%e5%85%b6%e4%bb%96%e6%b6%88%e6%81%af%e7%b1%bb%e5%9e%8b" aria-label="使用其他消息类型">使用其他消息类型</a><ul>
+                            
+                    <li>
+                        <a href="#%e5%af%bc%e5%85%a5%e5%ae%9a%e4%b9%89" aria-label="导入定义">导入定义</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e5%b5%8c%e5%a5%97%e7%b1%bb%e5%9e%8b" aria-label="嵌套类型">嵌套类型</a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+  <div class="post-content"><ul>
+<li>.proto 文件用于定义服务。以下文档关于 Proto3。</li>
+<li>语言指南：<a href="https://protobuf.com.cn/programming-guides/proto3/" target="_blank" rel="noopener">https://protobuf.com.cn/programming-guides/proto3/</a></li>
+</ul>
+<h2 id="定义消息类型">定义消息类型<a hidden class="anchor" aria-hidden="true" href="#定义消息类型">#</a></h2>
+<ol>
+<li>首先让我们看一个非常简单的例子。假设你要定义搜索请求消息格式， 其中每个搜索请求都有一个查询字符串、你感兴趣的特定结果页面以及每页的结果数量。这是用于定义消息类型的 .proto 文件。
+<ul>
+<li>文件的第一行指定您正在使用 proto3 语法：如果您不这样做，则协议缓冲区编译器将假定您正在使用 proto2。这必须是文件中的第一行非空、非注释行。</li>
+<li>SearchRequest 消息定义指定三个字段（名称/值对），每个字段对应于您希望包含在此类消息中的每条数据。每个字段都有一个名称和一个类型。</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="n">syntax</span> <span class="o">=</span> <span class="s">&#34;proto3&#34;</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="kd">message</span> <span class="nc">SearchRequest</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="kt">string</span> <span class="n">query</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="kt">int32</span> <span class="n">page_number</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="kt">int32</span> <span class="n">result_per_page</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></div><h3 id="指定字段类型">指定字段类型<a hidden class="anchor" aria-hidden="true" href="#指定字段类型">#</a></h3>
+<ol>
+<li>在前面的示例中，所有字段都是<strong>标量类型</strong>：两个整数（page_number 和 results_per_page）和一个字符串（query）。您还可以为字段指定<strong>枚举</strong>和<strong>复合类型</strong>，如其他消息类型。</li>
+</ol>
+<h3 id="分配字段编号">分配字段编号<a hidden class="anchor" aria-hidden="true" href="#分配字段编号">#</a></h3>
+<ol>
+<li>您必须为消息定义中的每个字段指定 1 到 536,870,911 之间的一个数字，并遵守以下限制：
+<ul>
+<li>给定的数字<strong>必须</strong>在该消息的所有字段中唯一。</li>
+<li>字段编号19,000至19,999为 Protocol Buffers 实现保留。如果您在消息中使用这些保留字段编号之一，协议缓冲区编译器将发出警告。</li>
+<li>您不能使用任何先前保留的字段编号或已分配给扩展的任何字段编号。</li>
+</ul>
+</li>
+<li>此编号<strong>不能在您的消息类型使用后更改</strong>，因为它标识了消息线格式中的字段。“更改”字段编号等同于删除该字段并创建一个具有相同类型但新编号的新字段。有关如何正确执行此操作，请参阅删除字段。</li>
+<li>字段编号绝不应重复使用。切勿从保留列表中取出字段编号，以与新字段定义重复使用。请参阅重复使用字段编号的后果。</li>
+<li>您应该使用字段编号 1 到 15 来设置最常用的字段。较低的字段编号值在有线格式中占用较小的空间。例如，范围为 1 到 15 的字段编号需要一个字节进行编码。范围为 16 到 2047 的字段编号需要两个字节。您可以在协议缓冲区编码中找到更多相关信息。</li>
+</ol>
+<h3 id="指定字段标签">指定字段标签<a hidden class="anchor" aria-hidden="true" href="#指定字段标签">#</a></h3>
+<ol>
+<li>消息字段可以是以下之一
+<ul>
+<li>optional：optional 字段处于两种可能状态之一，您可以检查该值是否已显式设置。
+<ul>
+<li>字段已设置，并且包含显式设置或从线路解析的值。它将序列化到线路。</li>
+<li>字段未设置，并将返回默认值。它不会序列化到线路。</li>
+</ul>
+</li>
+<li>repeated：此字段类型可以在格式良好的消息中重复零次或多次。将保留重复值的顺序。</li>
+<li>map：这是一个配对键/值字段类型。有关此字段类型的更多信息，请参阅 Maps。</li>
+<li>如果没有应用显式字段标签，则假定默认字段标签，称为“隐式字段存在”。（您无法将字段显式设置为此状态。）格式良好的消息可以有零个或一个此字段（但不能多于一个）。您也无法确定此类型的字段是否已从线路解析。隐式存在字段将序列化到线路，除非它是默认值。有关此主题的更多信息，请参阅 字段存在。</li>
+</ul>
+</li>
+<li>在 proto3 中，标量数字类型的 repeated 字段默认使用 packed 编码。您可以在 Protocol Buffer 编码 中了解有关 packed 编码的更多信息。</li>
+</ol>
+<h3 id="添加更多消息类型">添加更多消息类型<a hidden class="anchor" aria-hidden="true" href="#添加更多消息类型">#</a></h3>
+<ol>
+<li>可以在单个 .proto 文件中定义多个消息类型。如果您要定义多个相关消息，这很有用 - 例如，如果您想定义与 SearchResponse 消息类型相对应的回复消息格式，则可以将其添加到相同的 .proto。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="kd">message</span> <span class="nc">SearchRequest</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="kt">string</span> <span class="n">query</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="kt">int32</span> <span class="n">page_number</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="kt">int32</span> <span class="n">results_per_page</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="kd">message</span> <span class="nc">SearchResponse</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span> <span class="o">...</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></div><ol start="2">
+<li>合并消息会导致膨胀虽然可以在单个 .proto 文件中定义多种消息类型（例如消息、枚举和服务），但当在一个文件中定义大量具有不同依赖项的消息时，它也可能导致依赖项膨胀。建议尽可能在每个 .proto 文件中包含较少的消息类型。</li>
+</ol>
+<h3 id="添加注释">添加注释<a hidden class="anchor" aria-hidden="true" href="#添加注释">#</a></h3>
+<ol>
+<li>要为 .proto 文件添加注释，请使用 C/C++ 样式的 // 和 /* &hellip; */ 语法。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="cm">/* SearchRequest represents a search query, with pagination options to
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * indicate which results to include in the response. */</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="kd">message</span> <span class="nc">SearchRequest</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="kt">string</span> <span class="n">query</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="kt">int32</span> <span class="n">page_number</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>  <span class="c1">// Which page number do we want?
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">int32</span> <span class="n">results_per_page</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>  <span class="c1">// Number of results to return per page.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></div><h3 id="删除字段">删除字段<a hidden class="anchor" aria-hidden="true" href="#删除字段">#</a></h3>
+<ol>
+<li>如果操作不当，删除字段可能会导致严重问题。</li>
+<li>当不再需要某个字段且已从客户端代码中删除所有引用时，可以从消息中删除该字段定义。但是，必须保留已删除的字段号。如果不保留字段号，开发人员将来有可能重新使用该字段号。</li>
+<li>还应保留字段名称，以允许消息的 JSON 和 TextFormat 编码继续进行解析。</li>
+</ol>
+<h3 id="保留字段">保留字段<a hidden class="anchor" aria-hidden="true" href="#保留字段">#</a></h3>
+<ol>
+<li>如果通过完全删除字段或将其注释掉来更新消息类型，则未来的开发人员可以在对类型进行自己的更新时重新使用该字段号。这可能会导致严重问题，如重新使用字段号的后果中所述。</li>
+<li>为确保这种情况不会发生，请将已删除的字段号添加到 reserved 列表中。为确保消息的 JSON 和 TextFormat 实例仍可解析，还应将已删除的字段名称添加到 reserved 列表中。</li>
+<li>如果任何未来的开发人员尝试使用这些保留的字段号或名称，则协议缓冲区编译器会发出警告。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="kd">message</span> <span class="nc">Foo</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="n">reserved</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">9</span> <span class="k">to</span> <span class="mi">11</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="n">reserved</span> <span class="s">&#34;foo&#34;</span><span class="p">,</span> <span class="s">&#34;bar&#34;</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></div><ol start="4">
+<li>保留的字段号范围是包含的（9 到 11 与 9、10、11 相同）。请注意，不能在同一个 reserved 语句中混合字段名称和字段号。</li>
+</ol>
+<h3 id="从-proto-生成什么">从 .proto 生成什么？<a hidden class="anchor" aria-hidden="true" href="#从-proto-生成什么">#</a></h3>
+<ol>
+<li>在 .proto 上运行协议缓冲区编译器时，编译器会以你选择的语言生成代码，你将需要使用该代码来处理你在文件中描述的消息类型，包括获取和设置字段值、将消息序列化到输出流以及从输入流解析消息。
+<ul>
+<li>对于 C++，编译器会为每个 .proto 生成一个 .h 文件和 .cc 文件，其中包含一个类，用于描述文件中所述的每种消息类型。</li>
+<li>对于 Java，编译器会生成一个 .java 文件，其中包含一个类，用于描述每种消息类型，以及一个用于创建消息类实例的特殊 Builder 类。</li>
+<li>对于 Kotlin，除了生成的 Java 代码之外，编译器还会为每种消息类型生成一个 .kt 文件，其中包含经过改进的 Kotlin API。这包括一个用于简化创建消息实例的 DSL、一个可空字段访问器和一个复制函数。</li>
+<li>Python 有点不同 - Python 编译器会生成一个模块，其中包含 .proto 中每种消息类型的静态描述符，然后使用 元类 在运行时创建必要的 Python 数据访问类。</li>
+<li>对于 Go，编译器会生成一个 .pb.go 文件，其中包含一个类型，用于描述文件中每种消息类型。</li>
+<li>对于 Ruby，编译器会生成一个 .rb 文件，其中包含一个 Ruby 模块，该模块包含您的消息类型。</li>
+<li>对于 Objective-C，编译器会为每个 .proto 生成一个 pbobjc.h 文件和 pbobjc.m 文件，其中包含一个类，用于描述文件中所述的每种消息类型。</li>
+<li>对于 C#，编译器会为每个 .proto 生成一个 .cs 文件，其中包含一个类，用于描述文件中所述的每种消息类型。</li>
+<li>对于 PHP，编译器会为文件中所述的每种消息类型生成一个 .php 消息文件，并为每个编译的 .proto 文件生成一个 .php 元数据文件。元数据文件用于将有效的消息类型加载到描述符池中。</li>
+<li>对于 Dart，编译器会生成一个 .pb.dart 文件，其中包含一个类，用于描述文件中每种消息类型。</li>
+</ul>
+</li>
+</ol>
+<h2 id="标量值类型">标量值类型<a hidden class="anchor" aria-hidden="true" href="#标量值类型">#</a></h2>
+<ol>
+<li>标量消息字段可以具有以下类型之一。该表显示了 .proto 文件中指定的类型，以及自动生成的类中的相应类型：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">.proto</th>
+<th style="text-align:center">C++</th>
+<th style="text-align:center">Java/Kotlin[1]</th>
+<th style="text-align:center">Python[3]</th>
+<th style="text-align:center">Go</th>
+<th style="text-align:center">Ruby</th>
+<th style="text-align:center">C#</th>
+<th style="text-align:center">PHP</th>
+<th style="text-align:center">Dart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">double</td>
+<td style="text-align:center">double</td>
+<td style="text-align:center">double</td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">float64</td>
+<td style="text-align:center">Float</td>
+<td style="text-align:center">double</td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">double</td>
+</tr>
+<tr>
+<td style="text-align:center">float</td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">float32</td>
+<td style="text-align:center">Float</td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">double</td>
+</tr>
+<tr>
+<td style="text-align:center">int32</td>
+<td style="text-align:center">int32</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">int32</td>
+<td style="text-align:center">Fixnum or Bignum (as required)</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">integer</td>
+<td style="text-align:center">int</td>
+</tr>
+<tr>
+<td style="text-align:center">int64</td>
+<td style="text-align:center">int64</td>
+<td style="text-align:center">long</td>
+<td style="text-align:center">int/long[4]</td>
+<td style="text-align:center">int64</td>
+<td style="text-align:center">Bignum</td>
+<td style="text-align:center">long</td>
+<td style="text-align:center">integer/string[6]</td>
+<td style="text-align:center">Int64</td>
+</tr>
+<tr>
+<td style="text-align:center">uint32</td>
+<td style="text-align:center">uint32</td>
+<td style="text-align:center">int[2]</td>
+<td style="text-align:center">int/long[4]</td>
+<td style="text-align:center">uint32</td>
+<td style="text-align:center">Fixnum or Bignum (as required)</td>
+<td style="text-align:center">uint</td>
+<td style="text-align:center">integer</td>
+<td style="text-align:center">int</td>
+</tr>
+<tr>
+<td style="text-align:center">uint64</td>
+<td style="text-align:center">uint64</td>
+<td style="text-align:center">long[2]</td>
+<td style="text-align:center">int/long[4]</td>
+<td style="text-align:center">uint64</td>
+<td style="text-align:center">Bignum</td>
+<td style="text-align:center">ulong</td>
+<td style="text-align:center">integer/string[6]</td>
+<td style="text-align:center">Int64</td>
+</tr>
+<tr>
+<td style="text-align:center">sint32</td>
+<td style="text-align:center">int32</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">int32</td>
+<td style="text-align:center">Fixnum or Bignum (as required)</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">integer</td>
+<td style="text-align:center">int</td>
+</tr>
+<tr>
+<td style="text-align:center">sint64</td>
+<td style="text-align:center">int64</td>
+<td style="text-align:center">long</td>
+<td style="text-align:center">int/long[4]</td>
+<td style="text-align:center">int64</td>
+<td style="text-align:center">Bignum</td>
+<td style="text-align:center">long</td>
+<td style="text-align:center">integer/string[6]</td>
+<td style="text-align:center">Int64</td>
+</tr>
+<tr>
+<td style="text-align:center">fixed32</td>
+<td style="text-align:center">uint32</td>
+<td style="text-align:center">int[2]</td>
+<td style="text-align:center">int/long[4]</td>
+<td style="text-align:center">uint32</td>
+<td style="text-align:center">Fixnum or Bignum (as required)</td>
+<td style="text-align:center">uint</td>
+<td style="text-align:center">integer</td>
+<td style="text-align:center">int</td>
+</tr>
+<tr>
+<td style="text-align:center">fixed64</td>
+<td style="text-align:center">uint64</td>
+<td style="text-align:center">long[2]</td>
+<td style="text-align:center">int/long[4]</td>
+<td style="text-align:center">uint64</td>
+<td style="text-align:center">Bignum</td>
+<td style="text-align:center">ulong</td>
+<td style="text-align:center">integer/string[6]</td>
+<td style="text-align:center">Int64</td>
+</tr>
+<tr>
+<td style="text-align:center">sfixed32</td>
+<td style="text-align:center">int32</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">int32</td>
+<td style="text-align:center">Fixnum or Bignum (as required)</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">integer</td>
+<td style="text-align:center">int</td>
+</tr>
+<tr>
+<td style="text-align:center">sfixed64</td>
+<td style="text-align:center">int64</td>
+<td style="text-align:center">long</td>
+<td style="text-align:center">int/long[4]</td>
+<td style="text-align:center">int64</td>
+<td style="text-align:center">Bignum</td>
+<td style="text-align:center">long</td>
+<td style="text-align:center">integer/string[6]</td>
+<td style="text-align:center">Int64</td>
+</tr>
+<tr>
+<td style="text-align:center">bool</td>
+<td style="text-align:center">bool</td>
+<td style="text-align:center">boolean</td>
+<td style="text-align:center">bool</td>
+<td style="text-align:center">bool</td>
+<td style="text-align:center">TrueClass/FalseClass</td>
+<td style="text-align:center">bool</td>
+<td style="text-align:center">boolean</td>
+<td style="text-align:center">bool</td>
+</tr>
+<tr>
+<td style="text-align:center">string</td>
+<td style="text-align:center">string</td>
+<td style="text-align:center">String</td>
+<td style="text-align:center">str/unicode[5]</td>
+<td style="text-align:center">string</td>
+<td style="text-align:center">String (UTF-8)</td>
+<td style="text-align:center">string</td>
+<td style="text-align:center">string</td>
+<td style="text-align:center">String</td>
+</tr>
+<tr>
+<td style="text-align:center">bytes</td>
+<td style="text-align:center">string</td>
+<td style="text-align:center">ByteString</td>
+<td style="text-align:center">str (Python 2) bytes (Python 3)</td>
+<td style="text-align:center">[]byte</td>
+<td style="text-align:center">String (ASCII-8BIT)</td>
+<td style="text-align:center">ByteString</td>
+<td style="text-align:center">string</td>
+<td style="text-align:center">List</td>
+</tr>
+</tbody>
+</table>
+<ol start="2">
+<li>注意：
+<ul>
+<li>int32：使用可变长度编码。对负数进行编码效率低下。如果你的字段可能有负值，请改用 sint32。</li>
+<li>int64：使用可变长度编码。对负数进行编码效率低下。如果你的字段可能有负值，请改用 sint64。</li>
+<li>uint32：使用可变长度编码。</li>
+<li>uint64：使用可变长度编码。</li>
+<li>sint32：使用可变长度编码。带符号的 int 值。这些比常规 int32 更有效地编码负数。</li>
+<li>sint64：使用可变长度编码。带符号的 int 值。这些比常规 int64 更有效地编码负数。</li>
+<li>fixed32：总是四个字节。如果值通常大于 2^28，则比 uint32 更有效。</li>
+<li>fixed64：总是八个字节。如果值通常大于 2^56，则比 uint64 更有效。</li>
+<li>sfixed32：总是四个字节。</li>
+<li>sfixed64：总是八个字节。</li>
+<li>string：字符串必须始终包含 UTF-8 编码或 7 位 ASCII 文本，并且不能超过 2^32。</li>
+<li>bytes：可以包含不超过 2^32 的任意字节序列。</li>
+</ul>
+</li>
+</ol>
+<h2 id="默认值">默认值<a hidden class="anchor" aria-hidden="true" href="#默认值">#</a></h2>
+<ol>
+<li>当解析消息时，如果编码的消息不包含特定的隐式存在元素，则访问解析对象中的相应字段将返回该字段的默认值。这些默认值是特定于类型的
+<ul>
+<li>对于字符串，默认值为空字符串。</li>
+<li>对于字节，默认值为空字节。</li>
+<li>对于布尔值，默认值是 false。</li>
+<li>对于数字类型，默认值是零。</li>
+<li>对于枚举，默认值是第一个定义的枚举值，它必须是 0。</li>
+<li>对于消息字段，该字段未设置。其确切值取决于语言。有关详细信息，请参阅生成代码指南。</li>
+</ul>
+</li>
+<li>重复字段的默认值为空（通常是相应语言中的空列表）。</li>
+<li>请注意，对于标量消息字段，一旦解析了消息，就无法判断某个字段是否明确设置为默认值（例如，布尔值是否设置为 false）或根本未设置：在定义消息类型时应牢记这一点。例如，如果您不希望某个布尔值在设置为 false 时开启某些行为，则不要使用该布尔值；另外请注意，如果标量消息字段已设置为其默认值，则该值不会在网络上序列化。如果浮点值或双精度值设置为 +0，则不会对其进行序列化，但 -0 被视为不同的值，并且会进行序列化。</li>
+</ol>
+<h2 id="枚举">枚举<a hidden class="anchor" aria-hidden="true" href="#枚举">#</a></h2>
+<ol>
+<li>在定义消息类型时，您可能希望其某个字段仅具有预定义值列表中的一个值。例如，假设您想为每个 SearchRequest 添加一个 corpus 字段，其中语料库可以是 UNIVERSAL、WEB、IMAGES、LOCAL、NEWS、PRODUCTS 或 VIDEO。您可以通过向消息定义中添加一个 enum 来非常简单地实现此目的，其中每个可能的枚举值都有一个常量。</li>
+<li>在以下示例中，我们添加了一个名为 Corpus 的 enum，其中包含所有可能的值，以及一个类型为 Corpus 的字段</li>
+</ol>
+<pre tabindex="0"><code class="language-porto" data-lang="porto">enum Corpus {
+  CORPUS_UNSPECIFIED = 0;
+  CORPUS_UNIVERSAL = 1;
+  CORPUS_WEB = 2;
+  CORPUS_IMAGES = 3;
+  CORPUS_LOCAL = 4;
+  CORPUS_NEWS = 5;
+  CORPUS_PRODUCTS = 6;
+  CORPUS_VIDEO = 7;
+}
+
+message SearchRequest {
+  string query = 1;
+  int32 page_number = 2;
+  int32 results_per_page = 3;
+  Corpus corpus = 4;
+}
+</code></pre><ol start="3">
+<li>正如您所见，Corpus 枚举的第一个常量映射到零：每个枚举定义必须包含一个常量，该常量映射到零作为其第一个元素。这是因为
+<ul>
+<li>必须有一个零值，以便我们可以使用 0 作为数字 默认值。</li>
+<li>零值需要是第一个元素，以与 proto2 语义兼容，其中第一个枚举值是默认值，除非明确指定了不同的值。</li>
+</ul>
+</li>
+<li>您可以通过为不同的枚举常量分配相同的值来定义别名。为此，您需要将 allow_alias 选项设置为 true。否则，当找到别名时，协议缓冲区编译器会生成一条警告消息。尽管所有别名值在反序列化期间都是有效的，但在序列化时始终使用第一个值。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="kd">enum</span> <span class="n">EnumAllowingAlias</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="k">option</span> <span class="n">allow_alias</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="n">EAA_UNSPECIFIED</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="n">EAA_STARTED</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="n">EAA_RUNNING</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="n">EAA_FINISHED</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="kd">enum</span> <span class="n">EnumNotAllowingAlias</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="n">ENAA_UNSPECIFIED</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="n">ENAA_STARTED</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="c1">// ENAA_RUNNING = 1;  // Uncommenting this line will cause a warning message.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">ENAA_FINISHED</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></div><ol start="5">
+<li>枚举器常量必须在 32 位整数的范围内。由于 enum 值在传输中使用 varint 编码，因此负值效率低下，因此不推荐使用。您可以像前面的示例中那样在消息定义中定义 enum，也可以在外部定义 - 这些 enum 可以重复用于 .proto 文件中的任何消息定义。您还可以使用在一个消息中声明的 enum 类型作为另一个消息中字段的类型，使用语法 <em>MessageType</em>.<em>EnumType</em>。</li>
+<li>当您对使用 enum 的 .proto 运行协议缓冲区编译器时，生成的代码将具有相应的 enum，用于 Java、Kotlin 或 C++，或者一个特殊的 EnumDescriptor 类，用于 Python，该类用于在运行时生成的类中创建一组具有整数值的符号常量。</li>
+</ol>
+<h3 id="保留值">保留值<a hidden class="anchor" aria-hidden="true" href="#保留值">#</a></h3>
+<ol>
+<li>如果您通过完全删除枚举项或将其注释掉来 更新枚举类型，则以后的用户可以在对类型进行自己的更新时重用数字值。如果他们稍后加载相同 .proto 的旧版本，则可能会导致严重问题，包括数据损坏、隐私错误等。确保这种情况不会发生的一种方法是指定已删除条目的数字值（和/或名称，这也会导致 JSON 序列化问题）为 reserved。如果任何以后的用户尝试使用这些标识符，协议缓冲区编译器将发出警告。您可以使用 max 关键字指定保留的数字值范围达到最大可能值。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="kd">enum</span> <span class="n">Foo</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="n">reserved</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">9</span> <span class="k">to</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">40</span> <span class="k">to</span> <span class="k">max</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="n">reserved</span> <span class="s">&#34;FOO&#34;</span><span class="p">,</span> <span class="s">&#34;BAR&#34;</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></div><ol start="2">
+<li>请注意，您不能在同一个 reserved 语句中混合字段名称和数字值。</li>
+</ol>
+<h2 id="使用其他消息类型">使用其他消息类型<a hidden class="anchor" aria-hidden="true" href="#使用其他消息类型">#</a></h2>
+<ol>
+<li>您可以使用其他消息类型作为字段类型。例如，假设您希望在每个 SearchResponse 消息中包含 Result 消息——要执行此操作，您可以在同一个 .proto 中定义一个 Result 消息类型，然后在 SearchResponse 中指定一个类型为 Result 的字段。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="kd">message</span> <span class="nc">SearchResponse</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="k">repeated</span> <span class="n">Result</span> <span class="n">results</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="kd">message</span> <span class="nc">Result</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="kt">string</span> <span class="n">url</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="kt">string</span> <span class="n">title</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="k">repeated</span> <span class="kt">string</span> <span class="n">snippets</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></div><h3 id="导入定义">导入定义<a hidden class="anchor" aria-hidden="true" href="#导入定义">#</a></h3>
+<ol>
+<li>在前面的示例中，Result 消息类型在与 SearchResponse 相同的文件中定义——如果您希望用作字段类型的消息类型已在另一个 .proto 文件中定义，该怎么办？</li>
+<li>您可以通过导入其他 .proto 文件来使用其定义。要导入另一个 .proto 的定义，您需要在文件的顶部添加一个导入语句</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="k">import</span> <span class="s">&#34;myproject/other_protos.proto&#34;</span><span class="p">;</span><span class="err">
+</span></span></span></code></pre></div><ol start="3">
+<li>默认情况下，您只能使用直接导入的 .proto 文件中的定义。但是，有时您可能需要将 .proto 文件移动到新位置。您可以将占位符 .proto 文件放在旧位置，而不是直接移动 .proto 文件并在单个更改中更新所有调用位置，以使用 import public 概念将所有导入转发到新位置。</li>
+<li>请注意，Java 中不提供公共导入功能。</li>
+<li>导入 proto（其中包含 import public 语句）的任何代码都可以间接依赖 import public 依赖项。例如</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="c1">// new.proto
+</span></span></span><span class="line"><span class="cl"><span class="c1">// All definitions are moved here
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="c1">// old.proto
+</span></span></span><span class="line"><span class="cl"><span class="c1">// This is the proto that all clients are importing.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">import</span> <span class="n">public</span> <span class="s">&#34;new.proto&#34;</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">import</span> <span class="s">&#34;other.proto&#34;</span><span class="p">;</span><span class="err">
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="c1">// client.proto
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">import</span> <span class="s">&#34;old.proto&#34;</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// You use definitions from old.proto and new.proto, but not other.proto
+</span></span></span></code></pre></div><ol start="6">
+<li>协议编译器使用 -I/&ndash;proto_path 标志在协议编译器命令行上指定的一组目录中搜索导入的文件。如果未给出标志，它将在编译器被调用的目录中查找。通常，您应该将 &ndash;proto_path 标志设置为项目的根目录，并对所有导入使用完全限定名称。</li>
+</ol>
+<h2 id="嵌套类型">嵌套类型<a hidden class="anchor" aria-hidden="true" href="#嵌套类型">#</a></h2>
+<ol>
+<li>您可以在其他消息类型中定义和使用消息类型，如下例所示——此处 Result 消息在 SearchResponse 消息中定义。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="kd">message</span> <span class="nc">SearchResponse</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="kd">message</span> <span class="nc">Result</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="kt">string</span> <span class="n">url</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="kt">string</span> <span class="n">title</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="k">repeated</span> <span class="kt">string</span> <span class="n">snippets</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="k">repeated</span> <span class="n">Result</span> <span class="n">results</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></div><ol start="2">
+<li>如果您想在父消息类型外部重新使用此消息类型，则将其称为 <code>_Parent_._Type_</code></li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="kd">message</span> <span class="nc">SomeOtherMessage</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="n">SearchResponse.Result</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></div><ol start="3">
+<li>您可以根据需要嵌套消息。在下面的示例中，请注意，两个名为 Inner 的嵌套类型完全独立，因为它们在不同的消息中定义</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="kd">message</span> <span class="nc">Outer</span> <span class="p">{</span>       <span class="c1">// Level 0
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kd">message</span> <span class="nc">MiddleAA</span> <span class="p">{</span>  <span class="c1">// Level 1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">message</span> <span class="nc">Inner</span> <span class="p">{</span>   <span class="c1">// Level 2
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="kt">int64</span> <span class="n">ival</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>      <span class="kt">bool</span>  <span class="n">booly</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="kd">message</span> <span class="nc">MiddleBB</span> <span class="p">{</span>  <span class="c1">// Level 1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">message</span> <span class="nc">Inner</span> <span class="p">{</span>   <span class="c1">// Level 2
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="kt">int32</span> <span class="n">ival</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>      <span class="kt">bool</span>  <span class="n">booly</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>  <span class="p">}</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></div>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://heliu.site/tags/grpc/">Grpc</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://heliu.site/posts/grpc/install/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>本地环境搭建</span>
+  </a>
+  <a class="next" href="https://heliu.site/posts/grpc/ssl/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>SSL/TLS</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    
+    <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv">
+        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    </span>
+    <span id="busuanzi_container_site_uv">
+        本站访客数<span id="busuanzi_value_site_uv"></span>人次
+    </span>
+    </div>
+        <span>Copyright © 2024 蜀ICP备2024091074号 <a href="#">heliu's blog</a>. All rights reserved</span>  
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'Copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'Done';
+            setTimeout(() => {
+                copybutton.innerHTML = 'Copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
