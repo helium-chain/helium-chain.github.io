@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Header 与 Trailer | Helium</title>
+<meta name="keywords" content="grpc">
+<meta name="description" content="grpc Header 与 Trailer 介绍。">
+<meta name="author" content="helium">
+<link rel="canonical" href="https://heliu.site/posts/grpc/header-trailer/">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://heliu.site/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/grpc/header-trailer/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono-nl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.6.0/style.css" />
+    <style>
+        body {
+            font-family: "LXGW WenKai Lite", sans-serif;
+            font-family: "LXGW WenKai Screen", sans-serif;
+        }
+    </style>
+</head>
+</html>
+
+  
+
+<meta property="og:title" content="Header 与 Trailer" />
+<meta property="og:description" content="grpc Header 与 Trailer 介绍。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://heliu.site/posts/grpc/header-trailer/" />
+<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-09-06T00:00:00+00:00" />
+<meta property="article:modified_time" content="2024-09-06T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:title" content="Header 与 Trailer"/>
+<meta name="twitter:description" content="grpc Header 与 Trailer 介绍。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Article",
+      "item": "https://heliu.site/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "gRPC",
+      "item": "https://heliu.site/posts/grpc/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Header 与 Trailer",
+      "item": "https://heliu.site/posts/grpc/header-trailer/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Header 与 Trailer",
+  "name": "Header 与 Trailer",
+  "description": "grpc Header 与 Trailer 介绍。",
+  "keywords": [
+    "grpc"
+  ],
+  "articleBody": " Header 和 Trailer 都用于传递元数据，但它们在 RPC 调用中的使用时机和目的有所不同。 Header 和 Trailer 区别 在 gRPC 中，Header 和 Trailer 都用于传递元数据，但它们在 RPC 调用中的使用时机和目的有所不同： Header： 发送时机：Header 通常在 RPC 调用开始时发送，即在响应消息之前发送。 内容：它们通常包含与请求相关的元数据，比如请求的身份验证信息、内容类型、压缩算法等。 用途：Header 可以用来影响请求的处理，比如授权检查或者请求路由。 读取时机：在服务器端，Header 可以在处理请求的任何时间点读取；在客户端，通常在发送请求后立即读取响应的 Header。 Trailer： 发送时机：Trailer 在 RPC 调用结束时发送，即在所有响应消息发送完毕后发送。 内容：它们通常包含关于整个调用过程的状态信息，比如状态码、错误消息或者调用持续时间等。 用途：Trailer 用于提供关于整个调用结果的信息，特别是如果调用失败，它们可以提供额外的错误详情。 读取时机：在服务器端，Trailer 通常在响应发送完毕后设置；在客户端，通常在调用完成（成功或失败）后读取 Trailer。 主要区别： 发送时间点：Header 在调用开始时发送，而 Trailer 在调用结束时发送。 内容类型：Header 通常包含请求相关的元数据，Trailer 则包含响应相关的元数据。 读取时机：Header 在处理请求之前或期间读取，Trailer 在响应结束后读取。 在实际应用中，Header 和 Trailer 的使用取决于特定的需求和场景。例如，如果你需要在请求被完全处理之前就提供一些信息，那么使用 Header 是合适的；如果你需要在请求处理完毕后提供状态信息，那么使用 Trailer 是更好的选择。 因为trailer是在服务端发送完请求之后才发送的，所以client获取trailer的时候需要在stream.CloseAndRecv或者stream.Recv 返回非nil错误 (包含 io.EOF)之后。 如果stream.CloseAndRecv之前调用stream.Trailer()获取的是空。 stream, err := client.SomeStreamingRPC(ctx) // retrieve header header, err := stream.Header() // retrieve trailer // `trailer`会在rpc返回的时候，即这个请求结束的时候被发送 // 因此此时调用`stream.Trailer()`获取的是空 trailer := stream.Trailer() stream.CloseAndRecv() // retrieve trailer // `trailer`会在rpc返回的时候，即这个请求结束的时候被发送 // 因此此时调用`stream.Trailer()`才可以获取到值 trailer := stream.Trailer() Header 和 Trailer 使用场景 Header 和 Trailer 在 gRPC 应用中有着多种具体的应用场景，以下是一些常见的用途： Header 的应用场景： 身份验证和授权： 在 Header 中发送认证令牌（如 JWT、OAuth 2.0 tokens）供服务器端验证用户身份。 发送 API 密钥或者其他身份验证信息。 内容协商： 指定请求的 Accept 类型，告诉服务器期望的响应格式（如 application/grpc+proto）。 发送 Accept-Encoding 来指示客户端支持哪些压缩算法。 路由和负载均衡： 使用特定的 Header 字段来影响请求的路由，比如在微服务架构中进行服务发现。 携带请求相关的上下文信息，比如租户标识，用于多租户环境的路由。 缓存控制： 发送 Cache-Control 指示缓存策略。 发送 If-None-Match 或 If-Modified-Since 用于条件请求。 调试和跟踪： 发送请求 ID 或 Correlation ID 用于日志记录和请求跟踪。 Trailer 的应用场景： 状态和错误信息： 当发生错误时，在 Trailer 中发送详细的错误信息，特别是当响应体中不便包含这些信息时。 提供状态码和额外的状态描述。 元数据记录： 记录请求处理时间、服务器标识、处理请求的实例信息等。 提供关于响应生成过程的统计信息，如响应生成耗时。 链式调用信息： 在多个服务间进行链式调用时，使用 Trailer 传递链式调用的状态或结果。 流控和重试策略： 发送关于流控的信息，比如服务器端是否已满载，客户端是否应该重试。 提供关于请求重试的指导，比如建议的重试间隔或重试次数。 数据校验： 发送数据校验和（如 CRC、MD5），让客户端能够验证数据的完整性。 通过这些应用场景，可以看出 Header 和 Trailer 在 gRPC 通信中扮演着重要的角色，它们提供了请求和响应的上下文信息，增强了通信的灵活性和健壮性。正确地使用 Header 和 Trailer 可以让服务间的交互更加透明和高效。 在拦截器中，我们不但可以获取或修改接收到的metadata，甚至还可以截取并修改要发送出去的metadata。 比如：我们在客户端拦截器中从要发送给服务端的metadata中读取一个时间戳字段，如果没有则补充这个时间戳字段。 func orderUnaryClientInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error { var s string // 获取要发送给服务端的`metadata` md, ok := metadata.FromOutgoingContext(ctx) if ok \u0026\u0026 len(md.Get(\"time\")) \u003e 0 { s = md.Get(\"time\")[0] } else { // 如果没有则补充这个时间戳字段 s = \"inter\" + strconv.FormatInt(time.Now().UnixNano(), 10) ctx = metadata.AppendToOutgoingContext(ctx, \"time\", s) } log.Printf(\"call timestamp: %s\", s) // Invoking the remote method err := invoker(ctx, method, req, reply, cc, opts...) return err } 使用示例 在 gRPC 中，Header 和 Trailer 可以同时使用。实际上，这是相当常见的做法，因为它们服务于不同的目的，并且发送于不同的时间点。 在服务器端，你可以在处理请求时发送 Header，并在请求处理完毕后发送 Trailer。 package main import ( \"context\" \"fmt\" \"log\" \"net\" \"google.golang.org/grpc\" \"google.golang.org/grpc/metadata\" ) type server struct{} func (s *server) YourRPCMethod(ctx context.Context, req *YourRequest) (*YourResponse, error) { // 发送 Header header := metadata.New(map[string]string{\"header-key\": \"header-value\"}) grpc.SendHeader(ctx, header) // ... 处理请求 ... // 发送 Trailer trailer := metadata.New(map[string]string{\"trailer-key\": \"trailer-value\"}) grpc.SetTrailer(ctx, trailer) return \u0026YourResponse{}, nil } func main() { lis, err := net.Listen(\"tcp\", \":50051\") if err != nil { log.Fatalf(\"failed to listen: %v\", err) } s := grpc.NewServer() RegisterYourServiceServer(s, \u0026server{}) if err := s.Serve(lis); err != nil { log.Fatalf(\"failed to serve: %v\", err) } } 在客户端，你可以接收来自服务器的 Header 和 Trailer。 package main import ( \"context\" \"log\" \"google.golang.org/grpc\" \"google.golang.org/grpc/metadata\" ) func main() { conn, err := grpc.Dial(\"localhost:50051\", grpc.WithInsecure()) if err != nil { log.Fatalf(\"did not connect: %v\", err) } defer conn.Close() c := NewYourServiceClient(conn) ctx, cancel := context.WithTimeout(context.Background(), time.Second) defer cancel() // 发送请求并接收响应 stream, err := c.YourRPCMethod(ctx, \u0026YourRequest{}) if err != nil { log.Fatalf(\"could not call: %v\", err) } // 接收 Header header, err := stream.Header() if err != nil { log.Fatalf(\"could not get header: %v\", err) } log.Printf(\"Header: %v\", header) // 接收响应 resp, err := stream.Recv() if err != nil { log.Fatalf(\"could not receive response: %v\", err) } // 接收 Trailer trailer := stream.Trailer() log.Printf(\"Trailer: %v\", trailer) // 使用响应 // ... } 在这个例子中，服务器发送了 Header 和 Trailer，而客户端接收了它们。注意，Header 是通过 stream.Header() 获取的，而 Trailer 是在流结束时通过 stream.Trailer() 获取的。 在实际应用中，根据你的具体需求，你可以选择是否同时使用 Header 和 Trailer。它们是完全兼容的，可以一起使用来提供完整的请求和响应元数据。 google.golang.org/grpc func SendHeader 用于在服务器端发送初始的元数据（称为 Header）给客户端。这个函数应该在服务器端处理请求时调用，通常是在响应体发送之前。 // SendHeader sends header metadata. It may be called at most once, and may not // be called after any event that causes headers to be sent (see SetHeader for // a complete list). The provided md and headers set by SetHeader() will be // sent. // // The error returned is compatible with the status package. However, the // status code will often not match the RPC status as seen by the client // application, and therefore, should not be relied upon for this purpose. func SendHeader(ctx context.Context, md metadata.MD) error { stream := ServerTransportStreamFromContext(ctx) if stream == nil { return status.Errorf(codes.Internal, \"grpc: failed to fetch the stream from the context %v\", ctx) } if err := stream.SendHeader(md); err != nil { return toRPCErr(err) } return nil } 在服务器端的方法实现中，你可以使用 grpc.SendHeader 来发送 Header。以下是一个示例： package main import ( \"context\" \"log\" \"net\" \"google.golang.org/grpc\" \"google.golang.org/grpc/metadata\" ) type server struct{} func (s *server) YourRPCMethod(ctx context.Context, req *YourRequest) (*YourResponse, error) { // 创建要发送的 Header header := metadata.New(map[string]string{ \"header-key-1\": \"value-1\", \"header-key-2\": \"value-2\", }) // 发送 Header if err := grpc.SendHeader(ctx, header); err != nil { log.Printf(\"Failed to send header: %v\", err) return nil, err } // ... 处理请求 ... // 返回响应 return \u0026YourResponse{}, nil } func main() { lis, err := net.Listen(\"tcp\", \":50051\") if err != nil { log.Fatalf(\"failed to listen: %v\", err) } s := grpc.NewServer() RegisterYourServiceServer(s, \u0026server{}) if err := s.Serve(lis); err != nil { log.Fatalf(\"failed to serve: %v\", err) } } 注意事项： grpc.SendHeader 只能在服务器端调用，并且应该在发送任何响应消息之前调用。 你只能发送一次 Header。如果尝试发送多次，后续的调用将失败。 发送 Header 是一个异步操作，不会阻塞当前的服务方法。 Header 应该包含与请求相关的元数据，例如内容类型、授权信息等。 如果在发送 Header 前服务器端或客户端关闭了连接，Header 可能不会被发送。 在客户端，你可以通过调用响应流对象的 Header() 方法来接收 Header： // 假设 stream 是 gRPC 客户端流 header, err := stream.Header() if err != nil { log.Printf(\"Failed to receive header: %v\", err) } else { log.Printf(\"Received header: %v\", header) } 通过这种方式，服务器端可以在处理请求之前，向客户端发送一些重要的元数据。客户端可以根据这些元数据来调整其行为，例如处理授权、内容协商等。 func SetHeader SetHeader设置从服务器发送到客户端的报头元数据。所提供的上下文必须是传递给服务器处理程序的上下文。 流式rpc应该更喜欢ServerStream的SetHeader方法。 当多次调用时，所有提供的元数据将被合并。当发生以下情况之一时，所有元数据将被发送出去: 调用grpc.SendHeader，对于流处理程序，调用stream.SendHeader。 发送第一条响应消息。对于一元处理程序，这在处理程序返回时发生;对于流处理程序，这可能在流的SendMsg方法被调用时发生。发送RPC状态(错误或成功)。这在处理程序返回时发生。如果在上述任何事件之后调用SetHeader将失败。 返回的错误与状态包兼容。但是，状态码通常与客户端应用程序看到的RPC状态不匹配，因此不应该依赖于此目的。 // SetHeader sets the header metadata to be sent from the server to the client. // The context provided must be the context passed to the server's handler. // // Streaming RPCs should prefer the SetHeader method of the ServerStream. // // When called multiple times, all the provided metadata will be merged. All // the metadata will be sent out when one of the following happens: // // - grpc.SendHeader is called, or for streaming handlers, stream.SendHeader. // - The first response message is sent. For unary handlers, this occurs when // the handler returns; for streaming handlers, this can happen when stream's // SendMsg method is called. // - An RPC status is sent out (error or success). This occurs when the handler // returns. // // SetHeader will fail if called after any of the events above. // // The error returned is compatible with the status package. However, the // status code will often not match the RPC status as seen by the client // application, and therefore, should not be relied upon for this purpose. func SetHeader(ctx context.Context, md metadata.MD) error { if md.Len() == 0 { return nil } stream := ServerTransportStreamFromContext(ctx) if stream == nil { return status.Errorf(codes.Internal, \"grpc: failed to fetch the stream from the context %v\", ctx) } return stream.SetHeader(md) } grpc.SetHeader 和 grpc.SendHeader 的区别： grpc.SetHeader 用途：在服务器端，设置响应的 Header 元数据。 时机：在服务器端处理请求时调用。 行为：允许服务器多次调用 SetHeader 来设置或更新 Header 元数据。 发送时机：当服务器调用 grpc.SendHeader 或 grpc.SetTrailer 时，或者在发送第一个响应消息后，或者在发送 RPC 状态（成功或错误）后，这些 Header 元数据会被发送给客户端。 grpc.SendHeader 用途：在服务器端，发送已经设置好的 Header 元数据给客户端。 时机：在服务器端处理请求时调用，通常在响应体发送之前。 行为：SendHeader 只能调用一次，用于发送已经通过 SetHeader 设置的 Header 元数据。 发送时机：SendHeader 调用后，之前设置的 Header 元数据会被发送给客户端。 总结： grpc.SetHeader 用于服务器端设置 Header 元数据，允许多次调用来更新元数据。 grpc.SendHeader 用于服务器端发送 Header 元数据给客户端，只能调用一次。 在服务器端，通常你会先使用 grpc.SetHeader 设置元数据，然后在适当的时候调用 grpc.SendHeader 发送这些元数据。如果在发送响应消息之前没有调用 grpc.SendHeader，框架会自动在发送第一个响应消息后发送这些元数据。 func SetTrailer SetTrailer设置RPC返回时将发送的尾部元数据。当多次调用时，所有提供的元数据将被合并。 返回的错误与状态包兼容。但是，状态码通常与客户端应用程序看到的RPC状态不匹配，因此不应该依赖于此目的。 // SetTrailer sets the trailer metadata that will be sent when an RPC returns. // When called more than once, all the provided metadata will be merged. // // The error returned is compatible with the status package. However, the // status code will often not match the RPC status as seen by the client // application, and therefore, should not be relied upon for this purpose. func SetTrailer(ctx context.Context, md metadata.MD) error { if md.Len() == 0 { return nil } stream := ServerTransportStreamFromContext(ctx) if stream == nil { return status.Errorf(codes.Internal, \"grpc: failed to fetch the stream from the context %v\", ctx) } return stream.SetTrailer(md) } 用于服务器端设置 Trailer 元数据，这些元数据会在响应结束时发送给客户端。与 Header 元数据不同，Trailer 是在响应处理完毕后发送的，通常包含关于 RPC 调用状态的信息，如错误代码、错误消息或其他与响应相关的元数据。 以下是如何在服务器端使用 grpc.SetTrailer 的示例： 在这个例子中，我们创建了一个 Trailer 并使用 grpc.SetTrailer 设置它。这应该在响应处理完毕后调用，通常是在响应的最后一个消息发送之后。 请注意，grpc.SetTrailer 只能调用一次，且必须在响应发送完毕之前调用。如果在发送响应消息之前没有调用 grpc.SetTrailer，框架会自动在发送最后一个响应消息后发送这些 Trailer 元数据。 package main import ( \"context\" \"log\" \"net\" \"google.golang.org/grpc\" \"google.golang.org/grpc/metadata\" ) type server struct{} func (s *server) YourRPCMethod(ctx context.Context, req *YourRequest) (*YourResponse, error) { // ... 处理请求 ... // 设置 Trailer trailer := metadata.New(map[string]string{ \"error-code\": \"500\", \"error-message\": \"Internal server error\", }) grpc.SetTrailer(ctx, trailer) // ... 返回响应 ... } func main() { lis, err := net.Listen(\"tcp\", \":50051\") if err != nil { log.Fatalf(\"failed to listen: %v\", err) } s := grpc.NewServer() RegisterYourServiceServer(s, \u0026server{}) if err := s.Serve(lis); err != nil { log.Fatalf(\"failed to serve: %v\", err) } } 在客户端，你可以通过调用响应流对象的 Trailer() 方法来接收 Trailer： // 假设 stream 是 gRPC 客户端流 trailer := stream.Trailer() if trailer != nil { // 处理 Trailer 中的元数据 errorCode, ok := trailer[\"error-code\"] if ok \u0026\u0026 errorCode[0] == \"500\" { log.Printf(\"Received error code: %s\", errorCode[0]) } } 通过这种方式，服务器端可以在响应处理完毕后，向客户端发送一些重要的元数据，如错误信息或其他与响应相关的状态信息。客户端可以根据这些信息来处理错误或采取其他必要的行动。 type CallOption func Header Header返回一个calllooptions，用于检索一元RPC的Header元数据。 用于客户端接收来自服务端响应的 Header。 // Header returns a CallOptions that retrieves the header metadata // for a unary RPC. func Header(md *metadata.MD) CallOption { return HeaderCallOption{HeaderAddr: md} } 使用示例：客户端 func main() { // ... var opts1 []grpc.CallOption = []grpc.CallOption{ grpc.WaitForReady(false), grpc.Header(\u0026header), grpc.Trailer(\u0026tr), } // 执行rpc调用(这个方法在服务器端来实现并返回结构) resp, err := client.SayHello(ctx, \u0026pb.HelloRequest{RequestName: \"gh\", Age: 12}, opts1...) if err != nil { fmt.Printf(\"%v\\n\", err) return } fmt.Printf(\"Response-Header: %v\\n\", header) fmt.Println(resp.GetResponseMsg()) fmt.Printf(\"Response-Trailer: %v\\n\", tr) // ... } func Trailer Trailer返回一个calllooptions，用于检索一元RPC的Trailer元数据。 用于客户端接收来自服务端响应的 Trailer。 // Trailer returns a CallOptions that retrieves the trailer metadata // for a unary RPC. func Trailer(md *metadata.MD) CallOption { return TrailerCallOption{TrailerAddr: md} } 使用示例：客户端 func main() { // ... var opts1 []grpc.CallOption = []grpc.CallOption{ grpc.WaitForReady(false), grpc.Header(\u0026header), grpc.Trailer(\u0026tr), } // 执行rpc调用(这个方法在服务器端来实现并返回结构) resp, err := client.SayHello(ctx, \u0026pb.HelloRequest{RequestName: \"gh\", Age: 12}, opts1...) if err != nil { fmt.Printf(\"%v\\n\", err) return } fmt.Printf(\"Response-Header: %v\\n\", header) fmt.Println(resp.GetResponseMsg()) fmt.Printf(\"Response-Trailer: %v\\n\", tr) // ... } 特殊的元数据键 在 gRPC 中，有一些特殊的元数据键，它们具有特定的含义和用途。这些特殊键通常与 gRPC 协议的各个方面有关，包括但不限于状态、压缩、认证、流量控制等。以下是一些常见的特殊元数据键： grpc-status： 类型：字符串 描述：包含 RPC 的状态码。这个键通常在响应的 Trailer 中使用。 grpc-message： 类型：字符串 描述：包含 RPC 状态的详细消息。这个键通常在响应的 Trailer 中使用。 grpc-encoding： 类型：字符串 描述：指定请求或响应的压缩算法。例如，gzip。 grpc-timeout： 类型：字符串 描述：指定 RPC 调用的超时时间。例如，10s。 grpc-accept-encoding： 类型：字符串 描述：指定客户端支持的压缩算法。例如，gzip。 grpc-authority： 类型：字符串 描述：指定服务提供者的权威信息。例如，example.com:8080。 grpc-client-authority： 类型：字符串 描述：指定客户端的权威信息。例如，client.example.com:8080。 grpc-max-send-message-length： 类型：字符串 描述：指定客户端允许发送的最大消息长度。例如，1048576。 grpc-max-receive-message-length： 类型：字符串 描述：指定服务器允许接收的最大消息长度。例如，1048576。 grpc-compress-algorithm： 类型：字符串 描述：指定请求或响应的压缩算法。例如，gzip。 这些特殊键是由 gRPC 协议定义的，它们被用来在请求和响应中传递与 gRPC 协议相关的信息。在客户端和服务器端，这些键可以通过 grpc.Header 和 grpc.Trailer 函数来设置和访问。 ",
+  "wordCount" : "1518",
+  "inLanguage": "zh",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-09-06T00:00:00Z",
+  "dateModified": "2024-09-06T00:00:00Z",
+  "author":[{
+    "@type": "Person",
+    "name": "helium"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://heliu.site/posts/grpc/header-trailer/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Helium",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://heliu.site/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+                    height="35">Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://heliu.site/" title="主页">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/posts" title="文章">
+                    <span>Article</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/archives" title="时间轴">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/tags/" title="标签">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/support" title="打赏">
+                    <span>🫶Help</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+
+<article class="post" autonumbering>
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/grpc/">gRPC</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Header 与 Trailer
+    </h1>
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2024-09-06</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2024-09-06</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select: text;">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="user-select: text;"></path>
+    <polyline points="14 2 14 8 20 8" style="user-select: text;"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
+    <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
+    <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
+</svg><span>1518字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="9"></circle>
+    <polyline points="12 7 12 12 15 15"></polyline>
+</svg><span>8分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+</svg><span>helium</span></span>
+      <span class="x-post-meta-item">
+        &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
+        <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
+            <a href="https://heliu.site/tags/grpc/" target="_blank" rel="noopener">Grpc</a>
+        </ul>
+      </span>
+      
+      <span id="busuanzi_container_page_pv" class="x-post-meta-item">
+        &nbsp;<svg t="1720844685710" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="27237" width="200" height="200"><path d="M739.754667 574.08c-121.386667 45.610667-208.469333 169.813333-208.64 316.16 0 33.408 4.693333 65.493333 13.141333 95.914667H94.122667c-26.453333-43.52-41.685333-91.946667-41.685334-143.189334 0-185.173333 192.896-335.104 430.805334-335.104 96.256 0 184.832 24.746667 256.512 66.218667z m-280.490667-114.986667a214.869333 214.869333 0 0 1-214.869333-215.04A215.04 215.04 0 0 1 459.264 28.842667a215.04 215.04 0 0 1 215.04 215.210666 215.04 215.04 0 0 1-215.04 215.04zM974.506667 641.28c9.856 0 17.834667 7.466667 17.834666 16.64v59.989333c-0.341333 8.789333-7.850667 15.786667-17.28 16.085334-9.856 0.341333-18.176-6.826667-18.517333-16.085334v-20.053333l-99.114667 91.093333-0.256 0.256a18.474667 18.474667 0 0 1-14.848 4.352h-0.768a18.176 18.176 0 0 1-9.344-4.608l-0.938666-0.981333-85.930667-80.042667-123.562667 115.072a18.773333 18.773333 0 0 1-25.216 0 15.786667 15.786667 0 0 1 0-23.466666l136.149334-126.848 0.725333-0.597334a18.645333 18.645333 0 0 1 24.362667 0.512l87.253333 81.237334 86.058667-79.232h-21.248c-9.386667-0.298667-16.938667-7.338667-17.28-16.085334-0.341333-9.173333 7.381333-16.896 17.28-17.237333h64.64z m-367.146667 240h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v72.192a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042667-16.042666v-72.192c0-8.874667 7.210667-16.042667 16.042667-16.042667z m110.805333-106.666667h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v178.858667a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042666v-178.858667c0-8.874667 7.168-16.042667 16.042666-16.042667z m106.538667 80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v99.413333a16.042667 16.042667 0 0 1-16.042667 16.042667H824.746667a16.042667 16.042667 0 0 1-16.042667-16.042667v-99.413333c0-8.874667 7.168-16.042667 16.042667-16.042667z m110.165333-80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v179.413333a16.042667 16.042667 0 0 1-16.042667 16.042667h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042667v-179.413333c0-8.874667 7.210667-16.042667 16.042666-16.042667z" fill="#999999" p-id="27238"></path></svg>
+        <span id="busuanzi_value_page_pv"></span>
+      </span>
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#header-%e5%92%8c-trailer-%e5%8c%ba%e5%88%ab" aria-label="Header 和 Trailer 区别">Header 和 Trailer 区别</a></li>
+                    <li>
+                        <a href="#header-%e5%92%8c-trailer-%e4%bd%bf%e7%94%a8%e5%9c%ba%e6%99%af" aria-label="Header 和 Trailer 使用场景">Header 和 Trailer 使用场景</a></li>
+                    <li>
+                        <a href="#%e4%bd%bf%e7%94%a8%e7%a4%ba%e4%be%8b" aria-label="使用示例">使用示例</a></li>
+                    <li>
+                        <a href="#googlegolangorggrpc" aria-label="google.golang.org/grpc">google.golang.org/grpc</a><ul>
+                            
+                    <li>
+                        <a href="#func-sendheader" aria-label="func SendHeader">func SendHeader</a></li>
+                    <li>
+                        <a href="#func-setheader" aria-label="func SetHeader">func SetHeader</a></li>
+                    <li>
+                        <a href="#func-settrailer" aria-label="func SetTrailer">func SetTrailer</a></li>
+                    <li>
+                        <a href="#type-calloption" aria-label="type CallOption">type CallOption</a><ul>
+                            
+                    <li>
+                        <a href="#func-header" aria-label="func Header">func Header</a></li>
+                    <li>
+                        <a href="#func-trailer" aria-label="func Trailer">func Trailer</a></li></ul>
+                    </li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e7%89%b9%e6%ae%8a%e7%9a%84%e5%85%83%e6%95%b0%e6%8d%ae%e9%94%ae" aria-label="特殊的元数据键">特殊的元数据键</a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+  <div class="post-content"><ul>
+<li>Header 和 Trailer 都用于传递元数据，但它们在 RPC 调用中的使用时机和目的有所不同。</li>
+</ul>
+<h2 id="header-和-trailer-区别">Header 和 Trailer 区别<a hidden class="anchor" aria-hidden="true" href="#header-和-trailer-区别">#</a></h2>
+<ol>
+<li>在 gRPC 中，Header 和 Trailer 都用于传递元数据，但它们在 RPC 调用中的使用时机和目的有所不同：</li>
+<li>Header：
+<ul>
+<li><strong>发送时机</strong>：Header 通常在 RPC 调用开始时发送，即在<strong>响应消息之前</strong>发送。</li>
+<li><strong>内容</strong>：它们通常包含与请求相关的元数据，比如请求的身份验证信息、内容类型、压缩算法等。</li>
+<li><strong>用途</strong>：Header 可以用来影响请求的处理，比如授权检查或者请求路由。</li>
+<li><strong>读取时机</strong>：在服务器端，Header 可以在处理请求的任何时间点读取；在客户端，通常在发送请求后立即读取响应的 Header。</li>
+</ul>
+</li>
+<li>Trailer：
+<ul>
+<li><strong>发送时机</strong>：Trailer 在 RPC 调用结束时发送，即在<strong>所有响应消息发送完毕后</strong>发送。</li>
+<li><strong>内容</strong>：它们通常包含关于整个调用过程的状态信息，比如状态码、错误消息或者调用持续时间等。</li>
+<li><strong>用途</strong>：Trailer 用于提供关于整个调用结果的信息，特别是如果调用失败，它们可以提供额外的错误详情。</li>
+<li><strong>读取时机</strong>：在服务器端，Trailer 通常在响应发送完毕后设置；在客户端，通常在调用完成（成功或失败）后读取 Trailer。</li>
+</ul>
+</li>
+<li>主要区别：
+<ul>
+<li><strong>发送时间点</strong>：Header 在调用开始时发送，而 Trailer 在调用结束时发送。</li>
+<li><strong>内容类型</strong>：Header 通常包含请求相关的元数据，Trailer 则包含响应相关的元数据。</li>
+<li><strong>读取时机</strong>：Header 在处理请求之前或期间读取，Trailer 在响应结束后读取。</li>
+</ul>
+</li>
+<li>在实际应用中，Header 和 Trailer 的使用取决于特定的需求和场景。例如，如果你需要在请求被完全处理之前就提供一些信息，那么使用 Header 是合适的；如果你需要在请求处理完毕后提供状态信息，那么使用 Trailer 是更好的选择。</li>
+<li>因为trailer是在服务端发送完请求之后才发送的，所以client获取trailer的时候需要在stream.CloseAndRecv或者stream.Recv 返回非nil错误 (包含 io.EOF)之后。</li>
+<li>如果stream.CloseAndRecv之前调用stream.Trailer()获取的是空。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">stream</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">SomeStreamingRPC</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// retrieve header
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">header</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Header</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// retrieve trailer 
+</span></span></span><span class="line"><span class="cl"><span class="c1">// `trailer`会在rpc返回的时候，即这个请求结束的时候被发送
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 因此此时调用`stream.Trailer()`获取的是空
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">trailer</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Trailer</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">stream</span><span class="p">.</span><span class="nf">CloseAndRecv</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// retrieve trailer 
+</span></span></span><span class="line"><span class="cl"><span class="c1">// `trailer`会在rpc返回的时候，即这个请求结束的时候被发送
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 因此此时调用`stream.Trailer()`才可以获取到值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">trailer</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Trailer</span><span class="p">()</span>
+</span></span></code></pre></div><h2 id="header-和-trailer-使用场景">Header 和 Trailer 使用场景<a hidden class="anchor" aria-hidden="true" href="#header-和-trailer-使用场景">#</a></h2>
+<ol>
+<li>Header 和 Trailer 在 gRPC 应用中有着多种具体的应用场景，以下是一些常见的用途：</li>
+<li>Header 的应用场景：
+<ol>
+<li>身份验证和授权：
+<ul>
+<li>在 Header 中发送认证令牌（如 JWT、OAuth 2.0 tokens）供服务器端验证用户身份。</li>
+<li>发送 API 密钥或者其他身份验证信息。</li>
+</ul>
+</li>
+<li>内容协商：
+<ul>
+<li>指定请求的 Accept 类型，告诉服务器期望的响应格式（如 application/grpc+proto）。</li>
+<li>发送 Accept-Encoding 来指示客户端支持哪些压缩算法。</li>
+</ul>
+</li>
+<li>路由和负载均衡：
+<ul>
+<li>使用特定的 Header 字段来影响请求的路由，比如在微服务架构中进行服务发现。</li>
+<li>携带请求相关的上下文信息，比如租户标识，用于多租户环境的路由。</li>
+</ul>
+</li>
+<li>缓存控制：
+<ul>
+<li>发送 Cache-Control 指示缓存策略。</li>
+<li>发送 If-None-Match 或 If-Modified-Since 用于条件请求。</li>
+</ul>
+</li>
+<li>调试和跟踪：
+<ul>
+<li>发送请求 ID 或 Correlation ID 用于日志记录和请求跟踪。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>Trailer 的应用场景：
+<ol>
+<li>状态和错误信息：
+<ul>
+<li>当发生错误时，在 Trailer 中发送详细的错误信息，特别是当响应体中不便包含这些信息时。</li>
+<li>提供状态码和额外的状态描述。</li>
+</ul>
+</li>
+<li>元数据记录：
+<ul>
+<li>记录请求处理时间、服务器标识、处理请求的实例信息等。</li>
+<li>提供关于响应生成过程的统计信息，如响应生成耗时。</li>
+</ul>
+</li>
+<li>链式调用信息：
+<ul>
+<li>在多个服务间进行链式调用时，使用 Trailer 传递链式调用的状态或结果。</li>
+</ul>
+</li>
+<li>流控和重试策略：
+<ul>
+<li>发送关于流控的信息，比如服务器端是否已满载，客户端是否应该重试。</li>
+<li>提供关于请求重试的指导，比如建议的重试间隔或重试次数。</li>
+</ul>
+</li>
+<li>数据校验：
+<ul>
+<li>发送数据校验和（如 CRC、MD5），让客户端能够验证数据的完整性。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>通过这些应用场景，可以看出 Header 和 Trailer 在 gRPC 通信中扮演着重要的角色，它们提供了请求和响应的上下文信息，增强了通信的灵活性和健壮性。正确地使用 Header 和 Trailer 可以让服务间的交互更加透明和高效。</li>
+<li>在拦截器中，我们不但可以获取或修改接收到的metadata，甚至还可以截取并修改要发送出去的metadata。</li>
+<li>比如：我们在客户端拦截器中从要发送给服务端的metadata中读取一个时间戳字段，如果没有则补充这个时间戳字段。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">orderUnaryClientInterceptor</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">method</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">reply</span> <span class="kd">interface</span><span class="p">{},</span>
+</span></span><span class="line"><span class="cl"> <span class="nx">cc</span> <span class="o">*</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">ClientConn</span><span class="p">,</span> <span class="nx">invoker</span> <span class="nx">grpc</span><span class="p">.</span><span class="nx">UnaryInvoker</span><span class="p">,</span> <span class="nx">opts</span> <span class="o">...</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">CallOption</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="kd">var</span> <span class="nx">s</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="c1">// 获取要发送给服务端的`metadata`
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span> <span class="nx">md</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">FromOutgoingContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> <span class="k">if</span> <span class="nx">ok</span> <span class="o">&amp;&amp;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">md</span><span class="p">.</span><span class="nf">Get</span><span class="p">(</span><span class="s">&#34;time&#34;</span><span class="p">))</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">s</span> <span class="p">=</span> <span class="nx">md</span><span class="p">.</span><span class="nf">Get</span><span class="p">(</span><span class="s">&#34;time&#34;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"> <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 如果没有则补充这个时间戳字段
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">s</span> <span class="p">=</span> <span class="s">&#34;inter&#34;</span> <span class="o">+</span> <span class="nx">strconv</span><span class="p">.</span><span class="nf">FormatInt</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">UnixNano</span><span class="p">(),</span> <span class="mi">10</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">ctx</span> <span class="p">=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">AppendToOutgoingContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="s">&#34;time&#34;</span><span class="p">,</span> <span class="nx">s</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;call timestamp: %s&#34;</span><span class="p">,</span> <span class="nx">s</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="c1">// Invoking the remote method
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span> <span class="nx">err</span> <span class="o">:=</span> <span class="nf">invoker</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">method</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">reply</span><span class="p">,</span> <span class="nx">cc</span><span class="p">,</span> <span class="nx">opts</span><span class="o">...</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="k">return</span> <span class="nx">err</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="使用示例">使用示例<a hidden class="anchor" aria-hidden="true" href="#使用示例">#</a></h2>
+<ol>
+<li>在 gRPC 中，Header 和 Trailer 可以同时使用。实际上，这是相当常见的做法，因为它们服务于不同的目的，并且发送于不同的时间点。</li>
+<li>在服务器端，你可以在处理请求时发送 Header，并在请求处理完毕后发送 Trailer。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;net&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;google.golang.org/grpc&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;google.golang.org/grpc/metadata&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">server</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">YourRPCMethod</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">req</span> <span class="o">*</span><span class="nx">YourRequest</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">YourResponse</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 发送 Header
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">header</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;header-key&#34;</span><span class="p">:</span> <span class="s">&#34;header-value&#34;</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">grpc</span><span class="p">.</span><span class="nf">SendHeader</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">header</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ... 处理请求 ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 发送 Trailer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">trailer</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;trailer-key&#34;</span><span class="p">:</span> <span class="s">&#34;trailer-value&#34;</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">grpc</span><span class="p">.</span><span class="nf">SetTrailer</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">trailer</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">YourResponse</span><span class="p">{},</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">lis</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">net</span><span class="p">.</span><span class="nf">Listen</span><span class="p">(</span><span class="s">&#34;tcp&#34;</span><span class="p">,</span> <span class="s">&#34;:50051&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;failed to listen: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">s</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">NewServer</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">RegisterYourServiceServer</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">server</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">Serve</span><span class="p">(</span><span class="nx">lis</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;failed to serve: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="3">
+<li>在客户端，你可以接收来自服务器的 Header 和 Trailer。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;google.golang.org/grpc&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;google.golang.org/grpc/metadata&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">conn</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">Dial</span><span class="p">(</span><span class="s">&#34;localhost:50051&#34;</span><span class="p">,</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">WithInsecure</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;did not connect: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nx">conn</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">c</span> <span class="o">:=</span> <span class="nf">NewYourServiceClient</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">ctx</span><span class="p">,</span> <span class="nx">cancel</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nf">WithTimeout</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">(),</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nf">cancel</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 发送请求并接收响应
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">stream</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">YourRPCMethod</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">YourRequest</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;could not call: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 接收 Header
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">header</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Header</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;could not get header: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Header: %v&#34;</span><span class="p">,</span> <span class="nx">header</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 接收响应
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">resp</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Recv</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;could not receive response: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 接收 Trailer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">trailer</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Trailer</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Trailer: %v&#34;</span><span class="p">,</span> <span class="nx">trailer</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 使用响应
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><ol start="4">
+<li>在这个例子中，服务器发送了 Header 和 Trailer，而客户端接收了它们。注意，Header 是通过 stream.Header() 获取的，而 Trailer 是在流结束时通过 stream.Trailer() 获取的。</li>
+<li>在实际应用中，根据你的具体需求，你可以选择是否同时使用 Header 和 Trailer。它们是完全兼容的，可以一起使用来提供完整的请求和响应元数据。</li>
+</ol>
+<p><img loading="lazy" src="../images/grpc-002.png" alt=""  />
+</p>
+<h2 id="googlegolangorggrpc">google.golang.org/grpc<a hidden class="anchor" aria-hidden="true" href="#googlegolangorggrpc">#</a></h2>
+<h3 id="func-sendheader">func SendHeader<a hidden class="anchor" aria-hidden="true" href="#func-sendheader">#</a></h3>
+<ol>
+<li>用于在服务器端发送初始的元数据（称为 Header）给客户端。这个函数应该在服务器端处理请求时调用，通常是在响应体发送之前。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// SendHeader sends header metadata. It may be called at most once, and may not
+</span></span></span><span class="line"><span class="cl"><span class="c1">// be called after any event that causes headers to be sent (see SetHeader for
+</span></span></span><span class="line"><span class="cl"><span class="c1">// a complete list).  The provided md and headers set by SetHeader() will be
+</span></span></span><span class="line"><span class="cl"><span class="c1">// sent.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// The error returned is compatible with the status package.  However, the
+</span></span></span><span class="line"><span class="cl"><span class="c1">// status code will often not match the RPC status as seen by the client
+</span></span></span><span class="line"><span class="cl"><span class="c1">// application, and therefore, should not be relied upon for this purpose.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">SendHeader</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">md</span> <span class="nx">metadata</span><span class="p">.</span><span class="nx">MD</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">stream</span> <span class="o">:=</span> <span class="nf">ServerTransportStreamFromContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">stream</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">status</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="nx">codes</span><span class="p">.</span><span class="nx">Internal</span><span class="p">,</span> <span class="s">&#34;grpc: failed to fetch the stream from the context %v&#34;</span><span class="p">,</span> <span class="nx">ctx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">SendHeader</span><span class="p">(</span><span class="nx">md</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nf">toRPCErr</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="2">
+<li>在服务器端的方法实现中，你可以使用 grpc.SendHeader 来发送 Header。以下是一个示例：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;net&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;google.golang.org/grpc&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;google.golang.org/grpc/metadata&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">server</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">YourRPCMethod</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">req</span> <span class="o">*</span><span class="nx">YourRequest</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">YourResponse</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 创建要发送的 Header
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">header</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="s">&#34;header-key-1&#34;</span><span class="p">:</span> <span class="s">&#34;value-1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s">&#34;header-key-2&#34;</span><span class="p">:</span> <span class="s">&#34;value-2&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 发送 Header
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">SendHeader</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">header</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Failed to send header: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ... 处理请求 ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 返回响应
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="o">&amp;</span><span class="nx">YourResponse</span><span class="p">{},</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">lis</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">net</span><span class="p">.</span><span class="nf">Listen</span><span class="p">(</span><span class="s">&#34;tcp&#34;</span><span class="p">,</span> <span class="s">&#34;:50051&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;failed to listen: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">s</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">NewServer</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">RegisterYourServiceServer</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">server</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">Serve</span><span class="p">(</span><span class="nx">lis</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;failed to serve: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="3">
+<li>注意事项：
+<ul>
+<li>grpc.SendHeader 只能在服务器端调用，并且应该在发送任何响应消息之前调用。</li>
+<li>你只能发送一次 Header。如果尝试发送多次，后续的调用将失败。</li>
+<li>发送 Header 是一个异步操作，不会阻塞当前的服务方法。</li>
+<li>Header 应该包含与请求相关的元数据，例如内容类型、授权信息等。</li>
+<li>如果在发送 Header 前服务器端或客户端关闭了连接，Header 可能不会被发送。</li>
+</ul>
+</li>
+<li>在客户端，你可以通过调用响应流对象的 Header() 方法来接收 Header：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 假设 stream 是 gRPC 客户端流
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">header</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Header</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Failed to receive header: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Received header: %v&#34;</span><span class="p">,</span> <span class="nx">header</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="5">
+<li>通过这种方式，服务器端可以在处理请求之前，向客户端发送一些重要的元数据。客户端可以根据这些元数据来调整其行为，例如处理授权、内容协商等。</li>
+</ol>
+<h3 id="func-setheader">func SetHeader<a hidden class="anchor" aria-hidden="true" href="#func-setheader">#</a></h3>
+<ol>
+<li>SetHeader设置从服务器发送到客户端的报头元数据。所提供的上下文必须是传递给服务器处理程序的上下文。</li>
+<li>流式rpc应该更喜欢ServerStream的SetHeader方法。</li>
+<li>当多次调用时，所有提供的元数据将被合并。当发生以下情况之一时，所有元数据将被发送出去:
+<ul>
+<li>调用grpc.SendHeader，对于流处理程序，调用stream.SendHeader。</li>
+<li>发送第一条响应消息。对于一元处理程序，这在处理程序返回时发生;对于流处理程序，这可能在流的SendMsg方法被调用时发生。发送RPC状态(错误或成功)。这在处理程序返回时发生。如果在上述任何事件之后调用SetHeader将失败。</li>
+<li>返回的错误与状态包兼容。但是，状态码通常与客户端应用程序看到的RPC状态不匹配，因此不应该依赖于此目的。</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// SetHeader sets the header metadata to be sent from the server to the client.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// The context provided must be the context passed to the server&#39;s handler.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Streaming RPCs should prefer the SetHeader method of the ServerStream.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// When called multiple times, all the provided metadata will be merged.  All
+</span></span></span><span class="line"><span class="cl"><span class="c1">// the metadata will be sent out when one of the following happens:
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">//   - grpc.SendHeader is called, or for streaming handlers, stream.SendHeader.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//   - The first response message is sent.  For unary handlers, this occurs when
+</span></span></span><span class="line"><span class="cl"><span class="c1">//     the handler returns; for streaming handlers, this can happen when stream&#39;s
+</span></span></span><span class="line"><span class="cl"><span class="c1">//     SendMsg method is called.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//   - An RPC status is sent out (error or success).  This occurs when the handler
+</span></span></span><span class="line"><span class="cl"><span class="c1">//     returns.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// SetHeader will fail if called after any of the events above.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// The error returned is compatible with the status package.  However, the
+</span></span></span><span class="line"><span class="cl"><span class="c1">// status code will often not match the RPC status as seen by the client
+</span></span></span><span class="line"><span class="cl"><span class="c1">// application, and therefore, should not be relied upon for this purpose.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">SetHeader</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">md</span> <span class="nx">metadata</span><span class="p">.</span><span class="nx">MD</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">md</span><span class="p">.</span><span class="nf">Len</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">stream</span> <span class="o">:=</span> <span class="nf">ServerTransportStreamFromContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">stream</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">status</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="nx">codes</span><span class="p">.</span><span class="nx">Internal</span><span class="p">,</span> <span class="s">&#34;grpc: failed to fetch the stream from the context %v&#34;</span><span class="p">,</span> <span class="nx">ctx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">SetHeader</span><span class="p">(</span><span class="nx">md</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="4">
+<li>grpc.SetHeader 和 grpc.SendHeader 的区别：
+<ol>
+<li>grpc.SetHeader
+<ul>
+<li>用途：在服务器端，设置响应的 Header 元数据。</li>
+<li>时机：在服务器端处理请求时调用。</li>
+<li>行为：允许服务器多次调用 SetHeader 来设置或更新 Header 元数据。</li>
+<li>发送时机：当服务器调用 grpc.SendHeader 或 grpc.SetTrailer 时，或者在发送第一个响应消息后，或者在发送 RPC 状态（成功或错误）后，这些 Header 元数据会被发送给客户端。</li>
+</ul>
+</li>
+<li>grpc.SendHeader
+<ul>
+<li>用途：在服务器端，发送已经设置好的 Header 元数据给客户端。</li>
+<li>时机：在服务器端处理请求时调用，通常在响应体发送之前。</li>
+<li>行为：SendHeader 只能调用一次，用于发送已经通过 SetHeader 设置的 Header 元数据。</li>
+<li>发送时机：SendHeader 调用后，之前设置的 Header 元数据会被发送给客户端。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>总结：
+<ul>
+<li>grpc.SetHeader 用于服务器端设置 Header 元数据，允许多次调用来更新元数据。</li>
+<li>grpc.SendHeader 用于服务器端发送 Header 元数据给客户端，只能调用一次。</li>
+</ul>
+</li>
+<li>在服务器端，通常你会先使用 grpc.SetHeader 设置元数据，然后在适当的时候调用 grpc.SendHeader 发送这些元数据。如果在发送响应消息之前没有调用 grpc.SendHeader，框架会自动在发送第一个响应消息后发送这些元数据。</li>
+</ol>
+<h3 id="func-settrailer">func SetTrailer<a hidden class="anchor" aria-hidden="true" href="#func-settrailer">#</a></h3>
+<ol>
+<li>SetTrailer设置RPC返回时将发送的尾部元数据。当多次调用时，所有提供的元数据将被合并。</li>
+<li>返回的错误与状态包兼容。但是，状态码通常与客户端应用程序看到的RPC状态不匹配，因此不应该依赖于此目的。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// SetTrailer sets the trailer metadata that will be sent when an RPC returns.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// When called more than once, all the provided metadata will be merged.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// The error returned is compatible with the status package.  However, the
+</span></span></span><span class="line"><span class="cl"><span class="c1">// status code will often not match the RPC status as seen by the client
+</span></span></span><span class="line"><span class="cl"><span class="c1">// application, and therefore, should not be relied upon for this purpose.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">SetTrailer</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">md</span> <span class="nx">metadata</span><span class="p">.</span><span class="nx">MD</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">md</span><span class="p">.</span><span class="nf">Len</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">stream</span> <span class="o">:=</span> <span class="nf">ServerTransportStreamFromContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">stream</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">status</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="nx">codes</span><span class="p">.</span><span class="nx">Internal</span><span class="p">,</span> <span class="s">&#34;grpc: failed to fetch the stream from the context %v&#34;</span><span class="p">,</span> <span class="nx">ctx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">SetTrailer</span><span class="p">(</span><span class="nx">md</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="3">
+<li>用于服务器端设置 Trailer 元数据，这些元数据会在响应结束时发送给客户端。与 Header 元数据不同，Trailer 是在响应处理完毕后发送的，通常包含关于 RPC 调用状态的信息，如错误代码、错误消息或其他与响应相关的元数据。</li>
+<li>以下是如何在服务器端使用 grpc.SetTrailer 的示例：
+<ul>
+<li>在这个例子中，我们创建了一个 Trailer 并使用 grpc.SetTrailer 设置它。这应该在响应处理完毕后调用，通常是在响应的最后一个消息发送之后。</li>
+<li>请注意，grpc.SetTrailer 只能调用一次，且必须在响应发送完毕之前调用。如果在发送响应消息之前没有调用 grpc.SetTrailer，框架会自动在发送最后一个响应消息后发送这些 Trailer 元数据。</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;net&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;google.golang.org/grpc&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;google.golang.org/grpc/metadata&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">server</span> <span class="kd">struct</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">YourRPCMethod</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">req</span> <span class="o">*</span><span class="nx">YourRequest</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">YourResponse</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ... 处理请求 ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 设置 Trailer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">trailer</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="s">&#34;error-code&#34;</span><span class="p">:</span>    <span class="s">&#34;500&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s">&#34;error-message&#34;</span><span class="p">:</span> <span class="s">&#34;Internal server error&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">grpc</span><span class="p">.</span><span class="nf">SetTrailer</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">trailer</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ... 返回响应 ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">lis</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">net</span><span class="p">.</span><span class="nf">Listen</span><span class="p">(</span><span class="s">&#34;tcp&#34;</span><span class="p">,</span> <span class="s">&#34;:50051&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;failed to listen: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">s</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">NewServer</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">RegisterYourServiceServer</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">server</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">Serve</span><span class="p">(</span><span class="nx">lis</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;failed to serve: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="5">
+<li>在客户端，你可以通过调用响应流对象的 Trailer() 方法来接收 Trailer：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 假设 stream 是 gRPC 客户端流
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">trailer</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Trailer</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="nx">trailer</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 处理 Trailer 中的元数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">errorCode</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">trailer</span><span class="p">[</span><span class="s">&#34;error-code&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">ok</span> <span class="o">&amp;&amp;</span> <span class="nx">errorCode</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#34;500&#34;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Received error code: %s&#34;</span><span class="p">,</span> <span class="nx">errorCode</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="6">
+<li>通过这种方式，服务器端可以在响应处理完毕后，向客户端发送一些重要的元数据，如错误信息或其他与响应相关的状态信息。客户端可以根据这些信息来处理错误或采取其他必要的行动。</li>
+</ol>
+<h3 id="type-calloption">type CallOption<a hidden class="anchor" aria-hidden="true" href="#type-calloption">#</a></h3>
+<h4 id="func-header">func Header<a hidden class="anchor" aria-hidden="true" href="#func-header">#</a></h4>
+<ol>
+<li>Header返回一个calllooptions，用于检索一元RPC的Header元数据。</li>
+<li>用于客户端接收来自服务端响应的 Header。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Header returns a CallOptions that retrieves the header metadata
+</span></span></span><span class="line"><span class="cl"><span class="c1">// for a unary RPC.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">Header</span><span class="p">(</span><span class="nx">md</span> <span class="o">*</span><span class="nx">metadata</span><span class="p">.</span><span class="nx">MD</span><span class="p">)</span> <span class="nx">CallOption</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">HeaderCallOption</span><span class="p">{</span><span class="nx">HeaderAddr</span><span class="p">:</span> <span class="nx">md</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="3">
+<li>使用示例：客户端</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">opts1</span> <span class="p">[]</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">CallOption</span> <span class="p">=</span> <span class="p">[]</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">CallOption</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">grpc</span><span class="p">.</span><span class="nf">WaitForReady</span><span class="p">(</span><span class="kc">false</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">grpc</span><span class="p">.</span><span class="nf">Header</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">header</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">grpc</span><span class="p">.</span><span class="nf">Trailer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">tr</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 执行rpc调用(这个方法在服务器端来实现并返回结构)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">resp</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">SayHello</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">pb</span><span class="p">.</span><span class="nx">HelloRequest</span><span class="p">{</span><span class="nx">RequestName</span><span class="p">:</span> <span class="s">&#34;gh&#34;</span><span class="p">,</span> <span class="nx">Age</span><span class="p">:</span> <span class="mi">12</span><span class="p">},</span> <span class="nx">opts1</span><span class="o">...</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%v\n&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Response-Header: %v\n&#34;</span><span class="p">,</span> <span class="nx">header</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">resp</span><span class="p">.</span><span class="nf">GetResponseMsg</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Response-Trailer: %v\n&#34;</span><span class="p">,</span> <span class="nx">tr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><h4 id="func-trailer">func Trailer<a hidden class="anchor" aria-hidden="true" href="#func-trailer">#</a></h4>
+<ol>
+<li>Trailer返回一个calllooptions，用于检索一元RPC的Trailer元数据。</li>
+<li>用于客户端接收来自服务端响应的 Trailer。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Trailer returns a CallOptions that retrieves the trailer metadata
+</span></span></span><span class="line"><span class="cl"><span class="c1">// for a unary RPC.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">Trailer</span><span class="p">(</span><span class="nx">md</span> <span class="o">*</span><span class="nx">metadata</span><span class="p">.</span><span class="nx">MD</span><span class="p">)</span> <span class="nx">CallOption</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">TrailerCallOption</span><span class="p">{</span><span class="nx">TrailerAddr</span><span class="p">:</span> <span class="nx">md</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="3">
+<li>使用示例：客户端</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">opts1</span> <span class="p">[]</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">CallOption</span> <span class="p">=</span> <span class="p">[]</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">CallOption</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">grpc</span><span class="p">.</span><span class="nf">WaitForReady</span><span class="p">(</span><span class="kc">false</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">grpc</span><span class="p">.</span><span class="nf">Header</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">header</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">grpc</span><span class="p">.</span><span class="nf">Trailer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">tr</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 执行rpc调用(这个方法在服务器端来实现并返回结构)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">resp</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">SayHello</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">pb</span><span class="p">.</span><span class="nx">HelloRequest</span><span class="p">{</span><span class="nx">RequestName</span><span class="p">:</span> <span class="s">&#34;gh&#34;</span><span class="p">,</span> <span class="nx">Age</span><span class="p">:</span> <span class="mi">12</span><span class="p">},</span> <span class="nx">opts1</span><span class="o">...</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%v\n&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Response-Header: %v\n&#34;</span><span class="p">,</span> <span class="nx">header</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">resp</span><span class="p">.</span><span class="nf">GetResponseMsg</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Response-Trailer: %v\n&#34;</span><span class="p">,</span> <span class="nx">tr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><h2 id="特殊的元数据键">特殊的元数据键<a hidden class="anchor" aria-hidden="true" href="#特殊的元数据键">#</a></h2>
+<ol>
+<li>在 gRPC 中，有一些特殊的元数据键，它们具有特定的含义和用途。这些特殊键通常与 gRPC 协议的各个方面有关，包括但不限于状态、压缩、认证、流量控制等。以下是一些常见的特殊元数据键：
+<ol>
+<li>grpc-status：
+<ul>
+<li>类型：字符串</li>
+<li>描述：包含 RPC 的状态码。这个键通常在响应的 Trailer 中使用。</li>
+</ul>
+</li>
+<li>grpc-message：
+<ul>
+<li>类型：字符串</li>
+<li>描述：包含 RPC 状态的详细消息。这个键通常在响应的 Trailer 中使用。</li>
+</ul>
+</li>
+<li>grpc-encoding：
+<ul>
+<li>类型：字符串</li>
+<li>描述：指定请求或响应的压缩算法。例如，gzip。</li>
+</ul>
+</li>
+<li>grpc-timeout：
+<ul>
+<li>类型：字符串</li>
+<li>描述：指定 RPC 调用的超时时间。例如，10s。</li>
+</ul>
+</li>
+<li>grpc-accept-encoding：
+<ul>
+<li>类型：字符串</li>
+<li>描述：指定客户端支持的压缩算法。例如，gzip。</li>
+</ul>
+</li>
+<li>grpc-authority：
+<ul>
+<li>类型：字符串</li>
+<li>描述：指定服务提供者的权威信息。例如，example.com:8080。</li>
+</ul>
+</li>
+<li>grpc-client-authority：
+<ul>
+<li>类型：字符串</li>
+<li>描述：指定客户端的权威信息。例如，client.example.com:8080。</li>
+</ul>
+</li>
+<li>grpc-max-send-message-length：
+<ul>
+<li>类型：字符串</li>
+<li>描述：指定客户端允许发送的最大消息长度。例如，1048576。</li>
+</ul>
+</li>
+<li>grpc-max-receive-message-length：
+<ul>
+<li>类型：字符串</li>
+<li>描述：指定服务器允许接收的最大消息长度。例如，1048576。</li>
+</ul>
+</li>
+<li>grpc-compress-algorithm：
+<ul>
+<li>类型：字符串</li>
+<li>描述：指定请求或响应的压缩算法。例如，gzip。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>这些特殊键是由 gRPC 协议定义的，它们被用来在请求和响应中传递与 gRPC 协议相关的信息。在客户端和服务器端，这些键可以通过 grpc.Header 和 grpc.Trailer 函数来设置和访问。</li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://heliu.site/tags/grpc/">Grpc</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://heliu.site/posts/grpc/metadata/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>Metadata 元数据</span>
+  </a>
+  <a class="next" href="https://heliu.site/posts/grpc/err/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>错误处理</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    
+    <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv">
+        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    </span>
+    <span id="busuanzi_container_site_uv">
+        本站访客数<span id="busuanzi_value_site_uv"></span>人次
+    </span>
+    </div>
+        <span>Copyright © 2024 蜀ICP备2024091074号 <a href="#">heliu's blog</a>. All rights reserved</span>  
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'Copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'Done';
+            setTimeout(() => {
+                copybutton.innerHTML = 'Copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

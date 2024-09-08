@@ -5,9 +5,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>Token | Helium</title>
+<title>用户认证 | Helium</title>
 <meta name="keywords" content="grpc">
-<meta name="description" content="grpc token 认证。">
+<meta name="description" content="grpc 用户认证介绍。">
 <meta name="author" content="helium">
 <link rel="canonical" href="https://heliu.site/posts/grpc/token/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
@@ -74,8 +74,8 @@
 
   
 
-<meta property="og:title" content="Token" />
-<meta property="og:description" content="grpc token 认证。" />
+<meta property="og:title" content="用户认证" />
+<meta property="og:description" content="grpc 用户认证介绍。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://heliu.site/posts/grpc/token/" />
 <meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
@@ -85,8 +85,8 @@
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
-<meta name="twitter:title" content="Token"/>
-<meta name="twitter:description" content="grpc token 认证。"/>
+<meta name="twitter:title" content="用户认证"/>
+<meta name="twitter:description" content="grpc 用户认证介绍。"/>
 
 
 <script type="application/ld+json">
@@ -109,7 +109,7 @@
     {
       "@type": "ListItem",
       "position":  3 ,
-      "name": "Token",
+      "name": "用户认证",
       "item": "https://heliu.site/posts/grpc/token/"
     }
   ]
@@ -119,14 +119,14 @@
 {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Token",
-  "name": "Token",
-  "description": "grpc token 认证。",
+  "headline": "用户认证",
+  "name": "用户认证",
+  "description": "grpc 用户认证介绍。",
   "keywords": [
     "grpc"
   ],
-  "articleBody": " gRpc 提供了一个接口，这个接口位于credentials包下，这个接口需要客户端实现。 第一个方法用作获取元数据信息，也就是客户端提供的 key/value 对，context用于控制超时和取消，uri是请求入口处的uri。 第二个方法的作用是否需要基于 TLS 认证进行安全传输，如果返回是true，则必须加上TLS验证，返回值是false则不用。 // PerRPCCredentials defines the common interface for the credentials which need to // attach security information to every RPC (e.g., oauth2). type PerRPCCredentials interface { // GetRequestMetadata gets the current request metadata, refreshing tokens // if required. This should be called by the transport layer on each // request, and the data should be populated in headers or other // context. If a status code is returned, it will be used as the status for // the RPC (restricted to an allowable set of codes as defined by gRFC // A54). uri is the URI of the entry point for the request. When supported // by the underlying implementation, ctx can be used for timeout and // cancellation. Additionally, RequestInfo data will be available via ctx // to this call. TODO(zhaoq): Define the set of the qualified keys instead // of leaving it as an arbitrary string. GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) // RequireTransportSecurity indicates whether the credentials requires // transport security. RequireTransportSecurity() bool } gRPC将各种认证方式浓缩统一到一个凭证(credentials)上，可以单独使用一种凭证，比如只使用LTS凭证或者只使用自定义凭证，也可以多种凭证组合，gRpc提供统一的API验证机制，使研发人员使用方便。 github Go代码：https://github.com/helium-chain/grpc-tls-token ",
-  "wordCount" : "177",
+  "articleBody": " 用户认证，简单来说就是验证请求的用户身份，避免破坏者伪造身份获取他人数据隐私。比如当访问微博网站时，微博服务端通过用户认证来识别你的身份，并返回正确的主页数据。 用户认证有很多方式。例如HTTP中使用的cookie、session、oauth、jwt等等。gRPC框架并不限制用户认证的方式，而是提供了开放的能力来支持各种各样的用户认证。 gRPC的用户认证可以用两句话总结： gRPC客户端提供在每一次调用注入用户凭证的能力。 gRPC服务端使用拦截器来验证每一个客户端的请求。 gRpc 提供了一个接口，这个接口位于credentials包下，这个接口需要客户端实现。 第一个方法用作获取元数据信息，也就是客户端提供的 key/value 对，context用于控制超时和取消，uri是请求入口处的uri。 第二个方法的作用是否需要基于 TLS 认证进行安全传输，如果返回是true，则必须加上TLS验证，返回值是false则不用。 // PerRPCCredentials defines the common interface for the credentials which need to // attach security information to every RPC (e.g., oauth2). type PerRPCCredentials interface { // GetRequestMetadata gets the current request metadata, refreshing tokens // if required. This should be called by the transport layer on each // request, and the data should be populated in headers or other // context. If a status code is returned, it will be used as the status for // the RPC (restricted to an allowable set of codes as defined by gRFC // A54). uri is the URI of the entry point for the request. When supported // by the underlying implementation, ctx can be used for timeout and // cancellation. Additionally, RequestInfo data will be available via ctx // to this call. TODO(zhaoq): Define the set of the qualified keys instead // of leaving it as an arbitrary string. GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) // RequireTransportSecurity indicates whether the credentials requires // transport security. RequireTransportSecurity() bool } gRPC将各种认证方式浓缩统一到一个凭证(credentials)上，可以单独使用一种凭证，比如只使用LTS凭证或者只使用自定义凭证，也可以多种凭证组合，gRpc提供统一的API验证机制，使研发人员使用方便。 github Go代码：https://github.com/helium-chain/grpc-tls-token Basic Authentication Basic Authentication是最简单的认证方式。 使用Basic Authentication时，客户端携带一个Authorization header头，值为Basic + 空格 + base64编码的用户名:密码，例如一个用户名和密码都是admin，那么header头如下 Authorization: Basic YWRtaW46YWRtaW4=。 通常并不推荐使用Basic Authentication，gRPC也没有内置组件支持，但在gRPC中很容易做到。 type PerRPCCredentials interface { // GetRequestMetadata 获取当前请求的metadata GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) // RequireTransportSecurity 是否使用安全的传输协议 RequireTransportSecurity() bool } var _ credentials.PerRPCCredentials = BasicAuthentication{} type BasicAuthentication struct { password string username string } func (b BasicAuthentication) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) { auth := b.username + \":\" + b.password enc := base64.StdEncoding.EncodeToString([]byte(auth)) return map[string]string{ \"authorization\": \"Basic \" + enc, }, nil } func (b BasicAuthentication) RequireTransportSecurity() bool { return true } 在创建连接时使用grpc.WithPerRPCCredentials(auth)设置每一次请求的用户凭证。 func main() { ctx, cancel := context.WithTimeout(context.Background(), time.Second) defer cancel() auth := BasicAuthentication{ username: \"admin\", password: \"admin\", } creds, err := credentials.NewClientTLSFromFile(\"./x509/rootCa.crt\", \"www.example.com\") if err != nil { panic(err) } conn, err := grpc.Dial(\"localhost:8009\", grpc.WithTransportCredentials(creds), grpc.WithPerRPCCredentials(auth)) if err != nil { panic(err) } defer conn.Close() client := pb.NewOrderManagementClient(conn) // Get Order retrievedOrder, err := client.GetOrder(ctx, \u0026wrapperspb.StringValue{Value: \"101\"}) if err != nil { panic(err) } log.Print(\"GetOrder Response -\u003e : \", retrievedOrder) } RequireTransportSecurity()代表是否使用安全的传输协议。如果设置了true，则必须通过grpc.WithTransportCredentials()设置合理的传输层加密方式，否则会导致建立连接时失败。 gRPC官方库里有个insecure.NewCredentials()，这段函数含义为禁用传输层安全协议，因此grpc.WithTransportCredentials(insecure.NewCredentials())是无效的，依旧会导致建立连接时失败。 auth := BasicAuthentication{ username: \"admin\", password: \"admin\", } conn, err := grpc.Dial(\"localhost:8009\", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithPerRPCCredentials(auth)) if err != nil { panic(err) } $ go run basic-authentication/client/main.go panic: grpc: the credentials require transport level security (use grpc.WithTransportCredentials() to set) 服务端使用拦截器来验证请求是否合法，对于不合法的token返回codes.Unauthenticated，如果token合法，在ensureValidBasicCredentials中调用handler来继续请求的处理。 var ( errMissingMetadata = status.Errorf(codes.InvalidArgument, \"missing metadata\") errInvalidToken = status.Errorf(codes.Unauthenticated, \"invalid credentials\") ) func ensureValidBasicCredentials(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) { md, ok := metadata.FromIncomingContext(ctx) if !ok { return nil, errMissingMetadata } authorization := md[\"authorization\"] if len(authorization) \u003c 1 { return nil, errInvalidToken } token := strings.TrimPrefix(authorization[0], \"Basic \") if token != base64.StdEncoding.EncodeToString([]byte(\"admin:admin\")) { return nil, errInvalidToken } return handler(ctx, req) } func main() { l, err := net.Listen(\"tcp\", \":8009\") if err != nil { panic(err) } creds, err := credentials.NewServerTLSFromFile(\"./x509/server.crt\", \"./x509/server.key\") s := grpc.NewServer( grpc.UnaryInterceptor(ensureValidBasicCredentials), grpc.Creds(creds), ) pb.RegisterOrderManagementServer(s, \u0026server{}) if err := s.Serve(l); err != nil { panic(err) } } JWT 客户端的token应该是由服务端返回的，而不是客户端自己生成的，这里只是为了方便演示，主要逻辑是声明claims然后使用secret key进行签名。 package main import ( \"context\" \"log\" \"time\" \"github.com/golang-jwt/jwt/v4\" pb \"github.com/liangwt/note/grpc/authentication/ecommerce\" \"google.golang.org/grpc\" \"google.golang.org/grpc/credentials\" \"google.golang.org/protobuf/types/known/wrapperspb\" ) var _ credentials.PerRPCCredentials = JwtAuthentication{} type JwtAuthentication struct { Key []byte } func (a JwtAuthentication) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) { // Create a new token object, specifying signing method and the claims // you would like it to contain. token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{ ID: \"example\", ExpiresAt: jwt.NewNumericDate(time.Now().Add(-2 * time.Hour)), }) // Sign and get the complete encoded token as a string using the secret tokenString, err := token.SignedString(a.Key) if err != nil { return nil, err } return map[string]string{ \"authorization\": \"Bearer \" + tokenString, }, nil } func (b JwtAuthentication) RequireTransportSecurity() bool { return true } func main() { ctx, cancel := context.WithTimeout(context.Background(), time.Second) defer cancel() creds, err := credentials.NewClientTLSFromFile(\"./x509/rootCa.crt\", \"www.example.com\") if err != nil { panic(err) } jwtAuth := JwtAuthentication{[]byte(\"154a8b3aa89d3d4c49826f6dbbbe5542b5a9fbbb\")} conn, err := grpc.Dial(\"localhost:8009\", grpc.WithTransportCredentials(creds), grpc.WithPerRPCCredentials(jwtAuth)) if err != nil { panic(err) } defer conn.Close() client := pb.NewOrderManagementClient(conn) // Get Order retrievedOrder, err := client.GetOrder(ctx, \u0026wrapperspb.StringValue{Value: \"101\"}) if err != nil { panic(err) } log.Printf(\"GetOrder Response -\u003e : %+v\\n\", retrievedOrder) } 服务端代码使用拦截器，来对jwt进行验证。 package main import ( \"context\" \"fmt\" \"net\" \"strings\" \"github.com/golang-jwt/jwt/v4\" pb \"github.com/liangwt/note/grpc/authentication/ecommerce\" \"google.golang.org/grpc\" \"google.golang.org/grpc/codes\" \"google.golang.org/grpc/credentials\" \"google.golang.org/grpc/metadata\" \"google.golang.org/grpc/status\" ) var ( errMissingMetadata = status.Errorf(codes.InvalidArgument, \"missing metadata\") ) func ensureValidBasicCredentials(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) { md, ok := metadata.FromIncomingContext(ctx) if !ok { return nil, errMissingMetadata } tokenString := strings.TrimPrefix(md[\"authorization\"][0], \"Bearer \") token, err := jwt.ParseWithClaims(tokenString, \u0026jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) { // Don't forget to validate the alg is what you expect: if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok { return nil, fmt.Errorf(\"Unexpected signing method: %v\", token.Header[\"alg\"]) } return []byte(\"154a8b3aa89d3d4c49826f6dbbbe5542b5a9fbbb\"), nil }) claims, ok := token.Claims.(*jwt.RegisteredClaims) if !ok || !token.Valid { return nil, status.Errorf(codes.Unauthenticated, err.Error()) } fmt.Println(claims.ID) return handler(ctx, req) } func main() { l, err := net.Listen(\"tcp\", \":8009\") if err != nil { panic(err) } creds, err := credentials.NewServerTLSFromFile(\"./x509/server.crt\", \"./x509/server.key\") s := grpc.NewServer( grpc.UnaryInterceptor(ensureValidBasicCredentials), grpc.Creds(creds), ) pb.RegisterOrderManagementServer(s, \u0026server{}) if err := s.Serve(l); err != nil { panic(err) } } 自定义实现jwt推荐使用github.com/golang-jwt/jwt。 参考 写给go开发者的gRPC教程-用户认证 ",
+  "wordCount" : "827",
   "inLanguage": "zh",
   "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-09-02T00:00:00Z",
   "dateModified": "2024-09-02T00:00:00Z",
@@ -232,7 +232,7 @@
   <header class="post-header">
     <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/grpc/">gRPC</a></div>
     <h1 class="post-title entry-hint-parent">
-      Token
+      用户认证
     </h1>
     <div class="post-meta">
 
@@ -252,12 +252,12 @@
     <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
     <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
     <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
-</svg><span>177字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>827字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="12" r="9"></circle>
     <polyline points="12 7 12 12 15 15"></polyline>
-</svg><span>1分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>4分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="7" r="4"></circle>
@@ -276,8 +276,94 @@
       </span>
 
 </div>
-  </header> 
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#basic-authentication" aria-label="Basic Authentication">Basic Authentication</a></li>
+                    <li>
+                        <a href="#jwt" aria-label="JWT">JWT</a></li>
+                    <li>
+                        <a href="#%e5%8f%82%e8%80%83" aria-label="参考">参考</a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
   <div class="post-content"><ol>
+<li>用户认证，简单来说就是验证请求的用户身份，避免破坏者伪造身份获取他人数据隐私。比如当访问微博网站时，微博服务端通过用户认证来识别你的身份，并返回正确的主页数据。</li>
+<li>用户认证有很多方式。例如HTTP中使用的cookie、session、oauth、jwt等等。gRPC框架并不限制用户认证的方式，而是提供了开放的能力来支持各种各样的用户认证。</li>
+<li>gRPC的用户认证可以用两句话总结：
+<ul>
+<li>gRPC客户端提供在每一次调用注入用户凭证的能力。</li>
+<li>gRPC服务端使用拦截器来验证每一个客户端的请求。</li>
+</ul>
+</li>
 <li>gRpc 提供了一个接口，这个接口位于credentials包下，这个接口需要<strong>客户端</strong>实现。
 <ul>
 <li>第一个方法用作获取元数据信息，也就是客户端提供的 key/value 对，context用于控制超时和取消，uri是请求入口处的uri。</li>
@@ -288,24 +374,305 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// PerRPCCredentials defines the common interface for the credentials which need to
 </span></span></span><span class="line"><span class="cl"><span class="c1">// attach security information to every RPC (e.g., oauth2).
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">PerRPCCredentials</span> <span class="kd">interface</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// GetRequestMetadata gets the current request metadata, refreshing tokens
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// if required. This should be called by the transport layer on each
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// request, and the data should be populated in headers or other
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// context. If a status code is returned, it will be used as the status for
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// the RPC (restricted to an allowable set of codes as defined by gRFC
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// A54). uri is the URI of the entry point for the request.  When supported
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// by the underlying implementation, ctx can be used for timeout and
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// cancellation. Additionally, RequestInfo data will be available via ctx
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// to this call.  TODO(zhaoq): Define the set of the qualified keys instead
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// of leaving it as an arbitrary string.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nf">GetRequestMetadata</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">uri</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="c1">// RequireTransportSecurity indicates whether the credentials requires
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// transport security.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nf">RequireTransportSecurity</span><span class="p">()</span> <span class="kt">bool</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// GetRequestMetadata gets the current request metadata, refreshing tokens
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// if required. This should be called by the transport layer on each
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// request, and the data should be populated in headers or other
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// context. If a status code is returned, it will be used as the status for
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// the RPC (restricted to an allowable set of codes as defined by gRFC
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// A54). uri is the URI of the entry point for the request.  When supported
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// by the underlying implementation, ctx can be used for timeout and
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// cancellation. Additionally, RequestInfo data will be available via ctx
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// to this call.  TODO(zhaoq): Define the set of the qualified keys instead
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// of leaving it as an arbitrary string.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">GetRequestMetadata</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">uri</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// RequireTransportSecurity indicates whether the credentials requires
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// transport security.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">RequireTransportSecurity</span><span class="p">()</span> <span class="kt">bool</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><ol start="2">
+</span></span></code></pre></div><ol start="5">
 <li>gRPC将各种认证方式浓缩统一到一个凭证(credentials)上，可以单独使用一种凭证，比如只使用LTS凭证或者只使用自定义凭证，也可以多种凭证组合，gRpc提供统一的API验证机制，使研发人员使用方便。</li>
 <li>github Go代码：<a href="https://github.com/helium-chain/grpc-tls-token" target="_blank" rel="noopener">https://github.com/helium-chain/grpc-tls-token</a></li>
+</ol>
+<h2 id="basic-authentication">Basic Authentication<a hidden class="anchor" aria-hidden="true" href="#basic-authentication">#</a></h2>
+<ol>
+<li>Basic Authentication是最简单的认证方式。</li>
+<li>使用Basic Authentication时，客户端携带一个Authorization header头，值为Basic + 空格 + base64编码的用户名:密码，例如一个用户名和密码都是admin，那么header头如下 <strong>Authorization: Basic YWRtaW46YWRtaW4=</strong>。</li>
+<li>通常并不推荐使用Basic Authentication，gRPC也没有内置组件支持，但在gRPC中很容易做到。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">PerRPCCredentials</span> <span class="kd">interface</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// GetRequestMetadata 获取当前请求的metadata
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">GetRequestMetadata</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">uri</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// RequireTransportSecurity 是否使用安全的传输协议
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nf">RequireTransportSecurity</span><span class="p">()</span> <span class="kt">bool</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">_</span> <span class="nx">credentials</span><span class="p">.</span><span class="nx">PerRPCCredentials</span> <span class="p">=</span> <span class="nx">BasicAuthentication</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">BasicAuthentication</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">password</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">username</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="nx">BasicAuthentication</span><span class="p">)</span> <span class="nf">GetRequestMetadata</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">uri</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">auth</span> <span class="o">:=</span> <span class="nx">b</span><span class="p">.</span><span class="nx">username</span> <span class="o">+</span> <span class="s">&#34;:&#34;</span> <span class="o">+</span> <span class="nx">b</span><span class="p">.</span><span class="nx">password</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">enc</span> <span class="o">:=</span> <span class="nx">base64</span><span class="p">.</span><span class="nx">StdEncoding</span><span class="p">.</span><span class="nf">EncodeToString</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="nx">auth</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;authorization&#34;</span><span class="p">:</span> <span class="s">&#34;Basic &#34;</span> <span class="o">+</span> <span class="nx">enc</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="nx">BasicAuthentication</span><span class="p">)</span> <span class="nf">RequireTransportSecurity</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="4">
+<li>在创建连接时使用grpc.WithPerRPCCredentials(auth)设置每一次请求的用户凭证。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">ctx</span><span class="p">,</span> <span class="nx">cancel</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nf">WithTimeout</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">(),</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nf">cancel</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">auth</span> <span class="o">:=</span> <span class="nx">BasicAuthentication</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">username</span><span class="p">:</span> <span class="s">&#34;admin&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">password</span><span class="p">:</span> <span class="s">&#34;admin&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">creds</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">credentials</span><span class="p">.</span><span class="nf">NewClientTLSFromFile</span><span class="p">(</span><span class="s">&#34;./x509/rootCa.crt&#34;</span><span class="p">,</span> <span class="s">&#34;www.example.com&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">conn</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">Dial</span><span class="p">(</span><span class="s">&#34;localhost:8009&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">grpc</span><span class="p">.</span><span class="nf">WithTransportCredentials</span><span class="p">(</span><span class="nx">creds</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">grpc</span><span class="p">.</span><span class="nf">WithPerRPCCredentials</span><span class="p">(</span><span class="nx">auth</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nx">conn</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">client</span> <span class="o">:=</span> <span class="nx">pb</span><span class="p">.</span><span class="nf">NewOrderManagementClient</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Get Order
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">retrievedOrder</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">GetOrder</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">wrapperspb</span><span class="p">.</span><span class="nx">StringValue</span><span class="p">{</span><span class="nx">Value</span><span class="p">:</span> <span class="s">&#34;101&#34;</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Print</span><span class="p">(</span><span class="s">&#34;GetOrder Response -&gt; : &#34;</span><span class="p">,</span> <span class="nx">retrievedOrder</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="5">
+<li>RequireTransportSecurity()代表是否使用安全的传输协议。如果设置了true，则必须通过grpc.WithTransportCredentials()设置合理的传输层加密方式，否则会导致建立连接时失败。</li>
+<li>gRPC官方库里有个insecure.NewCredentials()，这段函数含义为禁用传输层安全协议，因此grpc.WithTransportCredentials(insecure.NewCredentials())是无效的，依旧会导致建立连接时失败。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">auth</span> <span class="o">:=</span> <span class="nx">BasicAuthentication</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">username</span><span class="p">:</span> <span class="s">&#34;admin&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">password</span><span class="p">:</span> <span class="s">&#34;admin&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">conn</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">Dial</span><span class="p">(</span><span class="s">&#34;localhost:8009&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                       <span class="nx">grpc</span><span class="p">.</span><span class="nf">WithTransportCredentials</span><span class="p">(</span><span class="nx">insecure</span><span class="p">.</span><span class="nf">NewCredentials</span><span class="p">()),</span>
+</span></span><span class="line"><span class="cl">                       <span class="nx">grpc</span><span class="p">.</span><span class="nf">WithPerRPCCredentials</span><span class="p">(</span><span class="nx">auth</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ go run basic-authentication/client/main.go
+</span></span><span class="line"><span class="cl">panic: grpc: the credentials require transport level security <span class="o">(</span>use grpc.WithTransportCredentials<span class="o">()</span> to <span class="nb">set</span><span class="o">)</span>
+</span></span></code></pre></div><ol start="7">
+<li>服务端使用拦截器来验证请求是否合法，对于不合法的token返回codes.Unauthenticated，如果token合法，在ensureValidBasicCredentials中调用handler来继续请求的处理。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">var</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl"> <span class="nx">errMissingMetadata</span> <span class="p">=</span> <span class="nx">status</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="nx">codes</span><span class="p">.</span><span class="nx">InvalidArgument</span><span class="p">,</span> <span class="s">&#34;missing metadata&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"> <span class="nx">errInvalidToken</span>    <span class="p">=</span> <span class="nx">status</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="nx">codes</span><span class="p">.</span><span class="nx">Unauthenticated</span><span class="p">,</span> <span class="s">&#34;invalid credentials&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">ensureValidBasicCredentials</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">req</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">info</span> <span class="o">*</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">UnaryServerInfo</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">grpc</span><span class="p">.</span><span class="nx">UnaryHandler</span><span class="p">)</span> <span class="p">(</span><span class="nx">resp</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">md</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">FromIncomingContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">errMissingMetadata</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">authorization</span> <span class="o">:=</span> <span class="nx">md</span><span class="p">[</span><span class="s">&#34;authorization&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">authorization</span><span class="p">)</span> <span class="p">&lt;</span> <span class="mi">1</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">errInvalidToken</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">token</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">TrimPrefix</span><span class="p">(</span><span class="nx">authorization</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#34;Basic &#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">token</span> <span class="o">!=</span> <span class="nx">base64</span><span class="p">.</span><span class="nx">StdEncoding</span><span class="p">.</span><span class="nf">EncodeToString</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="s">&#34;admin:admin&#34;</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">errInvalidToken</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">handler</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">req</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">l</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">net</span><span class="p">.</span><span class="nf">Listen</span><span class="p">(</span><span class="s">&#34;tcp&#34;</span><span class="p">,</span> <span class="s">&#34;:8009&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">creds</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">credentials</span><span class="p">.</span><span class="nf">NewServerTLSFromFile</span><span class="p">(</span><span class="s">&#34;./x509/server.crt&#34;</span><span class="p">,</span> <span class="s">&#34;./x509/server.key&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">s</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">NewServer</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">grpc</span><span class="p">.</span><span class="nf">UnaryInterceptor</span><span class="p">(</span><span class="nx">ensureValidBasicCredentials</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">grpc</span><span class="p">.</span><span class="nf">Creds</span><span class="p">(</span><span class="nx">creds</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">pb</span><span class="p">.</span><span class="nf">RegisterOrderManagementServer</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">server</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">Serve</span><span class="p">(</span><span class="nx">l</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="jwt">JWT<a hidden class="anchor" aria-hidden="true" href="#jwt">#</a></h2>
+<ol>
+<li>客户端的token应该是由服务端返回的，而不是客户端自己生成的，这里只是为了方便演示，主要逻辑是声明claims然后使用secret key进行签名。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;time&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;github.com/golang-jwt/jwt/v4&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="nx">pb</span> <span class="s">&#34;github.com/liangwt/note/grpc/authentication/ecommerce&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;google.golang.org/grpc&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;google.golang.org/grpc/credentials&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;google.golang.org/protobuf/types/known/wrapperspb&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">_</span> <span class="nx">credentials</span><span class="p">.</span><span class="nx">PerRPCCredentials</span> <span class="p">=</span> <span class="nx">JwtAuthentication</span><span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">JwtAuthentication</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">Key</span> <span class="p">[]</span><span class="kt">byte</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">a</span> <span class="nx">JwtAuthentication</span><span class="p">)</span> <span class="nf">GetRequestMetadata</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">uri</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Create a new token object, specifying signing method and the claims
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// you would like it to contain.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">token</span> <span class="o">:=</span> <span class="nx">jwt</span><span class="p">.</span><span class="nf">NewWithClaims</span><span class="p">(</span><span class="nx">jwt</span><span class="p">.</span><span class="nx">SigningMethodHS256</span><span class="p">,</span> <span class="nx">jwt</span><span class="p">.</span><span class="nx">RegisteredClaims</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">ID</span><span class="p">:</span>        <span class="s">&#34;example&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">ExpiresAt</span><span class="p">:</span> <span class="nx">jwt</span><span class="p">.</span><span class="nf">NewNumericDate</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">Add</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Hour</span><span class="p">)),</span>
+</span></span><span class="line"><span class="cl">    <span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Sign and get the complete encoded token as a string using the secret
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">tokenString</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">token</span><span class="p">.</span><span class="nf">SignedString</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">Key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;authorization&#34;</span><span class="p">:</span> <span class="s">&#34;Bearer &#34;</span> <span class="o">+</span> <span class="nx">tokenString</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="nx">JwtAuthentication</span><span class="p">)</span> <span class="nf">RequireTransportSecurity</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">ctx</span><span class="p">,</span> <span class="nx">cancel</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nf">WithTimeout</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">(),</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nf">cancel</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">creds</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">credentials</span><span class="p">.</span><span class="nf">NewClientTLSFromFile</span><span class="p">(</span><span class="s">&#34;./x509/rootCa.crt&#34;</span><span class="p">,</span> <span class="s">&#34;www.example.com&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">jwtAuth</span> <span class="o">:=</span> <span class="nx">JwtAuthentication</span><span class="p">{[]</span><span class="nb">byte</span><span class="p">(</span><span class="s">&#34;154a8b3aa89d3d4c49826f6dbbbe5542b5a9fbbb&#34;</span><span class="p">)}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">conn</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">Dial</span><span class="p">(</span><span class="s">&#34;localhost:8009&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">grpc</span><span class="p">.</span><span class="nf">WithTransportCredentials</span><span class="p">(</span><span class="nx">creds</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">grpc</span><span class="p">.</span><span class="nf">WithPerRPCCredentials</span><span class="p">(</span><span class="nx">jwtAuth</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nx">conn</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">client</span> <span class="o">:=</span> <span class="nx">pb</span><span class="p">.</span><span class="nf">NewOrderManagementClient</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Get Order
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">retrievedOrder</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">GetOrder</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">wrapperspb</span><span class="p">.</span><span class="nx">StringValue</span><span class="p">{</span><span class="nx">Value</span><span class="p">:</span> <span class="s">&#34;101&#34;</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;GetOrder Response -&gt; : %+v\n&#34;</span><span class="p">,</span> <span class="nx">retrievedOrder</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="2">
+<li>服务端代码使用拦截器，来对jwt进行验证。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;fmt&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;net&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;strings&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;github.com/golang-jwt/jwt/v4&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="nx">pb</span> <span class="s">&#34;github.com/liangwt/note/grpc/authentication/ecommerce&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;google.golang.org/grpc&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;google.golang.org/grpc/codes&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;google.golang.org/grpc/credentials&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;google.golang.org/grpc/metadata&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&#34;google.golang.org/grpc/status&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">errMissingMetadata</span> <span class="p">=</span> <span class="nx">status</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="nx">codes</span><span class="p">.</span><span class="nx">InvalidArgument</span><span class="p">,</span> <span class="s">&#34;missing metadata&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">ensureValidBasicCredentials</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">req</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">info</span> <span class="o">*</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">UnaryServerInfo</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">grpc</span><span class="p">.</span><span class="nx">UnaryHandler</span><span class="p">)</span> <span class="p">(</span><span class="nx">resp</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">md</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">FromIncomingContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">errMissingMetadata</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">tokenString</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">TrimPrefix</span><span class="p">(</span><span class="nx">md</span><span class="p">[</span><span class="s">&#34;authorization&#34;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#34;Bearer &#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">token</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">jwt</span><span class="p">.</span><span class="nf">ParseWithClaims</span><span class="p">(</span><span class="nx">tokenString</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">jwt</span><span class="p">.</span><span class="nx">RegisteredClaims</span><span class="p">{},</span> <span class="kd">func</span><span class="p">(</span><span class="nx">token</span> <span class="o">*</span><span class="nx">jwt</span><span class="p">.</span><span class="nx">Token</span><span class="p">)</span> <span class="p">(</span><span class="kd">interface</span><span class="p">{},</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Don&#39;t forget to validate the alg is what you expect:
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">token</span><span class="p">.</span><span class="nx">Method</span><span class="p">.(</span><span class="o">*</span><span class="nx">jwt</span><span class="p">.</span><span class="nx">SigningMethodHMAC</span><span class="p">);</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;Unexpected signing method: %v&#34;</span><span class="p">,</span> <span class="nx">token</span><span class="p">.</span><span class="nx">Header</span><span class="p">[</span><span class="s">&#34;alg&#34;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">[]</span><span class="nb">byte</span><span class="p">(</span><span class="s">&#34;154a8b3aa89d3d4c49826f6dbbbe5542b5a9fbbb&#34;</span><span class="p">),</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl">    <span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">claims</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">token</span><span class="p">.</span><span class="nx">Claims</span><span class="p">.(</span><span class="o">*</span><span class="nx">jwt</span><span class="p">.</span><span class="nx">RegisteredClaims</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">!</span><span class="nx">ok</span> <span class="o">||</span> <span class="p">!</span><span class="nx">token</span><span class="p">.</span><span class="nx">Valid</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">status</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="nx">codes</span><span class="p">.</span><span class="nx">Unauthenticated</span><span class="p">,</span> <span class="nx">err</span><span class="p">.</span><span class="nf">Error</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">claims</span><span class="p">.</span><span class="nx">ID</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">handler</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">req</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">l</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">net</span><span class="p">.</span><span class="nf">Listen</span><span class="p">(</span><span class="s">&#34;tcp&#34;</span><span class="p">,</span> <span class="s">&#34;:8009&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">creds</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">credentials</span><span class="p">.</span><span class="nf">NewServerTLSFromFile</span><span class="p">(</span><span class="s">&#34;./x509/server.crt&#34;</span><span class="p">,</span> <span class="s">&#34;./x509/server.key&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">s</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">NewServer</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">grpc</span><span class="p">.</span><span class="nf">UnaryInterceptor</span><span class="p">(</span><span class="nx">ensureValidBasicCredentials</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">grpc</span><span class="p">.</span><span class="nf">Creds</span><span class="p">(</span><span class="nx">creds</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">pb</span><span class="p">.</span><span class="nf">RegisterOrderManagementServer</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">server</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">Serve</span><span class="p">(</span><span class="nx">l</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="3">
+<li>自定义实现jwt推荐使用github.com/golang-jwt/jwt。</li>
+</ol>
+<h2 id="参考">参考<a hidden class="anchor" aria-hidden="true" href="#参考">#</a></h2>
+<ol>
+<li><a href="https://mp.weixin.qq.com/s?__biz=MzIyMTI4OTY3Mw==&amp;mid=2247484475&amp;idx=1&amp;sn=2c562149dc7306847740d35971f9176c&amp;chksm=e83e499ddf49c08bfc85cec9e4b34c414c81b6b6ffa6997b1e8b5a1c2c08ab95f30a4dde4380&amp;scene=178&amp;cur_album_id=2760500493343014914#rd" target="_blank" rel="noopener">写给go开发者的gRPC教程-用户认证</a></li>
 </ol>
 
 
@@ -319,7 +686,7 @@
   <a class="prev" href="https://heliu.site/posts/grpc/ssl/">
     <span class="title">« 上一页</span>
     <br>
-    <span>SSL/TLS</span>
+    <span>SSL/TLS 安全</span>
   </a>
   <a class="next" href="https://heliu.site/posts/grpc/middleware/">
     <span class="title">下一页 »</span>

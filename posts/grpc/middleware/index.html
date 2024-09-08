@@ -125,8 +125,8 @@
   "keywords": [
     "grpc"
   ],
-  "articleBody": " gRPC 拦截器分为服务端拦截器和客户端拦截器。 服务端拦截器：是gRPC服务器在到达实际RPC方法之前调用的函数。它可以用于多种用途，例如日志记录、跟踪、速率限制、身份验证和授权。 客户端拦截器：是gRPC客户端在调用实际RPC之前调用的函数。 拦截器分为以下几种： UnaryClientInterceptor：在客户端拦截所有一元 gRPC 调用。 UnaryServerInterceptor：在服务端拦截所有一元 gRPC 调用。 StreamClientInterceptor：在客户端拦截所有流 gRPC 调用。 StreamServerInterceptor：在服务端拦截所有流 gRPC 调用。 一元拦截器 客户端 作用：使用客户端元数据丰富消息的地方，例如有关客户端运行的硬件或操作系统的一些信息，或者可能启动跟踪流程。 客户端拦截器类型： ctx：Go语言中上下文，一般和goroutine配合使用，起到超时控制的效果。 method：当前调用的 RPC 方法名称。格式：/服务名/方法名。 req：本次请求的参数，只有在处理前阶段修改才有效。该参数是接口，存储的请求参数的地址，比如 *server.HelloRequest。 reply：本次请求响应，需要在处理后阶段才能获取到。该参数是接口，存储的响应参数的地址，比如 *server.HelloReply。 cc：gRPC 连接信息。*grpc.ClientConn。 invoker：可以看作是当前 RPC 方法，一般在拦截器中调用 invoker 能达到调用 RPC 方法的效果，当然底层也是gRPC调用。 opts：本次调用指定的 options 信息。 // UnaryClientInterceptor intercepts the execution of a unary RPC on the client. // Unary interceptors can be specified as a DialOption, using // WithUnaryInterceptor() or WithChainUnaryInterceptor(), when creating a // ClientConn. When a unary interceptor(s) is set on a ClientConn, gRPC // delegates all unary RPC invocations to the interceptor, and it is the // responsibility of the interceptor to call invoker to complete the processing // of the RPC. // // method is the RPC name. req and reply are the corresponding request and // response messages. cc is the ClientConn on which the RPC was invoked. invoker // is the handler to complete the RPC and it is the responsibility of the // interceptor to call it. opts contain all applicable call options, including // defaults from the ClientConn as well as per-call options. // // The returned error must be compatible with the status package. type UnaryClientInterceptor func(ctx context.Context, method string, req, reply any, cc *ClientConn, invoker UnaryInvoker, opts ...CallOption) error 作为客户端拦截器，可以在处理前检查 req 看看本次请求带没带 token 之类的鉴权数据，没有的话就可以在拦截器中终止或带上。 使用示例： func UnaryClientInterceptor() grpc.UnaryClientInterceptor { return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error { // method: /SayHello/SayHello // req: 接口装载的 *server.HelloRequest // reply: 接口返回的 *server.HelloReply // cc: grpc.ClientConn // invoker: grpc.UnaryInvoker // opts: []grpc.CallOption fmt.Printf(\"req: %v\\n\", req) // 获取 gRPC 方法名称 // method: /SayHello/SayHello fmt.Printf(\"opts: %s\\n\", opts) // 获取 gRPC 方法的请求参数 // req: 接口装载的 *server.HelloRequest fmt.Printf(\"req: %v\\n\", req) fmt.Printf(\"type: %T\\n\", req) // 获取 gRPC 方法的返回参数 // reply: 接口返回的 *server.HelloReply fmt.Printf(\"reply: %v\\n\", reply) fmt.Printf(\"type: %T\\n\", reply) // 获取 gRPC 方法的 gRPC 客户端连接 // cc: grpc.Client // 1) 预处理阶段 start := time.Now() cos := runtime.GOOS // 获取操作系统 // 将操作系统信息附加到元数据传出请求 ctx = metadata.AppendToOutgoingContext(ctx, \"client-os\", cos) // 2) 调用 gRPC 方法 // invoker 这里是真正调用 RPC 方法的地方。 // 因此我们可以在调用前后增加自己的逻辑，比如调用前检查以下参数之类的，调用后记录下本次请求处理耗时等 err := invoker(ctx, method, req, reply, cc, opts...) // 3) 后处理阶段 end := time.Now() // RPC: /SayHello/SayHello, client-os: linux, req: requestName:\"gh\", start-time: 2024-09-03 21:25:51.715107181 +0800 CST m=+0.000534541, end-time: 2024-09-03 21:25:51.717004906 +0800 CST m=+0.002432245, err: log.Printf(\"RPC: %s, client-os: %s, req: %v, start-time: %s, end-time: %s, err: %v\\n\", method, cos, req, start, end, err) // *server.HelloRequest fmt.Printf(\"req: %v\\n\", req) fmt.Printf(\"type: %T\\n\", req) return err } } 拦截器其实就是一个函数，可以分为预处理、调用RPC、后处理三个阶段。 客户端通过 grpc.WithUnaryInterceptor() 方法指定要添加的拦截器： func main() { // ... var opts []grpc.DialOption // 不带TLS这里是grpc.WithTransportCredentials(insecure.NewCredentials()) opts = append(opts, grpc.WithTransportCredentials(creds)) opts = append(opts, grpc.WithPerRPCCredentials(\u0026ClientTokenAuth{})) // 添加客户端拦截器 opts = append(opts, grpc.WithUnaryInterceptor(interceptor.UnaryClientInterceptor())) // 连接server端，使用ssl加密通信 conn, err := grpc.NewClient(\"127.0.0.1:9090\", opts...) // ... } 服务端 作用：可以对请求的真实性进行一些检查，例如对其进行授权，或者检查某些字段是否存在/验证请求。 服务器拦截器类型： ctx：请求上下文。 req：RPC 方法的请求参数，接口也就是 service.HelloRequest。 info：RPC 方法的所有信息。 info.FullMethod：请求方法名称，/服务名/方法名称 handler：RPC 方法正真执行的逻辑。 // UnaryServerInterceptor provides a hook to intercept the execution of a unary RPC on the server. info // contains all the information of this RPC the interceptor can operate on. And handler is the wrapper // of the service method implementation. It is the responsibility of the interceptor to invoke handler // to complete the RPC. type UnaryServerInterceptor func(ctx context.Context, req any, info *UnaryServerInfo, handler UnaryHandler) (resp any, err error) 使用示例： func UnaryServerInterceptor() grpc.UnaryServerInterceptor { return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) { // req：请求参数类型 *service.HelloRequest // info.FullMethod：请求方法名称，**/服务名/方法名称** fmt.Printf(\"req: %T\\n\", req) // 1) 预处理 start := time.Now() // 从传入上下文获取元数据 md, ok := metadata.FromIncomingContext(ctx) if !ok { return nil, fmt.Errorf(\"上下文中没有元数据\") } // 检索客户端操作系统，如果它不存在说明此值为空 os := md.Get(\"client-os\") // 获取客户端IP地址 ip, err := getClientIp(ctx) if err != nil { return nil, err } // 2) 调用 RPC 方法 // 真正执行 RPC 方法，与 invoker 的调用不一样。因此我们可以在真正执行前后检查数据 // 比如查看客户端操作系统和客户端IP地址、记录请求参数，耗时，错误信息等 m, err := handler(ctx, req) // 3) 后处理 end := time.Now() fmt.Printf(\"RPC: %s, client-os: '%v' and IP: '%v', req: %v, start-time: %s, end-time: %s, err: %v\", info.FullMethod, os, ip, req, start.Format(time.RFC3339), end.Format(time.RFC3339), err) return m, err } } func getClientIp(ctx context.Context) (string, error) { p, ok := peer.FromContext(ctx) if !ok { return \"\", fmt.Errorf(\"没有获取到IP\") } return p.Addr.String(), nil } 客户端通过 grpc.UnaryInterceptor() 方法指定要添加的拦截器： func main() { // ... // 开启端口 listen, _ := net.Listen(\"tcp\", \":9090\") // 创建grpc服务 grpcServer := grpc.NewServer(grpc.Creds(creds), grpc.UnaryInterceptor(interceptor.UnaryServerInterceptor())) // 在grpc服务端中注册我们自己编写的服务 pb.RegisterSayHelloServer(grpcServer, \u0026server{}) // ... } github github 代码：https://github.com/helium-chain/interceptor 流式拦截器 流拦截器过程和一元拦截器有所不同，同样分为三阶段：预处理、调用RPC方法、后处理。 预处理阶段和一元拦截器类似，参数调用RPC方法和后处理这两个阶段则完全不同。 StreamAPI 的请求和响应都是通过 Stream 进行传递的，也就是通过 Streamer 调用 SendMsg 和 RecvMsg 这两个方法获取的。 然后 Streamer 又调用 RPC 方法来获取的，所以再流拦截器中我们可以对 Streamer 进行包装，然后实现 SendMsg 和 RecvMsg 这两个方法。 客户端 作用：比如将10个对象列表传输到服务器，例如文件或视频的块，我们可以再发送每个块之前拦截，并验证校验和等内容是否有效，将元数据添加到帧等。 客户端拦截器类型： // StreamClientInterceptor intercepts the creation of a ClientStream. Stream // interceptors can be specified as a DialOption, using WithStreamInterceptor() // or WithChainStreamInterceptor(), when creating a ClientConn. When a stream // interceptor(s) is set on the ClientConn, gRPC delegates all stream creations // to the interceptor, and it is the responsibility of the interceptor to call // streamer. // // desc contains a description of the stream. cc is the ClientConn on which the // RPC was invoked. streamer is the handler to create a ClientStream and it is // the responsibility of the interceptor to call it. opts contain all applicable // call options, including defaults from the ClientConn as well as per-call // options. // // StreamClientInterceptor may return a custom ClientStream to intercept all I/O // operations. The returned error must be compatible with the status package. type StreamClientInterceptor func(ctx context.Context, desc *StreamDesc, cc *ClientConn, method string, streamer Streamer, opts ...CallOption) (ClientStream, error) 使用示例： func StreamClientInterceptor() grpc.StreamClientInterceptor { return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) { // 1) 预处理 log.Printf(\"method: %v\\n\", method) // /SayHello/Channel // 因为SendMsg和RecvMsg方法是ClientStream接口内方法，我们需要先调用streamer函数获取到ClientStream // 再对它进行封装，实现自己的 SendMsg 和 RecvMsg 方法。 stream, err := streamer(ctx, desc, cc, method, opts...) return newStreamClient(stream), err } } type streamClient struct { grpc.ClientStream } func newStreamClient(c grpc.ClientStream) grpc.ClientStream { return \u0026streamClient{c} } func (s *streamClient) SendMsg(m interface{}) error { // 2) 发送前，我们可以再这里对发送的消息处理 fmt.Printf(\"SendMsg: %v\\n m: %T\\n\", m, m) // SendMsg: value:\"张三\"\\n m: *service.Request return s.ClientStream.SendMsg(m) } func (s *streamClient) RecvMsg(m interface{}) error { // 3) 在这里，我们可以对接收到的消息进行处理(发送前) fmt.Printf(\"RecvMsg: %v\\n m:%T\\n\", m, m) // RecvMsg: m:*service.Response return s.ClientStream.RecvMsg(m) // 发送后 } 客户端通过 grpc.WithStreamInterceptor() 方法指定要添加的拦截器： func main() { // ... var opts []grpc.DialOption // 不带TLS这里是grpc.WithTransportCredentials(insecure.NewCredentials()) opts = append(opts, grpc.WithTransportCredentials(creds)) opts = append(opts, grpc.WithPerRPCCredentials(\u0026ClientTokenAuth{})) // 添加客户端拦截器 opts = append(opts, grpc.WithUnaryInterceptor(interceptor.UnaryClientInterceptor())) // 添加流拦截器 opts = append(opts, grpc.WithStreamInterceptor(interceptor.StreamClientInterceptor())) // 连接server端，使用ssl加密通信 conn, err := grpc.NewClient(\"127.0.0.1:9090\", opts...) // ... } 服务端 作用：比如我们在接收上述文件快想验证在传输过程中没有丢失任何内容，并在存储之前再次验证校验和。 服务端拦截器类型： // StreamServerInterceptor provides a hook to intercept the execution of a streaming RPC on the server. // info contains all the information of this RPC the interceptor can operate on. And handler is the // service method implementation. It is the responsibility of the interceptor to invoke handler to // complete the RPC. type StreamServerInterceptor func(srv any, ss ServerStream, info *StreamServerInfo, handler StreamHandler) error 使用示例： func StreamServerInterceptor() grpc.StreamServerInterceptor { return func(srv any, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error { wrapper := newStreamServer(ss) return handler(srv, wrapper) } } type streamServe struct { grpc.ServerStream } func newStreamServer(s grpc.ServerStream) grpc.ServerStream { return \u0026streamServe{s} } func (s *streamServe) SendMsg(m interface{}) error { return s.ServerStream.SendMsg(m) } func (s *streamServe) RecvMsg(m interface{}) error { return s.ServerStream.RecvMsg(m) } 服务端通过 grpc.StreamInterceptor() 方法指定要添加的拦截器： func main() { // ... // 开启端口 listen, _ := net.Listen(\"tcp\", \":9090\") // 创建grpc服务 grpcServer := grpc.NewServer(grpc.Creds(creds), grpc.UnaryInterceptor(interceptor.UnaryServerInterceptor()), grpc.StreamInterceptor(interceptor.StreamServerInterceptor())) // 在grpc服务端中注册我们自己编写的服务 pb.RegisterSayHelloServer(grpcServer, \u0026server{}) // ... } github github 代码：https://github.com/helium-chain/grpc-stream 参考 参考文档：https://blog.51cto.com/u_16213678/11565016 ",
-  "wordCount" : "1178",
+  "articleBody": " gRPC的拦截器和其他框架的拦截器（也称middleware）作用是一样的。利用拦截器我们可以在不侵入业务逻辑的前提下修改或者记录服务端或客户端的请求与响应，利用拦截器我们可以实现诸如日志记录、权限认证、限流等诸多功能 gRPC 拦截器分为服务端拦截器和客户端拦截器。 服务端拦截器：是gRPC服务器在到达实际RPC方法之前调用的函数。它可以用于多种用途，例如日志记录、跟踪、速率限制、身份验证和授权。 客户端拦截器：是gRPC客户端在调用实际RPC之前调用的函数。 拦截器分为以下几种： UnaryClientInterceptor：在客户端拦截所有一元 gRPC 调用。 UnaryServerInterceptor：在服务端拦截所有一元 gRPC 调用。 StreamClientInterceptor：在客户端拦截所有流 gRPC 调用。 StreamServerInterceptor：在服务端拦截所有流 gRPC 调用。 一元拦截器 客户端 作用：使用客户端元数据丰富消息的地方，例如有关客户端运行的硬件或操作系统的一些信息，或者可能启动跟踪流程。 客户端拦截器类型： ctx context.Context：单个请求的上下文，一般和goroutine配合使用，起到超时控制的效果。 method string：当前调用的 RPC 方法名称。格式：/服务名/方法名。 req any：本次请求的参数，只有在处理前阶段修改才有效。该参数是接口，存储的请求参数的地址，比如*server.HelloRequest。 reply any：本次请求响应，需要在处理后阶段才能获取到。该参数是接口，存储的响应参数的地址，比如*server.HelloReply。 cc *ClientConn：客户端与服务端的链接。 invoker UnaryInvoker：可以看作是当前RPC方法，一般在拦截器中调用invoker能达到调用RPC方法的效果，当然底层也是gRPC调用。 opts ...CallOption：RPC调用的所有配置项，包含设置到conn上的，也包含配置在每一个调用上的。 // UnaryClientInterceptor intercepts the execution of a unary RPC on the client. // Unary interceptors can be specified as a DialOption, using // WithUnaryInterceptor() or WithChainUnaryInterceptor(), when creating a // ClientConn. When a unary interceptor(s) is set on a ClientConn, gRPC // delegates all unary RPC invocations to the interceptor, and it is the // responsibility of the interceptor to call invoker to complete the processing // of the RPC. // // method is the RPC name. req and reply are the corresponding request and // response messages. cc is the ClientConn on which the RPC was invoked. invoker // is the handler to complete the RPC and it is the responsibility of the // interceptor to call it. opts contain all applicable call options, including // defaults from the ClientConn as well as per-call options. // // The returned error must be compatible with the status package. type UnaryClientInterceptor func(ctx context.Context, method string, req, reply any, cc *ClientConn, invoker UnaryInvoker, opts ...CallOption) error 作为客户端拦截器，可以在处理前检查 req 看看本次请求带没带 token 之类的鉴权数据，没有的话就可以在拦截器中终止或带上。 使用示例： func UnaryClientInterceptor() grpc.UnaryClientInterceptor { return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error { // method: /SayHello/SayHello // req: 接口装载的 *server.HelloRequest // reply: 接口返回的 *server.HelloReply // cc: grpc.ClientConn // invoker: grpc.UnaryInvoker // opts: []grpc.CallOption fmt.Printf(\"req: %v\\n\", req) // 获取 gRPC 方法名称 // method: /SayHello/SayHello fmt.Printf(\"opts: %s\\n\", opts) // 获取 gRPC 方法的请求参数 // req: 接口装载的 *server.HelloRequest fmt.Printf(\"req: %v\\n\", req) fmt.Printf(\"type: %T\\n\", req) // 获取 gRPC 方法的返回参数 // reply: 接口返回的 *server.HelloReply fmt.Printf(\"reply: %v\\n\", reply) fmt.Printf(\"type: %T\\n\", reply) // 获取 gRPC 方法的 gRPC 客户端连接 // cc: grpc.Client // 1) 预处理阶段 start := time.Now() cos := runtime.GOOS // 获取操作系统 // 将操作系统信息附加到元数据传出请求 ctx = metadata.AppendToOutgoingContext(ctx, \"client-os\", cos) // 2) 调用 gRPC 方法 // invoker 这里是真正调用 RPC 方法的地方。 // 因此我们可以在调用前后增加自己的逻辑，比如调用前检查以下参数之类的，调用后记录下本次请求处理耗时等 err := invoker(ctx, method, req, reply, cc, opts...) // 3) 后处理阶段 end := time.Now() // RPC: /SayHello/SayHello, client-os: linux, req: requestName:\"gh\", start-time: 2024-09-03 21:25:51.715107181 +0800 CST m=+0.000534541, end-time: 2024-09-03 21:25:51.717004906 +0800 CST m=+0.002432245, err: log.Printf(\"RPC: %s, client-os: %s, req: %v, start-time: %s, end-time: %s, err: %v\\n\", method, cos, req, start, end, err) // *server.HelloRequest fmt.Printf(\"req: %v\\n\", req) fmt.Printf(\"type: %T\\n\", req) return err } } 拦截器其实就是一个函数，可以分为预处理、调用RPC、后处理三个阶段。 客户端通过 grpc.WithUnaryInterceptor() 方法指定要添加的拦截器： 拦截器中的 ctx context.Context 就是这里的 client.SayHello(context.Background(), ...) 这里的 ctx。 拦截器中的 method string 就是这里的 /SayHello/SayHello。 拦截器中的 req, reply any 是 *pb.HelloRequest、*pb.HelloResponse。 拦截器中的 cc *ClientConn 就是这里的 conn, err := grpc.NewClient(...) 这里的 conn。 拦截器中的 invoker UnaryInvoker 相当于 client.SayHello() 方法调用。 拦截器中的 opts ...CallOption 相当于这里的 client.SayHello() 的第三个参数。 func main() { // ... var opts []grpc.DialOption // 不带TLS这里是grpc.WithTransportCredentials(insecure.NewCredentials()) opts = append(opts, grpc.WithTransportCredentials(creds)) opts = append(opts, grpc.WithPerRPCCredentials(\u0026ClientTokenAuth{})) // 添加客户端拦截器 opts = append(opts, grpc.WithUnaryInterceptor(interceptor.UnaryClientInterceptor())) // 连接server端，使用ssl加密通信 conn, err := grpc.NewClient(\"127.0.0.1:9090\", opts...) defer conn.Close() // 建立连接 client := pb.NewSayHelloClient(conn) // 执行rpc调用(这个方法在服务器端来实现并返回结构) resp, err := client.SayHello(context.Background(), \u0026pb.HelloRequest{RequestName: \"gh\", Age: 12}) // ... } grpc.CallOption\n服务端 作用：可以对请求的真实性进行一些检查，例如对其进行授权，或者检查某些字段是否存在/验证请求。 服务器拦截器类型： ctx context.Context：单个请求的上下文。 req any：RPC服务的请求结构体，接口也就是 *service.HelloRequest。 info *UnaryServerInfo：RPC的服务信息。 info.FullMethod：请求方法名称，/服务名/方法名称 info.Server：也就是当前调用方法的实现类，比如 *main.server。 handler UnaryHandler：它包装了服务实现，通过调用它我们可以完成RPC并获取到响应。所以在调用它之前我们可以进行改写req或ctx、记录逻辑开始时间等操作。调用完handler即完成了RPC并获取到响应，我们不仅可以记录响应还可以改写响应。 // UnaryServerInterceptor provides a hook to intercept the execution of a unary RPC on the server. info // contains all the information of this RPC the interceptor can operate on. And handler is the wrapper // of the service method implementation. It is the responsibility of the interceptor to invoke handler // to complete the RPC. type UnaryServerInterceptor func(ctx context.Context, req any, info *UnaryServerInfo, handler UnaryHandler) (resp any, err error) 使用示例： func UnaryServerInterceptor() grpc.UnaryServerInterceptor { return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) { // req：请求参数类型 *service.HelloRequest // info.FullMethod：请求方法名称，**/服务名/方法名称** fmt.Printf(\"req: %T\\n\", req) // 1) 预处理 start := time.Now() // 从传入上下文获取元数据 md, ok := metadata.FromIncomingContext(ctx) if !ok { return nil, fmt.Errorf(\"上下文中没有元数据\") } // 检索客户端操作系统，如果它不存在说明此值为空 os := md.Get(\"client-os\") // 获取客户端IP地址 ip, err := getClientIp(ctx) if err != nil { return nil, err } // 2) 调用 RPC 方法 // 真正执行 RPC 方法，与 invoker 的调用不一样。因此我们可以在真正执行前后检查数据 // 比如查看客户端操作系统和客户端IP地址、记录请求参数，耗时，错误信息等 m, err := handler(ctx, req) // 3) 后处理 end := time.Now() fmt.Printf(\"RPC: %s, client-os: '%v' and IP: '%v', req: %v, start-time: %s, end-time: %s, err: %v\", info.FullMethod, os, ip, req, start.Format(time.RFC3339), end.Format(time.RFC3339), err) return m, err } } func getClientIp(ctx context.Context) (string, error) { p, ok := peer.FromContext(ctx) if !ok { return \"\", fmt.Errorf(\"没有获取到IP\") } return p.Addr.String(), nil } 客户端通过 grpc.UnaryInterceptor() 方法指定要添加的拦截器： func main() { // ... // 开启端口 listen, _ := net.Listen(\"tcp\", \":9090\") // 创建grpc服务 grpcServer := grpc.NewServer(grpc.Creds(creds), grpc.UnaryInterceptor(interceptor.UnaryServerInterceptor())) // 在grpc服务端中注册我们自己编写的服务 pb.RegisterSayHelloServer(grpcServer, \u0026server{}) // ... } github github 代码：https://github.com/helium-chain/interceptor 流式拦截器 流拦截器过程和一元拦截器有所不同，同样分为三阶段：预处理、调用RPC方法、后处理。 预处理阶段和一元拦截器类似，参数调用RPC方法和后处理这两个阶段则完全不同。 StreamAPI 的请求和响应都是通过 Stream 进行传递的，也就是通过 Streamer 调用 SendMsg 和 RecvMsg 这两个方法获取的。 然后 Streamer 又调用 RPC 方法来获取的，所以再流拦截器中我们可以对 Streamer 进行包装，然后实现 SendMsg 和 RecvMsg 这两个方法。 客户端 作用：比如将10个对象列表传输到服务器，例如文件或视频的块，我们可以再发送每个块之前拦截，并验证校验和等内容是否有效，将元数据添加到帧等。 客户端拦截器类型： ctx context.Context：单个请求的上下文，一般和goroutine配合使用，起到超时控制的效果。 desc *StreamDesc：流描述信息。 cc *ClientConn：客户端信息。 method string：当前调用的 RPC 方法名称。格式：/服务名/方法名。 streamer Streamer：完成RPC请求的调用。 opts …CallOption：RPC调用的所有配置项，包含设置到conn上的，也包含配置在每一个调用上的。 // StreamClientInterceptor intercepts the creation of a ClientStream. Stream // interceptors can be specified as a DialOption, using WithStreamInterceptor() // or WithChainStreamInterceptor(), when creating a ClientConn. When a stream // interceptor(s) is set on the ClientConn, gRPC delegates all stream creations // to the interceptor, and it is the responsibility of the interceptor to call // streamer. // // desc contains a description of the stream. cc is the ClientConn on which the // RPC was invoked. streamer is the handler to create a ClientStream and it is // the responsibility of the interceptor to call it. opts contain all applicable // call options, including defaults from the ClientConn as well as per-call // options. // // StreamClientInterceptor may return a custom ClientStream to intercept all I/O // operations. The returned error must be compatible with the status package. type StreamClientInterceptor func(ctx context.Context, desc *StreamDesc, cc *ClientConn, method string, streamer Streamer, opts ...CallOption) (ClientStream, error) 使用示例： func StreamClientInterceptor() grpc.StreamClientInterceptor { return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) { // 1) 预处理 // 1234-desc: \u0026{Channel 0x846e20 true true} fmt.Printf(\"1234-desc: %v\\n\", desc) // method: /SayHello/Channel log.Printf(\"method: %v\\n\", method) // /SayHello/Channel // 因为SendMsg和RecvMsg方法是ClientStream接口内方法，我们需要先调用streamer函数获取到ClientStream // 再对它进行封装，实现自己的 SendMsg 和 RecvMsg 方法。 stream, err := streamer(ctx, desc, cc, method, opts...) return newStreamClient(stream), err } } type streamClient struct { grpc.ClientStream } func newStreamClient(c grpc.ClientStream) grpc.ClientStream { return \u0026streamClient{c} } func (s *streamClient) SendMsg(m interface{}) error { // 2) 发送前，我们可以再这里对发送的消息处理 fmt.Printf(\"SendMsg: %v\\n m: %T\\n\", m, m) // SendMsg: value:\"张三\"\\n m: *service.Request return s.ClientStream.SendMsg(m) } func (s *streamClient) RecvMsg(m interface{}) error { // 3) 在这里，我们可以对接收到的消息进行处理(发送前) fmt.Printf(\"RecvMsg: %v\\n m:%T\\n\", m, m) // RecvMsg: m:*service.Response return s.ClientStream.RecvMsg(m) // 发送后 } 客户端通过 grpc.WithStreamInterceptor() 方法指定要添加的拦截器： func main() { // ... var opts []grpc.DialOption // 不带TLS这里是grpc.WithTransportCredentials(insecure.NewCredentials()) opts = append(opts, grpc.WithTransportCredentials(creds)) opts = append(opts, grpc.WithPerRPCCredentials(\u0026ClientTokenAuth{})) // 添加客户端拦截器 opts = append(opts, grpc.WithUnaryInterceptor(interceptor.UnaryClientInterceptor())) // 添加流拦截器 opts = append(opts, grpc.WithStreamInterceptor(interceptor.StreamClientInterceptor())) // 连接server端，使用ssl加密通信 conn, err := grpc.NewClient(\"127.0.0.1:9090\", opts...) // ... } 服务端 作用：比如我们在接收上述文件快想验证在传输过程中没有丢失任何内容，并在存储之前再次验证校验和。 服务端拦截器类型： srv any：服务实现，也就是 *main.server。 ss ServerStream：服务端视角的流。无论是哪一种流式RPC对于服务端来说发送（SendMsg）就代表着响应数据，接收（RecvMsg）就代表着请求数据，不同的流式RPC的区别就在于是多次发送数据（服务器端流式 RPC）还是多次接收数据（客户端流式 RPC）或者两者均有（双向流式 RPC）。因此仅使用这一个抽象就代表了所有的流式RPC场景 通过该参数能设置Header、Trailer，获取 ctx，SendMsg、RecvMsg。 info *StreamServerInfo：RPC的服务信息 FullMethod string：方法名称。 IsClientStream bool：客户端是流模式吗？ IsServerStream bool：服务端是流模式吗？ handler StreamHandler：它包装了服务实现，通过调用它我们可以完成RPC。 // StreamServerInterceptor provides a hook to intercept the execution of a streaming RPC on the server. // info contains all the information of this RPC the interceptor can operate on. And handler is the // service method implementation. It is the responsibility of the interceptor to invoke handler to // complete the RPC. type StreamServerInterceptor func(srv any, ss ServerStream, info *StreamServerInfo, handler StreamHandler) error 使用示例： func StreamServerInterceptor() grpc.StreamServerInterceptor { return func(srv any, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error { // 2024-srv: *main.server fmt.Printf(\"2024-srv: %T\\n\", srv) // 2024-ss: *grpc.serverStream fmt.Printf(\"2024-ss: %T\\n\", ss) // 2024-info: \u0026{/SayHello/Channel true true} fmt.Printf(\"2024-info: %v\\n\", info) // ss 接口包含： // SetHeader(metadata.MD) error // SendHeader(metadata.MD) error // SetTrailer(metadata.MD) // Context() context.Context // SendMsg(m any) error // RecvMsg(m any) error wrapper := newStreamServer(ss) return handler(srv, wrapper) } } type streamServe struct { grpc.ServerStream } func newStreamServer(s grpc.ServerStream) grpc.ServerStream { return \u0026streamServe{s} } func (s *streamServe) SendMsg(m interface{}) error { return s.ServerStream.SendMsg(m) } func (s *streamServe) RecvMsg(m interface{}) error { return s.ServerStream.RecvMsg(m) } 服务端通过 grpc.StreamInterceptor() 方法指定要添加的拦截器： func main() { // ... // 开启端口 listen, _ := net.Listen(\"tcp\", \":9090\") // 创建grpc服务 grpcServer := grpc.NewServer(grpc.Creds(creds), grpc.UnaryInterceptor(interceptor.UnaryServerInterceptor()), grpc.StreamInterceptor(interceptor.StreamServerInterceptor())) // 在grpc服务端中注册我们自己编写的服务 pb.RegisterSayHelloServer(grpcServer, \u0026server{}) // ... } github github 代码：https://github.com/helium-chain/grpc-stream 注意 默认的 gRPC 只能配置一个拦截器。如果想设置多个拦截器链可以自己实现，也可以使用第三方包。 比如，https://github.com/grpc-ecosystem/go-grpc-middleware。 参考 参考文档：https://blog.51cto.com/u_16213678/11565016 ",
+  "wordCount" : "1330",
   "inLanguage": "zh",
   "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-09-03T00:00:00Z",
   "dateModified": "2024-09-03T00:00:00Z",
@@ -252,12 +252,12 @@
     <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
     <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
     <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
-</svg><span>1178字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>1330字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="12" r="9"></circle>
     <polyline points="12 7 12 12 15 15"></polyline>
-</svg><span>6分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>7分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="7" r="4"></circle>
@@ -304,6 +304,8 @@
                     <li>
                         <a href="#github-1" aria-label="github">github</a></li></ul>
                     </li>
+                    <li>
+                        <a href="#%e6%b3%a8%e6%84%8f" aria-label="注意">注意</a></li>
                     <li>
                         <a href="#%e5%8f%82%e8%80%83" aria-label="参考">参考</a>
                     </li>
@@ -372,6 +374,7 @@
     }
 </script>
   <div class="post-content"><ul>
+<li>gRPC的拦截器和其他框架的拦截器（也称middleware）作用是一样的。利用拦截器我们可以在不侵入业务逻辑的前提下修改或者记录服务端或客户端的请求与响应，利用拦截器我们可以实现诸如日志记录、权限认证、限流等诸多功能</li>
 <li>gRPC 拦截器分为服务端拦截器和客户端拦截器。</li>
 <li>服务端拦截器：是gRPC服务器在到达实际RPC方法之前调用的函数。它可以用于多种用途，例如日志记录、跟踪、速率限制、身份验证和授权。</li>
 <li>客户端拦截器：是gRPC客户端在调用实际RPC之前调用的函数。</li>
@@ -390,13 +393,13 @@
 <li>作用：使用客户端元数据丰富消息的地方，例如有关客户端运行的硬件或操作系统的一些信息，或者可能启动跟踪流程。</li>
 <li>客户端拦截器类型：
 <ul>
-<li>ctx：Go语言中上下文，一般和goroutine配合使用，起到超时控制的效果。</li>
-<li>method：当前调用的 RPC 方法名称。格式：<strong>/服务名/方法名</strong>。</li>
-<li>req：本次请求的参数，只有在处理前阶段修改才有效。该参数是接口，存储的请求参数的地址，比如 *server.HelloRequest。</li>
-<li>reply：本次请求响应，需要在处理后阶段才能获取到。该参数是接口，存储的响应参数的地址，比如 *server.HelloReply。</li>
-<li>cc：gRPC 连接信息。*grpc.ClientConn。</li>
-<li>invoker：可以看作是当前 RPC 方法，一般在拦截器中调用 invoker 能达到调用 RPC 方法的效果，当然底层也是gRPC调用。</li>
-<li>opts：本次调用指定的 options 信息。</li>
+<li><strong><code>ctx context.Context</code></strong>：单个请求的上下文，一般和goroutine配合使用，起到超时控制的效果。</li>
+<li><strong><code>method string</code></strong>：当前调用的 RPC 方法名称。格式：<strong>/服务名/方法名</strong>。</li>
+<li><strong><code>req any</code></strong>：本次请求的参数，只有在处理前阶段修改才有效。该参数是接口，存储的请求参数的地址，比如<code>*server.HelloRequest</code>。</li>
+<li><strong><code>reply any</code></strong>：本次请求响应，需要在处理后阶段才能获取到。该参数是接口，存储的响应参数的地址，比如<code>*server.HelloReply</code>。</li>
+<li><strong><code>cc *ClientConn</code></strong>：客户端与服务端的链接。</li>
+<li><strong><code>invoker UnaryInvoker</code></strong>：可以看作是当前RPC方法，一般在拦截器中调用invoker能达到调用RPC方法的效果，当然底层也是gRPC调用。</li>
+<li><strong><code>opts ...CallOption</code></strong>：RPC调用的所有配置项，包含设置到conn上的，也包含配置在每一个调用上的。</li>
 </ul>
 </li>
 </ol>
@@ -416,7 +419,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="c1">//
 </span></span></span><span class="line"><span class="cl"><span class="c1">// The returned error must be compatible with the status package.
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">UnaryClientInterceptor</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">method</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">reply</span> <span class="nx">any</span><span class="p">,</span> <span class="nx">cc</span> <span class="o">*</span><span class="nx">ClientConn</span><span class="p">,</span> <span class="nx">invoker</span> <span class="nx">UnaryInvoker</span><span class="p">,</span> <span class="nx">opts</span> <span class="o">...</span><span class="nx">CallOption</span><span class="p">)</span> <span class="kt">error</span>
-</span></span></code></pre></div><ol start="3">
+</span></span></code></pre></div><ol>
 <li>作为客户端拦截器，可以在处理前检查 req 看看本次请求带没带 token 之类的鉴权数据，没有的话就可以在拦截器中终止或带上。</li>
 <li>使用示例：</li>
 </ol>
@@ -473,7 +476,16 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><ol start="5">
 <li>拦截器其实就是一个函数，可以分为<strong>预处理</strong>、<strong>调用RPC</strong>、<strong>后处理</strong>三个阶段。</li>
-<li>客户端通过 grpc.WithUnaryInterceptor() 方法指定要添加的拦截器：</li>
+<li>客户端通过 grpc.WithUnaryInterceptor() 方法指定要添加的拦截器：
+<ul>
+<li>拦截器中的 <code>ctx context.Context</code> 就是这里的 <code>client.SayHello(context.Background(), ...)</code> 这里的 ctx。</li>
+<li>拦截器中的 <code>method string</code> 就是这里的 <code>/SayHello/SayHello</code>。</li>
+<li>拦截器中的 <code>req, reply any</code> 是 <code>*pb.HelloRequest</code>、<code>*pb.HelloResponse</code>。</li>
+<li>拦截器中的 <code>cc *ClientConn</code> 就是这里的 <code>conn, err := grpc.NewClient(...)</code> 这里的 conn。</li>
+<li>拦截器中的 <code>invoker UnaryInvoker</code> 相当于 <code>client.SayHello()</code> 方法调用。</li>
+<li>拦截器中的 <code>opts ...CallOption</code> 相当于这里的 <code>client.SayHello()</code> 的第三个参数。</li>
+</ul>
+</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">    <span class="c1">// ...
@@ -488,21 +500,32 @@
 </span></span><span class="line"><span class="cl">    <span class="c1">// 连接server端，使用ssl加密通信
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">conn</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">NewClient</span><span class="p">(</span><span class="s">&#34;127.0.0.1:9090&#34;</span><span class="p">,</span> <span class="nx">opts</span><span class="o">...</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nx">conn</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 建立连接
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">client</span> <span class="o">:=</span> <span class="nx">pb</span><span class="p">.</span><span class="nf">NewSayHelloClient</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 执行rpc调用(这个方法在服务器端来实现并返回结构)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">resp</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">SayHello</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">(),</span> <span class="o">&amp;</span><span class="nx">pb</span><span class="p">.</span><span class="nx">HelloRequest</span><span class="p">{</span><span class="nx">RequestName</span><span class="p">:</span> <span class="s">&#34;gh&#34;</span><span class="p">,</span> <span class="nx">Age</span><span class="p">:</span> <span class="mi">12</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">    <span class="c1">// ...
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre></div><h3 id="服务端">服务端<a hidden class="anchor" aria-hidden="true" href="#服务端">#</a></h3>
+</span></span></code></pre></div><p><img loading="lazy" src="../images/grpc-001.png" alt=""  />
+</p>
+<p>grpc.CallOption</p>
+<h3 id="服务端">服务端<a hidden class="anchor" aria-hidden="true" href="#服务端">#</a></h3>
 <ol>
 <li>作用：可以对请求的真实性进行一些检查，例如对其进行授权，或者检查某些字段是否存在/验证请求。</li>
 <li>服务器拦截器类型：
 <ul>
-<li>ctx：请求上下文。</li>
-<li>req：RPC 方法的请求参数，接口也就是 <strong>service.HelloRequest</strong>。</li>
-<li>info：RPC 方法的所有信息。
+<li><code>ctx context.Context</code>：单个请求的上下文。</li>
+<li><code>req any</code>：RPC服务的请求结构体，接口也就是 <strong>*service.HelloRequest</strong>。</li>
+<li><code>info *UnaryServerInfo</code>：RPC的服务信息。
 <ul>
 <li>info.FullMethod：请求方法名称，<strong>/服务名/方法名称</strong></li>
+<li>info.Server：也就是当前调用方法的实现类，比如 *main.server。</li>
 </ul>
 </li>
-<li>handler：RPC 方法正真执行的逻辑。</li>
+<li><code>handler UnaryHandler</code>：它包装了服务实现，通过调用它我们可以完成RPC并获取到响应。所以在调用它之前我们可以进行改写req或ctx、记录逻辑开始时间等操作。调用完handler即完成了RPC并获取到响应，我们不仅可以记录响应还可以改写响应。</li>
 </ul>
 </li>
 </ol>
@@ -511,7 +534,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="c1">// of the service method implementation. It is the responsibility of the interceptor to invoke handler
 </span></span></span><span class="line"><span class="cl"><span class="c1">// to complete the RPC.
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">UnaryServerInterceptor</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">req</span> <span class="nx">any</span><span class="p">,</span> <span class="nx">info</span> <span class="o">*</span><span class="nx">UnaryServerInfo</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">UnaryHandler</span><span class="p">)</span> <span class="p">(</span><span class="nx">resp</span> <span class="nx">any</span><span class="p">,</span> <span class="nx">err</span> <span class="kt">error</span><span class="p">)</span>
-</span></span></code></pre></div><ol start="3">
+</span></span></code></pre></div><ol>
 <li>使用示例：</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">UnaryServerInterceptor</span><span class="p">()</span> <span class="nx">grpc</span><span class="p">.</span><span class="nx">UnaryServerInterceptor</span> <span class="p">{</span>
@@ -583,6 +606,8 @@
 <ol>
 <li>github 代码：<a href="https://github.com/helium-chain/interceptor" target="_blank" rel="noopener">https://github.com/helium-chain/interceptor</a></li>
 </ol>
+<p><img loading="lazy" src="../images/grpc-003.png" alt=""  />
+</p>
 <h2 id="流式拦截器">流式拦截器<a hidden class="anchor" aria-hidden="true" href="#流式拦截器">#</a></h2>
 <ol>
 <li>流拦截器过程和一元拦截器有所不同，同样分为三阶段：预处理、调用RPC方法、后处理。</li>
@@ -593,7 +618,16 @@
 <h3 id="客户端-1">客户端<a hidden class="anchor" aria-hidden="true" href="#客户端-1">#</a></h3>
 <ol>
 <li>作用：比如将10个对象列表传输到服务器，例如文件或视频的块，我们可以再发送每个块之前拦截，并验证校验和等内容是否有效，将元数据添加到帧等。</li>
-<li>客户端拦截器类型：</li>
+<li>客户端拦截器类型：
+<ul>
+<li><strong>ctx context.Context</strong>：单个请求的上下文，一般和goroutine配合使用，起到超时控制的效果。</li>
+<li><strong>desc *StreamDesc</strong>：流描述信息。</li>
+<li><strong>cc *ClientConn</strong>：客户端信息。</li>
+<li><strong>method string</strong>：当前调用的 RPC 方法名称。格式：/服务名/方法名。</li>
+<li><strong>streamer Streamer</strong>：完成RPC请求的调用。</li>
+<li><strong>opts &hellip;CallOption</strong>：RPC调用的所有配置项，包含设置到conn上的，也包含配置在每一个调用上的。</li>
+</ul>
+</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// StreamClientInterceptor intercepts the creation of a ClientStream. Stream
 </span></span></span><span class="line"><span class="cl"><span class="c1">// interceptors can be specified as a DialOption, using WithStreamInterceptor()
@@ -611,12 +645,15 @@
 </span></span></span><span class="line"><span class="cl"><span class="c1">// StreamClientInterceptor may return a custom ClientStream to intercept all I/O
 </span></span></span><span class="line"><span class="cl"><span class="c1">// operations. The returned error must be compatible with the status package.
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">StreamClientInterceptor</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">desc</span> <span class="o">*</span><span class="nx">StreamDesc</span><span class="p">,</span> <span class="nx">cc</span> <span class="o">*</span><span class="nx">ClientConn</span><span class="p">,</span> <span class="nx">method</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">streamer</span> <span class="nx">Streamer</span><span class="p">,</span> <span class="nx">opts</span> <span class="o">...</span><span class="nx">CallOption</span><span class="p">)</span> <span class="p">(</span><span class="nx">ClientStream</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
-</span></span></code></pre></div><ol start="3">
+</span></span></code></pre></div><ol>
 <li>使用示例：</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">StreamClientInterceptor</span><span class="p">()</span> <span class="nx">grpc</span><span class="p">.</span><span class="nx">StreamClientInterceptor</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">desc</span> <span class="o">*</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">StreamDesc</span><span class="p">,</span> <span class="nx">cc</span> <span class="o">*</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">ClientConn</span><span class="p">,</span> <span class="nx">method</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">streamer</span> <span class="nx">grpc</span><span class="p">.</span><span class="nx">Streamer</span><span class="p">,</span> <span class="nx">opts</span> <span class="o">...</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">CallOption</span><span class="p">)</span> <span class="p">(</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">ClientStream</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">        <span class="c1">// 1) 预处理
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// 1234-desc: &amp;{Channel 0x846e20 true true}
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;1234-desc: %v\n&#34;</span><span class="p">,</span> <span class="nx">desc</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">//  method: /SayHello/Channel
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;method: %v\n&#34;</span><span class="p">,</span> <span class="nx">method</span><span class="p">)</span> <span class="c1">// /SayHello/Channel
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>
 </span></span><span class="line"><span class="cl">        <span class="c1">// 因为SendMsg和RecvMsg方法是ClientStream接口内方法，我们需要先调用streamer函数获取到ClientStream
@@ -667,18 +704,50 @@
 </span></span></code></pre></div><h3 id="服务端-1">服务端<a hidden class="anchor" aria-hidden="true" href="#服务端-1">#</a></h3>
 <ol>
 <li>作用：比如我们在接收上述文件快想验证在传输过程中没有丢失任何内容，并在存储之前再次验证校验和。</li>
-<li>服务端拦截器类型：</li>
+<li>服务端拦截器类型：
+<ul>
+<li><strong>srv any</strong>：服务实现，也就是 *main.server。</li>
+<li><strong>ss ServerStream</strong>：服务端视角的流。无论是哪一种流式RPC对于服务端来说发送（SendMsg）就代表着响应数据，接收（RecvMsg）就代表着请求数据，不同的流式RPC的区别就在于是多次发送数据（服务器端流式 RPC）还是多次接收数据（客户端流式 RPC）或者两者均有（双向流式 RPC）。因此仅使用这一个抽象就代表了所有的流式RPC场景
+<ul>
+<li>通过该参数能设置Header、Trailer，获取 ctx，SendMsg、RecvMsg。</li>
+</ul>
+</li>
+<li><strong>info *StreamServerInfo</strong>：RPC的服务信息
+<ul>
+<li>FullMethod string：方法名称。</li>
+<li>IsClientStream bool：客户端是流模式吗？</li>
+<li>IsServerStream bool：服务端是流模式吗？</li>
+</ul>
+</li>
+<li><strong>handler StreamHandler</strong>：它包装了服务实现，通过调用它我们可以完成RPC。</li>
+</ul>
+</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// StreamServerInterceptor provides a hook to intercept the execution of a streaming RPC on the server.
 </span></span></span><span class="line"><span class="cl"><span class="c1">// info contains all the information of this RPC the interceptor can operate on. And handler is the
 </span></span></span><span class="line"><span class="cl"><span class="c1">// service method implementation. It is the responsibility of the interceptor to invoke handler to
 </span></span></span><span class="line"><span class="cl"><span class="c1">// complete the RPC.
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">StreamServerInterceptor</span> <span class="kd">func</span><span class="p">(</span><span class="nx">srv</span> <span class="nx">any</span><span class="p">,</span> <span class="nx">ss</span> <span class="nx">ServerStream</span><span class="p">,</span> <span class="nx">info</span> <span class="o">*</span><span class="nx">StreamServerInfo</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">StreamHandler</span><span class="p">)</span> <span class="kt">error</span>
-</span></span></code></pre></div><ol start="3">
+</span></span></code></pre></div><ol>
 <li>使用示例：</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">StreamServerInterceptor</span><span class="p">()</span> <span class="nx">grpc</span><span class="p">.</span><span class="nx">StreamServerInterceptor</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kd">func</span><span class="p">(</span><span class="nx">srv</span> <span class="nx">any</span><span class="p">,</span> <span class="nx">ss</span> <span class="nx">grpc</span><span class="p">.</span><span class="nx">ServerStream</span><span class="p">,</span> <span class="nx">info</span> <span class="o">*</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">StreamServerInfo</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">grpc</span><span class="p">.</span><span class="nx">StreamHandler</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 2024-srv: *main.server
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;2024-srv: %T\n&#34;</span><span class="p">,</span> <span class="nx">srv</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 2024-ss: *grpc.serverStream
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;2024-ss: %T\n&#34;</span><span class="p">,</span> <span class="nx">ss</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 2024-info: &amp;{/SayHello/Channel true true}
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;2024-info: %v\n&#34;</span><span class="p">,</span> <span class="nx">info</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// ss 接口包含：
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">//    SetHeader(metadata.MD) error
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">//    SendHeader(metadata.MD) error
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">//    SetTrailer(metadata.MD)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">//    Context() context.Context
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">//    SendMsg(m any) error
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">//    RecvMsg(m any) error
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
 </span></span><span class="line"><span class="cl">        <span class="nx">wrapper</span> <span class="o">:=</span> <span class="nf">newStreamServer</span><span class="p">(</span><span class="nx">ss</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nf">handler</span><span class="p">(</span><span class="nx">srv</span><span class="p">,</span> <span class="nx">wrapper</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
@@ -720,6 +789,11 @@
 <ol>
 <li>github 代码：<a href="https://github.com/helium-chain/grpc-stream" target="_blank" rel="noopener">https://github.com/helium-chain/grpc-stream</a></li>
 </ol>
+<h2 id="注意">注意<a hidden class="anchor" aria-hidden="true" href="#注意">#</a></h2>
+<ol>
+<li>默认的 gRPC 只能配置一个拦截器。如果想设置多个拦截器链可以自己实现，也可以使用第三方包。</li>
+<li>比如，https://github.com/grpc-ecosystem/go-grpc-middleware。</li>
+</ol>
 <h2 id="参考">参考<a hidden class="anchor" aria-hidden="true" href="#参考">#</a></h2>
 <ol>
 <li>参考文档：<a href="https://blog.51cto.com/u_16213678/11565016" target="_blank" rel="noopener">https://blog.51cto.com/u_16213678/11565016</a></li>
@@ -736,12 +810,12 @@
   <a class="prev" href="https://heliu.site/posts/grpc/token/">
     <span class="title">« 上一页</span>
     <br>
-    <span>Token</span>
+    <span>用户认证</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/tool/acme/">
+  <a class="next" href="https://heliu.site/posts/grpc/metadata/">
     <span class="title">下一页 »</span>
     <br>
-    <span>acme.sh</span>
+    <span>Metadata 元数据</span>
   </a>
 </nav>
 

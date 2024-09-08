@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Tue, 03 Sep 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 08 Sep 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://heliu.site/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>sync.Pool</title>
@@ -883,18 +883,18 @@
       <description>proto3 文件介绍。</description>
     </item>
     <item>
-      <title>SSL/TLS</title>
+      <title>SSL/TLS 安全</title>
       <link>https://heliu.site/posts/grpc/ssl/</link>
       <pubDate>Mon, 02 Sep 2024 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/grpc/ssl/</guid>
-      <description>gRpc SSL/TLS 认证方式。</description>
+      <description>gRpc SSL/TLS 连接安全。</description>
     </item>
     <item>
-      <title>Token</title>
+      <title>用户认证</title>
       <link>https://heliu.site/posts/grpc/token/</link>
       <pubDate>Mon, 02 Sep 2024 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/grpc/token/</guid>
-      <description>grpc token 认证。</description>
+      <description>grpc 用户认证介绍。</description>
     </item>
     <item>
       <title>拦截器</title>
@@ -902,6 +902,34 @@
       <pubDate>Tue, 03 Sep 2024 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/grpc/middleware/</guid>
       <description>grpc 拦截器介绍。</description>
+    </item>
+    <item>
+      <title>Metadata 元数据</title>
+      <link>https://heliu.site/posts/grpc/metadata/</link>
+      <pubDate>Wed, 04 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/grpc/metadata/</guid>
+      <description>Metadata 元数据使用介绍。</description>
+    </item>
+    <item>
+      <title>Header 与 Trailer</title>
+      <link>https://heliu.site/posts/grpc/header-trailer/</link>
+      <pubDate>Fri, 06 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/grpc/header-trailer/</guid>
+      <description>grpc Header 与 Trailer 介绍。</description>
+    </item>
+    <item>
+      <title>错误处理</title>
+      <link>https://heliu.site/posts/grpc/err/</link>
+      <pubDate>Sun, 08 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/grpc/err/</guid>
+      <description>💥本文章关于google.google.org/grpc v1.66.0。</description>
+    </item>
+    <item>
+      <title>grpc.CallOption</title>
+      <link>https://heliu.site/posts/grpc/grpc-calloption/</link>
+      <pubDate>Thu, 05 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/grpc/grpc-calloption/</guid>
+      <description>💥本文章关于google.google.org/grpc v1.66.0。</description>
     </item>
     <item>
       <title>acme.sh</title>

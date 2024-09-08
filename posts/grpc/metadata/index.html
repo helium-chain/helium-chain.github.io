@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Metadata 元数据 | Helium</title>
+<meta name="keywords" content="grpc">
+<meta name="description" content="Metadata 元数据使用介绍。">
+<meta name="author" content="helium">
+<link rel="canonical" href="https://heliu.site/posts/grpc/metadata/">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://heliu.site/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/grpc/metadata/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono-nl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.6.0/style.css" />
+    <style>
+        body {
+            font-family: "LXGW WenKai Lite", sans-serif;
+            font-family: "LXGW WenKai Screen", sans-serif;
+        }
+    </style>
+</head>
+</html>
+
+  
+
+<meta property="og:title" content="Metadata 元数据" />
+<meta property="og:description" content="Metadata 元数据使用介绍。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://heliu.site/posts/grpc/metadata/" />
+<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-09-04T00:00:00+00:00" />
+<meta property="article:modified_time" content="2024-09-04T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:title" content="Metadata 元数据"/>
+<meta name="twitter:description" content="Metadata 元数据使用介绍。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Article",
+      "item": "https://heliu.site/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "gRPC",
+      "item": "https://heliu.site/posts/grpc/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Metadata 元数据",
+      "item": "https://heliu.site/posts/grpc/metadata/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Metadata 元数据",
+  "name": "Metadata 元数据",
+  "description": "Metadata 元数据使用介绍。",
+  "keywords": [
+    "grpc"
+  ],
+  "articleBody": " gRPC 允许发送自定义元数据。元数据是键值对的一个非常简单的概念。 在 Go gRPC 中，元数据是一个 map[string][]string。 元数据可以作为 header 或 trailer 发送： header 应该在数据之前发送。 trailer 应在处理完毕后发送。 元数据允许我们在不更改 protobuf 消息的情况下向请求中添加数据。通常用于添加与请求相关但不属于请求的数据。 例如，我们可以在请求的元数据中添加 JWT 令牌作为身份验证。这对于身份验证、速率限制或日志记录很有用。 官方Go metadata文档：https://pkg.go.dev/google.golang.org/grpc/metadata metadata 创建 使用 New()： md := metadata.New(map[string]string{\"key1\":\"value1\",\"key2\":\"value2\"}) 使用 Pairs()：注意如果有相同的 key 会自动合并 md := metadata.Pairs( \"key1\", \"value1\", \"key1\", \"value1.2\", // \"key1\" will have map value []string{\"value1\", \"value1.2\"} \"key2\", \"value2\", ) 使用 Join()： md1 := metadata.Pairs(\"k1\", \"v1\", \"k2\", \"v2\") md2 := metadata.New(map[string]string{\"key1\":\"value1\",\"key2\":\"value2\"}) md := metadata.Join(md1, md2) 存储二进制数据。 在 metadata 中，key 永远是 string 类型，但是 value 可以是 string 也可以是二进制数据。为了在 metadata 中存储二进制数据，我们仅仅需要在 key 的后面加上一个 - bin 后缀。具有 - bin 后缀的 key 所对应的 value 在创建 metadata 时会被编码（base64），收到的时候会被解码： md := metadata.Pairs( \"key\", \"string value\", \"key-bin\", string([]byte{96, 102}), ) 客户端发送 metadata client发送metadata，那就是把metadata存储到contex.Context。 把Metadata放到contex.Context，有几种方式。 NewOutgoingContext 将新创建的metadata添加到context中，这样会 覆盖 掉原来已有的metadata // 将metadata添加到context中，获取新的context md := metadata.Pairs(\"k1\", \"v1\", \"k1\", \"v2\", \"k2\", \"v3\") ctx := metadata.NewOutgoingContext(context.Background(), md) // unary RPC response, err := client.SomeRPC(ctx, someRequest) // streaming RPC stream, err := client.SomeStreamingRPC(ctx) AppendToOutgoingContext 可以直接将 key-value 对添加到已有的context中 如果context中没有metadata，那么就会 创建 一个 如果已有metadata，那么就将数据 添加 到原来的metadata // 如果对应的 context 没有 metadata，那么就会创建一个 ctx := metadata.AppendToOutgoingContext(ctx, \"k1\", \"v1\", \"k1\", \"v2\", \"k2\", \"v3\") // 如果已有 metadata 了，那么就将数据添加到原来的 metadata (例如在拦截器中) ctx := metadata.AppendToOutgoingContext(ctx, \"k3\", \"v4\") // 普通RPC（unary RPC） response, err := client.SomeRPC(ctx, someRequest) // 流式RPC（streaming RPC） stream, err := client.SomeStreamingRPC(ctx) 服务端接收 meatdata server接收metadata，就是从contex.Context中读取Metadata。 普通RPC与流式RPC的区别不大，都是从contex.Context中读取metadata。 FromIncomingContext 普通RPC（unary RPC） //Unary Call func (s *server) SomeRPC(ctx context.Context, in *pb.someRequest) (*pb.someResponse, error) { md, ok := metadata.FromIncomingContext(ctx) // do something with metadata } 流式RPC（streaming RPC） //Streaming Call func (s *server) SomeStreamingRPC(stream pb.Service_SomeStreamingRPCServer) error { md, ok := metadata.FromIncomingContext(stream.Context()) // get context from stream // do something with metadata } 服务端发送 metadata 服务端发送的metadata被分成了header和 trailer两者，因而客户端也可以读取两者。 对于普通RPC（unary RPC）server可以使用grpc包中提供的函数向client发送 header 和trailer。 grpc.SendHeader() grpc.SetHeader() grpc.SetTrailer() 对于流式RPC（streaming RPC）server可以使用ServerStream[1]接口中定义的函数向client发送header和 trailer。 ServerStream.SendHeader() ServerStream.SetHeader() ServerStream.SetTrailer() 普通RPC 使用 grpc.SendHeader() 和 grpc.SetTrailer() 方法 ，这两个函数将context.Context作为第一个参数 func (s *server) SomeRPC(ctx context.Context, in *pb.someRequest) (*pb.someResponse, error) { // 创建并发送header header := metadata.Pairs(\"header-key\", \"val\") grpc.SendHeader(ctx, header) // 创建并发送trailer trailer := metadata.Pairs(\"trailer-key\", \"val\") grpc.SetTrailer(ctx, trailer) } 如果不想立即发送header，也可以使用grpc.SetHeader()。grpc.SetHeader()可以被多次调用，在如下时机会把多个metadata合并发送出去。 func (s *server) SomeRPC(ctx context.Context, in *pb.someRequest) (*pb.someResponse, error) { // 创建header，在适当时机会被发送 header := metadata.Pairs(\"header-key1\", \"val1\") grpc.SetHeader(ctx, header) // 创建header，在适当时机会被发送 header := metadata.Pairs(\"header-key2\", \"val2\") grpc.SetHeader(ctx, header) // 创建并发送trailer trailer := metadata.Pairs(\"trailer-key\", \"val\") grpc.SetTrailer(ctx, trailer) } 流式RPC 使用 ServerStream.SendHeader() 和 ServerStream.SetTrailer() 方法 func (s *server) SomeStreamingRPC(stream pb.Service_SomeStreamingRPCServer) error { // create and send header header := metadata.Pairs(\"header-key\", \"val\") stream.SendHeader(header) // create and set trailer trailer := metadata.Pairs(\"trailer-key\", \"val\") stream.SetTrailer(trailer) } 如果不想立即发送header，也可以使用ServerStream.SetHeader()。ServerStream.SetHeader()可以被多次调用，在如下时机会把多个metadata合并发送出去。 func (s *server) SomeStreamingRPC(stream pb.Service_SomeStreamingRPCServer) error { // create and send header header := metadata.Pairs(\"header-key\", \"val\") stream.SetHeader(header) // create and set trailer trailer := metadata.Pairs(\"trailer-key\", \"val\") stream.SetTrailer(trailer) } 客户端接收 metadata 普通RPC 普通RPC（unary RPC）使用grpc.Header()和grpc.Trailer()方法来接收 Metadata // RPC using the context with new metadata. var header, trailer metadata.MD // Add Order order := pb.Order{Id: \"101\", Items: []string{\"iPhone XS\", \"Mac Book Pro\"}, Destination: \"San Jose, CA\", Price: 2300.00} res, err := client.AddOrder(ctx, \u0026order, grpc.Header(\u0026header), grpc.Trailer(\u0026trailer)) if err != nil { panic(err) } 流式RPC 流式RPC（streaming RPC）通过调用返回的 ClientStream接口的Header()和 Trailer()方法接收 metadata stream, err := client.SomeStreamingRPC(ctx) // retrieve header header, err := stream.Header() stream.CloseAndRecv() // retrieve trailer trailer := stream.Trailer() google.golang.org/grpc/metadata func AppendToOutgoingContext AppendToOutgoingContext返回一个新的上下文，其中提供的kv与上下文中的任何现有元数据合并。 用于向现有的上下文中追加新的元数据。这通常用于在客户端发送请求时添加额外的元数据。 // AppendToOutgoingContext returns a new context with the provided kv merged // with any existing metadata in the context. Please refer to the documentation // of Pairs for a description of kv. func AppendToOutgoingContext(ctx context.Context, kv ...string) context.Context { if len(kv)%2 == 1 { panic(fmt.Sprintf(\"metadata: AppendToOutgoingContext got an odd number of input pairs for metadata: %d\", len(kv))) } md, _ := ctx.Value(mdOutgoingKey{}).(rawMD) added := make([][]string, len(md.added)+1) copy(added, md.added) kvCopy := make([]string, 0, len(kv)) for i := 0; i \u003c len(kv); i += 2 { kvCopy = append(kvCopy, strings.ToLower(kv[i]), kv[i+1]) } added[len(added)-1] = kvCopy return context.WithValue(ctx, mdOutgoingKey{}, rawMD{md: md.md, added: added}) } 以下是 metadata.AppendToOutgoingContext 的使用方式： package main import ( \"context\" \"log\" \"google.golang.org/grpc\" \"google.golang.org/grpc/metadata\" ) func main() { // 创建一个空元数据对象 md := metadata.New(nil) // 添加自定义键值对 md.Append(\"custom-header\", \"custom-value\") // 创建一个上下文 ctx := context.Background() // 将元数据追加到上下文中 ctx = metadata.AppendToOutgoingContext(ctx, md) // 创建客户端连接 conn, err := grpc.Dial(\"localhost:50051\", grpc.WithInsecure(), grpc.WithContextDialer(dialer)) if err != nil { log.Fatalf(\"failed to dial: %v\", err) } defer conn.Close() // 创建客户端实例 c := NewYourServiceClient(conn) // 使用追加了元数据的上下文发送请求 resp, err := c.YourRPCMethod(ctx, \u0026YourRequest{}) if err != nil { log.Fatalf(\"could not call: %v\", err) } // 使用响应 // ... } 在这个例子中，我们首先创建了一个空的元数据对象 md，然后使用 metadata.Append 函数添加了一些自定义的键值对。接着，我们使用 metadata.AppendToOutgoingContext 函数将这个元数据追加到上下文中。最后，我们使用这个带有追加元数据的上下文来创建 gRPC 客户端并发送请求。 请注意，metadata.AppendToOutgoingContext 函数不会覆盖上下文中已存在的元数据，而是会追加新的元数据。如果你需要覆盖已存在的元数据，可以使用 metadata.NewOutgoingContext 函数。 // 如果对应的 context 没有 metadata，那么就会创建一个 ctx := metadata.AppendToOutgoingContext(ctx, \"k1\", \"v1\", \"k1\", \"v2\", \"k2\", \"v3\") // 如果已有 metadata 了，那么就将数据添加到原来的 metadata (例如在拦截器中) ctx := metadata.AppendToOutgoingContext(ctx, \"k3\", \"v4\") // 普通RPC（unary RPC） response, err := client.SomeRPC(ctx, someRequest) // 流式RPC（streaming RPC） stream, err := client.SomeStreamingRPC(ctx) func NewOutgoingContext NewOutgoingContext创建一个带有外发md的新上下文。 如果与AppendToOutgoingContext一起使用，NewOutgoingContext将覆盖任何先前附加的元数据。 在调用此函数后不能修改Md。 NewOutgoingContext 会覆盖之前数据，但是后面可以使用 AppendToOutgoingContext 追加数据。 // NewOutgoingContext creates a new context with outgoing md attached. If used // in conjunction with AppendToOutgoingContext, NewOutgoingContext will // overwrite any previously-appended metadata. md must not be modified after // calling this function. func NewOutgoingContext(ctx context.Context, md MD) context.Context { return context.WithValue(ctx, mdOutgoingKey{}, rawMD{md: md}) } 客户端使用示例： // 将新创建的metadata添加到context中，这样会 覆盖 掉原来已有的metadata // 将metadata添加到context中，获取新的context md := metadata.Pairs(\"k1\", \"v1\", \"k1\", \"v2\", \"k2\", \"v3\") ctx := metadata.NewOutgoingContext(context.Background(), md) // unary RPC response, err := client.SomeRPC(ctx, someRequest) // streaming RPC stream, err := client.SomeStreamingRPC(ctx) func NewIncomingContext NewIncomingContext创建一个带有传入md的新上下文。在调用此函数后不能修改Md。 该函数用于服务端，追加md到之前的ctx中。 // NewIncomingContext creates a new context with incoming md attached. md must // not be modified after calling this function. func NewIncomingContext(ctx context.Context, md MD) context.Context { return context.WithValue(ctx, mdIncomingKey{}, md) } func ValueFromIncomingContext ValueFromIncomingContext返回与传入元数据键对应的元数据值(如果存在)。键匹配不区分大小写。 该函数用于服务端，从传入的ctx中取出指定的key。 // ValueFromIncomingContext returns the metadata value corresponding to the metadata // key from the incoming metadata if it exists. Keys are matched in a case insensitive // manner. func ValueFromIncomingContext(ctx context.Context, key string) []string { md, ok := ctx.Value(mdIncomingKey{}).(MD) if !ok { return nil } if v, ok := md[key]; ok { return copyOf(v) } for k, v := range md { // Case insensitive comparison: MD is a map, and there's no guarantee // that the MD attached to the context is created using our helper // functions. if strings.EqualFold(k, key) { return copyOf(v) } } return nil } type MD MD是从元数据键到值的映射。用户应该使用以下两个方便的函数New和Pairs来生成MD。 type MD map[string][]string func FromIncomingContext 如果ctx存在，FromIncomingContext返回传入的元数据。 返回的MD中的所有键都是小写的。 该函数用于服务端从ctx中接收客户端传来的 Header。 // FromIncomingContext returns the incoming metadata in ctx if it exists. // // All keys in the returned MD are lowercase. func FromIncomingContext(ctx context.Context) (MD, bool) { md, ok := ctx.Value(mdIncomingKey{}).(MD) if !ok { return nil, false } out := make(MD, len(md)) for k, v := range md { // We need to manually convert all keys to lower case, because MD is a // map, and there's no guarantee that the MD attached to the context is // created using our helper functions. key := strings.ToLower(k) out[key] = copyOf(v) } return out, true } 服务端使用： // 从传入上下文获取元数据 md, ok := metadata.FromIncomingContext(ctx) if !ok { return nil, fmt.Errorf(\"上下文中没有元数据\") } func FromOutgoingContext FromOutgoingContext返回ctx形式的传出元数据(如果存在)。 返回的MD中的所有键都是小写的。 用于客户端，比如客户端拦截器中，获取发送给服务器的 metadata。 // FromOutgoingContext returns the outgoing metadata in ctx if it exists. // // All keys in the returned MD are lowercase. func FromOutgoingContext(ctx context.Context) (MD, bool) { raw, ok := ctx.Value(mdOutgoingKey{}).(rawMD) if !ok { return nil, false } mdSize := len(raw.md) for i := range raw.added { mdSize += len(raw.added[i]) / 2 } out := make(MD, mdSize) for k, v := range raw.md { // We need to manually convert all keys to lower case, because MD is a // map, and there's no guarantee that the MD attached to the context is // created using our helper functions. key := strings.ToLower(k) out[key] = copyOf(v) } for _, added := range raw.added { if len(added)%2 == 1 { panic(fmt.Sprintf(\"metadata: FromOutgoingContext got an odd number of input pairs for metadata: %d\", len(added))) } for i := 0; i \u003c len(added); i += 2 { key := strings.ToLower(added[i]) out[key] = append(out[key], added[i+1]) } } return out, ok } 客户端拦截器中： func orderUnaryClientInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error { var s string // 获取要发送给服务端的`metadata` md, ok := metadata.FromOutgoingContext(ctx) if ok \u0026\u0026 len(md.Get(\"time\")) \u003e 0 { s = md.Get(\"time\")[0] } else { // 如果没有则补充这个时间戳字段 s = \"inter\" + strconv.FormatInt(time.Now().UnixNano(), 10) ctx = metadata.AppendToOutgoingContext(ctx, \"time\", s) } log.Printf(\"call timestamp: %s\", s) // Invoking the remote method err := invoker(ctx, method, req, reply, cc, opts...) return err } func New New从给定的键值映射创建一个MD。 key中只允许使用以下ASCII字符： 数字：0-9 大写字母：A-Z 小写字母：a-z 特殊字符：- _ . 大写字母会自动转换为小写字母。 以“grpc-”开头的键仅供grpc内部使用，如果在元数据中设置可能会导致错误。 // New creates an MD from a given key-value map. // // Only the following ASCII characters are allowed in keys: // - digits: 0-9 // - uppercase letters: A-Z (normalized to lower) // - lowercase letters: a-z // - special characters: -_. // // Uppercase letters are automatically converted to lowercase. // // Keys beginning with \"grpc-\" are reserved for grpc-internal use only and may // result in errors if set in metadata. func New(m map[string]string) MD { md := make(MD, len(m)) // map[string][]string for k, val := range m { // string,string key := strings.ToLower(k) md[key] = append(md[key], val) } return md } 使用示例： md := metadata.New(map[string]string{\"key1\":\"value1\",\"key2\":\"value2\"}) func Pairs pair返回一个由key, value…如果len(kv)是奇数，Pairs 就会 panic。 key中只允许使用以下ASCII字符: 数字：0-9 大写字母：A-Z 小写字母：a-z 特殊字符：- _ . 大写字母会自动转换为小写字母。 以“grpc-”开头的键仅供grpc内部使用，如果在元数据中设置可能会导致错误。 如果有相同的 key 会自动合并。 // Pairs returns an MD formed by the mapping of key, value ... // Pairs panics if len(kv) is odd. // // Only the following ASCII characters are allowed in keys: // - digits: 0-9 // - uppercase letters: A-Z (normalized to lower) // - lowercase letters: a-z // - special characters: -_. // // Uppercase letters are automatically converted to lowercase. // // Keys beginning with \"grpc-\" are reserved for grpc-internal use only and may // result in errors if set in metadata. func Pairs(kv ...string) MD { if len(kv)%2 == 1 { panic(fmt.Sprintf(\"metadata: Pairs got the odd number of input pairs for metadata: %d\", len(kv))) } md := make(MD, len(kv)/2) // map[string][]string for i := 0; i \u003c len(kv); i += 2 { key := strings.ToLower(kv[i]) md[key] = append(md[key], kv[i+1]) } return md } 使用示例： md := metadata.Pairs( \"key1\", \"value1\", \"key1\", \"value1.2\", // \"key1\" will have map value []string{\"value1\", \"value1.2\"} \"key2\", \"value2\", ) func Join Join将任意数量的mds连接到单个MD中。 每个键的值顺序由包含这些值的mds呈现给Join的顺序决定。 // Join joins any number of mds into a single MD. // // The order of values for each key is determined by the order in which the mds // containing those values are presented to Join. func Join(mds ...MD) MD { out := MD{} // []map[string][]string for _, md := range mds { // int,map[string][]string for k, v := range md { // string,[]string out[k] = append(out[k], v...) } } return out } 使用示例： md1 := metadata.Pairs(\"k1\", \"v1\", \"k2\", \"v2\") md2 := metadata.New(map[string]string{\"key1\":\"value1\",\"key2\":\"value2\"}) md := metadata.Join(md1, md2) func (MD) Append Append将值添加到键k中，而不是覆盖已经存储在该键中的内容。 K在存储到md之前被转换为小写。 // Append adds the values to key k, not overwriting what was already stored at // that key. // // k is converted to lowercase before storing in md. func (md MD) Append(k string, vals ...string) { if len(vals) == 0 { return } k = strings.ToLower(k) md[k] = append(md[k], vals...) } 使用示例： md := metadata.New(map[string]string{\"key1\":\"value1\",\"key2\":\"value2\"}) md.Append(\"key1\", \"v1\", \"v2\") func (MD) Copy Copy返回md的副本。 // Copy returns a copy of md. func (md MD) Copy() MD { out := make(MD, len(md)) for k, v := range md { out[k] = copyOf(v) } return out } func (MD) Delete Delete删除给定键k的值，该键k在从md中删除之前被转换为小写。 // Delete removes the values for a given key k which is converted to lowercase // before removing it from md. func (md MD) Delete(k string) { k = strings.ToLower(k) delete(md, k) } func (MD) Get Get获取给定键的值。 在md中搜索之前，K被转换为小写。 // Get obtains the values for a given key. // // k is converted to lowercase before searching in md. func (md MD) Get(k string) []string { k = strings.ToLower(k) return md[k] } func (MD) Len Len返回md中的项数。 // Len returns the number of items in md. func (md MD) Len() int { return len(md) } func (MD) Set Set用一个值片来设置给定键的值。 K在存储到md之前被转换为小写。 // Set sets the value of a given key with a slice of values. // // k is converted to lowercase before storing in md. func (md MD) Set(k string, vals ...string) { if len(vals) == 0 { return } k = strings.ToLower(k) md[k] = vals } 参考 写给go开发者的gRPC教程-metadata ",
+  "wordCount" : "1936",
+  "inLanguage": "zh",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-09-04T00:00:00Z",
+  "dateModified": "2024-09-04T00:00:00Z",
+  "author":[{
+    "@type": "Person",
+    "name": "helium"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://heliu.site/posts/grpc/metadata/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Helium",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://heliu.site/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+                    height="35">Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://heliu.site/" title="主页">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/posts" title="文章">
+                    <span>Article</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/archives" title="时间轴">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/tags/" title="标签">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/support" title="打赏">
+                    <span>🫶Help</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+
+<article class="post" autonumbering>
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/grpc/">gRPC</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Metadata 元数据
+    </h1>
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2024-09-04</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2024-09-04</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select: text;">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="user-select: text;"></path>
+    <polyline points="14 2 14 8 20 8" style="user-select: text;"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
+    <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
+    <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
+</svg><span>1936字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="9"></circle>
+    <polyline points="12 7 12 12 15 15"></polyline>
+</svg><span>10分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+</svg><span>helium</span></span>
+      <span class="x-post-meta-item">
+        &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
+        <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
+            <a href="https://heliu.site/tags/grpc/" target="_blank" rel="noopener">Grpc</a>
+        </ul>
+      </span>
+      
+      <span id="busuanzi_container_page_pv" class="x-post-meta-item">
+        &nbsp;<svg t="1720844685710" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="27237" width="200" height="200"><path d="M739.754667 574.08c-121.386667 45.610667-208.469333 169.813333-208.64 316.16 0 33.408 4.693333 65.493333 13.141333 95.914667H94.122667c-26.453333-43.52-41.685333-91.946667-41.685334-143.189334 0-185.173333 192.896-335.104 430.805334-335.104 96.256 0 184.832 24.746667 256.512 66.218667z m-280.490667-114.986667a214.869333 214.869333 0 0 1-214.869333-215.04A215.04 215.04 0 0 1 459.264 28.842667a215.04 215.04 0 0 1 215.04 215.210666 215.04 215.04 0 0 1-215.04 215.04zM974.506667 641.28c9.856 0 17.834667 7.466667 17.834666 16.64v59.989333c-0.341333 8.789333-7.850667 15.786667-17.28 16.085334-9.856 0.341333-18.176-6.826667-18.517333-16.085334v-20.053333l-99.114667 91.093333-0.256 0.256a18.474667 18.474667 0 0 1-14.848 4.352h-0.768a18.176 18.176 0 0 1-9.344-4.608l-0.938666-0.981333-85.930667-80.042667-123.562667 115.072a18.773333 18.773333 0 0 1-25.216 0 15.786667 15.786667 0 0 1 0-23.466666l136.149334-126.848 0.725333-0.597334a18.645333 18.645333 0 0 1 24.362667 0.512l87.253333 81.237334 86.058667-79.232h-21.248c-9.386667-0.298667-16.938667-7.338667-17.28-16.085334-0.341333-9.173333 7.381333-16.896 17.28-17.237333h64.64z m-367.146667 240h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v72.192a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042667-16.042666v-72.192c0-8.874667 7.210667-16.042667 16.042667-16.042667z m110.805333-106.666667h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v178.858667a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042666v-178.858667c0-8.874667 7.168-16.042667 16.042666-16.042667z m106.538667 80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v99.413333a16.042667 16.042667 0 0 1-16.042667 16.042667H824.746667a16.042667 16.042667 0 0 1-16.042667-16.042667v-99.413333c0-8.874667 7.168-16.042667 16.042667-16.042667z m110.165333-80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v179.413333a16.042667 16.042667 0 0 1-16.042667 16.042667h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042667v-179.413333c0-8.874667 7.210667-16.042667 16.042666-16.042667z" fill="#999999" p-id="27238"></path></svg>
+        <span id="busuanzi_value_page_pv"></span>
+      </span>
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#metadata-%e5%88%9b%e5%bb%ba" aria-label="metadata 创建">metadata 创建</a></li>
+                    <li>
+                        <a href="#%e5%ae%a2%e6%88%b7%e7%ab%af%e5%8f%91%e9%80%81-metadata" aria-label="客户端发送 metadata">客户端发送 metadata</a><ul>
+                            
+                    <li>
+                        <a href="#newoutgoingcontext" aria-label="NewOutgoingContext">NewOutgoingContext</a></li>
+                    <li>
+                        <a href="#appendtooutgoingcontext" aria-label="AppendToOutgoingContext">AppendToOutgoingContext</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e6%9c%8d%e5%8a%a1%e7%ab%af%e6%8e%a5%e6%94%b6-meatdata" aria-label="服务端接收 meatdata">服务端接收 meatdata</a><ul>
+                            
+                    <li>
+                        <a href="#fromincomingcontext" aria-label="FromIncomingContext">FromIncomingContext</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e6%9c%8d%e5%8a%a1%e7%ab%af%e5%8f%91%e9%80%81-metadata" aria-label="服务端发送 metadata">服务端发送 metadata</a><ul>
+                            
+                    <li>
+                        <a href="#%e6%99%ae%e9%80%9arpc" aria-label="普通RPC">普通RPC</a></li>
+                    <li>
+                        <a href="#%e6%b5%81%e5%bc%8frpc" aria-label="流式RPC">流式RPC</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e5%ae%a2%e6%88%b7%e7%ab%af%e6%8e%a5%e6%94%b6-metadata" aria-label="客户端接收 metadata">客户端接收 metadata</a><ul>
+                            
+                    <li>
+                        <a href="#%e6%99%ae%e9%80%9arpc-1" aria-label="普通RPC">普通RPC</a></li>
+                    <li>
+                        <a href="#%e6%b5%81%e5%bc%8frpc-1" aria-label="流式RPC">流式RPC</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#googlegolangorggrpcmetadata" aria-label="google.golang.org/grpc/metadata">google.golang.org/grpc/metadata</a><ul>
+                            
+                    <li>
+                        <a href="#func-appendtooutgoingcontext" aria-label="func AppendToOutgoingContext">func AppendToOutgoingContext</a></li>
+                    <li>
+                        <a href="#func-newoutgoingcontext" aria-label="func NewOutgoingContext">func NewOutgoingContext</a></li>
+                    <li>
+                        <a href="#func-newincomingcontext" aria-label="func NewIncomingContext">func NewIncomingContext</a></li>
+                    <li>
+                        <a href="#func-valuefromincomingcontext" aria-label="func ValueFromIncomingContext">func ValueFromIncomingContext</a></li>
+                    <li>
+                        <a href="#type-md" aria-label="type MD">type MD</a><ul>
+                            
+                    <li>
+                        <a href="#func-fromincomingcontext" aria-label="func FromIncomingContext">func FromIncomingContext</a></li>
+                    <li>
+                        <a href="#func-fromoutgoingcontext" aria-label="func FromOutgoingContext">func FromOutgoingContext</a></li>
+                    <li>
+                        <a href="#func-new" aria-label="func New">func New</a></li>
+                    <li>
+                        <a href="#func-pairs" aria-label="func Pairs">func Pairs</a></li>
+                    <li>
+                        <a href="#func-join" aria-label="func Join">func Join</a></li>
+                    <li>
+                        <a href="#func-md-append" aria-label="func (MD) Append">func (MD) Append</a></li>
+                    <li>
+                        <a href="#func-md-copy" aria-label="func (MD) Copy">func (MD) Copy</a></li>
+                    <li>
+                        <a href="#func-md-delete" aria-label="func (MD) Delete">func (MD) Delete</a></li>
+                    <li>
+                        <a href="#func-md-get" aria-label="func (MD) Get">func (MD) Get</a></li>
+                    <li>
+                        <a href="#func-md-len" aria-label="func (MD) Len">func (MD) Len</a></li>
+                    <li>
+                        <a href="#func-md-set" aria-label="func (MD) Set">func (MD) Set</a></li></ul>
+                    </li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e5%8f%82%e8%80%83" aria-label="参考">参考</a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+  <div class="post-content"><ul>
+<li>gRPC 允许发送自定义元数据。元数据是键值对的一个非常简单的概念。</li>
+<li>在 Go gRPC 中，元数据是一个 map[string][]string。</li>
+<li>元数据可以作为 header 或 trailer 发送：
+<ul>
+<li>header 应该在数据之前发送。</li>
+<li>trailer 应在处理完毕后发送。</li>
+</ul>
+</li>
+<li>元数据允许我们在不更改 protobuf 消息的情况下向请求中添加数据。通常用于添加与请求相关但不属于请求的数据。</li>
+<li>例如，我们可以在请求的元数据中添加 JWT 令牌作为身份验证。这对于身份验证、速率限制或日志记录很有用。</li>
+<li>官方Go metadata文档：<a href="https://pkg.go.dev/google.golang.org/grpc/metadata" target="_blank" rel="noopener">https://pkg.go.dev/google.golang.org/grpc/metadata</a></li>
+</ul>
+<h2 id="metadata-创建">metadata 创建<a hidden class="anchor" aria-hidden="true" href="#metadata-创建">#</a></h2>
+<ol>
+<li>使用 New()：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">md</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;key1&#34;</span><span class="p">:</span><span class="s">&#34;value1&#34;</span><span class="p">,</span><span class="s">&#34;key2&#34;</span><span class="p">:</span><span class="s">&#34;value2&#34;</span><span class="p">})</span>
+</span></span></code></pre></div><ol start="2">
+<li>使用 Pairs()：注意如果有相同的 key 会自动合并</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">md</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;key1&#34;</span><span class="p">,</span> <span class="s">&#34;value1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;key1&#34;</span><span class="p">,</span> <span class="s">&#34;value1.2&#34;</span><span class="p">,</span> <span class="c1">// &#34;key1&#34; will have map value []string{&#34;value1&#34;, &#34;value1.2&#34;}
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="s">&#34;key2&#34;</span><span class="p">,</span> <span class="s">&#34;value2&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div><ol start="3">
+<li>使用 Join()：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">md1</span> <span class="o">:=</span>  <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span><span class="s">&#34;k1&#34;</span><span class="p">,</span> <span class="s">&#34;v1&#34;</span><span class="p">,</span> <span class="s">&#34;k2&#34;</span><span class="p">,</span> <span class="s">&#34;v2&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nx">md2</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;key1&#34;</span><span class="p">:</span><span class="s">&#34;value1&#34;</span><span class="p">,</span><span class="s">&#34;key2&#34;</span><span class="p">:</span><span class="s">&#34;value2&#34;</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">md</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Join</span><span class="p">(</span><span class="nx">md1</span><span class="p">,</span> <span class="nx">md2</span><span class="p">)</span>
+</span></span></code></pre></div><ol start="4">
+<li>存储二进制数据。
+<ul>
+<li>在 metadata 中，key 永远是 string 类型，但是 value 可以是 string 也可以是二进制数据。为了在 metadata 中存储二进制数据，我们仅仅需要在 key 的后面加上一个 - bin 后缀。具有 - bin 后缀的 key 所对应的 value 在创建 metadata 时会被编码（base64），收到的时候会被解码：</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">md</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;key&#34;</span><span class="p">,</span> <span class="s">&#34;string value&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;key-bin&#34;</span><span class="p">,</span> <span class="nb">string</span><span class="p">([]</span><span class="kt">byte</span><span class="p">{</span><span class="mi">96</span><span class="p">,</span> <span class="mi">102</span><span class="p">}),</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div><h2 id="客户端发送-metadata">客户端发送 metadata<a hidden class="anchor" aria-hidden="true" href="#客户端发送-metadata">#</a></h2>
+<ol>
+<li>client发送metadata，那就是把metadata存储到contex.Context。</li>
+<li>把Metadata放到contex.Context，有几种方式。</li>
+</ol>
+<h3 id="newoutgoingcontext">NewOutgoingContext<a hidden class="anchor" aria-hidden="true" href="#newoutgoingcontext">#</a></h3>
+<ol>
+<li>将新创建的metadata添加到context中，这样会 覆盖 掉原来已有的metadata</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 将metadata添加到context中，获取新的context
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">md</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span><span class="s">&#34;k1&#34;</span><span class="p">,</span> <span class="s">&#34;v1&#34;</span><span class="p">,</span> <span class="s">&#34;k1&#34;</span><span class="p">,</span> <span class="s">&#34;v2&#34;</span><span class="p">,</span> <span class="s">&#34;k2&#34;</span><span class="p">,</span> <span class="s">&#34;v3&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nx">ctx</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">NewOutgoingContext</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">(),</span> <span class="nx">md</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// unary RPC
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">response</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">SomeRPC</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">someRequest</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// streaming RPC
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">stream</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">SomeStreamingRPC</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span></code></pre></div><h3 id="appendtooutgoingcontext">AppendToOutgoingContext<a hidden class="anchor" aria-hidden="true" href="#appendtooutgoingcontext">#</a></h3>
+<ol>
+<li>可以直接将 key-value 对添加到已有的context中
+<ul>
+<li>如果context中没有metadata，那么就会 创建 一个</li>
+<li>如果已有metadata，那么就将数据 添加 到原来的metadata</li>
+</ul>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 如果对应的 context 没有 metadata，那么就会创建一个
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">ctx</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">AppendToOutgoingContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="s">&#34;k1&#34;</span><span class="p">,</span> <span class="s">&#34;v1&#34;</span><span class="p">,</span> <span class="s">&#34;k1&#34;</span><span class="p">,</span> <span class="s">&#34;v2&#34;</span><span class="p">,</span> <span class="s">&#34;k2&#34;</span><span class="p">,</span> <span class="s">&#34;v3&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 如果已有 metadata 了，那么就将数据添加到原来的 metadata  (例如在拦截器中)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">ctx</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">AppendToOutgoingContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="s">&#34;k3&#34;</span><span class="p">,</span> <span class="s">&#34;v4&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 普通RPC（unary RPC）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">response</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">SomeRPC</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">someRequest</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 流式RPC（streaming RPC）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">stream</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">SomeStreamingRPC</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span></code></pre></div><h2 id="服务端接收-meatdata">服务端接收 meatdata<a hidden class="anchor" aria-hidden="true" href="#服务端接收-meatdata">#</a></h2>
+<ol>
+<li>server接收metadata，就是从contex.Context中读取Metadata。</li>
+<li>普通RPC与流式RPC的区别不大，都是从contex.Context中读取metadata。</li>
+</ol>
+<h3 id="fromincomingcontext">FromIncomingContext<a hidden class="anchor" aria-hidden="true" href="#fromincomingcontext">#</a></h3>
+<ol>
+<li>普通RPC（unary RPC）</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">//Unary Call
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">SomeRPC</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">in</span> <span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">someRequest</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">someResponse</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">md</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">FromIncomingContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// do something with metadata
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><ol start="2">
+<li>流式RPC（streaming RPC）</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">//Streaming Call
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">SomeStreamingRPC</span><span class="p">(</span><span class="nx">stream</span> <span class="nx">pb</span><span class="p">.</span><span class="nx">Service_SomeStreamingRPCServer</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">md</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">FromIncomingContext</span><span class="p">(</span><span class="nx">stream</span><span class="p">.</span><span class="nf">Context</span><span class="p">())</span> <span class="c1">// get context from stream
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// do something with metadata
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><h2 id="服务端发送-metadata">服务端发送 metadata<a hidden class="anchor" aria-hidden="true" href="#服务端发送-metadata">#</a></h2>
+<ol>
+<li>服务端发送的metadata被分成了header和 trailer两者，因而客户端也可以读取两者。</li>
+<li>对于普通RPC（unary RPC）server可以使用grpc包中提供的函数向client发送 header 和trailer。
+<ul>
+<li>grpc.SendHeader()</li>
+<li>grpc.SetHeader()</li>
+<li>grpc.SetTrailer()</li>
+</ul>
+</li>
+<li>对于流式RPC（streaming RPC）server可以使用ServerStream[1]接口中定义的函数向client发送header和 trailer。
+<ul>
+<li>ServerStream.SendHeader()</li>
+<li>ServerStream.SetHeader()</li>
+<li>ServerStream.SetTrailer()</li>
+</ul>
+</li>
+</ol>
+<h3 id="普通rpc">普通RPC<a hidden class="anchor" aria-hidden="true" href="#普通rpc">#</a></h3>
+<ol>
+<li>使用 grpc.SendHeader()  和 grpc.SetTrailer() 方法 ，这两个函数将context.Context作为第一个参数</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">SomeRPC</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">in</span> <span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">someRequest</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">someResponse</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 创建并发送header
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">header</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span><span class="s">&#34;header-key&#34;</span><span class="p">,</span> <span class="s">&#34;val&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">grpc</span><span class="p">.</span><span class="nf">SendHeader</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">header</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  <span class="c1">// 创建并发送trailer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">trailer</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span><span class="s">&#34;trailer-key&#34;</span><span class="p">,</span> <span class="s">&#34;val&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">grpc</span><span class="p">.</span><span class="nf">SetTrailer</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">trailer</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="2">
+<li>如果不想立即发送header，也可以使用grpc.SetHeader()。grpc.SetHeader()可以被多次调用，在如下时机会把多个metadata合并发送出去。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">SomeRPC</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">in</span> <span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">someRequest</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">pb</span><span class="p">.</span><span class="nx">someResponse</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// 创建header，在适当时机会被发送
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">header</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span><span class="s">&#34;header-key1&#34;</span><span class="p">,</span> <span class="s">&#34;val1&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">grpc</span><span class="p">.</span><span class="nf">SetHeader</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">header</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">  <span class="c1">// 创建header，在适当时机会被发送
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">header</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span><span class="s">&#34;header-key2&#34;</span><span class="p">,</span> <span class="s">&#34;val2&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">grpc</span><span class="p">.</span><span class="nf">SetHeader</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">header</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  <span class="c1">// 创建并发送trailer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">trailer</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span><span class="s">&#34;trailer-key&#34;</span><span class="p">,</span> <span class="s">&#34;val&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">grpc</span><span class="p">.</span><span class="nf">SetTrailer</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">trailer</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="流式rpc">流式RPC<a hidden class="anchor" aria-hidden="true" href="#流式rpc">#</a></h3>
+<ol>
+<li>使用 ServerStream.SendHeader() 和 ServerStream.SetTrailer() 方法</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">SomeStreamingRPC</span><span class="p">(</span><span class="nx">stream</span> <span class="nx">pb</span><span class="p">.</span><span class="nx">Service_SomeStreamingRPCServer</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// create and send header
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">header</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span><span class="s">&#34;header-key&#34;</span><span class="p">,</span> <span class="s">&#34;val&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">stream</span><span class="p">.</span><span class="nf">SendHeader</span><span class="p">(</span><span class="nx">header</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  <span class="c1">// create and set trailer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">trailer</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span><span class="s">&#34;trailer-key&#34;</span><span class="p">,</span> <span class="s">&#34;val&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">stream</span><span class="p">.</span><span class="nf">SetTrailer</span><span class="p">(</span><span class="nx">trailer</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="2">
+<li>如果不想立即发送header，也可以使用ServerStream.SetHeader()。ServerStream.SetHeader()可以被多次调用，在如下时机会把多个metadata合并发送出去。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">server</span><span class="p">)</span> <span class="nf">SomeStreamingRPC</span><span class="p">(</span><span class="nx">stream</span> <span class="nx">pb</span><span class="p">.</span><span class="nx">Service_SomeStreamingRPCServer</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// create and send header
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">header</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span><span class="s">&#34;header-key&#34;</span><span class="p">,</span> <span class="s">&#34;val&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">stream</span><span class="p">.</span><span class="nf">SetHeader</span><span class="p">(</span><span class="nx">header</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  <span class="c1">// create and set trailer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">trailer</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span><span class="s">&#34;trailer-key&#34;</span><span class="p">,</span> <span class="s">&#34;val&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">stream</span><span class="p">.</span><span class="nf">SetTrailer</span><span class="p">(</span><span class="nx">trailer</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="客户端接收-metadata">客户端接收 metadata<a hidden class="anchor" aria-hidden="true" href="#客户端接收-metadata">#</a></h2>
+<h3 id="普通rpc-1">普通RPC<a hidden class="anchor" aria-hidden="true" href="#普通rpc-1">#</a></h3>
+<ol>
+<li>普通RPC（unary RPC）使用grpc.Header()和grpc.Trailer()方法来接收 Metadata</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// RPC using the context with new metadata.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">var</span> <span class="nx">header</span><span class="p">,</span> <span class="nx">trailer</span> <span class="nx">metadata</span><span class="p">.</span><span class="nx">MD</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Add Order
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">order</span> <span class="o">:=</span> <span class="nx">pb</span><span class="p">.</span><span class="nx">Order</span><span class="p">{</span><span class="nx">Id</span><span class="p">:</span> <span class="s">&#34;101&#34;</span><span class="p">,</span> <span class="nx">Items</span><span class="p">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;iPhone XS&#34;</span><span class="p">,</span> <span class="s">&#34;Mac Book Pro&#34;</span><span class="p">},</span> <span class="nx">Destination</span><span class="p">:</span> <span class="s">&#34;San Jose, CA&#34;</span><span class="p">,</span> <span class="nx">Price</span><span class="p">:</span> <span class="mf">2300.00</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nx">res</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">AddOrder</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">order</span><span class="p">,</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">Header</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">header</span><span class="p">),</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">Trailer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">trailer</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="流式rpc-1">流式RPC<a hidden class="anchor" aria-hidden="true" href="#流式rpc-1">#</a></h3>
+<ol>
+<li>流式RPC（streaming RPC）通过调用返回的 ClientStream接口的Header()和 Trailer()方法接收 metadata</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">stream</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">SomeStreamingRPC</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// retrieve header
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">header</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Header</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">stream</span><span class="p">.</span><span class="nf">CloseAndRecv</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// retrieve trailer
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">trailer</span> <span class="o">:=</span> <span class="nx">stream</span><span class="p">.</span><span class="nf">Trailer</span><span class="p">()</span>
+</span></span></code></pre></div><p><img loading="lazy" src="../images/grpc-002.png" alt=""  />
+</p>
+<h2 id="googlegolangorggrpcmetadata">google.golang.org/grpc/metadata<a hidden class="anchor" aria-hidden="true" href="#googlegolangorggrpcmetadata">#</a></h2>
+<h3 id="func-appendtooutgoingcontext">func AppendToOutgoingContext<a hidden class="anchor" aria-hidden="true" href="#func-appendtooutgoingcontext">#</a></h3>
+<ol>
+<li>AppendToOutgoingContext返回一个新的上下文，其中提供的kv与上下文中的任何现有元数据合并。</li>
+<li>用于向现有的上下文中追加新的元数据。这通常用于在客户端发送请求时添加额外的元数据。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// AppendToOutgoingContext returns a new context with the provided kv merged
+</span></span></span><span class="line"><span class="cl"><span class="c1">// with any existing metadata in the context. Please refer to the documentation
+</span></span></span><span class="line"><span class="cl"><span class="c1">// of Pairs for a description of kv.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">AppendToOutgoingContext</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">kv</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">kv</span><span class="p">)</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">panic</span><span class="p">(</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;metadata: AppendToOutgoingContext got an odd number of input pairs for metadata: %d&#34;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">kv</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">md</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nf">Value</span><span class="p">(</span><span class="nx">mdOutgoingKey</span><span class="p">{}).(</span><span class="nx">rawMD</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">added</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([][]</span><span class="kt">string</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">md</span><span class="p">.</span><span class="nx">added</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">copy</span><span class="p">(</span><span class="nx">added</span><span class="p">,</span> <span class="nx">md</span><span class="p">.</span><span class="nx">added</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">kvCopy</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">string</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">kv</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">kv</span><span class="p">);</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">2</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">kvCopy</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">kvCopy</span><span class="p">,</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">ToLower</span><span class="p">(</span><span class="nx">kv</span><span class="p">[</span><span class="nx">i</span><span class="p">]),</span> <span class="nx">kv</span><span class="p">[</span><span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">added</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nx">added</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">=</span> <span class="nx">kvCopy</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">context</span><span class="p">.</span><span class="nf">WithValue</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">mdOutgoingKey</span><span class="p">{},</span> <span class="nx">rawMD</span><span class="p">{</span><span class="nx">md</span><span class="p">:</span> <span class="nx">md</span><span class="p">.</span><span class="nx">md</span><span class="p">,</span> <span class="nx">added</span><span class="p">:</span> <span class="nx">added</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="3">
+<li>以下是 metadata.AppendToOutgoingContext 的使用方式：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">main</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;context&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;log&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;google.golang.org/grpc&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;google.golang.org/grpc/metadata&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 创建一个空元数据对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">md</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="kc">nil</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 添加自定义键值对
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">md</span><span class="p">.</span><span class="nf">Append</span><span class="p">(</span><span class="s">&#34;custom-header&#34;</span><span class="p">,</span> <span class="s">&#34;custom-value&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 创建一个上下文
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">ctx</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 将元数据追加到上下文中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">ctx</span> <span class="p">=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">AppendToOutgoingContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">md</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 创建客户端连接
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">conn</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">Dial</span><span class="p">(</span><span class="s">&#34;localhost:50051&#34;</span><span class="p">,</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">WithInsecure</span><span class="p">(),</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">WithContextDialer</span><span class="p">(</span><span class="nx">dialer</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;failed to dial: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">defer</span> <span class="nx">conn</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 创建客户端实例
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">c</span> <span class="o">:=</span> <span class="nf">NewYourServiceClient</span><span class="p">(</span><span class="nx">conn</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 使用追加了元数据的上下文发送请求
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">resp</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">YourRPCMethod</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">YourRequest</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">log</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;could not call: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 使用响应
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><ol start="4">
+<li>在这个例子中，我们首先创建了一个空的元数据对象 md，然后使用 metadata.Append 函数添加了一些自定义的键值对。接着，我们使用 metadata.AppendToOutgoingContext 函数将这个元数据追加到上下文中。最后，我们使用这个带有追加元数据的上下文来创建 gRPC 客户端并发送请求。</li>
+<li>请注意，metadata.AppendToOutgoingContext 函数不会覆盖上下文中已存在的元数据，而是会追加新的元数据。如果你需要覆盖已存在的元数据，可以使用 metadata.NewOutgoingContext 函数。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 如果对应的 context 没有 metadata，那么就会创建一个
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">ctx</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">AppendToOutgoingContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="s">&#34;k1&#34;</span><span class="p">,</span> <span class="s">&#34;v1&#34;</span><span class="p">,</span> <span class="s">&#34;k1&#34;</span><span class="p">,</span> <span class="s">&#34;v2&#34;</span><span class="p">,</span> <span class="s">&#34;k2&#34;</span><span class="p">,</span> <span class="s">&#34;v3&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 如果已有 metadata 了，那么就将数据添加到原来的 metadata  (例如在拦截器中)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">ctx</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">AppendToOutgoingContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="s">&#34;k3&#34;</span><span class="p">,</span> <span class="s">&#34;v4&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 普通RPC（unary RPC）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">response</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">SomeRPC</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">someRequest</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 流式RPC（streaming RPC）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">stream</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">SomeStreamingRPC</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span></code></pre></div><h3 id="func-newoutgoingcontext">func NewOutgoingContext<a hidden class="anchor" aria-hidden="true" href="#func-newoutgoingcontext">#</a></h3>
+<ol>
+<li>NewOutgoingContext创建一个带有外发md的新上下文。</li>
+<li>如果与AppendToOutgoingContext一起使用，NewOutgoingContext将覆盖任何先前附加的元数据。</li>
+<li>在调用此函数后不能修改Md。</li>
+<li>NewOutgoingContext 会覆盖之前数据，但是后面可以使用 AppendToOutgoingContext 追加数据。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// NewOutgoingContext creates a new context with outgoing md attached. If used
+</span></span></span><span class="line"><span class="cl"><span class="c1">// in conjunction with AppendToOutgoingContext, NewOutgoingContext will
+</span></span></span><span class="line"><span class="cl"><span class="c1">// overwrite any previously-appended metadata. md must not be modified after
+</span></span></span><span class="line"><span class="cl"><span class="c1">// calling this function.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">NewOutgoingContext</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">md</span> <span class="nx">MD</span><span class="p">)</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">context</span><span class="p">.</span><span class="nf">WithValue</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">mdOutgoingKey</span><span class="p">{},</span> <span class="nx">rawMD</span><span class="p">{</span><span class="nx">md</span><span class="p">:</span> <span class="nx">md</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="5">
+<li>客户端使用示例：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 将新创建的metadata添加到context中，这样会 覆盖 掉原来已有的metadata
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 将metadata添加到context中，获取新的context
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">md</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span><span class="s">&#34;k1&#34;</span><span class="p">,</span> <span class="s">&#34;v1&#34;</span><span class="p">,</span> <span class="s">&#34;k1&#34;</span><span class="p">,</span> <span class="s">&#34;v2&#34;</span><span class="p">,</span> <span class="s">&#34;k2&#34;</span><span class="p">,</span> <span class="s">&#34;v3&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nx">ctx</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">NewOutgoingContext</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">(),</span> <span class="nx">md</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// unary RPC
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">response</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">SomeRPC</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">someRequest</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// streaming RPC
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">stream</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">SomeStreamingRPC</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span></code></pre></div><h3 id="func-newincomingcontext">func NewIncomingContext<a hidden class="anchor" aria-hidden="true" href="#func-newincomingcontext">#</a></h3>
+<ol>
+<li>NewIncomingContext创建一个带有传入md的新上下文。在调用此函数后不能修改Md。</li>
+<li>该函数用于服务端，追加md到之前的ctx中。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// NewIncomingContext creates a new context with incoming md attached. md must
+</span></span></span><span class="line"><span class="cl"><span class="c1">// not be modified after calling this function.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">NewIncomingContext</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">md</span> <span class="nx">MD</span><span class="p">)</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">context</span><span class="p">.</span><span class="nf">WithValue</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">mdIncomingKey</span><span class="p">{},</span> <span class="nx">md</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="func-valuefromincomingcontext">func ValueFromIncomingContext<a hidden class="anchor" aria-hidden="true" href="#func-valuefromincomingcontext">#</a></h3>
+<ol>
+<li>ValueFromIncomingContext返回与传入元数据键对应的元数据值(如果存在)。键匹配不区分大小写。</li>
+<li>该函数用于服务端，从传入的ctx中取出指定的key。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// ValueFromIncomingContext returns the metadata value corresponding to the metadata
+</span></span></span><span class="line"><span class="cl"><span class="c1">// key from the incoming metadata if it exists. Keys are matched in a case insensitive
+</span></span></span><span class="line"><span class="cl"><span class="c1">// manner.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">ValueFromIncomingContext</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">key</span> <span class="kt">string</span><span class="p">)</span> <span class="p">[]</span><span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">md</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nf">Value</span><span class="p">(</span><span class="nx">mdIncomingKey</span><span class="p">{}).(</span><span class="nx">MD</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">v</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">md</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span> <span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nf">copyOf</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">md</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// Case insensitive comparison: MD is a map, and there&#39;s no guarantee
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="c1">// that the MD attached to the context is created using our helper
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="c1">// functions.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="k">if</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">EqualFold</span><span class="p">(</span><span class="nx">k</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="nf">copyOf</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="kc">nil</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="type-md">type MD<a hidden class="anchor" aria-hidden="true" href="#type-md">#</a></h3>
+<ol>
+<li>MD是从元数据键到值的映射。用户应该使用以下两个方便的函数New和Pairs来生成MD。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">MD</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">][]</span><span class="kt">string</span>
+</span></span></code></pre></div><h4 id="func-fromincomingcontext">func FromIncomingContext<a hidden class="anchor" aria-hidden="true" href="#func-fromincomingcontext">#</a></h4>
+<ol>
+<li>如果ctx存在，FromIncomingContext返回传入的元数据。</li>
+<li>返回的MD中的所有键都是小写的。</li>
+<li>该函数用于服务端从ctx中接收客户端传来的 Header。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// FromIncomingContext returns the incoming metadata in ctx if it exists.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// All keys in the returned MD are lowercase.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">FromIncomingContext</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">(</span><span class="nx">MD</span><span class="p">,</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">md</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nf">Value</span><span class="p">(</span><span class="nx">mdIncomingKey</span><span class="p">{}).(</span><span class="nx">MD</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">out</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="nx">MD</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">md</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">md</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// We need to manually convert all keys to lower case, because MD is a
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// map, and there&#39;s no guarantee that the MD attached to the context is
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// created using our helper functions.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">key</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">ToLower</span><span class="p">(</span><span class="nx">k</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">out</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nf">copyOf</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">out</span><span class="p">,</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="4">
+<li>服务端使用：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 从传入上下文获取元数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">md</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">FromIncomingContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;上下文中没有元数据&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h4 id="func-fromoutgoingcontext">func FromOutgoingContext<a hidden class="anchor" aria-hidden="true" href="#func-fromoutgoingcontext">#</a></h4>
+<ol>
+<li>FromOutgoingContext返回ctx形式的传出元数据(如果存在)。</li>
+<li>返回的MD中的所有键都是小写的。</li>
+<li>用于客户端，比如客户端拦截器中，获取发送给服务器的 metadata。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// FromOutgoingContext returns the outgoing metadata in ctx if it exists.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// All keys in the returned MD are lowercase.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">FromOutgoingContext</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">(</span><span class="nx">MD</span><span class="p">,</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">raw</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nf">Value</span><span class="p">(</span><span class="nx">mdOutgoingKey</span><span class="p">{}).(</span><span class="nx">rawMD</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">!</span><span class="nx">ok</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">mdSize</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">raw</span><span class="p">.</span><span class="nx">md</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">raw</span><span class="p">.</span><span class="nx">added</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">mdSize</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">raw</span><span class="p">.</span><span class="nx">added</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">out</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="nx">MD</span><span class="p">,</span> <span class="nx">mdSize</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">raw</span><span class="p">.</span><span class="nx">md</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// We need to manually convert all keys to lower case, because MD is a
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// map, and there&#39;s no guarantee that the MD attached to the context is
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// created using our helper functions.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">key</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">ToLower</span><span class="p">(</span><span class="nx">k</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">out</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nf">copyOf</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">added</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">raw</span><span class="p">.</span><span class="nx">added</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">added</span><span class="p">)</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">panic</span><span class="p">(</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;metadata: FromOutgoingContext got an odd number of input pairs for metadata: %d&#34;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">added</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">added</span><span class="p">);</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">2</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nx">key</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">ToLower</span><span class="p">(</span><span class="nx">added</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">            <span class="nx">out</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">out</span><span class="p">[</span><span class="nx">key</span><span class="p">],</span> <span class="nx">added</span><span class="p">[</span><span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">out</span><span class="p">,</span> <span class="nx">ok</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="4">
+<li>客户端拦截器中：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">orderUnaryClientInterceptor</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span> <span class="nx">method</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">reply</span> <span class="kd">interface</span><span class="p">{},</span>
+</span></span><span class="line"><span class="cl"><span class="nx">cc</span> <span class="o">*</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">ClientConn</span><span class="p">,</span> <span class="nx">invoker</span> <span class="nx">grpc</span><span class="p">.</span><span class="nx">UnaryInvoker</span><span class="p">,</span> <span class="nx">opts</span> <span class="o">...</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">CallOption</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">s</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 获取要发送给服务端的`metadata`
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">md</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">FromOutgoingContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nx">ok</span> <span class="o">&amp;&amp;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">md</span><span class="p">.</span><span class="nf">Get</span><span class="p">(</span><span class="s">&#34;time&#34;</span><span class="p">))</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">s</span> <span class="p">=</span> <span class="nx">md</span><span class="p">.</span><span class="nf">Get</span><span class="p">(</span><span class="s">&#34;time&#34;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 如果没有则补充这个时间戳字段
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">s</span> <span class="p">=</span> <span class="s">&#34;inter&#34;</span> <span class="o">+</span> <span class="nx">strconv</span><span class="p">.</span><span class="nf">FormatInt</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">UnixNano</span><span class="p">(),</span> <span class="mi">10</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">ctx</span> <span class="p">=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">AppendToOutgoingContext</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="s">&#34;time&#34;</span><span class="p">,</span> <span class="nx">s</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;call timestamp: %s&#34;</span><span class="p">,</span> <span class="nx">s</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Invoking the remote method
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">err</span> <span class="o">:=</span> <span class="nf">invoker</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">method</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">reply</span><span class="p">,</span> <span class="nx">cc</span><span class="p">,</span> <span class="nx">opts</span><span class="o">...</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">err</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h4 id="func-new">func New<a hidden class="anchor" aria-hidden="true" href="#func-new">#</a></h4>
+<ol>
+<li>New从给定的键值映射创建一个MD。</li>
+<li>key中只允许使用以下ASCII字符：
+<ul>
+<li>数字：0-9</li>
+<li>大写字母：A-Z</li>
+<li>小写字母：a-z</li>
+<li>特殊字符：- _ .</li>
+</ul>
+</li>
+<li>大写字母会自动转换为小写字母。</li>
+<li>以“grpc-”开头的键仅供grpc内部使用，如果在元数据中设置可能会导致错误。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// New creates an MD from a given key-value map.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Only the following ASCII characters are allowed in keys:
+</span></span></span><span class="line"><span class="cl"><span class="c1">//   - digits: 0-9
+</span></span></span><span class="line"><span class="cl"><span class="c1">//   - uppercase letters: A-Z (normalized to lower)
+</span></span></span><span class="line"><span class="cl"><span class="c1">//   - lowercase letters: a-z
+</span></span></span><span class="line"><span class="cl"><span class="c1">//   - special characters: -_.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Uppercase letters are automatically converted to lowercase.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Keys beginning with &#34;grpc-&#34; are reserved for grpc-internal use only and may
+</span></span></span><span class="line"><span class="cl"><span class="c1">// result in errors if set in metadata.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">New</span><span class="p">(</span><span class="nx">m</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">)</span> <span class="nx">MD</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">md</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="nx">MD</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">m</span><span class="p">))</span> <span class="c1">// map[string][]string
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">val</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">m</span> <span class="p">{</span> <span class="c1">// string,string
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="nx">key</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">ToLower</span><span class="p">(</span><span class="nx">k</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">md</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">md</span><span class="p">[</span><span class="nx">key</span><span class="p">],</span> <span class="nx">val</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">md</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="5">
+<li>使用示例：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">md</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;key1&#34;</span><span class="p">:</span><span class="s">&#34;value1&#34;</span><span class="p">,</span><span class="s">&#34;key2&#34;</span><span class="p">:</span><span class="s">&#34;value2&#34;</span><span class="p">})</span>
+</span></span></code></pre></div><h4 id="func-pairs">func Pairs<a hidden class="anchor" aria-hidden="true" href="#func-pairs">#</a></h4>
+<ol>
+<li>pair返回一个由key, value…如果len(kv)是奇数，Pairs 就会 panic。</li>
+<li>key中只允许使用以下ASCII字符:
+<ul>
+<li>数字：0-9
+<ul>
+<li>大写字母：A-Z</li>
+<li>小写字母：a-z</li>
+<li>特殊字符：- _ .</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>大写字母会自动转换为小写字母。</li>
+<li>以“grpc-”开头的键仅供grpc内部使用，如果在元数据中设置可能会导致错误。</li>
+<li>如果有相同的 key 会自动合并。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Pairs returns an MD formed by the mapping of key, value ...
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Pairs panics if len(kv) is odd.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Only the following ASCII characters are allowed in keys:
+</span></span></span><span class="line"><span class="cl"><span class="c1">//   - digits: 0-9
+</span></span></span><span class="line"><span class="cl"><span class="c1">//   - uppercase letters: A-Z (normalized to lower)
+</span></span></span><span class="line"><span class="cl"><span class="c1">//   - lowercase letters: a-z
+</span></span></span><span class="line"><span class="cl"><span class="c1">//   - special characters: -_.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Uppercase letters are automatically converted to lowercase.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Keys beginning with &#34;grpc-&#34; are reserved for grpc-internal use only and may
+</span></span></span><span class="line"><span class="cl"><span class="c1">// result in errors if set in metadata.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">Pairs</span><span class="p">(</span><span class="nx">kv</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="nx">MD</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">kv</span><span class="p">)</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">panic</span><span class="p">(</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;metadata: Pairs got the odd number of input pairs for metadata: %d&#34;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">kv</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">md</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="nx">MD</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">kv</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="c1">// map[string][]string
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">kv</span><span class="p">);</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">2</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">key</span> <span class="o">:=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">ToLower</span><span class="p">(</span><span class="nx">kv</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">md</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">md</span><span class="p">[</span><span class="nx">key</span><span class="p">],</span> <span class="nx">kv</span><span class="p">[</span><span class="nx">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">md</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="6">
+<li>使用示例：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">md</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;key1&#34;</span><span class="p">,</span> <span class="s">&#34;value1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s">&#34;key1&#34;</span><span class="p">,</span> <span class="s">&#34;value1.2&#34;</span><span class="p">,</span> <span class="c1">// &#34;key1&#34; will have map value []string{&#34;value1&#34;, &#34;value1.2&#34;}
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="s">&#34;key2&#34;</span><span class="p">,</span> <span class="s">&#34;value2&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div><h4 id="func-join">func Join<a hidden class="anchor" aria-hidden="true" href="#func-join">#</a></h4>
+<ol>
+<li>Join将任意数量的mds连接到单个MD中。</li>
+<li>每个键的值顺序由包含这些值的mds呈现给Join的顺序决定。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Join joins any number of mds into a single MD.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// The order of values for each key is determined by the order in which the mds
+</span></span></span><span class="line"><span class="cl"><span class="c1">// containing those values are presented to Join.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">Join</span><span class="p">(</span><span class="nx">mds</span> <span class="o">...</span><span class="nx">MD</span><span class="p">)</span> <span class="nx">MD</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">out</span> <span class="o">:=</span> <span class="nx">MD</span><span class="p">{}</span> <span class="c1">// []map[string][]string
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">md</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">mds</span> <span class="p">{</span> <span class="c1">// int,map[string][]string
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">md</span> <span class="p">{</span> <span class="c1">// string,[]string
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="nx">out</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">out</span><span class="p">[</span><span class="nx">k</span><span class="p">],</span> <span class="nx">v</span><span class="o">...</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">out</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="3">
+<li>使用示例：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">md1</span> <span class="o">:=</span>  <span class="nx">metadata</span><span class="p">.</span><span class="nf">Pairs</span><span class="p">(</span><span class="s">&#34;k1&#34;</span><span class="p">,</span> <span class="s">&#34;v1&#34;</span><span class="p">,</span> <span class="s">&#34;k2&#34;</span><span class="p">,</span> <span class="s">&#34;v2&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nx">md2</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;key1&#34;</span><span class="p">:</span><span class="s">&#34;value1&#34;</span><span class="p">,</span><span class="s">&#34;key2&#34;</span><span class="p">:</span><span class="s">&#34;value2&#34;</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">md</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">Join</span><span class="p">(</span><span class="nx">md1</span><span class="p">,</span> <span class="nx">md2</span><span class="p">)</span>
+</span></span></code></pre></div><h4 id="func-md-append">func (MD) Append<a hidden class="anchor" aria-hidden="true" href="#func-md-append">#</a></h4>
+<ol>
+<li>Append将值添加到键k中，而不是覆盖已经存储在该键中的内容。</li>
+<li>K在存储到md之前被转换为小写。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Append adds the values to key k, not overwriting what was already stored at
+</span></span></span><span class="line"><span class="cl"><span class="c1">// that key.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// k is converted to lowercase before storing in md.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">md</span> <span class="nx">MD</span><span class="p">)</span> <span class="nf">Append</span><span class="p">(</span><span class="nx">k</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">vals</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">vals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">k</span> <span class="p">=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">ToLower</span><span class="p">(</span><span class="nx">k</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">md</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">md</span><span class="p">[</span><span class="nx">k</span><span class="p">],</span> <span class="nx">vals</span><span class="o">...</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ol start="3">
+<li>使用示例：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">md</span> <span class="o">:=</span> <span class="nx">metadata</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span><span class="p">{</span><span class="s">&#34;key1&#34;</span><span class="p">:</span><span class="s">&#34;value1&#34;</span><span class="p">,</span><span class="s">&#34;key2&#34;</span><span class="p">:</span><span class="s">&#34;value2&#34;</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">md</span><span class="p">.</span><span class="nf">Append</span><span class="p">(</span><span class="s">&#34;key1&#34;</span><span class="p">,</span> <span class="s">&#34;v1&#34;</span><span class="p">,</span> <span class="s">&#34;v2&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><h4 id="func-md-copy">func (MD) Copy<a hidden class="anchor" aria-hidden="true" href="#func-md-copy">#</a></h4>
+<ol>
+<li>Copy返回md的副本。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Copy returns a copy of md.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">md</span> <span class="nx">MD</span><span class="p">)</span> <span class="nf">Copy</span><span class="p">()</span> <span class="nx">MD</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">out</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="nx">MD</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">md</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">md</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">out</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="p">=</span> <span class="nf">copyOf</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">out</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h4 id="func-md-delete">func (MD) Delete<a hidden class="anchor" aria-hidden="true" href="#func-md-delete">#</a></h4>
+<ol>
+<li>Delete删除给定键k的值，该键k在从md中删除之前被转换为小写。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Delete removes the values for a given key k which is converted to lowercase
+</span></span></span><span class="line"><span class="cl"><span class="c1">// before removing it from md.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">md</span> <span class="nx">MD</span><span class="p">)</span> <span class="nf">Delete</span><span class="p">(</span><span class="nx">k</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">k</span> <span class="p">=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">ToLower</span><span class="p">(</span><span class="nx">k</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">delete</span><span class="p">(</span><span class="nx">md</span><span class="p">,</span> <span class="nx">k</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h4 id="func-md-get">func (MD) Get<a hidden class="anchor" aria-hidden="true" href="#func-md-get">#</a></h4>
+<ol>
+<li>Get获取给定键的值。</li>
+<li>在md中搜索之前，K被转换为小写。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Get obtains the values for a given key.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// k is converted to lowercase before searching in md.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">md</span> <span class="nx">MD</span><span class="p">)</span> <span class="nf">Get</span><span class="p">(</span><span class="nx">k</span> <span class="kt">string</span><span class="p">)</span> <span class="p">[]</span><span class="kt">string</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">k</span> <span class="p">=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">ToLower</span><span class="p">(</span><span class="nx">k</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">md</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h4 id="func-md-len">func (MD) Len<a hidden class="anchor" aria-hidden="true" href="#func-md-len">#</a></h4>
+<ol>
+<li>Len返回md中的项数。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Len returns the number of items in md.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">md</span> <span class="nx">MD</span><span class="p">)</span> <span class="nf">Len</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nx">md</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h4 id="func-md-set">func (MD) Set<a hidden class="anchor" aria-hidden="true" href="#func-md-set">#</a></h4>
+<ol>
+<li>Set用一个值片来设置给定键的值。</li>
+<li>K在存储到md之前被转换为小写。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// Set sets the value of a given key with a slice of values.
+</span></span></span><span class="line"><span class="cl"><span class="c1">//
+</span></span></span><span class="line"><span class="cl"><span class="c1">// k is converted to lowercase before storing in md.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">md</span> <span class="nx">MD</span><span class="p">)</span> <span class="nf">Set</span><span class="p">(</span><span class="nx">k</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">vals</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">vals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">k</span> <span class="p">=</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">ToLower</span><span class="p">(</span><span class="nx">k</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">md</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span> <span class="p">=</span> <span class="nx">vals</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="参考">参考<a hidden class="anchor" aria-hidden="true" href="#参考">#</a></h2>
+<ol>
+<li><a href="https://mp.weixin.qq.com/s?__biz=MzIyMTI4OTY3Mw==&amp;mid=2247484298&amp;idx=1&amp;sn=f76997b5d6b875e5ddc8cbe5f83c603f&amp;chksm=e83e4e2cdf49c73abb4cce748c8473c489d3a55ae6a5c8d4995f68884b9eef7b80e58dbc8abb&amp;scene=178&amp;cur_album_id=2760500493343014914#rd" target="_blank" rel="noopener">写给go开发者的gRPC教程-metadata</a></li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://heliu.site/tags/grpc/">Grpc</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://heliu.site/posts/grpc/middleware/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>拦截器</span>
+  </a>
+  <a class="next" href="https://heliu.site/posts/grpc/header-trailer/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>Header 与 Trailer</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    
+    <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv">
+        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    </span>
+    <span id="busuanzi_container_site_uv">
+        本站访客数<span id="busuanzi_value_site_uv"></span>人次
+    </span>
+    </div>
+        <span>Copyright © 2024 蜀ICP备2024091074号 <a href="#">heliu's blog</a>. All rights reserved</span>  
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'Copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'Done';
+            setTimeout(() => {
+                copybutton.innerHTML = 'Copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
