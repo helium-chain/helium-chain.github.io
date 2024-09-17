@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>分区表 | Helium</title>
+<meta name="keywords" content="mysql">
+<meta name="description" content="mysql 分区表介绍。">
+<meta name="author" content="helium">
+<link rel="canonical" href="https://heliu.site/posts/mysql/subzone/">
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<meta name="referrer" content="no-referrer-when-downgrade">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://heliu.site/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/mysql/subzone/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono-nl.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/lxgw-wenkai-screen-webfont/1.6.0/style.css" />
+    <style>
+        body {
+            font-family: "LXGW WenKai Lite", sans-serif;
+            font-family: "LXGW WenKai Screen", sans-serif;
+        }
+    </style>
+</head>
+</html>
+
+  
+
+<meta property="og:title" content="分区表" />
+<meta property="og:description" content="mysql 分区表介绍。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://heliu.site/posts/mysql/subzone/" />
+<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-11-12T00:00:00+00:00" />
+<meta property="article:modified_time" content="2022-11-12T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:title" content="分区表"/>
+<meta name="twitter:description" content="mysql 分区表介绍。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Article",
+      "item": "https://heliu.site/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Mysql",
+      "item": "https://heliu.site/posts/mysql/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "分区表",
+      "item": "https://heliu.site/posts/mysql/subzone/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "分区表",
+  "name": "分区表",
+  "description": "mysql 分区表介绍。",
+  "keywords": [
+    "mysql"
+  ],
+  "articleBody": " MySQL分区 是一种数据库优化的技术，它允许将一个大的表、索引或其子集分割成多个较小的、更易于管理的片段，这些片段称为“分区”。 每个分区都可以独立于其他分区进行存储、备份、索引和其他操作。这种技术主要是为了改善大型数据库表的查询性能、维护的方便性以及数据管理效率。 基本概念 物理存储与逻辑分割 物理上，每个分区可以存储在不同的文件或目录中，这取决于分区类型和配置。 逻辑上，表数据根据分区键的值被分割到不同的分区里。 查询性能提升 当执行查询时，MySQL能够确定哪些分区包含相关数据，并只在这些分区上进行搜索。这减少了需要搜索的数据量，从而提高了查询性能。 对于范围查询或特定值的查询，分区可以显著减少扫描的数据量。 数据管理与维护 分区可以使得数据管理更加灵活。例如，可以独立地备份、恢复或优化某个分区，而无需对整个表进行操作。 对于具有时效性的数据，可以通过删除或归档某个分区来快速释放存储空间。 扩展性与并行处理 分区技术使得数据库表更容易扩展到更大的数据集。当表的大小超过单个存储设备的容量时，可以使用分区将数据分布到多个存储设备上。 由于每个分区可以独立处理，因此可以并行执行查询和其他数据库操作，从而进一步提高性能。 分区的原理和类型 分区的原理 分区技术是将表中的记录分散到不同的物理文件中，即每个分区对应一个.idb文件。这是MySQL 5.1及以后版本支持的一项高级功能，旨在提高大数据表的管理效率和查询性能。 分区类型：MySQL支持水平分区，即根据某些条件将表中的行分配到不同的分区中。这些分区在物理上是独立的，可以单独处理，也可以作为整体处理。 性能和影响：虽然分区可以提高查询性能和管理效率，但如果不恰当使用，也可能对性能产生负面影响。因此，在使用分区时应谨慎评估其影响。 索引与分区：在MySQL中，分区是局部的，意味着数据和索引都存储在各自的分区内。目前，MySQL尚不支持全局分区索引。 分区键与唯一索引：当表存在主键或唯一索引时，分区列必须是这些索引的一部分。这是为了确保分区的唯一性和查询效率。 分区类型 MySQL支持几种不同类型的分区方式，包括RANGE、LIST、HASH和KEY。下面简要介绍这些分区方式的工作原理： RANGE分区：基于列的值范围将数据分配到不同的分区。例如，可以根据日期范围将数据分配到不同的月份或年份的分区中。 LIST分区：类似于RANGE分区，但LIST分区是基于列的离散值集合来分配数据的。可以指定一个枚举列表来定义每个分区的值。 HASH分区：基于用户定义的表达式的哈希值来分配数据到不同的分区。这种分区方式适用于确保数据在各个分区之间均匀分布。 KEY分区：类似于HASH分区，但KEY分区支持计算一列或多列的哈希值来分配数据。它支持多列作为分区键，并且提供了更好的数据分布和查询性能。 使用场景 性能提升：通过将数据分散到多个分区中，可以并行处理查询，从而提高查询性能。同时，对于涉及大量数据的维护操作（如备份和恢复），可以单独处理每个分区，减少了操作的复杂性和时间成本。 管理简化：分区可以使得数据管理更加灵活。例如，可以独立地备份、恢复或优化某个分区，而无需对整个表进行操作。这对于大型数据库表来说尤为重要，因为它可以显著减少维护时间和资源消耗。 数据归档和清理：对于具有时间属性的数据（如日志、交易记录等），可以使用分区来轻松归档旧数据或删除不再需要的数据。通过简单地删除或归档某个分区，可以快速释放存储空间并提高性能。 可扩展性：分区技术使得数据库表更容易扩展到更大的数据集。当表的大小超过单个存储设备的容量时，可以使用分区将数据分布到多个存储设备上，从而实现水平扩展。 确认MySQL支持分区 从MySQL5.1开始引入分区功能，可以如下方式查看是否支持： “老\"版本方式：SHOW VARIABLES LIKE ‘%partition%’。 “新\"版本方式：show plugins。 # 信息中查看到这一条数据就表示支持分区 | partition | ACTIVE | STORAGE ENGINE | NULL | GPL | 注意事项 如果表中存在primary key或者unique key时，分区的列必须是primary key或者unique key的一个组成部分，也就是说，分区函数的列只能从primary key或者unique key这些key中取子集。 如果表中不存在任何的primary key或者unique key时，则可以指定任何一个列作为分区列。 MySQL5.5版本之前的Range、List、Hash分区要求分区键必须是int；MySQL5.5及以上，支持非整型的Range和List分区，即：range columns 和 list columns。 分区命名 ​分区的名字基本遵循其他MySQL标识符应当遵循的原则，例如用于表和数据库名字的标识符，但是注意，分区的名字是不区分大小写的。 无论使用何种类型的分区，分区总是在创建时就自动的顺序编号，且从0开始记录。 创建分区 RANGE分区 --创建数据库 CREATE DATABASE kubiao DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci; --创建分区表，主键：int类型 CREATE TABLE tbl_users ( `uuid` INT NOT NULL, `customerId` VARCHAR(200), `pwd` VARCHAR(20), `showName` VARCHAR(100), `trueName` VARCHAR(100), `registerTime` VARCHAR(100) ) PARTITION BY RANGE (uuid) ( PARTITION p0 VALUES LESS THAN (5), PARTITION p1 VALUES LESS THAN (10), PARTITION p2 VALUES LESS THAN (15), PARTITION p3 VALUES LESS THAN MAXVALUE ); --插入数据 INSERT INTO tbl_users VALUES(1,\"只为你\",\"123456\",\"qzp\",\"quezhipeng\",\"20200808\"),(6,\"人生\",\"123456\",\"人生\",\"无名\",\"20200808\"),(12,\"无须终有\",\"123456\",\"无须终有\",\"无声\",\"20200808\"),(100,\"坚持\",\"123456\",\"胜利\",\"坚持\",\"20200808\"); 通过命令查看分区。 mysql\u003e SELECT * FROM information_schema.`PARTITIONS` WHERE table_schema='kubiao' AND table_name='tbl_users'; 查看分区上的数据。 SELECT * FROM tbl_users PARTITION(p0); 查看MySQL操作的分区。 EXPLAIN PARTITIONS SELECT * FROM tbl_users WHERE uuid = 2; List分区 注意：如果试图操作的列值不在分区值列表中时，那么会失败并报错，要注意的是，LIST分区没有类似如：“VALUES LESS THAN”这样的包含其他值在内的定义，将要匹配的任何值都必须在值列表中找到。 LIST分区除了能和RANGE分区结合起来生成一个复合的子分区，与Hash和KEY分区结合起来成复合的子分区也是可以的。 CREATE TABLE tbl_users2 ( `uuid` INT NOT NULL, `customerId` VARCHAR(200), `pwd` VARCHAR(20), `showName` VARCHAR(100), `trueName` VARCHAR(100), `registerTime` VARCHAR(100) ) PARTITION BY List(uuid) ( PARTITION p0 VALUES in(1,2,3,5), PARTITION p1 VALUES in(7,9,10), PARTITION p2 VALUES in(11,15) ); --插入数据，注意：加入数据需要根据主键来，不可以时主键分区中没有的，否则报错 INSERT INTO tbl_users2 VALUES(1,\"只为你\",\"123456\",\"qzp\",\"quezhipeng\",\"20200808\"),(7,\"人生\",\"123456\",\"人生\",\"无名\",\"20200808\"),(10,\"无须终有\",\"123456\",\"无须终有\",\"无声\",\"20200808\"),(15,\"坚持\",\"123456\",\"胜利\",\"坚持\",\"20200808\"); 查看数据，与 RANGE 分区一样。 HASH分区 HASH分区：主要用来确保数据在预先确定数目的分区中平均分布，在RANGE和LIST分区中，必须明确指定一个给定的列值或者列值集合以指定应该保存在哪个分区中；而在HASH分区中，MySQL自动完成这些工作，要做的只是基于将要被哈希的列值指定的一个表达式，以及指定被分区的表将要被分割成的分区数量，如： --创建一张hash分区表 CREATE TABLE tbl_users4 ( `uuid` INT NOT NULL, `customerId` VARCHAR(200), `pwd` VARCHAR(20), `showName` VARCHAR(100), `trueName` VARCHAR(100), `registerTime` VARCHAR(100) ) PARTITION BY hash(uuid) PARTITIONS 3; --插入数据，注意：分区是有uuid/3求余数决定,余数为0，在p0;余数为1，在p1;余数为2，在p2,以此类推.... INSERT INTO tbl_users2 VALUES(1,\"只为你\",\"123456\",\"qzp\",\"quezhipeng\",\"20200808\"),(7,\"人生\",\"123456\",\"人生\",\"无名\",\"20200808\"),(10,\"无须终有\",\"123456\",\"无须终有\",\"无声\",\"20200808\"),(15,\"坚持\",\"123456\",\"胜利\",\"坚持\",\"20200808\"); KEY分区 类似于按照HASH分区，HASH分区允许用户自定义表达式，而KEY分区不允许使用用户自定义的表达式：HASH分区只支持整数分区，KEY分区支持除了blob或者text类型之外的其他数据类型分区。 与HASH分区不同，创建KEY分区表的时候，可以不指定分区键，默认会选择使用主键或者唯一键作为分区键，没有主键或唯一键，就必须指定分区键。 --创建一张key分区表 CREATE TABLE tbl_users5 ( `uuid` INT NOT NULL, `customerId` VARCHAR(200), `pwd` VARCHAR(20), `showName` VARCHAR(100), `trueName` VARCHAR(100), `registerTime` VARCHAR(100) ) PARTITION BY LINEAR key(uuid) PARTITIONS 3; --插入数据，注意：分区是有uuid/3求余数决定,余数为0，在p0;余数为1，在p1;余数为2，在p2,以此类推.... INSERT INTO tbl_users5 VALUES(1,\"只为你\",\"123456\",\"qzp\",\"quezhipeng\",\"20200808\"),(7,\"人生\",\"123456\",\"人生\",\"无名\",\"20200808\"),(10,\"无须终有\",\"123456\",\"无须终有\",\"无声\",\"20200808\"),(15,\"坚持\",\"123456\",\"胜利\",\"坚持\",\"20200808\"); 参考 MySQL分区知识及操作详解(完整版) MySQL分区表：万字详解与实践指南 ",
+  "wordCount" : "288",
+  "inLanguage": "zh",
+  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2022-11-12T00:00:00Z",
+  "dateModified": "2022-11-12T00:00:00Z",
+  "author":[{
+    "@type": "Person",
+    "name": "helium"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://heliu.site/posts/mysql/subzone/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Helium",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://heliu.site/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+                    height="35">Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://heliu.site/" title="主页">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/posts" title="文章">
+                    <span>Article</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/archives" title="时间轴">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/tags/" title="标签">
+                    <span>Tag</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://heliu.site/support" title="打赏">
+                    <span>🫶Help</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+
+<article class="post" autonumbering>
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/mysql/">Mysql</a></div>
+    <h1 class="post-title entry-hint-parent">
+      分区表
+    </h1>
+    <div class="post-meta">
+
+
+
+
+
+
+
+
+
+
+<span class="x-post-meta-item"><svg t="1720837714681" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7520" width="200" height="200"><path d="M123.47509 1023.984942a123.565437 123.565437 0 0 1-123.505206-123.32451V243.863302A123.565437 123.565437 0 0 1 123.47509 120.568908h171.630374V26.06529a26.050232 26.050232 0 0 1 52.070349 0v94.503618h377.592848V26.06529a26.050232 26.050232 0 0 1 52.100464 0v94.503618h183.797189A123.565437 123.565437 0 0 1 1084.171519 243.863302v656.79713A123.565437 123.565437 0 0 1 960.666314 1023.984942H123.47509z m-71.404741-123.32451A71.434857 71.434857 0 0 0 123.47509 971.974825h837.191224a71.434857 71.434857 0 0 0 71.404741-71.314393V442.326922l-946.361273-3.824716a25.598494 25.598494 0 0 1-5.84248-0.692665l-27.796953-6.444798v469.295689zM123.47509 172.579025a71.434857 71.434857 0 0 0-71.404741 71.284277v149.736133l27.796953-6.444797a26.080348 26.080348 0 0 1 5.902712-0.662549l946.301041 3.824716V243.863302a71.404741 71.404741 0 0 0-71.404741-71.284277h-180.183284l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.261043 26.261043 0 0 1-23.520499-14.786895l-6.173754-12.859479H350.819834l-6.173754 12.859479a26.200812 26.200812 0 0 1-23.490383 14.786895 26.230928 26.230928 0 0 1-23.520499-14.786895l-6.173755-12.859479H123.47509z m156.150814 578.827128a26.050232 26.050232 0 0 1-26.050232-25.990001c0-14.335157 11.68496-26.020116 26.050232-26.020116h521.697312c14.365273 0 26.050232 11.68496 26.050233 26.020116a26.050232 26.050232 0 0 1-26.050233 25.990001H279.625904z" fill="#3D3F42" p-id="7521"></path></svg><span>2022-11-12</span></span>&nbsp;<span class="x-post-meta-item"><svg t="1720839329181" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14106" width="200" height="200"><path d="M699.270662 190.485379c-0.411369 0-0.821715 0.011256-1.227967 0.032746H507.034407a23.041786 23.041786 0 0 0-1.221828-0.031723c-12.779048 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.360975 23.141046 23.140023 23.141046v0.032746h193.458083v-0.032746c12.780071 0 23.141046-10.359952 23.141047-23.141046 0-12.780071-10.360975-23.140023-23.141047-23.140023zM979.215516 724.005508c0-142.090159-115.186416-257.277598-257.277598-257.277598-72.245418 0-137.532353 29.777187-184.262654 77.725223l45.868677 31.474852c36.227086-33.873482 84.882226-54.617945 138.393977-54.617945 111.945605 0 202.696492 90.750887 202.696492 202.695468h-43.01263l70.331835 104.289228 70.331835-104.289228H979.215516z" fill="" p-id="14107"></path><path d="M748.885664 588.843132c0-14.881942-12.06785-26.945699-26.947746-26.945698-14.883989 0-26.947745 12.063757-26.947745 26.945698v135.164423c0 14.879895 12.063757 26.945699 26.947745 26.945699h107.786889c14.881942 0 26.945699-12.063757 26.945698-26.945699s-12.063757-26.945699-26.945698-26.945699h-80.839143V588.843132zM721.937918 926.702c-111.947651 0-202.696492-90.74884-202.696492-202.696492 0-0.144286 0.004093-0.285502 0.004094-0.429788h43.004443l-70.330812-104.289228-70.331835 104.289228h43.075051c0 0.144286-0.00307 0.285502-0.00307 0.429788 0 142.091182 115.187439 257.279644 257.278621 257.279645 72.241324 0 137.530306-29.77821 184.260607-77.727269l-45.86663-31.474852c-36.227086 33.873482-84.884272 54.618968-138.393977 54.618968zM694.633039 423.38066c-1.354857-11.487635-11.120268-20.400632-22.972201-20.400632H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.138999 0 12.781094 10.359952 23.141046 23.140023 23.141047H596.949252c30.209022-13.81668 63.104223-22.76754 97.683787-25.879414zM438.548616 623.143333H206.362486c-12.780071 0-23.140023 10.358929-23.140023 23.140023 0 12.780071 10.359952 23.140023 23.140023 23.140023h219.956598a298.463626 298.463626 0 0 1 12.229532-46.280046zM506.934123 513.062192H206.362486c-12.780071 0-23.140023 10.359952-23.140023 23.139 0 12.781094 10.359952 23.140023 23.140023 23.140023H469.936487a302.241672 302.241672 0 0 1 36.997636-46.279023z" fill="" p-id="14108"></path><path d="M442.765661 835.277778a298.531164 298.531164 0 0 1-14.365173-46.150087H146.542052v-0.065491c-33.036417 0-59.81941-26.78197-59.81941-59.819411V329.36031h704.907545v100.905154a298.561863 298.561863 0 0 1 46.150086 14.996552V194.619536h-0.162706c0-53.422723-43.307342-96.728018-96.730065-96.728018h-68.89409V84.418668c0-33.037441-26.782993-59.81941-59.81941-59.81941v-0.361227h-18.87079v0.032745c-33.038464 0-59.820434 26.78197-59.820433 59.819411 0 0.109494 0.008186 0.218988 0.008186 0.328481h-0.339738v13.47285H345.203648V84.418668c0-33.037441-26.782993-59.81941-59.819411-59.81941v-0.361227h-18.872836v0.032745c-33.036417 0-59.81941 26.78197-59.81941 59.819411 0 0.109494 0.007163 0.218988 0.008186 0.328481h-0.339737v13.47285h-69.189826c-53.4217 0-96.729042 43.306318-96.729041 96.728018 0 1.701758 0.045025 3.39226 0.132006 5.071505v533.785166a98.051153 98.051153 0 0 0-0.132006 5.071506c0 53.4217 43.307342 96.728018 96.729041 96.728018v0.001023h305.595047zM86.723665 204.056466c0-33.037441 26.782993-59.81941 59.819411-59.819411 0.044002 0 0.086981 0.00307 0.130983 0.00307v-0.068561h105.968473V94.874811h0.032746a22.807449 22.807449 0 0 1-0.032746-1.215688c0-12.779048 10.360975-23.140023 23.140023-23.140023s23.140023 10.360975 23.140023 23.140023c0 0.408299-0.010233 0.812505-0.031722 1.215688h0.031722v49.297776h280.508696V94.874811h0.032745a22.807449 22.807449 0 0 1-0.032745-1.215688c0-12.779048 10.361999-23.140023 23.140023-23.140023 12.780071 0 23.141046 10.360975 23.141046 23.140023 0 0.408299-0.011256 0.812505-0.032746 1.215688h0.032746v49.297776h106.10048v0.065492c33.035394 0 59.818387 26.780947 59.818387 59.81941h0.130983V283.080264H86.723665v-79.023798z" fill="" p-id="14109"></path></svg><span>2022-11-12</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text" style="user-select: text;">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" style="user-select: text;"></path>
+    <polyline points="14 2 14 8 20 8" style="user-select: text;"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
+    <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
+    <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
+</svg><span>288字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="12" r="9"></circle>
+    <polyline points="12 7 12 12 15 15"></polyline>
+</svg><span>2分钟</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+</svg><span>helium</span></span>
+      <span class="x-post-meta-item">
+        &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
+        <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
+            <a href="https://heliu.site/tags/mysql/" target="_blank" rel="noopener">Mysql</a>
+        </ul>
+      </span>
+      
+      <span id="busuanzi_container_page_pv" class="x-post-meta-item">
+        &nbsp;<svg t="1720844685710" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="27237" width="200" height="200"><path d="M739.754667 574.08c-121.386667 45.610667-208.469333 169.813333-208.64 316.16 0 33.408 4.693333 65.493333 13.141333 95.914667H94.122667c-26.453333-43.52-41.685333-91.946667-41.685334-143.189334 0-185.173333 192.896-335.104 430.805334-335.104 96.256 0 184.832 24.746667 256.512 66.218667z m-280.490667-114.986667a214.869333 214.869333 0 0 1-214.869333-215.04A215.04 215.04 0 0 1 459.264 28.842667a215.04 215.04 0 0 1 215.04 215.210666 215.04 215.04 0 0 1-215.04 215.04zM974.506667 641.28c9.856 0 17.834667 7.466667 17.834666 16.64v59.989333c-0.341333 8.789333-7.850667 15.786667-17.28 16.085334-9.856 0.341333-18.176-6.826667-18.517333-16.085334v-20.053333l-99.114667 91.093333-0.256 0.256a18.474667 18.474667 0 0 1-14.848 4.352h-0.768a18.176 18.176 0 0 1-9.344-4.608l-0.938666-0.981333-85.930667-80.042667-123.562667 115.072a18.773333 18.773333 0 0 1-25.216 0 15.786667 15.786667 0 0 1 0-23.466666l136.149334-126.848 0.725333-0.597334a18.645333 18.645333 0 0 1 24.362667 0.512l87.253333 81.237334 86.058667-79.232h-21.248c-9.386667-0.298667-16.938667-7.338667-17.28-16.085334-0.341333-9.173333 7.381333-16.896 17.28-17.237333h64.64z m-367.146667 240h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v72.192a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042667-16.042666v-72.192c0-8.874667 7.210667-16.042667 16.042667-16.042667z m110.805333-106.666667h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v178.858667a16.042667 16.042667 0 0 1-16.042667 16.042666h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042666v-178.858667c0-8.874667 7.168-16.042667 16.042666-16.042667z m106.538667 80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v99.413333a16.042667 16.042667 0 0 1-16.042667 16.042667H824.746667a16.042667 16.042667 0 0 1-16.042667-16.042667v-99.413333c0-8.874667 7.168-16.042667 16.042667-16.042667z m110.165333-80h48.128c8.874667 0 16.042667 7.168 16.042667 16.042667v179.413333a16.042667 16.042667 0 0 1-16.042667 16.042667h-48.128a16.042667 16.042667 0 0 1-16.042666-16.042667v-179.413333c0-8.874667 7.210667-16.042667 16.042666-16.042667z" fill="#999999" p-id="27238"></path></svg>
+        <span id="busuanzi_value_page_pv"></span>
+      </span>
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#%e5%9f%ba%e6%9c%ac%e6%a6%82%e5%bf%b5" aria-label="基本概念">基本概念</a><ul>
+                            
+                    <li>
+                        <a href="#%e7%89%a9%e7%90%86%e5%ad%98%e5%82%a8%e4%b8%8e%e9%80%bb%e8%be%91%e5%88%86%e5%89%b2" aria-label="物理存储与逻辑分割">物理存储与逻辑分割</a></li>
+                    <li>
+                        <a href="#%e6%9f%a5%e8%af%a2%e6%80%a7%e8%83%bd%e6%8f%90%e5%8d%87" aria-label="查询性能提升">查询性能提升</a></li>
+                    <li>
+                        <a href="#%e6%95%b0%e6%8d%ae%e7%ae%a1%e7%90%86%e4%b8%8e%e7%bb%b4%e6%8a%a4" aria-label="数据管理与维护">数据管理与维护</a></li>
+                    <li>
+                        <a href="#%e6%89%a9%e5%b1%95%e6%80%a7%e4%b8%8e%e5%b9%b6%e8%a1%8c%e5%a4%84%e7%90%86" aria-label="扩展性与并行处理">扩展性与并行处理</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e5%88%86%e5%8c%ba%e7%9a%84%e5%8e%9f%e7%90%86%e5%92%8c%e7%b1%bb%e5%9e%8b" aria-label="分区的原理和类型">分区的原理和类型</a><ul>
+                            
+                    <li>
+                        <a href="#%e5%88%86%e5%8c%ba%e7%9a%84%e5%8e%9f%e7%90%86" aria-label="分区的原理">分区的原理</a></li>
+                    <li>
+                        <a href="#%e5%88%86%e5%8c%ba%e7%b1%bb%e5%9e%8b" aria-label="分区类型">分区类型</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e4%bd%bf%e7%94%a8%e5%9c%ba%e6%99%af" aria-label="使用场景">使用场景</a></li>
+                    <li>
+                        <a href="#%e7%a1%ae%e8%ae%a4mysql%e6%94%af%e6%8c%81%e5%88%86%e5%8c%ba" aria-label="确认MySQL支持分区">确认MySQL支持分区</a></li>
+                    <li>
+                        <a href="#%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a1%b9" aria-label="注意事项">注意事项</a></li>
+                    <li>
+                        <a href="#%e5%88%86%e5%8c%ba%e5%91%bd%e5%90%8d" aria-label="分区命名">分区命名</a></li>
+                    <li>
+                        <a href="#%e5%88%9b%e5%bb%ba%e5%88%86%e5%8c%ba" aria-label="创建分区">创建分区</a><ul>
+                            
+                    <li>
+                        <a href="#range%e5%88%86%e5%8c%ba" aria-label="RANGE分区">RANGE分区</a></li>
+                    <li>
+                        <a href="#list%e5%88%86%e5%8c%ba" aria-label="List分区">List分区</a></li>
+                    <li>
+                        <a href="#hash%e5%88%86%e5%8c%ba" aria-label="HASH分区">HASH分区</a></li>
+                    <li>
+                        <a href="#key%e5%88%86%e5%8c%ba" aria-label="KEY分区">KEY分区</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e5%8f%82%e8%80%83" aria-label="参考">参考</a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 && 
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;   
+    }
+</script>
+  <div class="post-content"><ul>
+<li>MySQL分区 是一种数据库优化的技术，它允许将一个大的表、索引或其子集分割成多个较小的、更易于管理的片段，这些片段称为“分区”。</li>
+<li>每个分区都可以独立于其他分区进行存储、备份、索引和其他操作。这种技术主要是为了改善大型数据库表的查询性能、维护的方便性以及数据管理效率。</li>
+</ul>
+<h2 id="基本概念">基本概念<a hidden class="anchor" aria-hidden="true" href="#基本概念">#</a></h2>
+<h3 id="物理存储与逻辑分割">物理存储与逻辑分割<a hidden class="anchor" aria-hidden="true" href="#物理存储与逻辑分割">#</a></h3>
+<ol>
+<li>物理上，每个分区可以存储在不同的文件或目录中，这取决于分区类型和配置。</li>
+<li>逻辑上，表数据根据分区键的值被分割到不同的分区里。</li>
+</ol>
+<h3 id="查询性能提升">查询性能提升<a hidden class="anchor" aria-hidden="true" href="#查询性能提升">#</a></h3>
+<ol>
+<li>当执行查询时，MySQL能够确定哪些分区包含相关数据，并只在这些分区上进行搜索。这减少了需要搜索的数据量，从而提高了查询性能。</li>
+<li>对于范围查询或特定值的查询，分区可以显著减少扫描的数据量。</li>
+</ol>
+<h3 id="数据管理与维护">数据管理与维护<a hidden class="anchor" aria-hidden="true" href="#数据管理与维护">#</a></h3>
+<ol>
+<li>分区可以使得数据管理更加灵活。例如，可以独立地备份、恢复或优化某个分区，而无需对整个表进行操作。</li>
+<li>对于具有时效性的数据，可以通过删除或归档某个分区来快速释放存储空间。</li>
+</ol>
+<h3 id="扩展性与并行处理">扩展性与并行处理<a hidden class="anchor" aria-hidden="true" href="#扩展性与并行处理">#</a></h3>
+<ol>
+<li>分区技术使得数据库表更容易扩展到更大的数据集。当表的大小超过单个存储设备的容量时，可以使用分区将数据分布到多个存储设备上。</li>
+<li>由于每个分区可以独立处理，因此可以并行执行查询和其他数据库操作，从而进一步提高性能。</li>
+</ol>
+<h2 id="分区的原理和类型">分区的原理和类型<a hidden class="anchor" aria-hidden="true" href="#分区的原理和类型">#</a></h2>
+<h3 id="分区的原理">分区的原理<a hidden class="anchor" aria-hidden="true" href="#分区的原理">#</a></h3>
+<ol>
+<li>分区技术是将表中的记录分散到不同的物理文件中，即每个分区对应一个.idb文件。这是MySQL 5.1及以后版本支持的一项高级功能，旨在提高大数据表的管理效率和查询性能。</li>
+<li><strong>分区类型</strong>：MySQL支持水平分区，即根据某些条件将表中的行分配到不同的分区中。这些分区在物理上是独立的，可以单独处理，也可以作为整体处理。</li>
+<li><strong>性能和影响</strong>：虽然分区可以提高查询性能和管理效率，但如果不恰当使用，也可能对性能产生负面影响。因此，在使用分区时应谨慎评估其影响。</li>
+<li><strong>索引与分区</strong>：在MySQL中，分区是局部的，意味着数据和索引都存储在各自的分区内。目前，MySQL尚不支持全局分区索引。</li>
+<li><strong>分区键与唯一索引</strong>：当表存在主键或唯一索引时，分区列必须是这些索引的一部分。这是为了确保分区的唯一性和查询效率。</li>
+</ol>
+<h3 id="分区类型">分区类型<a hidden class="anchor" aria-hidden="true" href="#分区类型">#</a></h3>
+<ol>
+<li>MySQL支持几种不同类型的分区方式，包括RANGE、LIST、HASH和KEY。下面简要介绍这些分区方式的工作原理：
+<ul>
+<li>RANGE分区：基于列的值范围将数据分配到不同的分区。例如，可以根据日期范围将数据分配到不同的月份或年份的分区中。</li>
+<li>LIST分区：类似于RANGE分区，但LIST分区是基于列的离散值集合来分配数据的。可以指定一个枚举列表来定义每个分区的值。</li>
+<li>HASH分区：基于用户定义的表达式的哈希值来分配数据到不同的分区。这种分区方式适用于确保数据在各个分区之间均匀分布。</li>
+<li>KEY分区：类似于HASH分区，但KEY分区支持计算一列或多列的哈希值来分配数据。它支持多列作为分区键，并且提供了更好的数据分布和查询性能。</li>
+</ul>
+</li>
+</ol>
+<h2 id="使用场景">使用场景<a hidden class="anchor" aria-hidden="true" href="#使用场景">#</a></h2>
+<ol>
+<li>性能提升：通过将数据分散到多个分区中，可以并行处理查询，从而提高查询性能。同时，对于涉及大量数据的维护操作（如备份和恢复），可以单独处理每个分区，减少了操作的复杂性和时间成本。</li>
+<li>管理简化：分区可以使得数据管理更加灵活。例如，可以独立地备份、恢复或优化某个分区，而无需对整个表进行操作。这对于大型数据库表来说尤为重要，因为它可以显著减少维护时间和资源消耗。</li>
+<li>数据归档和清理：对于具有时间属性的数据（如日志、交易记录等），可以使用分区来轻松归档旧数据或删除不再需要的数据。通过简单地删除或归档某个分区，可以快速释放存储空间并提高性能。</li>
+<li>可扩展性：分区技术使得数据库表更容易扩展到更大的数据集。当表的大小超过单个存储设备的容量时，可以使用分区将数据分布到多个存储设备上，从而实现水平扩展。</li>
+</ol>
+<h2 id="确认mysql支持分区">确认MySQL支持分区<a hidden class="anchor" aria-hidden="true" href="#确认mysql支持分区">#</a></h2>
+<ol>
+<li>从MySQL5.1开始引入分区功能，可以如下方式查看是否支持：
+<ol>
+<li>&ldquo;老&quot;版本方式：SHOW VARIABLES LIKE ‘%partition%’。</li>
+<li>&ldquo;新&quot;版本方式：show plugins。</li>
+</ol>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="c1"># 信息中查看到这一条数据就表示支持分区</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> partition <span class="p">|</span> ACTIVE <span class="p">|</span> STORAGE ENGINE <span class="p">|</span> NULL <span class="p">|</span> GPL <span class="p">|</span>
+</span></span></code></pre></div><h2 id="注意事项">注意事项<a hidden class="anchor" aria-hidden="true" href="#注意事项">#</a></h2>
+<ol>
+<li>如果表中存在primary key或者unique key时，分区的列必须是primary key或者unique key的一个组成部分，也就是说，分区函数的列只能从primary key或者unique key这些key中取子集。</li>
+<li>如果表中不存在任何的primary key或者unique key时，则可以指定任何一个列作为分区列。</li>
+<li>MySQL5.5版本之前的Range、List、Hash分区要求分区键必须是int；MySQL5.5及以上，支持非整型的Range和List分区，即：range columns 和 list columns。</li>
+</ol>
+<h2 id="分区命名">分区命名<a hidden class="anchor" aria-hidden="true" href="#分区命名">#</a></h2>
+<ol>
+<li>​分区的名字基本遵循其他MySQL标识符应当遵循的原则，例如用于表和数据库名字的标识符，但是注意，分区的名字是不区分大小写的。</li>
+<li>无论使用何种类型的分区，分区总是在创建时就自动的顺序编号，且从0开始记录。</li>
+</ol>
+<h2 id="创建分区">创建分区<a hidden class="anchor" aria-hidden="true" href="#创建分区">#</a></h2>
+<h3 id="range分区">RANGE分区<a hidden class="anchor" aria-hidden="true" href="#range分区">#</a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">--创建数据库
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">kubiao</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="nb">CHARACTER</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">utf8</span><span class="w"> </span><span class="k">COLLATE</span><span class="w"> </span><span class="n">utf8_general_ci</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">--创建分区表，主键：int类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">tbl_users</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">uuid</span><span class="o">`</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">customerId</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">pwd</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">showName</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">trueName</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">registerTime</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">PARTITION</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">RANGE</span><span class="w"> </span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">PARTITION</span><span class="w"> </span><span class="n">p0</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="k">LESS</span><span class="w"> </span><span class="k">THAN</span><span class="w"> </span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">PARTITION</span><span class="w"> </span><span class="n">p1</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="k">LESS</span><span class="w"> </span><span class="k">THAN</span><span class="w"> </span><span class="p">(</span><span class="mi">10</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">PARTITION</span><span class="w"> </span><span class="n">p2</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="k">LESS</span><span class="w"> </span><span class="k">THAN</span><span class="w"> </span><span class="p">(</span><span class="mi">15</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">PARTITION</span><span class="w"> </span><span class="n">p3</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="k">LESS</span><span class="w"> </span><span class="k">THAN</span><span class="w"> </span><span class="k">MAXVALUE</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">--插入数据
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">tbl_users</span><span class="w"> </span><span class="k">VALUES</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s2">&#34;只为你&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;qzp&#34;</span><span class="p">,</span><span class="s2">&#34;quezhipeng&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">),(</span><span class="mi">6</span><span class="p">,</span><span class="s2">&#34;人生&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;人生&#34;</span><span class="p">,</span><span class="s2">&#34;无名&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">),(</span><span class="mi">12</span><span class="p">,</span><span class="s2">&#34;无须终有&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;无须终有&#34;</span><span class="p">,</span><span class="s2">&#34;无声&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">),(</span><span class="mi">100</span><span class="p">,</span><span class="s2">&#34;坚持&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;胜利&#34;</span><span class="p">,</span><span class="s2">&#34;坚持&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></div><ol>
+<li>通过命令查看分区。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">mysql</span><span class="o">&gt;</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">information_schema</span><span class="p">.</span><span class="o">`</span><span class="n">PARTITIONS</span><span class="o">`</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">table_schema</span><span class="o">=</span><span class="s1">&#39;kubiao&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="k">table_name</span><span class="o">=</span><span class="s1">&#39;tbl_users&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><ol start="2">
+<li>查看分区上的数据。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">tbl_users</span><span class="w"> </span><span class="n">PARTITION</span><span class="p">(</span><span class="n">p0</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></div><ol start="3">
+<li>查看MySQL操作的分区。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">EXPLAIN</span><span class="w"> </span><span class="n">PARTITIONS</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">tbl_users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">uuid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><h3 id="list分区">List分区<a hidden class="anchor" aria-hidden="true" href="#list分区">#</a></h3>
+<ol>
+<li>注意：如果试图操作的列值不在分区值列表中时，那么会失败并报错，要注意的是，LIST分区没有类似如：“VALUES LESS THAN”这样的包含其他值在内的定义，将要匹配的任何值都必须在值列表中找到。</li>
+<li>LIST分区除了能和RANGE分区结合起来生成一个复合的子分区，与Hash和KEY分区结合起来成复合的子分区也是可以的。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">tbl_users2</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">uuid</span><span class="o">`</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">customerId</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">pwd</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">showName</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">trueName</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">registerTime</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">PARTITION</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">List</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">PARTITION</span><span class="w"> </span><span class="n">p0</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="k">in</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">PARTITION</span><span class="w"> </span><span class="n">p1</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="k">in</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">PARTITION</span><span class="w"> </span><span class="n">p2</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="k">in</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">--插入数据，注意：加入数据需要根据主键来，不可以时主键分区中没有的，否则报错
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">tbl_users2</span><span class="w"> </span><span class="k">VALUES</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s2">&#34;只为你&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;qzp&#34;</span><span class="p">,</span><span class="s2">&#34;quezhipeng&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">),(</span><span class="mi">7</span><span class="p">,</span><span class="s2">&#34;人生&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;人生&#34;</span><span class="p">,</span><span class="s2">&#34;无名&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">),(</span><span class="mi">10</span><span class="p">,</span><span class="s2">&#34;无须终有&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;无须终有&#34;</span><span class="p">,</span><span class="s2">&#34;无声&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">),(</span><span class="mi">15</span><span class="p">,</span><span class="s2">&#34;坚持&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;胜利&#34;</span><span class="p">,</span><span class="s2">&#34;坚持&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></div><ol start="3">
+<li>查看数据，与 RANGE 分区一样。</li>
+</ol>
+<h3 id="hash分区">HASH分区<a hidden class="anchor" aria-hidden="true" href="#hash分区">#</a></h3>
+<ol>
+<li>HASH分区：主要用来确保数据在预先确定数目的分区中平均分布，在RANGE和LIST分区中，必须明确指定一个给定的列值或者列值集合以指定应该保存在哪个分区中；而在HASH分区中，MySQL自动完成这些工作，要做的只是基于将要被哈希的列值指定的一个表达式，以及指定被分区的表将要被分割成的分区数量，如：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">--创建一张hash分区表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">tbl_users4</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">`</span><span class="n">uuid</span><span class="o">`</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">`</span><span class="n">customerId</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">`</span><span class="n">pwd</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">`</span><span class="n">showName</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">`</span><span class="n">trueName</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">`</span><span class="n">registerTime</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">PARTITION</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">hash</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">PARTITIONS</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">--插入数据，注意：分区是有uuid/3求余数决定,余数为0，在p0;余数为1，在p1;余数为2，在p2,以此类推....
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">tbl_users2</span><span class="w"> </span><span class="k">VALUES</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s2">&#34;只为你&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;qzp&#34;</span><span class="p">,</span><span class="s2">&#34;quezhipeng&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">),(</span><span class="mi">7</span><span class="p">,</span><span class="s2">&#34;人生&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;人生&#34;</span><span class="p">,</span><span class="s2">&#34;无名&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">),(</span><span class="mi">10</span><span class="p">,</span><span class="s2">&#34;无须终有&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;无须终有&#34;</span><span class="p">,</span><span class="s2">&#34;无声&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">),(</span><span class="mi">15</span><span class="p">,</span><span class="s2">&#34;坚持&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;胜利&#34;</span><span class="p">,</span><span class="s2">&#34;坚持&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></div><h3 id="key分区">KEY分区<a hidden class="anchor" aria-hidden="true" href="#key分区">#</a></h3>
+<ol>
+<li>类似于按照HASH分区，HASH分区允许用户自定义表达式，而KEY分区不允许使用用户自定义的表达式：HASH分区只支持整数分区，KEY分区支持除了blob或者text类型之外的其他数据类型分区。</li>
+<li>与HASH分区不同，创建KEY分区表的时候，可以不指定分区键，默认会选择使用主键或者唯一键作为分区键，没有主键或唯一键，就必须指定分区键。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">--创建一张key分区表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">tbl_users5</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">`</span><span class="n">uuid</span><span class="o">`</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">`</span><span class="n">customerId</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">`</span><span class="n">pwd</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">`</span><span class="n">showName</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">`</span><span class="n">trueName</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="o">`</span><span class="n">registerTime</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">PARTITION</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">LINEAR</span><span class="w"> </span><span class="k">key</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="n">PARTITIONS</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">--插入数据，注意：分区是有uuid/3求余数决定,余数为0，在p0;余数为1，在p1;余数为2，在p2,以此类推....
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">tbl_users5</span><span class="w"> </span><span class="k">VALUES</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s2">&#34;只为你&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;qzp&#34;</span><span class="p">,</span><span class="s2">&#34;quezhipeng&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">),(</span><span class="mi">7</span><span class="p">,</span><span class="s2">&#34;人生&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;人生&#34;</span><span class="p">,</span><span class="s2">&#34;无名&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">),(</span><span class="mi">10</span><span class="p">,</span><span class="s2">&#34;无须终有&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;无须终有&#34;</span><span class="p">,</span><span class="s2">&#34;无声&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">),(</span><span class="mi">15</span><span class="p">,</span><span class="s2">&#34;坚持&#34;</span><span class="p">,</span><span class="s2">&#34;123456&#34;</span><span class="p">,</span><span class="s2">&#34;胜利&#34;</span><span class="p">,</span><span class="s2">&#34;坚持&#34;</span><span class="p">,</span><span class="s2">&#34;20200808&#34;</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></div><h2 id="参考">参考<a hidden class="anchor" aria-hidden="true" href="#参考">#</a></h2>
+<ol>
+<li><a href="https://blog.csdn.net/QZP51ZX/article/details/107904191" target="_blank" rel="noopener">MySQL分区知识及操作详解(完整版)</a></li>
+<li><a href="https://cloud.tencent.com/developer/article/2420277" target="_blank" rel="noopener">MySQL分区表：万字详解与实践指南</a></li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://heliu.site/tags/mysql/">Mysql</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://heliu.site/posts/mysql/trigger/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>触发器</span>
+  </a>
+  <a class="next" href="https://heliu.site/posts/nginx/install/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>nginx 安装部署</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    
+    <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv">
+        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    </span>
+    <span id="busuanzi_container_site_uv">
+        本站访客数<span id="busuanzi_value_site_uv"></span>人次
+    </span>
+    </div>
+        <span>Copyright © 2024 蜀ICP备2024091074号 <a href="#">heliu's blog</a>. All rights reserved</span>  
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'Copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'Done';
+            setTimeout(() => {
+                copybutton.innerHTML = 'Copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

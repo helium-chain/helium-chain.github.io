@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Sun, 08 Sep 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 17 Sep 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://heliu.site/tags/grpc/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>本地环境搭建</title>
@@ -27,6 +27,13 @@
       <pubDate>Sun, 01 Sep 2024 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/grpc/proto/</guid>
       <description>proto3 文件介绍。</description>
+    </item>
+    <item>
+      <title>通信模式</title>
+      <link>https://heliu.site/posts/grpc/mode/</link>
+      <pubDate>Wed, 11 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/grpc/mode/</guid>
+      <description>gRPC 的四种模式。</description>
     </item>
     <item>
       <title>SSL/TLS 安全</title>
@@ -71,11 +78,25 @@
       <description>💥本文章关于google.google.org/grpc v1.66.0。</description>
     </item>
     <item>
-      <title>grpc.CallOption</title>
-      <link>https://heliu.site/posts/grpc/grpc-calloption/</link>
-      <pubDate>Thu, 05 Sep 2024 00:00:00 +0000</pubDate>
-      <guid>https://heliu.site/posts/grpc/grpc-calloption/</guid>
-      <description>💥本文章关于google.google.org/grpc v1.66.0。</description>
+      <title>超时控制</title>
+      <link>https://heliu.site/posts/grpc/timeout/</link>
+      <pubDate>Mon, 16 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/grpc/timeout/</guid>
+      <description>grpc 超时控制。</description>
+    </item>
+    <item>
+      <title>grpc.Server</title>
+      <link>https://heliu.site/posts/grpc/grpc-server/</link>
+      <pubDate>Sun, 15 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/grpc/grpc-server/</guid>
+      <description>google.google.org/grpc 包。</description>
+    </item>
+    <item>
+      <title>grpc.Client</title>
+      <link>https://heliu.site/posts/grpc/grpc-client/</link>
+      <pubDate>Tue, 17 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/grpc/grpc-client/</guid>
+      <description>grpc client 介绍。</description>
     </item>
   </channel>
 </rss>

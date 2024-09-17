@@ -125,8 +125,8 @@
   "keywords": [
     "grpc"
   ],
-  "articleBody": " 官网地址：https://grpc.io/ 前置条件： 安装 Go 软件。 安装 Protocol buffer 编译器，protoc 版本 3。 protocol 编译器的 Go 插件安装。 Protocol编译器 官方安装文档：https://grpc.io/docs/protoc-installation/ 选择你要的版本：https://github.com/google/protobuf/releases $ wget https://github.com/protocolbuffers/protobuf/releases/download/v26.1/protoc-26.1-linux-x86_64.zip 在$HOME/.local或您选择的目录下解压缩该文件。例如： $ unzip protoc-26.1-linux-x86_64.zip -d $HOME/.local 更新环境路径变量以包含可执行protoc的路径。例如：（添加环境变量） # 临时生效 $ export PATH=\"$PATH:$HOME/.local/bin\" 验证安装： $ protoc --version protoc 帮助文档： -IPATH, --proto_path=PATH：表示的是我们要在哪个路径下搜索.proto文件，这个参数既可以用-I指定，也可以使用--proto_path=指定。如果不指定该参数，则默认在当前路径下进行搜索；另外，该参数也可以指定多次，这也意味着我们可以指定多个路径进行搜索。 下面的--cpp_out、--csharp_out等，protoc支持的语言长达13种，且都是比较常见的，但是却没有Go。因此需要安装Google维护的第三方插件。 $ protoc --help Usage: protoc [OPTION] PROTO_FILES -IPATH, --proto_path=PATH 指定搜索路径 --plugin=EXECUTABLE: .... --cpp_out=OUT_DIR Generate C++ header and source. --csharp_out=OUT_DIR Generate C# source file. --java_out=OUT_DIR Generate Java source file. --kotlin_out=OUT_DIR Generate Kotlin file. --objc_out=OUT_DIR Generate Objective-C header and source. --php_out=OUT_DIR Generate PHP source file. --pyi_out=OUT_DIR Generate python pyi stub. --python_out=OUT_DIR Generate Python source file. --ruby_out=OUT_DIR Generate Ruby source file. Go 插件 官方安装文档：https://grpc.io/docs/languages/go/quickstart/ protocol 编译器的 Go 插件安装：使用以下命令安装Go的protocol编译器插件 这两个插件可以用来生成Golang版本的proto协议代码和gRPC代理代码。 # 安装最新版本 protoc-gen-go@latest # protoc-gen-go 为 Golang 代码生成工具 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34 # 安装最新版本 protoc-gen-go-grpc@latest $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3 更新您的PATH，以便协议编译器可以找到插件： # 临时生效 $ export PATH=\"$PATH:$(go env GOPATH)/bin\" 验证： $ protoc-gen-go --version $ protoc-gen-go-grpc --version protoc-gen-go 插件 非内置的语言支持就得自己单独安装语言插件，比如--go_out=对应的是protoc-gen-go(生成pb序列化相关文件)，安装命令如下： # 最新版 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest # 指定版本 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34 protoc-gen-go要求pb文件必须指定go包的路径，即 option go_package = \"example.com/project/protos/fizz\"; // 如果想指定包名称添加下面代码 // package server // 也可写成这种形式，逗号后面即使包名称 // option go_package = \"example.com/project/protos/fizz;server\"; 支持相关参数：\n--go_out：指定go代码生成的基本路径。该参数会生成 xxx.pb.go 文件，包含所有类型的序列化和反序列化代码。 --go_opt：设定插件参数，protoc-gen-go提供了--go_opt来为其指定参数，并可以设置多个。 如果使用paths=import, 生成的文件会按go_package路径来生成，当然是在--go_out目录下，即 $go_out/$go_package/pb_filename.pb.go。(默认) 如果使用paths=source_relative，就在当前pb文件同路径下生成代码。注意pb的目录也被包含进去了。即 $go_out/$pb_filedir/$pb_filename.pb.go 如果指定了module=$PREFIX标志，则输出文件将放在以Go包的导入路径命名的目录中(例如 .proto文件中的go_package选项提供的路径)，但指定的目录前缀将从输出文件名中删除。 可以使用如下命令生成代码：\n$ protoc --proto_path=src --go_out=out --go_opt=paths=source_relative foo.proto bar/baz.proto protoc-gen-go-grpc 插件 生成gRPC相关代码需要安装grpc-go相关的插件protoc-gen-go-grpc。 # 最新版本 $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest # 指定版本 $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3 支持相关参数： --go-grpc_out：指定grpc go代码生成的基本路径，该命令会生成 xxx_grpc.pb.go 文件，包含客户端/服务端调用的接口定义。 --go-grpc_opt：和protoc-gen-go类似。 环境变量 永久修改环境变量： 使用修改.bashrc文件进行环境变量的编辑，只对当前用户有用 使用修改/etc/profile文件进行环境变量的编辑，是对所有用户有用 $ vim /etc/profile # 添加 export PATH=\"$PATH:$(go env GOPATH)/bin:$HOME/.local/bin\" # 刷新 $ source /etc/profile 安装核心库 $ go get google.golang.org/grpc protoc 命令 paths=import：示按照生成的Go代码的包的全路径去创建目录层级。 # -I . 指定当前目录下搜索 .proto 文件 # --go_out=./service 指定文件输出目录为 ./service # --go_opt=paths=import 应该输出 $go_out/$go_package/hello.pb.go protoc -I . --go_out=./service --go_opt=paths=import hello.proto # 生成位置 $go_out/$go_package/hello_grpc.pb.go protoc -I . --go-grpc_out=./service --go-grpc_opt=paths=import hello.proto paths=source_relative：表示按照 proto源文件的目录层级去创建Go代码的目录层级，如果目录已存在则不用创建。 module=$PREFIX ",
-  "wordCount" : "273",
+  "articleBody": " 官网地址：https://grpc.io/ 前置条件： 安装 Go 软件。 安装 Protocol buffer 编译器，protoc 版本 3。 protocol 编译器的 Go 插件安装。 Protocol编译器 官方安装文档：https://grpc.io/docs/protoc-installation/。 选择你要的版本：https://github.com/google/protobuf/releases。 $ wget https://github.com/protocolbuffers/protobuf/releases/download/v26.1/protoc-26.1-linux-x86_64.zip 在$HOME/.local或您选择的目录下解压缩该文件。例如： $ unzip protoc-26.1-linux-x86_64.zip -d $HOME/.local 更新环境路径变量以包含可执行protoc的路径。例如：（添加环境变量） # 临时生效 $ export PATH=\"$PATH:$HOME/.local/bin\" 验证安装： $ protoc --version protoc 帮助文档： -IPATH, --proto_path=PATH：表示的是我们要在哪个路径下搜索.proto文件，这个参数既可以用-I指定，也可以使用--proto_path=指定。如果不指定该参数，则默认在当前路径下进行搜索；另外，该参数也可以指定多次，这也意味着我们可以指定多个路径进行搜索。 下面的--cpp_out、--csharp_out等，protoc支持的语言长达13种，且都是比较常见的，但是却没有Go。因此需要安装Google维护的第三方插件。 $ protoc --help Usage: protoc [OPTION] PROTO_FILES -IPATH, --proto_path=PATH 指定搜索路径 --plugin=EXECUTABLE: .... --cpp_out=OUT_DIR Generate C++ header and source. --csharp_out=OUT_DIR Generate C# source file. --java_out=OUT_DIR Generate Java source file. --kotlin_out=OUT_DIR Generate Kotlin file. --objc_out=OUT_DIR Generate Objective-C header and source. --php_out=OUT_DIR Generate PHP source file. --pyi_out=OUT_DIR Generate python pyi stub. --python_out=OUT_DIR Generate Python source file. --ruby_out=OUT_DIR Generate Ruby source file. Go 插件 官方安装文档：https://grpc.io/docs/languages/go/quickstart/。 protocol 编译器的 Go 插件安装：使用以下命令安装Go的protocol编译器插件。 这两个插件可以用来生成Golang版本的proto协议代码和gRPC代理代码。 # 安装最新版本 protoc-gen-go@latest; protoc-gen-go 生成pb序列化相关文件。 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34 # 安装最新版本 protoc-gen-go-grpc@latest; protoc-gen-go-grpc 生成grpc相关文件。 $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3 更新您的PATH，以便协议编译器可以找到插件： # 临时生效 $ export PATH=\"$PATH:$(go env GOPATH)/bin\" 验证： $ protoc-gen-go --version $ protoc-gen-go-grpc --version protoc-gen-go 插件 非内置的语言支持就得自己单独安装语言插件，比如--go_out=对应的是protoc-gen-go(生成pb序列化相关文件)，安装命令如下： # 最新版 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest # 指定版本 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34 protoc-gen-go要求pb文件必须指定go包的路径，即 // 指定包路径 option go_package = \"example.com/project/protos/fizz\"; // 如果想指定包名称添加下面代码 // package server // 也可写成这种形式，逗号后面即使包名称 // option go_package = \"example.com/project/protos/fizz;server\"; 支持相关参数：\n--go_out：指定go代码生成的基本路径。该参数会生成 xxx.pb.go 文件，包含所有类型的序列化和反序列化代码。 --go_opt：设定插件参数，protoc-gen-go提供了--go_opt来为其指定参数，并可以设置多个。 如果使用paths=import, 生成的文件会按go_package路径来生成，当然是在--go_out目录下，即 $go_out/$go_package/pb_filename.pb.go。(默认) 如果使用paths=source_relative，就在当前pb文件同路径下生成代码。注意pb的目录也被包含进去了。即 $go_out/$pb_filedir/$pb_filename.pb.go。 如果指定了module=$PREFIX标志，则输出文件将放在以Go包的导入路径命名的目录中(例如 .proto文件中的go_package选项提供的路径)，但指定的目录前缀将从输出文件名中删除。 可以使用如下命令生成代码：\n$ protoc --proto_path=src --go_out=out --go_opt=paths=source_relative foo.proto bar/baz.proto protoc-gen-go-grpc 插件 生成gRPC相关代码需要安装grpc-go相关的插件protoc-gen-go-grpc。 # 最新版本 $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest # 指定版本 $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3 支持相关参数： --go-grpc_out：指定grpc go代码生成的基本路径，该命令会生成 xxx_grpc.pb.go 文件，包含客户端/服务端调用的接口定义。 --go-grpc_opt：和protoc-gen-go类似。 环境变量 永久修改环境变量： 使用修改.bashrc文件进行环境变量的编辑，只对当前用户有用 使用修改/etc/profile文件进行环境变量的编辑，是对所有用户有用 $ vim /etc/profile # 添加 export PATH=\"$PATH:$(go env GOPATH)/bin:$HOME/.local/bin\" # 刷新 $ source /etc/profile 安装核心库 $ go get google.golang.org/grpc protoc 命令 paths=import：示按照生成的Go代码的包的全路径去创建目录层级。 # -I . 指定当前目录下搜索 .proto 文件 # --go_out=./service 指定文件输出目录为 ./service # --go_opt=paths=import 应该输出 $go_out/$go_package/hello.pb.go $ protoc -I . --go_out=./service --go_opt=paths=import hello.proto # 生成位置 $go_out/$go_package/hello_grpc.pb.go $ protoc -I . --go-grpc_out=./service --go-grpc_opt=paths=import hello.proto paths=source_relative：表示按照 proto源文件的目录层级去创建Go代码的目录层级，如果目录已存在则不用创建。 $ protoc -I ./pb \\ --go_out ./ecommerce --go_opt paths=source_relative \\ --go-grpc_out ./ecommerce --go-grpc_opt paths=source_relative \\ ./pb/product.proto ",
+  "wordCount" : "291",
   "inLanguage": "zh",
   "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-09-01T00:00:00Z",
   "dateModified": "2024-09-01T00:00:00Z",
@@ -252,7 +252,7 @@
     <line x1="16" y1="13" x2="8" y2="13" style="user-select: text;"></line>
     <line x1="16" y1="17" x2="8" y2="17" style="user-select: text;"></line>
     <polyline points="10 9 9 9 8 9" style="user-select: text;"></polyline>
-</svg><span>273字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+</svg><span>291字</span></span>&nbsp;<span class="x-post-meta-item"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
      stroke-linecap="round" stroke-linejoin="round">
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
     <circle cx="12" cy="12" r="9"></circle>
@@ -377,8 +377,8 @@
 </ul>
 <h2 id="protocol编译器">Protocol编译器<a hidden class="anchor" aria-hidden="true" href="#protocol编译器">#</a></h2>
 <ol>
-<li>官方安装文档：<a href="https://grpc.io/docs/protoc-installation/" target="_blank" rel="noopener">https://grpc.io/docs/protoc-installation/</a></li>
-<li>选择你要的版本：<a href="https://github.com/google/protobuf/releases" target="_blank" rel="noopener">https://github.com/google/protobuf/releases</a></li>
+<li>官方安装文档：<a href="https://grpc.io/docs/protoc-installation/" target="_blank" rel="noopener">https://grpc.io/docs/protoc-installation/</a>。</li>
+<li>选择你要的版本：<a href="https://github.com/google/protobuf/releases" target="_blank" rel="noopener">https://github.com/google/protobuf/releases</a>。</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ wget https://github.com/protocolbuffers/protobuf/releases/download/v26.1/protoc-26.1-linux-x86_64.zip
 </span></span></code></pre></div><ol start="2">
@@ -421,22 +421,21 @@
 </span></span><span class="line"><span class="cl">--ruby_out<span class="o">=</span>OUT_DIR          Generate Ruby <span class="nb">source</span> file.
 </span></span></code></pre></div><h2 id="go-插件">Go 插件<a hidden class="anchor" aria-hidden="true" href="#go-插件">#</a></h2>
 <ol>
-<li>官方安装文档：<a href="https://grpc.io/docs/languages/go/quickstart/" target="_blank" rel="noopener">https://grpc.io/docs/languages/go/quickstart/</a></li>
-<li>protocol 编译器的 Go 插件安装：使用以下命令安装Go的protocol编译器插件</li>
+<li>官方安装文档：<a href="https://grpc.io/docs/languages/go/quickstart/" target="_blank" rel="noopener">https://grpc.io/docs/languages/go/quickstart/</a>。</li>
+<li>protocol 编译器的 Go 插件安装：使用以下命令安装Go的protocol编译器插件。</li>
 <li>这两个插件可以用来生成Golang版本的proto协议代码和gRPC代理代码。</li>
 </ol>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="c1"># 安装最新版本 protoc-gen-go@latest</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># protoc-gen-go 为 Golang 代码生成工具</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="c1"># 安装最新版本 protoc-gen-go@latest; protoc-gen-go 生成pb序列化相关文件。</span>
 </span></span><span class="line"><span class="cl">$ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 安装最新版本 protoc-gen-go-grpc@latest</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 安装最新版本 protoc-gen-go-grpc@latest; protoc-gen-go-grpc 生成grpc相关文件。</span>
 </span></span><span class="line"><span class="cl">$ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3
-</span></span></code></pre></div><ol start="2">
+</span></span></code></pre></div><ol start="4">
 <li>更新您的PATH，以便协议编译器可以找到插件：</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="c1"># 临时生效</span>
 </span></span><span class="line"><span class="cl">$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$PATH</span><span class="s2">:</span><span class="k">$(</span>go env GOPATH<span class="k">)</span><span class="s2">/bin&#34;</span>
-</span></span></code></pre></div><ol start="3">
+</span></span></code></pre></div><ol start="5">
 <li>验证：</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ protoc-gen-go --version
@@ -454,7 +453,8 @@
 </span></span></code></pre></div><ol start="2">
 <li>protoc-gen-go要求pb文件必须指定go包的路径，即</li>
 </ol>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="k">option</span> <span class="n">go_package</span> <span class="o">=</span> <span class="s">&#34;example.com/project/protos/fizz&#34;</span><span class="p">;</span><span class="err">
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="c1">// 指定包路径
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">option</span> <span class="n">go_package</span> <span class="o">=</span> <span class="s">&#34;example.com/project/protos/fizz&#34;</span><span class="p">;</span><span class="err">
 </span></span></span><span class="line"><span class="cl"><span class="err">
 </span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c1">// 如果想指定包名称添加下面代码
 </span></span></span><span class="line"><span class="cl"><span class="c1">// package server
@@ -469,7 +469,7 @@
 <li><strong><code>--go_opt</code></strong>：设定插件参数，<code>protoc-gen-go</code>提供了<code>--go_opt</code>来为其指定参数，并可以设置多个。
 <ul>
 <li>如果使用<code>paths=import</code>, 生成的文件会按go_package路径来生成，当然是在<code>--go_out</code>目录下，即 <strong>$go_out/$go_package/pb_filename.pb.go</strong>。(默认)</li>
-<li>如果使用<code>paths=source_relative</code>，就在当前pb文件同路径下生成代码。注意pb的目录也被包含进去了。即 <strong>$go_out/$pb_filedir/$pb_filename.pb.go</strong></li>
+<li>如果使用<code>paths=source_relative</code>，就在当前pb文件同路径下生成代码。注意pb的目录也被包含进去了。即 <strong>$go_out/$pb_filedir/$pb_filename.pb.go</strong>。</li>
 <li>如果指定了<code>module=$PREFIX</code>标志，则输出文件将放在以Go包的导入路径命名的目录中(例如 .proto文件中的go_package选项提供的路径)，但指定的目录前缀将从输出文件名中删除。</li>
 </ul>
 </li>
@@ -522,17 +522,18 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="c1"># -I . 指定当前目录下搜索 .proto 文件</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># --go_out=./service 指定文件输出目录为 ./service</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># --go_opt=paths=import 应该输出 $go_out/$go_package/hello.pb.go</span>
-</span></span><span class="line"><span class="cl">protoc -I . --go_out<span class="o">=</span>./service --go_opt<span class="o">=</span><span class="nv">paths</span><span class="o">=</span>import hello.proto
+</span></span><span class="line"><span class="cl">$ protoc -I . --go_out<span class="o">=</span>./service --go_opt<span class="o">=</span><span class="nv">paths</span><span class="o">=</span>import hello.proto
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="c1"># 生成位置 $go_out/$go_package/hello_grpc.pb.go</span>
-</span></span><span class="line"><span class="cl">protoc -I . --go-grpc_out<span class="o">=</span>./service --go-grpc_opt<span class="o">=</span><span class="nv">paths</span><span class="o">=</span>import hello.proto
+</span></span><span class="line"><span class="cl">$ protoc -I . --go-grpc_out<span class="o">=</span>./service --go-grpc_opt<span class="o">=</span><span class="nv">paths</span><span class="o">=</span>import hello.proto
 </span></span></code></pre></div><ol start="2">
 <li>paths=source_relative：表示按照 proto源文件的目录层级去创建Go代码的目录层级，如果目录已存在则不用创建。</li>
 </ol>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"></code></pre></div><ol start="3">
-<li>module=$PREFIX</li>
-</ol>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">$ protoc -I ./pb <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--go_out ./ecommerce --go_opt <span class="nv">paths</span><span class="o">=</span>source_relative <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>--go-grpc_out ./ecommerce --go-grpc_opt <span class="nv">paths</span><span class="o">=</span>source_relative <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>./pb/product.proto
+</span></span></code></pre></div>
 
   </div>
 
