@@ -12,7 +12,7 @@
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
-    <lastBuildDate>Tue, 17 Sep 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 25 Sep 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://heliu.site/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>sync.Pool</title>
@@ -883,11 +883,32 @@
       <description>carbon包使用介绍。</description>
     </item>
     <item>
+      <title>安装</title>
+      <link>https://heliu.site/posts/postgresql/install/</link>
+      <pubDate>Thu, 19 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/postgresql/install/</guid>
+      <description>pgSQL docker 安装介绍。</description>
+    </item>
+    <item>
       <title>本地环境搭建</title>
       <link>https://heliu.site/posts/grpc/install/</link>
       <pubDate>Sun, 01 Sep 2024 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/grpc/install/</guid>
       <description>Go gRpc教程。</description>
+    </item>
+    <item>
+      <title>客户端命令</title>
+      <link>https://heliu.site/posts/postgresql/client/</link>
+      <pubDate>Sun, 22 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/postgresql/client/</guid>
+      <description>💥本文章相关postgreSQL版本14.4</description>
+    </item>
+    <item>
+      <title>用户和角色</title>
+      <link>https://heliu.site/posts/postgresql/user-role/</link>
+      <pubDate>Fri, 20 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/postgresql/user-role/</guid>
+      <description>PostgreSQL 角色和用户。</description>
     </item>
     <item>
       <title>proto3</title>
@@ -897,11 +918,46 @@
       <description>proto3 文件介绍。</description>
     </item>
     <item>
+      <title>数据库与模式</title>
+      <link>https://heliu.site/posts/postgresql/database/</link>
+      <pubDate>Mon, 23 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/postgresql/database/</guid>
+      <description>💥本文章参考自PostgreSQL 14.4。</description>
+    </item>
+    <item>
+      <title>数据类型</title>
+      <link>https://heliu.site/posts/postgresql/datatype/</link>
+      <pubDate>Mon, 23 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/postgresql/datatype/</guid>
+      <description>💥本文章所有相关PostgreSQL 14版本。</description>
+    </item>
+    <item>
+      <title>查询</title>
+      <link>https://heliu.site/posts/postgresql/query/</link>
+      <pubDate>Wed, 18 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/postgresql/query/</guid>
+      <description>Query</description>
+    </item>
+    <item>
       <title>通信模式</title>
       <link>https://heliu.site/posts/grpc/mode/</link>
       <pubDate>Wed, 11 Sep 2024 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/grpc/mode/</guid>
       <description>gRPC 的四种模式。</description>
+    </item>
+    <item>
+      <title>表和表空间</title>
+      <link>https://heliu.site/posts/postgresql/table/</link>
+      <pubDate>Tue, 24 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/postgresql/table/</guid>
+      <description>💥本文章参考自PostgreSQL 14.4。</description>
+    </item>
+    <item>
+      <title>常用函数</title>
+      <link>https://heliu.site/posts/postgresql/function/</link>
+      <pubDate>Thu, 19 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/postgresql/function/</guid>
+      <description>pgSQL 常用函数简介。</description>
     </item>
     <item>
       <title>SSL/TLS 安全</title>
@@ -951,6 +1007,13 @@
       <pubDate>Mon, 16 Sep 2024 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/grpc/timeout/</guid>
       <description>grpc 超时控制。</description>
+    </item>
+    <item>
+      <title>设置默认时区</title>
+      <link>https://heliu.site/posts/postgresql/timezone/</link>
+      <pubDate>Wed, 25 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://heliu.site/posts/postgresql/timezone/</guid>
+      <description>💥本文章所有相关PostgreSQL 14版本。</description>
     </item>
     <item>
       <title>grpc.Server</title>
