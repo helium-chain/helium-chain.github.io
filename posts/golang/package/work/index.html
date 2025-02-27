@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, 包管理">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/package/work/">
+<link rel="canonical" href="https://helium.github.io/posts/golang/package/work/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/package/work/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/package/work/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="go work" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/package/work/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/golang/package/work/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2020-03-23T00:00:00+00:00" />
 <meta property="article:modified_time" content="2020-03-23T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="go work"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://heliu.site/posts/golang/"
+      "item": "https://helium.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第4章 包管理",
-      "item": "https://heliu.site/posts/golang/package/"
+      "item": "https://helium.github.io/posts/golang/package/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "go work",
-      "item": "https://heliu.site/posts/golang/package/work/"
+      "item": "https://helium.github.io/posts/golang/package/work/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": " 用法：go work [arguments] command 列表： edit：从工具或脚本编辑 go.work。 init：初始化工作区文件。 sync：将工作区构建列表同步到模块。 use：将模块添加到工作区文件。 go work init 用法：go work init [moddirs]。 init在当前目录中初始化并写入一个新的go.work文件，实际上是在当前目录中创建了一个新的工作空间。 go work init可选择接受工作区模块的路径作为参数。如果省略该参数，将创建一个没有模块的空工作区。 每个参数路径都添加到go.work文件中的use指令中。 当前的go版本也将列在go.work文件中。 示例： 1 2 # 初始化一个新的工作区，后面参数就是具体的子模块 $ go work init ./queue ./hello 1 2 3 4 5 6 7 8 9 // 项目目录构成 workspace |-- queue # 子模块 | |-- go.mod | |-- queue.go |-- hello # 子模块 | |-- go.mod | |-- main.go\t|-- go.work # 工作区 通常go.work文件不要提交到git上，因为它主要用于本地代码开发。 go work edit 用法：go work edit [editing flags] [go.work]。用于编辑go.work文件。 go work edit命令提供了一个用于编辑go.work的命令行界面，主要供工具或脚本使用。 它只读取go.work;它不查找有关所涉及模块的信息。如果没有指定文件，edit在当前目录及其父目录中查找go.work文件。 editing flags fmt：重新格式化go.work文件而不进行其他更改。使用或重写go.work文件的任何其他修改也暗示了这种重新格式化。唯一需要此标志的情况是没有指定其他标志。 示例：go work edit -fmt。用于格式化go.work文件。 $ go work edit -fmt -use=path：从go.work文件的模块目录集中添加use指令。建议使用go work use指令。 示例：go work edit -use=./queue。添加子模块。 $ go work edit -use ./ququq -dropuse=path：从go.work文件的模块目录集中删除use指令。 示例：go work edit -dropuse=./queue。删除子模块queue。 $ go work edit -dropuse ./queue -replace=old[@v]=new[@v]：添加了给定模块路径和版本对的替换。 如果old@v中的@v被省略，则添加左侧没有版本的替换，适用于旧模块路径的所有版本。 如果省略new@v中的@v，则新路径应该是本地模块根目录，而不是模块路径。 请注意，-replace会覆盖old[@v]的任何冗余替换，因此省略@v将删除特定版本的现有替换。 示例：go work edit -replace myzx.cn/helium/queue=./queue。 $ go work edit -replace myzx.cn/helium/queue=./queue -dropreplace=old[@v]：删除给定模块路径和版本对的替换。如果省略了@v，则会删除左侧没有版本的替换。 示例：go work edit -dropreplace myzx.cn/helium/queue。 $ go work edit -dropreplace myzx.cn/helium/queue -go=version：设置预期的Go语言版本。 示例：go work edit -go 1.19。 $ go work edit -go 1.19 这些editing flags可以重复使用。 更改按给定的顺序应用。 go work edit有额外的标志来控制它的输出 -print：以文本格式打印最终的go.work，而不是将其写回go.mod。 $ go work edit -print -json：以JSON格式打印最终的go.work文件，而不是将其写回go.mod。 $ go work edit -json JSON输出对应于以下Go类型： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 type Module struct { Path string Version string } type GoWork struct { Go string Directory []Directory Replace []Replace } type Use struct { Path string ModulePath string } type Replace struct { Old Module New Module } go work use 用法：go work use [-r] [moddirs]。use指定使用的模块目录。 go work use命令提供了一个命令行界面，用于将目录（可选地以递归方式）添加到go.work文件中。 use指令将被添加到命令行go.work文件中列出的每个参数目录的go.work文件（如果它存在于磁盘上），或者从go.work文件中删除（如果它不存在于磁盘上）。 删除功能使用：go work edit -dropuse ./queue命令。 -r：递归搜索参数目录中的模块，并且使用命令就像每个目录都被指定为参数一样操作：即，将为存在的目录添加使用指令，为不存在的目录删除使用指令。 递归的添加子模块到当前工作区，这对于子模块引用了很多模块很用用处。 示例：go work use ./queue，添加queue子模块。 $ go work use ./queue go work sync 用法：go work sync。没有参数。 go work sync命令将工作区的构建列表同步回工作区的模块。该命令会修改go.work文件。 工作区的构建列表是用于在工作区中进行构建的所有（传递）依赖模块的版本集。go work sync使用最小版本选择(MVS)算法生成该构建列表，然后将这些版本同步回工作区中指定的每个模块（使用use指令）。 一旦计算了工作区构建列表，工作区中每个模块的go.mod文件都会被重写，并使用与该模块相关的依赖项进行升级以匹配工作区构建列表。请注意，最小版本选择保证每个模块的构建列表版本始终与每个工作区模块中的相同或更高。 $ go work sync go env GOWORK 查看环境变量，查看当前工作区文件路径。可以排查工作区文件是否设置正确。go.work路径找不到可以使用GOWORK指定。 示例： $ go env GOWORK G:\\workspace\\go.work 禁用工作区，直接把GOWORK设置为off即可。 ",
   "wordCount" : "293",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2020-03-23T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2020-03-23T00:00:00Z",
   "dateModified": "2020-03-23T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/package/work/"
+    "@id": "https://helium.github.io/posts/golang/package/work/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/package/">第4章 包管理</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/package/">第4章 包管理</a></div>
     <h1 class="post-title entry-hint-parent">
       go work
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/" target="_blank" rel="noopener">包管理</a>
+            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium.github.io/tags/%E5%8C%85%E7%AE%A1%E7%90%86/" target="_blank" rel="noopener">包管理</a>
         </ul>
       </span>
       
@@ -597,16 +597,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
-      <li><a href="https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/">包管理</a></li>
+      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium.github.io/tags/%E5%8C%85%E7%AE%A1%E7%90%86/">包管理</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/package/module/">
+  <a class="prev" href="https://helium.github.io/posts/golang/package/module/">
     <span class="title">« 上一页</span>
     <br>
     <span>go modules</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/package/env/">
+  <a class="next" href="https://helium.github.io/posts/golang/package/env/">
     <span class="title">下一页 »</span>
     <br>
     <span>模块相关环境变量</span>

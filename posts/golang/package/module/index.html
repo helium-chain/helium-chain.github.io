@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, 包管理">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/package/module/">
+<link rel="canonical" href="https://helium.github.io/posts/golang/package/module/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/package/module/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/package/module/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="go modules" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/package/module/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/golang/package/module/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2020-03-21T00:00:00+00:00" />
 <meta property="article:modified_time" content="2020-03-21T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="go modules"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://heliu.site/posts/golang/"
+      "item": "https://helium.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第4章 包管理",
-      "item": "https://heliu.site/posts/golang/package/"
+      "item": "https://helium.github.io/posts/golang/package/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "go modules",
-      "item": "https://heliu.site/posts/golang/package/module/"
+      "item": "https://helium.github.io/posts/golang/package/module/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": " 用法：go mod [arguments]。 command支持命令列表： 命令 go mod 作用 go mod init 生成 go.mod 文件 go mod download 下载 go.mod 文件中指明的所有依赖 go mod tidy 整理现有的依赖 go mod graph 查看现有的依赖结构 go mod edit 编辑 go.mod 文件 go mod vendor 导出项目所有的依赖到vendor目录 go mod verify 校验一个模块是否被篡改过 go mod why 查看为什么需要依赖某模块 go mod init 用法：go mod init [module-path]。 示例： # 初始化当前目录并创建一个go.mod文件，模块路径根据其他条件推断判断 $ go mod init # 初始化当前目录并创建一个go.mod文件，模块路径为example.com/m $ go mod init example.com/m 介绍： go mod init命令在当前目录中初始化并写入一个新的go.mod文件，实际上创建了一个以当前目录为根的新模块。 go.mod文件必须不存在时执行上面命令，否则会提示go.mod文件已存在提示。 如当前存在一个空项目demo，在demo目录下执行go mod init gitee.com/bms/demo，会生成如下go.mod文件，当前go版本是go1.16.3。 module gitee.com/bms/demo go 1.16 init接受一个可选参数，即新模块的模块路径，有关选择模块路径的说明，请参阅模块路径。 如果省略了模块路径参数，init将尝试使用.go文件、vendoring工具配置文件和当前目录（如果在GOPATH中）中的导入注释来推断模块路径。 如果存在vendoring工具的配置文件，init将尝试从中导入模块需求。 init支持以下配置文件： GLOCKFILE (Glock) Godeps/Godeps.json (Godeps) Gopkg.lock (dep) dependencies.tsv (godeps) glide.lock (glide) vendor.conf (trash) vendor.yml (govend) vendor/manifest (gvt) vendor/vendor.json (govendor) Vendoring工具配置文件无法始终以完美的保真度进行翻译。 例如，同一个仓库中的多个包在不同版本中导入，而仓库中只包含一个模块，那么导入的go.mod就只能需要一个版本的模块。 您可能希望运行go list -m all以检查构建列表中的所有版本，并运行go mod tidy以添加缺少的需求并删除未使用的需求。 go mod download 将命名的模块下载到模块缓存中（模块缓存参考官方模块参考文档）。 参数可以是模块路径或模块模式，选择主模块的依赖项或表单的版本查询path@version。 不带参数，download适用于主模块的所有依赖项。 该go命令将在正常执行期间根据需要自动下载模块。 go mod download命令主要用于预填充模块缓存或加载要由模块代理服务的数据。 默认情况下，download不向标准输出写入任何内容。它将进度消息和错误打印到标准错误。 用法：go mod download [-json] [-x] [modules] -json： -json：download将一系列JSON对象打印到标准输出，描述每个下载的模块（或失败） 对应如下结构： type Module struct { Path string // 模块路径 Version string // 模块版本 Error string // 错误模板描述 Info string // 缓存的 .info 文件的绝对路径 GoMod string // 缓存 .mod 文件的绝对路径 Zip string // 缓存的 .zip 文件的绝对路径 Dir string // 缓存源根目录的绝对路径 Sum string // checksum路径，版本（比如在go.sum） GoModSum string // go.mod的checksum（比如在go.sum） -x：download打印命令download执行到标准错误 示例： $ go mod download -json -x gitee.com/phpbms/demo { \"Path\": \"gitee.com/phpbms/demo\", \"Version\": \"v0.0.0-20211021090521-71a745ffbccb\", \"Info\": \"/mnt/g/Go/worker/pkg/mod/cache/download/gitee.com/phpbms/demo/@v/v0.0.0-20211021090521-71a745ffbccb.info\", \"GoMod\": \"/mnt/g/Go/worker/pkg/mod/cache/download/gitee.com/phpbms/demo/@v/v0.0.0-20211021090521-71a745ffbccb.mod\", \"Zip\": \"/mnt/g/Go/worker/pkg/mod/cache/download/gitee.com/phpbms/demo/@v/v0.0.0-20211021090521-71a745ffbccb.zip\", \"Dir\": \"/mnt/g/Go/worker/pkg/mod/gitee.com/phpbms/demo@v0.0.0-20211021090521-71a745ffbccb\", \"Sum\": \"h1:JJlXgKY8MUQtOlnSHtbIsHtRU9DNbxx9NUgpsDt3pQA=\", \"GoModSum\": \"h1:6H8vzSoXg8Ey2gdfFaP7ToLmbOnfc04IAcuTFDKqSV8=\" } go mod tidy go mod tidy确保go.mod文件与模块中的源代码匹配。 它添加了构建当前模块的包和依赖项所需的任何缺失的模块要求，并删除了对不提供任何相关包的模块的要求。 它还向go.sum添加任何缺失的条目并删除不必要的条目。 go mod tidy通过递归加载主模块中的所有包以及它们导入的所有包来工作，这包括测试导入的包（包括其他模块中的测试）。 go mod tidy就像启用了所有构建标记一样，因此它会考虑特定于平台的源文件和需要自定义构建标记的文件，即使这些源文件通常不会被构建。 有一个例外：忽略构建标记未启用，因此不会考虑具有构建约束【// +build ignore】的文件。 请注意，go mod tidy不会考虑主模块中名为testdata或名称以.或_除非这些包是由其他包显式导入的。 一旦go mod tidy加载了这组包，它会确保提供一个或多个包的每个模块在主模块的go.mod文件中都有一个require指令，或者如果主模块在go 1.16或更低版本 - 是必需的另一个必需的模块。 go mod tidy将添加对每个缺失模块的最新版本的要求（有关最新版本的定义，请参阅版本查询），go mod tidy将删除不提供上述集合中任何包的模块的require指令。 go mod tidy还可以添加或删除require 指令的// indirect，// indirect间接注释表示模块不提供由主模块中的包导入的包。 用法：go mod tidy [-e] [-v] [-go=version] [-compat=version]。 介绍： -e：(在Go 1.16中添加)在加载包时遇到错误时尝试继续。 -v：将有关已删除模块的信息打印到标准错误。 -go=：将go指令更新为指定的版本，根据该版本启用或禁用模块图修剪和延迟模块加载（并根据需要添加或删除// indirect间接注释）。 -compat=：当模块图由go指令中指示的版本之前的Go版本加载时，go mod tidy将检查所选版本的模块是否不会更改。还可以通过-compat标志显式指定版本检查的兼容性。 go mod graph 以文本形式打印模块需求图。 用法：go mod graph [-go=version]。 介绍： 模块图中的每个顶点代表一个模块的特定版本，图中的每条边代表对依赖项的最低版本的要求。 go mod graph打印图形的边缘，每行一个。 每行有两个空格分隔的字段：模块版本及其依赖项之一。 每个模块版本都标识为path@version形式的字符串。 主模块没有@version后缀，因为它没有版本。 -go=：go mod graph报告给定Go版本加载的模块图，而不是go.mod文件中的go指令指示的版本。 有关如何选择版本的更多信息，请参阅最小版本选择(MVS)。 另请参阅go list -m以打印选定的版本，并查看go mod why以了解为什么需要模块。 example.com/main example.com/a@v1.1.0 example.com/main example.com/b@v1.2.0 example.com/a@v1.1.0 example.com/b@v1.1.1 example.com/a@v1.1.0 example.com/c@v1.3.0 example.com/b@v1.1.0 example.com/c@v1.1.0 example.com/b@v1.2.0 example.com/c@v1.2.0 go mod edit 该命令提供了一个用于编辑和格式化go.mod文件的命令行界面，主要供工具和脚本使用。 go mod edit只读取一个go.mod文件，它不查找有关其他模块的信息。 默认情况下，go mod edit读取和写入go.mod主模块的文件，但可以在编辑标志后指定不同的目标文件。 用法：go mod edit [editing flags] [-fmt|-print|-json] [go.mod] editing flags：指定编辑操作选项：(editing flags可以重复使用，按给定的顺序) -module：更改模块的路径(go.mod文件的module行)，修改module行模块名称。 -go=version：设置go.mod文件的Go版本。 -require=path@version：添加指定的模块路径和版本上的要求，会覆盖go.mod上的任何现有要求path。 -droprequire=path：删除指定的模块路径和版本上的要求。 -exclude=path@version：增加给定的模块路径，-exclude=path@version如果该排除已存在， 则为空操作。 -dropexclude=path@version：放弃对给定的模块路径和版本的排除。 -replace=old[@v]=new[@v]：添加了给定模块路径和版本对的替换。 如果省略old@v则添加左侧没有版本的替换，这适用于旧模块路径的所有版本。 如果省略new@v则新路径应该是本地模块根目录，而不是模块路径。 注意：-replace覆盖的任何冗余替换old[@v]，因此省略@v将删除特定版本的替换。 -dropreplace=old[@v]：丢弃给定模块路径和版本对的替换。 如果@v提供了，则删除给定版本的替换,左侧没有版本的现有替代品仍可更换模块。 如果@v省略 ，则删除没有版本的替换。 -retract=version：添加回收对于给定的版本，其可以是一个单一的版本（如v1.2.3）或间隔（等[v1.1.0,v1.2.0]）。 注意：-retract标志不能为retract指令添加基本原理注释。 -dropretract=version：删除回收对于给定的版本。 -fmt、-print、-json：额外标志来控制输出。 -fmt：重新格式化go.mod文件而不进行其他更改。 使用或重写go.mod文件的任何其他修改也暗示了这种重新格式化。 唯一需要此标志的情况是没有指定其他标志，如go mod edit -fmt。 -print：go.mod以其文本格式打印final ，而不是将其写回磁盘（就是打印go.mod文件内容）。 -json：go.mod以 JSON 格式打印最终结果，而不是以文本格式将其写回磁盘go mod edit -json。 // json打印格式 { \"Module\": { \"Path\": \"mymod\" }, \"Go\": \"1.17\", \"Require\": [ { \"Path\": \"gitee.com/phpbms/demo\", \"Version\": \"v0.0.0-20211021090521-71a745ffbccb\", \"Indirect\": true } ], \"Exclude\": null, \"Replace\": null, \"Retract\": null } // 对应相关结构体 type Module struct { Path string Version string } type GoMod struct { Module Module Go string Require []Require Exclude []Module Replace []Replace } type Require struct { Path string Version string Indirect bool } type Replace struct { Old Module New Module } type Retract struct { Low string High string Rationale string } 示例： # 添加替换指令 $ go mod edit -replace example.com/a@v1.0.0=./a # 删除替换指令 $ go mod edit -dropreplace example.com/a@v1.0.0 # 设置go版本，添加需求，打印文件而不是写入磁盘 $ go mod edit -go=1.14 -require=example.com/m@v1.0.0 -print # 格式化 go.mod 文件 $ go mod edit -fmt # 格式化并打印不同的 .mod 文件 $ go mod edit -print tools.mod # 打印 go.mod 文件的 JSON 表示 $ go mod edit -json # 所有命令使用 $ go mod edit -module=mydemo1 -go=1.16 -require=gitee.com/phpbms/demo/v3@v3.0.0 -exclude=gitee.com/phpbms/demo/v3@v3.0.1 -replace=gitee.com/phpbms/demo/v2@v2.0.1=gitee.com/phpbms/demo/v2@v2.0.0 -retract=v1.1.1 -print ./go.mod # 修改go版本，从之前的 go 1.20 修改为 go 1.21rc2 $ go mod edit -go 1.21rc2 go mod vendor 在主模块的根目录中构造一个名为vendor的目录，该目录包含支持主模块中包的构建和测试所需的所有包的副本。 不包括仅通过主模块之外的包测试导入的包。 与go mod tidy和其他模块命令一样，在构建vendor目录时不考虑除了ignore之外的构建约束。 当启用vendoring时，go命令将从vendor目录加载包，而不是将模块从其源下载到模块缓存中，并使用那些下载副本的包。 go mod vendor还会创建文件vendor/modules.txt，其中包含vendor包的列表以及从中复制它们的模块版本。 当启用vendoring时，此清单用作模块版本信息的来源，如go list -m和go version -m所报告的。 当go命令读取vendor/modules.txt时，它会检查模块版本是否与go.mod一致。 如果go.mod在vendor/modules.txt生成后发生了变化，则应再次运行go mod vendor。 请注意，go mod vendor会在重新构建之前删除vendor目录（如果它存在）。 不应对vendor的软件包进行本地更改。 go命令不会检查vendor目录中的包是否未被修改，但是可以通过运行go mod vendor并检查没有进行任何更改来验证vendor目录的完整性。 使用：go mod vendor [-e] [-v]。 -e：（在Go 1.16中添加）在加载包时遇到错误时尝试继续。 -v：将vendor模块和包的名称打印为标准错误。 go mod verify 检查存储在模块缓存中的主模块的依赖项自下载以来没有被修改。 执行此检查，对每个下载的module.zip文件和提取的目录进行散列然后将这些散列与首次下载模块时记录的散列进行比较。 go mod verify 检查构建列表中的每个模块（可以使用go list -m all打印所有模块）。 如果所有模块都未修改，则go mod verify 打印all modules verified否则，它将报告哪些模块已更改并以非零状态退出。 注意：所有模块感知命令都会验证主模块的go.sum文件中的哈希值是否与为下载到模块缓存中的模块记录的哈希值匹配。 如果go.sum中缺少哈希（例如，因为模块是第一次使用），则go命令使用校验和数据库验证其哈希。 除非模块路径与GOPRIVATE或GONOSUMDB匹配。 go mod verify不会为不在缓存中的模块下载内容，也不会使用go.sum文件来验证模块内容。 但是，go mod verify可能会下载go.mod文件以执行最少的版本选择。 它将使用go.sum来验证这些文件，并且可能会为丢失的哈希添加go.sum条目。 用法：go mod verify。 $ go mod verify all modules verified go mod why go mod why在导入图中显示从主模块到每个列出的包的最短路径。 用法：go mod why [-m] [-vendor] packages...。 -m：go mod why将其参数视为模块列表。 go mod why会打印每个模块中任何包的路径。 请注意，即使使用-m，go mod why查询包图，而不是go mod graph打印的模块图。 -vendor：go mod why忽略主模块之外的包测试中的导入（就像go mod vendor所做的那样）。 默认情况下， go mod why会考虑与all模式匹配的包图。 这个标志在Go 1.16之后在声明go 1.16或更高版本的模块中无效（使用go.mod中的go指令），因为all的含义已更改以匹配go mod供应商匹配的包集。 示例： 输出是一个节序列，每个在命令行上命名的包或模块都有一个节，用空行分隔。 每节以注释行开头，以#开头，给出目标包或模块。 后续行给出了通过导入图的路径，每行一个包。 如果包或模块不是从主模块引用的，则该节将显示一个带括号的注释，表明该事实。 $ go mod why golang.org/x/text/language golang.org/x/text/encoding # golang.org/x/text/language rsc.io/quote rsc.io/sampler golang.org/x/text/language # golang.org/x/text/encoding (main module does not need package golang.org/x/text/encoding) ",
   "wordCount" : "651",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2020-03-21T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2020-03-21T00:00:00Z",
   "dateModified": "2020-03-21T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/package/module/"
+    "@id": "https://helium.github.io/posts/golang/package/module/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/package/">第4章 包管理</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/package/">第4章 包管理</a></div>
     <h1 class="post-title entry-hint-parent">
       go modules
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/" target="_blank" rel="noopener">包管理</a>
+            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium.github.io/tags/%E5%8C%85%E7%AE%A1%E7%90%86/" target="_blank" rel="noopener">包管理</a>
         </ul>
       </span>
       
@@ -795,16 +795,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
-      <li><a href="https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/">包管理</a></li>
+      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium.github.io/tags/%E5%8C%85%E7%AE%A1%E7%90%86/">包管理</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/package/bag/">
+  <a class="prev" href="https://helium.github.io/posts/golang/package/bag/">
     <span class="title">« 上一页</span>
     <br>
     <span>package</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/package/work/">
+  <a class="next" href="https://helium.github.io/posts/golang/package/work/">
     <span class="title">下一页 »</span>
     <br>
     <span>go work</span>

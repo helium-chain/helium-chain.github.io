@@ -9,18 +9,18 @@
 <meta name="keywords" content="docker">
 <meta name="description" content="docker 常用命令。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/docker/use/">
+<link rel="canonical" href="https://helium.github.io/posts/docker/use/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/docker/use/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/docker/use/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="docker 用法" />
 <meta property="og:description" content="docker 常用命令。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/docker/use/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/docker/use/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2022-01-23T00:00:00+00:00" />
 <meta property="article:modified_time" content="2022-01-23T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="docker 用法"/>
 <meta name="twitter:description" content="docker 常用命令。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Docker",
-      "item": "https://heliu.site/posts/docker/"
+      "item": "https://helium.github.io/posts/docker/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "docker 用法",
-      "item": "https://heliu.site/posts/docker/use/"
+      "item": "https://helium.github.io/posts/docker/use/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " 仓库（repository）：docker仓库是用来保存镜像的地方。镜像构建完成后，可以直接在当前宿主机上运行，但是但是如果需要在其他服务器上使用这个镜像，就需要一个集中存储、分发镜像的服务，docker仓库就是这样的一个服务。 镜像（image）：保存了应用和需要的依赖环境，比如运行的runtime和webapp等。 容器（Container）：镜像的实例。一个容器代表一个正在运行的应用程序、进程或服务。 Docker官方提供了一个专门管理、存储镜像的网站，并对外开放了镜像上传、下载的权利。https://hub.docker.com/ 快速入门 Docker 快速的安装了 mysql。 docker run -d ：创建并运行一个容器，-d 则是让容器以后台进程运行。 –name mysql : 给容器起个名字叫mysql，可以是其他名称。 -p 3306:3306 : 设置端口映射。 容器是隔离环境，外界不可访问。但是可以将宿主机端口映射容器内到端口，当访问宿主机指定端口时，就是在访问容器内的端口了。 容器内端口往往是由容器内的进程决定，例如MySQL进程默认端口是3306，因此容器内端口一定是3306；而宿主机端口则可以任意指定，一般与容器内保持一致。 格式： -p 宿主机端口:容器内端口，示例中就是将宿主机的3306映射到容器内的3306端口。 -e TZ=Asia/Shanghai : 配置容器内进程运行时的一些参数。 格式：-e KEY=VALUE，KEY和VALUE都由容器内进程决定。 案例中，TZ=Asia/Shanghai是设置时区；MYSQL_ROOT_PASSWORD=123是设置MySQL默认密码。 mysql : 设置镜像名称，Docker 会根据这个名字搜索并下载镜像。 格式：REPOSITORY:TAG，例如 mysql:8.0，其中 REPOSITORY 可以理解为镜像名，TAG 是版本号。 在未指定TAG的情况下，默认是最新版本，也就是 mysql:latest。 1 2 3 4 5 6 $ docker run -d \\ --name mysql \\ -p 3306:3306 \\ -e TZ=Asia/Shanghai \\ -e MYSQL_ROOT_PASSWORD=123 \\ mysql docker 基础 常见命令 ——– 命令 ——– 说明 docker pull 拉取镜像 docker push 推送镜像到DockerRegistry docker images 查看本地镜像 docker rmi 删除本地镜像 docker run 创建并运行容器（不能重复创建） docker stop 停止指定容器 docker start 重新启动容器 docker rm 删除指定容器 docker ps 查看容器 docker logs 查看容器运行日志 docker exec 进入容器 docker save 保存镜像到本地压缩文件 docker load 加载本地压缩文件到镜像 docker inspect 查看容器详细信息 默认情况下，每次重启虚拟机我们都需要手动启动Docker和Docker中的容器。通过命令可以实现开机自启： 1 2 3 4 5 # Docker开机自启 systemctl enable docker # Docker容器开机自启 docker update --restart=always [容器名/容器id] 使用示例 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 # 第1步，去DockerHub查看nginx镜像仓库及相关信息 # 第2步，拉取Nginx镜像 $ docker pull nginx # 第3步，查看镜像 $ docker images # 结果如下： REPOSITORY TAG IMAGE ID CREATED SIZE nginx latest 605c77e624dd 16 months ago 141MB mysql latest 3218b38490ce 17 months ago 516MB # 第4步，创建并允许Nginx容器 $ docker run -d --name nginx -p 80:80 nginx # 第5步，查看运行中容器 $ docker ps # 也可以加格式化方式访问，格式会更加清爽 $ docker ps --format \"table {{.ID}}\\t{{.Image}}\\t{{.Ports}}\\t{{.Status}}\\t{{.Names}}\" # 第6步，访问网页，地址：http://虚拟机地址 # 第7步，停止容器 $ docker stop nginx # 第8步，查看所有容器 $ docker ps -a --format \"table {{.ID}}\\t{{.Image}}\\t{{.Ports}}\\t{{.Status}}\\t{{.Names}}\" # 第9步，再次启动nginx容器 $ docker start nginx # 第10步，再次查看容器 $ docker ps --format \"table {{.ID}}\\t{{.Image}}\\t{{.Ports}}\\t{{.Status}}\\t{{.Names}}\" # 第11步，查看容器详细信息 $ docker inspect nginx # 第12步，进入容器,查看容器内目录 $ docker exec -it nginx bash # 或者，可以进入MySQL $ docker exec -it mysql mysql -uroot -p # 第13步，删除容器 $ docker rm nginx # 发现无法删除，因为容器运行中，强制删除容器 $ docker rm -f nginx 命名别名 给常用Docker命令起别名，方便我们访问。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 # 修改/root/.bashrc文件 $ vi /root/.bashrc 内容如下： # .bashrc # User specific aliases and functions alias rm='rm -i' alias cp='cp -i' alias mv='mv -i' alias dps='docker ps --format \"table {{.ID}}\\t{{.Image}}\\t{{.Ports}}\\t{{.Status}}\\t{{.Names}}\"' alias dis='docker images' # Source global definitions if [ -f /etc/bashrc ]; then . /etc/bashrc fi # 执行命令使别名生效 $ source /root/.bashrc 数据卷 容器是隔离环境，容器内程序的文件、配置、运行时产生的容器都在容器内部，我们要读写容器内的文件非常不方便。\n简介 数据卷（volume）是一个虚拟目录，是容器内目录与宿主机目录之间映射的桥梁。 数据卷（volume）是一个虚拟目录，是容器内目录与宿主机目录之间映射的桥梁。 html：放置一些静态资源 conf：放置配置文件 如果我们要让Nginx代理我们的静态资源，最好是放到html目录；如果我们要修改Nginx的配置，最好是找到conf下的nginx.conf文件。 但遗憾的是，容器运行的Nginx所有的文件都在容器内部。所以我们必须利用数据卷将两个目录与宿主机目录关联，方便我们操作。 常见命令 ———— 命令 ———— 说明 docker volume create 创建数据卷 docker volume ls 查看所有数据卷 docker volume rm 删除指定数据卷 docker volume inspect 查看某个数据卷的详情 docker volume prune 清除数据卷 注意：容器与数据卷的挂载要在创建容器时配置，对于创建好的容器，是不能设置数据卷的。而且创建容器的过程中，数据卷会自动创建。\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 # 1.首先创建容器并指定数据卷，注意通过 -v 参数来指定数据卷 $ docker run -d --name nginx -p 80:80 -v html:/usr/share/nginx/html nginx # 2.然后查看数据卷 $ docker volume ls # 结果 DRIVER VOLUME NAME local 29524ff09715d3688eae3f99803a2796558dbd00ca584a25a4bbc193ca82459f local html # 3.查看数据卷详情 $ docker volume inspect html # 结果 [ { \"CreatedAt\": \"2024-05-17T19:57:08+08:00\", \"Driver\": \"local\", \"Labels\": null, \"Mountpoint\": \"/var/lib/docker/volumes/html/_data\", \"Name\": \"html\", \"Options\": null, \"Scope\": \"local\" } ] # 4.查看/var/lib/docker/volumes/html/_data目录 $ ll /var/lib/docker/volumes/html/_data # 可以看到与nginx的html目录内容一样，结果如下： 总用量 8 -rw-r--r--. 1 root root 497 12月 28 2021 50x.html -rw-r--r--. 1 root root 615 12月 28 2021 index.html # 5.进入该目录，并随意修改index.html内容 $ cd /var/lib/docker/volumes/html/_data $ vi index.html # 6.打开页面，查看效果 # 7.进入容器内部，查看/usr/share/nginx/html目录内的文件是否变化 $ docker exec -it nginx bash 挂载目录或文件 可以发现，数据卷的目录结构较深，如果我们去操作数据卷目录会不太方便。在很多情况下，我们会直接将容器目录与宿主机指定目录挂载。挂载语法与数据卷类似： 1 2 3 4 # 挂载本地目录 -v 本地目录:容器内目录 # 挂载本地文件 -v 本地文件:容器内文件 注意：本地目录或文件必须以 / 或 ./开头，如果直接以名字开头，会被识别为数据卷名而非本地目录名。\n例如： 1 2 -v mysql:/var/lib/mysql # 会被识别为一个数据卷叫mysql，运行时会自动创建这个数据卷 -v ./mysql:/var/lib/mysql # 会被识别为当前目录下的mysql目录，运行时如果不存在会创建目录 镜像 Dockerfile 这种记录镜像结构的文件就称为Dockerfile，其对应的语法可以参考官方文档：https://docs.docker.com/engine/reference/builder/ 命令 说明 示例 FROM 指定基础镜像 FROM centos:6 ENV 设置环境变量，可在后面指令使用 ENV key value COPY 拷贝本地文件到镜像的指定目录 COPY ./xx.jar /tmp/app.jar RUN 执行Linux的shell命令，一般是安装过程的命令 RUN yum install gcc EXPOSE 指定容器运行时监听的端口，是给镜像使用者看的 EXPOSE 8080 ENTRYPOINT 镜像中应用的启动命令，容器运行时调用 ENTRYPOINT java -jar xx.jar 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 FROM golang:1.22-alpine AS builder LABEL stage=gobuilder ENV CGO_ENABLED 0 ENV GOPROXY https://goproxy.cn,direct RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories RUN apk update --no-cache \u0026\u0026 apk add --no-cache tzdata WORKDIR /build ADD go.mod . ADD go.sum . RUN go mod download COPY . . COPY greet/api/etc /app/etc RUN go build -ldflags=\"-s -w\" -o /app/greet-api greet/api/greet.go FROM scratch COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt COPY --from=builder /usr/share/zoneinfo/Asia/Shanghai /usr/share/zoneinfo/Asia/Shanghai ENV TZ Asia/Shanghai WORKDIR /app COPY --from=builder /app/greet-api /app/greet-api COPY --from=builder /app/etc /app/etc EXPOSE 8888 CMD [\"./greet-api\", \"-f\", \"etc/greet.yaml\"] 构建镜像 当Dockerfile文件写好以后，就可以利用命令来构建镜像了。 docker build : 就是构建一个docker镜像。 -t docker-demo:1.0 ：-t参数是指定镜像的名称（repository和tag）。 . : 最后的点是指构建时Dockerfile所在路径，由于我们进入了demo目录，所以指定的是.代表当前目录，也可以直接指定Dockerfile目录： 1 2 # 直接指定Dockerfile目录 docker build -t docker-demo:1.0 /root/demo 网络 ——– 命令 ——– 说明 docker network create 创建一个网络 docker network ls 查看所有网络 docker network rm 删除指定网络 docker network prune 清除未使用的网络 docker network connect 使指定容器连接加入某网络 docker network disconnect 使指定容器连接离开某网络 docker network inspect 查看网络详细信息 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 # 1.首先通过命令创建一个网络 $ docker network create hmall # 2.然后查看网络 $ docker network ls # 结果： NETWORK ID NAME DRIVER SCOPE 639bc44d0a87 bridge bridge local 403f16ec62a2 hmall bridge local 0dc0f72a0fbb host host local cd8d3e8df47b none null local # 其中，除了hmall以外，其它都是默认的网络 # 3.让dd和mysql都加入该网络，注意，在加入网络时可以通过--alias给容器起别名 # 这样该网络内的其它容器可以用别名互相访问！ # 3.1.mysql容器，指定别名为db，另外每一个容器都有一个别名是容器名 $ docker network connect hmall mysql --alias db # 3.2.db容器，也就是我们的java项目 $ docker network connect hmall dd # 4.进入dd容器，尝试利用别名访问db # 4.1.进入容器 $ docker exec -it dd bash # 4.2.用db别名访问 ping db # 结果 PING db (172.18.0.2) 56(84) bytes of data. 64 bytes from mysql.hmall (172.18.0.2): icmp_seq=1 ttl=64 time=0.070 ms 64 bytes from mysql.hmall (172.18.0.2): icmp_seq=2 ttl=64 time=0.056 ms # 4.3.用容器名访问 ping mysql # 结果： PING mysql (172.18.0.2) 56(84) bytes of data. 64 bytes from mysql.hmall (172.18.0.2): icmp_seq=1 ttl=64 time=0.044 ms 64 bytes from mysql.hmall (172.18.0.2): icmp_seq=2 ttl=64 time=0.054 ms 参考 https://b11et3un53m.feishu.cn/wiki/MWQIw4Zvhil0I5ktPHwcoqZdnec ",
   "wordCount" : "959",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2022-01-23T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2022-01-23T00:00:00Z",
   "dateModified": "2022-01-23T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/docker/use/"
+    "@id": "https://helium.github.io/posts/docker/use/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/docker/">Docker</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/docker/">Docker</a></div>
     <h1 class="post-title entry-hint-parent">
       docker 用法
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/docker/" target="_blank" rel="noopener">Docker</a>
+            <a href="https://helium.github.io/tags/docker/" target="_blank" rel="noopener">Docker</a>
         </ul>
       </span>
       
@@ -1102,15 +1102,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/docker/">Docker</a></li>
+      <li><a href="https://helium.github.io/tags/docker/">Docker</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/docker/install/">
+  <a class="prev" href="https://helium.github.io/posts/docker/install/">
     <span class="title">« 上一页</span>
     <br>
     <span>linux 安装 docker</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/docker/file/">
+  <a class="next" href="https://helium.github.io/posts/docker/file/">
     <span class="title">下一页 »</span>
     <br>
     <span>Dockerfile</span>

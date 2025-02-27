@@ -9,18 +9,18 @@
 <meta name="keywords" content="nginx">
 <meta name="description" content="nginx 架构、目录结构、相关命令。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/nginx/install/">
+<link rel="canonical" href="https://helium.github.io/posts/nginx/install/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/nginx/install/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/nginx/install/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="nginx 安装部署" />
 <meta property="og:description" content="nginx 架构、目录结构、相关命令。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/nginx/install/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/nginx/install/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2021-04-15T00:00:00+00:00" />
 <meta property="article:modified_time" content="2021-04-15T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="nginx 安装部署"/>
 <meta name="twitter:description" content="nginx 架构、目录结构、相关命令。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Nginx",
-      "item": "https://heliu.site/posts/nginx/"
+      "item": "https://helium.github.io/posts/nginx/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "nginx 安装部署",
-      "item": "https://heliu.site/posts/nginx/install/"
+      "item": "https://helium.github.io/posts/nginx/install/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": "nginx 架构 nginx采用的是多进程的方式工作的。 nginx后台进程中包含一个master进程和多个worker进程，master进程主要用来管理worker进程，包含接收外界的信息。 将接收到的信号发送给各个worker进程，监控worker进程的状态，当worker进程出现异常退出后，会自动重新启动新的worker进程。 worker进程则是专门用来处理用户请求的，各个worker进程之间是平等的并且相互独立，处理请求的机会也是一样的。 可以通过 ps -ef | grep nginx 查看nginx进程信息。 nginx 目录结构 conf 目录是nginx所有配置文件目录。 文件 说明 fastcgi.conf fastcgi相关配置文件 fastcgi.conf.default fastcgi.conf的备份文件 fastcgi_params fastcgi的参数文件 fastcgi_params.default fastcgi的参数备份文件 scgi_params scgi的参数文件 scgi_params.default scgi的参数备份文件 uwsgi_params uwsgi的参数文件 uwsgi_params.default uwsgi的参数备份文件 mime.types 记录的是HTTP协议中的Content-Type的值和文件后缀名的对应关系 mime.types.default mime.types的备份文件 nginx.conf 这个是Nginx的核心配置文件 nginx.conf.default nginx.conf的备份文件 koi-utf、koi-win、win-utf 这三个文件都是与编码转换映射相关的配置文件，用来将一种编码转换成另一种编码 html 目录是nginx存放自带的两个静态的Html页面目录 文件 说明 50x.html 50x 失败后的失败页面 index.html 成功访问的默认首页 logs 目录用于记录nginx服务启动后的日志文件。 文件 说明 access.log 请求日志文件 error.log 错误日志文件 nginx.pid 记录 nginx PID sbin 目录用于存放执行程序文件目录。 文件 说明 nginx 控制Nginx的启动和停止命令的可执行文件 nginx 命令 信号控制 查看master进程的进程号ID：\nps -ef | grep nginx 命令。 通过 logs/nginx.pid 文件。 信号：调用命令 kill -signal PID\n信号 说明 举例 TERM/INT 立即关闭整个服务 kill -INT PID / kill -INT `cat /usr/local/nginx/logs/nginx.pid` QUIT “优雅\"地关闭整个服务 kill -QUIT PID / kill -TERM `cat /usr/local/nginx/logs/nginx.pid` HUP 重读配置文件并使用服务对新配置项生效 kill -HUP PID / kill -TERM `cat /usr/local/nginx/logs/nginx.pid` USR1 重新打开日志文件，可以用来进行日志切割 kill -USR1 PID / kill -TERM `cat /usr/local/nginx/logs/nginx.pid` USR2 平滑升级到最新版的nginx kill -USR2 PID / kill -USR2 `cat /usr/local/nginx/logs/nginx.pid` WINCH 所有子进程不在接收处理新连接，相当于给work进程发送QUIT指令 kill -WINCH PID /kill -WINCH `cat /usr/local/nginx/logs/nginx.pid` 命令行 通过 nginx -h 查看支持那些参数。 参数 说明 举例 -?,-h 显示帮助信息 nginx -h -v 打印版本号信息并退出 nginx -v -V 打印版本号信息和配置信息并退 nginx -V -t 测试nginx的配置文件语法是否正确并退出(常用) nginx -t -T 测试nginx的配置文件语法是否正确并列出用到的配置文件信息然后退出 nginx -T -s 信号(常用) nginx -s reload stop[快速关闭，类似于TERM/INT信号的作用] nginx -s stop quit[优雅的关闭，类似于QUIT信号的作用] nginx -s quit reopen[重新打开日志文件类似于USR1信号的作用] nginx -s reopen reload[类似于HUP信号的作用] nginx -s reload -p 指定Nginx的prefix路径，(默认为: /usr/local/nginx/) 常用指定自定义目录 -c 指定Nginx的配置文件路径,(默认为: conf/nginx.conf) 常用指定自定义文件 -g 用来补充Nginx配置文件，向Nginx服务指定启动时应用全局的配置 安装 docker-compose.yml version: '3.9' services: nginx: image: nginx:1.20.2 container_name: nginx privileged: true restart: unless-stopped ports: - \"80:80\" - \"443:443\" volumes: #- ./docker/nginx/html:/usr/share/nginx/html #- ./docker/nginx/cert:/etc/nginx/cert #- ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf #- ./docker/nginx/conf.d:/etc/nginx/conf.d #- /app/docker/nginx/logs:/var/log/nginx environment: - TZ=Asia/Shanghai healthcheck: test: [ \"CMD\", \"curl\", \"-f\", \"http://localhost\" ] interval: 30s timeout: 10s retries: 3 networks: - default_net networks: default_net: driver: bridge 启动命令。 $ docker-compose -p nginx up -d ",
   "wordCount" : "271",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2021-04-15T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2021-04-15T00:00:00Z",
   "dateModified": "2021-04-15T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/nginx/install/"
+    "@id": "https://helium.github.io/posts/nginx/install/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/nginx/">Nginx</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/nginx/">Nginx</a></div>
     <h1 class="post-title entry-hint-parent">
       nginx 安装部署
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/nginx/" target="_blank" rel="noopener">Nginx</a>
+            <a href="https://helium.github.io/tags/nginx/" target="_blank" rel="noopener">Nginx</a>
         </ul>
       </span>
       
@@ -685,15 +685,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/nginx/">Nginx</a></li>
+      <li><a href="https://helium.github.io/tags/nginx/">Nginx</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/mysql/subzone/">
+  <a class="prev" href="https://helium.github.io/posts/mysql/subzone/">
     <span class="title">« 上一页</span>
     <br>
     <span>分区表</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/nginx/conf/">
+  <a class="next" href="https://helium.github.io/posts/nginx/conf/">
     <span class="title">下一页 »</span>
     <br>
     <span>nginx nginx.cnf</span>

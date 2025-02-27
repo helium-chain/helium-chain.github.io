@@ -9,18 +9,18 @@
 <meta name="keywords" content="pgsql">
 <meta name="description" content="PostgreSQL docker 安装介绍。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/postgresql/install/">
+<link rel="canonical" href="https://helium.github.io/posts/postgresql/install/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/postgresql/install/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/postgresql/install/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="安装" />
 <meta property="og:description" content="PostgreSQL docker 安装介绍。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/postgresql/install/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/postgresql/install/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2023-05-19T00:00:00+00:00" />
 <meta property="article:modified_time" content="2023-05-19T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="安装"/>
 <meta name="twitter:description" content="PostgreSQL docker 安装介绍。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "PostgreSQL",
-      "item": "https://heliu.site/posts/postgresql/"
+      "item": "https://helium.github.io/posts/postgresql/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "安装",
-      "item": "https://heliu.site/posts/postgresql/install/"
+      "item": "https://helium.github.io/posts/postgresql/install/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " 从容器拷贝配置postgresql.conf、pg_data.conf等文件。 # postgresql.conf $ docker run -i --rm postgres:14.4 cat /usr/share/postgresql/postgresql.conf.sample \u003e postgresql.conf $ docker run -d --name pgsql01 \\ -e POSTGRES_PASSWORD=mysecretpassword \\ postgres:14.4 # pg_data.conf $ docker cp pgsql01:/var/lib/postgresql/data/pg_hba.conf ./pg_hba.conf # pg_ident.conf $ docker cp pgsql01:/var/lib/postgresql/data/pg_ident.conf ./pg_ident.conf # postgresql.auto.conf $ docker cp pgsql01:/var/lib/postgresql/data/postgresql.auto.conf ./postgresql.auto.conf # 删除容器 $ docker rm -f pgsql01 docker run 指定自定义配置文件。 $ docker run -d --name some-postgres \\ -v \"$PWD/my-postgres.conf\":/etc/postgresql/postgresql.conf \\ -e POSTGRES_PASSWORD=mysecretpassword \\ postgres:14.4 -c 'config_file=/etc/postgresql/postgresql.conf' docker-compose.yml 一键安装。 version: '3.9' services: postgres: image: postgres:14.4 container_name: postgres restart: always privileged: true command: [\"postgres\", \"-c\", \"config_file=/etc/postgresql/postgresql.conf\"] environment: POSTGRES_DB: shoping POSTGRES_USER: postgres POSTGRES_PASSWORD: 123456 TZ: Asia/Shanghai LANG: zh_CN.UTF-8 LC_ALL: zh_CN.UTF-8 LANGUAGE: zh_CN.UTF-8 ports: - \"5432:5432\" volumes: - /etc/locale.conf:/etc/locale.conf:ro - /usr/lib/locale:/usr/lib/locale - ./postgresql.conf:/etc/postgresql/postgresql.conf - ./pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf - ./pg_ident.conf:/var/lib/postgresql/data/pg_ident.conf - ./postgresql.auto.conf:/var/lib/postgresql/data/postgresql.auto.conf - ./pg-data:/var/lib/postgresql/data - /etc/localtime:/etc/localtime:ro - ./initdb:/docker-entrypoint-initdb.d/ 创建 ./initdb/init.sql 文件，写入。 -- 创建postgres用户并设置密码 CREATE USER postgres WITH ENCRYPTED PASSWORD '123456'; pg_hba.conf pg_hba.conf文件是PostgreSQL中的一个重要配置文件，它位于数据库服务器的数据目录中。 该件决定了哪些主机可以连接到哪些数据库，以及他们使用的认证方法。 pg_hba.conf 文件内容。该文件位于初始化安装的数据库目录下。 # TYPE DATABASE USER ADDRESS METHOD # \"local\" is for Unix domain socket connections only local all all trust # IPv4 local connections: host all all 127.0.0.1/32 trust # IPv6 local connections: host all all ::1/128 trust # Allow replication connections from localhost, by a user with the # replication privilege. local replication all trust host replication all 127.0.0.1/32 trust host replication all ::1/128 trust host all all all scram-sha-256 类型简介： TYPE表示主机类型。 DATABASE表示数据库名称(指定记录所匹配的数据库名称)。 USER表示用户名称。(指定这条记录匹配哪些数据库用户名) ADDRESS 指定这个记录匹配的客户端机器地址。(这个域可以包含一个主机名、一个 IP 地址范围或下文提到的特殊关键字之一) METHOD参数设置。 记录可以有多种格式： local database user auth-method [auth-options] host database user address auth-method [auth-options] hostssl database user address auth-method [auth-options] hostnossl database user address auth-method [auth-options] hostgssenc database user address auth-method [auth-options] hostnogssenc database user address auth-method [auth-options] host database user IP-address IP-mask auth-method [auth-options] hostssl database user IP-address IP-mask auth-method [auth-options] hostnossl database user IP-address IP-mask auth-method [auth-options] hostgssenc database user IP-address IP-mask auth-method [auth-options] hostnogssenc database user IP-address IP-mask auth-method [auth-options] TYPE local 表示是unix-domain的socket连接。这条记录匹配企图使用 Unix 域套接字的连接。如果没有这种类型的记录，就不允许 Unix 域套接字连接。 host 是TCP/IP socket。这条记录匹配企图使用 TCP/IP 建立的连接。host记录匹配SSL和非SSL的连接尝试，此外还有GSSAPI 加密的或non-GSSAPI加密的连接尝试。 注意：除非服务器带着合适的listen_addresses配置参数值启动，否则将不可能进行远程的 TCP/IP 连接，因为默认的行为是只监听在本地环回地址localhost上的 TCP/IP 连接。 hostssl 是SSL加密的TCP/IP socket。这条记录匹配企图使用 TCP/IP 建立的连接，但必须是使用SSL加密的连接。 要使用这个选项，编译服务器的时候必须打开SSL支持。此外，在服务器启动的时候必须通过设置ssl配置参数打开SSL。否则，hostssl记录会被忽略，并且会记录一个警告说它无法匹配任何连接。 hostnossl 这条记录的行为与hostssl相反；它只匹配那些在 TCP/IP上不使用SSL的连接企图。 hostgssenc 这条记录匹配企图使用TCP/IP建立的连接，但仅当使用GSSAPI加密建立连接时。 要使用这个选项，服务器必须具备GSSAPI支持。 否则，除了记录无法匹配任何连接的警告以外，hostgssenc记录将被忽略。 hostnogssenc 这个记录类型具有与hostgssenc相反的表现; 它仅匹配通过不使用GSSAPI加密的TCP/IP进行的连接尝试。 DATABASE all 指定该记录匹配所有数据库。 sameuser 匹配用户名同名的数据库。例如，如果用户 joe 尝试连接，则只有数据库 joe 会匹配。 指定如果被请求的数据库和请求的用户同名，则匹配。 samerole 匹配与用户角色相同的数据库。即，如果用户是某个角色的成员，则这个角色同名的数据库会被匹配。 samerole指定请求的用户必须是一个与数据库同名的角色中的成员（samegroup是一个已经废弃了，但目前仍然被接受的samerole同义词）。 对于一个用于samerole目的的角色，超级用户不会被考虑为其中的成员，除非它们是该角色的显式成员（直接或间接），而不是由于超级用户的原因。 replication 指定如果一个物理复制连接被请求则该记录匹配，不过，它不匹配逻辑复制连接。 注意，物理复制连接不指定任何特定的数据库而逻辑复制连接需要指定。 数据库名称 可以通过用逗号分隔的方法指定多个数据库，也可以通过在文件名前面放@来指定一个包含数据库名的文件。 USER all 指定它匹配所有用户。 一个用户名，一组用户名，多个用户时，可以用 ,逗号隔开。 指定这条记录匹配哪些数据库用户名。值all指定它匹配所有用户。 否则，它要么是一个特定数据库用户的名字或者是一个有前导+的组名称（回想一下，在PostgreSQL里，用户和组没有真正的区别，+实际表示“匹配这个角色的任何直接或间接成员角色”，而没有+记号的名字只匹配指定的角色）。 出于这个目的，如果超级用户显式的是一个角色的成员（直接或间接），那么超级用户将只被认为是该角色的一个成员而不是作为一个超级用户。 多个用户名可以通过用逗号分隔的方法提供。一个包含用户名的文件可以通过在文件名前面加上@来指定。 ADDRESS IP/32(IPV4) ipv4地址加掩码，比如： 172.20.143.89/32 用于一个主机。 172.20.143.0/24 用于一个小型网络。 10.6.0.0/16 用于一个大型网络。 0.0.0.0/0 所有 IPv4 地址。 127.0.0.1/32 本机。 IP/128(IPV6) ipv6地址加掩码，比如 ::1/128、fe80::7a31:c1ff:0000:0000/96。 ::1/128（IPv6 回环地址） fe80::7a31:c1ff:0000:0000/96 一个小型网络的 IPv6 地址范围。 ::0/0 表示所有 IPv6 地址 all 匹配任何 IP 地址。 samehost 来匹配任何本服务器自身的 IP 地址。 samenet 来匹配本服务器直接连接到的任意子网的任意地址。 域名 一个以点号（.）开始的主机名声明匹配实际主机名的后缀。因此.example.com将匹配foo.example.com（但不匹配example.com）。 IP-address、IP-mask：这两个域可以被用作IP-address/ mask-length记号法的替代方案。和指定掩码长度不同，实际的掩码被指 定在一个单独的列中。例如，255.0.0.0表示 IPv4 CIDR 掩码长度 8，而255.255.255.255表示 CIDR 掩码长度 32。这些域不适用于local记录。 METHOD trust 无条件地允许连接。这种方法允许任何可以与PostgreSQL数据库服务器连接的用户以他们期望的任意PostgreSQL数据库用户身份登入，而不需要口令或者其他任何认证。 reject 无条件地拒绝连接。这有助于从一个组中“过滤出”特定主机，例如一个reject行可以阻塞一个特定的主机连接，而后面一行允许一个特定网络中的其余主机进行连接。 scram-sha-256 执行SCRAM-SHA-256认证来验证用户的口令。 md5 执行SCRAM-SHA-256或MD5认证来验证用户的口令。 password 要求客户端提供一个未加密的口令进行认证。因为口令是以明文形式在网络上发送的，所以我们不应该在不可信的网络上使用这种方式。 gss 用 GSSAPI 认证用户。只对 TCP/IP 连接可用。 sspi 用 SSPI 来认证用户。只在 Windows 上可用。 ident 通过联系客户端的 ident 服务器获取客户端的操作系统名，并且检查它是否匹配被请求的数据库用户名。Ident 认证只能在 TCIP/IP 连接上使用。当为本地连接指定这种认证方式时，将用 peer 认证来替代。 peer 从操作系统获得客户端的操作系统用户，并且检查它是否匹配被请求的数据库用户名。这只对本地连接可用。 ldap 使用LDAP服务器认证。 radius 用 RADIUS 服务器认证。 cert 使用 SSL 客户端证书认证。 pam 使用操作系统提供的可插入认证模块服务（PAM）认证。 bsd 使用由操作系统提供的 BSD 认证服务进行认证。 auth-options 在auth-method域的后面， 可以是形如name=value的域，它们指定认证方法的选项。 关于哪些认证方法可以用哪些选项的细节请见下文。 参看：http://www.postgres.cn/docs/14/auth-pg-hba-conf.html 使用示例 # 允许本地系统上的任何用户 # 通过 Unix 域套接字以任意 # 数据库用户名连接到任意数据库（本地连接的默认值）。 # # TYPE DATABASE USER ADDRESS METHOD local all all trust # 相同的规则，但是使用本地环回 TCP/IP 连接。 # # TYPE DATABASE USER ADDRESS METHOD host all all 127.0.0.1/32 trust # 和前一行相同，但是使用了一个独立的掩码列 # # TYPE DATABASE USER IP-ADDRESS IP-MASK METHOD host all all 127.0.0.1 255.255.255.255 trust # IPv6 上相同的规则 # # TYPE DATABASE USER ADDRESS METHOD host all all ::1/128 trust # 使用主机名的相同规则（通常同时覆盖 IPv4 和 IPv6）。 # # TYPE DATABASE USER ADDRESS METHOD host all all localhost trust # 允许来自任意具有 IP 地址192.168.93.x 的主机上任意 # 用户以 ident 为该连接所报告的相同用户名连接到 # 数据库 \"postgres\"（通常是操作系统用户名）。 # # TYPE DATABASE USER ADDRESS METHOD host postgres all 192.168.93.0/24 ident # 如果用户的口令被正确提供，允许来自主机 192.168.12.10 # 的任意用户连接到数据库 \"postgres\"。 # # TYPE DATABASE USER ADDRESS METHOD host postgres all 192.168.12.10/32 scram-sha-256 # 如果用户的口令被正确提供，允许 example.com 中主机上 # 的任意用户连接到任意数据库。 # # 为大部分用户要求SCRAM认证，但是用户'mike'是个例外， # 他使用的是不支持SCRAM认证的旧客户端。 # # TYPE DATABASE USER ADDRESS METHOD host all mike .example.com md5 host all all .example.com scram-sha-256 # 如果没有前面的 \"host\" 行，这三行 # 将拒绝所有来自 192.168.54.1的连接（因为那些项将首先被匹配）， # 但是允许来自互联网其他任何地方的 # GSSAPI-encrypted连接。零掩码导致主机IP 地址中的所有位都不会被考虑， # 因此它匹配任意主机。未加密GSSAPI连接 # (which \"跳转\"到第三行是因为\"hostgssenc\" 仅匹配加密的 GSSAPI 连接) 是被允许的,但只能来自192.168.12.10. # # TYPE DATABASE USER ADDRESS METHOD host all all 192.168.54.1/32 reject hostgssenc all all 0.0.0.0/0 gss host all all 192.168.12.10/32 gss # 允许来自 192.168.x.x 主机的用户连接到任意数据库，如果它们能够 # 通过 ident 检查。例如，假设 ident说用户是 \"bryanh\" 并且他要求以 # PostgreSQL 用户 \"guest1\" 连接，如果在 pg_ident.conf 有一个映射 # \"omicron\" 的选项说 \"bryanh\" 被允许以 \"guest1\" 连接，则该连接将被允许。 # # TYPE DATABASE USER ADDRESS METHOD host all all 192.168.0.0/16 ident map=omicron # 如果这些是本地连接的唯一三行，它们将允许本地用户只连接到它们 # 自己的数据库（与其数据库用户名同名的数据库），不过管理员和角 # 色 \"support\" 的成员除外（它们可以连接到所有数据库）。文件 # $PGDATA/admins 包含一个管理员名字的列表。在所有情况下都要求口令。 # # TYPE DATABASE USER ADDRESS METHOD local sameuser all md5 local all @admins md5 local all +support md5 # 上面的最后两行可以被整合为一行： local all @admins,+support md5 # 数据库列也可以用列表和文件名： local db1,db2,@demodbs all md5 ",
   "wordCount" : "737",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2023-05-19T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2023-05-19T00:00:00Z",
   "dateModified": "2023-05-19T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/postgresql/install/"
+    "@id": "https://helium.github.io/posts/postgresql/install/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/postgresql/">PostgreSQL</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/postgresql/">PostgreSQL</a></div>
     <h1 class="post-title entry-hint-parent">
       安装
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/pgsql/" target="_blank" rel="noopener">Pgsql</a>
+            <a href="https://helium.github.io/tags/pgsql/" target="_blank" rel="noopener">Pgsql</a>
         </ul>
       </span>
       
@@ -663,15 +663,15 @@ host    all             all             all                     scram-sha-256
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/pgsql/">Pgsql</a></li>
+      <li><a href="https://helium.github.io/tags/pgsql/">Pgsql</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/grpc/install/">
+  <a class="prev" href="https://helium.github.io/posts/grpc/install/">
     <span class="title">« 上一页</span>
     <br>
     <span>本地环境搭建</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/postgresql/client/">
+  <a class="next" href="https://helium.github.io/posts/postgresql/client/">
     <span class="title">下一页 »</span>
     <br>
     <span>客户端命令</span>

@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, 环境安装">
 <meta name="description" content="Go 软件安装。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/install/install/">
+<link rel="canonical" href="https://helium.github.io/posts/golang/install/install/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/install/install/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/install/install/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,13 +77,13 @@
 <meta property="og:title" content="Install Golang" />
 <meta property="og:description" content="Go 软件安装。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/install/install/" />
-<meta property="og:image" content="https://heliu.site/posts/golang/install/images/install-cover.png" /><meta property="article:section" content="posts" />
+<meta property="og:url" content="https://helium.github.io/posts/golang/install/install/" />
+<meta property="og:image" content="https://helium.github.io/posts/golang/install/images/install-cover.png" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2019-01-14T00:00:00+00:00" />
 <meta property="article:modified_time" content="2022-03-22T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/posts/golang/install/images/install-cover.png" />
+<meta name="twitter:image" content="https://helium.github.io/posts/golang/install/images/install-cover.png" />
 <meta name="twitter:title" content="Install Golang"/>
 <meta name="twitter:description" content="Go 软件安装。"/>
 
@@ -97,25 +97,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://heliu.site/posts/golang/"
+      "item": "https://helium.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第1章 安装环境",
-      "item": "https://heliu.site/posts/golang/install/"
+      "item": "https://helium.github.io/posts/golang/install/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "Install Golang",
-      "item": "https://heliu.site/posts/golang/install/install/"
+      "item": "https://helium.github.io/posts/golang/install/install/"
     }
   ]
 }
@@ -133,7 +133,7 @@
   "articleBody": "Golang 软件安装 首先需要下载Go语言安装包。 下载地址：https://golang.org/dl/。（中国大陆可能访问不到） 国内下载地址：https://golang.google.cn/dl/。 官方安装教程：https://golang.google.cn/doc/install。 官方的教程很详细（https://golang.google.cn/doc）。 Linux UNIX / Linux / Mac OS和FreeBSD系统可以使用如下源码安装方法。 Mac系统下可以使用以.pkg为扩展名的安装包直接双击来完成安装，安装目录在/usr/local/go/下。 Linux下安装golang步骤 下载安装包wget https://golang.google.cn/dl/go1.17.3.linux-amd64.tar.gz。 32-bit Linux下载安装包 https://golang.google.cn/dl/go1.17.3.linux-386.tar.gz。 64-bit Linux下载安装包 https://golang.google.cn/dl/go1.17.3.linux-amd64.tar.gz。 删除老版本（如果存在则执行，不存在则忽略）rm -rf /usr/local/go。 解压安装包sudo tar -xzf go1.17.3.linux-amd64.tar.gz -C /usr/local。 配置环境变量：使用go env -w命令一般只是本次生效。 PATH环境变量export PATH=$PATH:/usr/local/go/binGoLang工具位置，包含gofmt工具。 GOROOT变量export GOROOT=/usr/local/goGoLang安装包位置。 使用go env -w GOROOT=/usr/local/go配置也是可以的。 GOPATH变量export GOPATH=/var/local/goGoLang 1.11版本前项目管理包位置。 使用go env -w GOPATH=/var/local/go配置也是可以的。 打印Go版本号go version。 如果上面(第4步)环境变量配置不成功，那么执行如下步骤配置： sudo vim ~/.bashrc命令打开文件。 在文件最后添加： 1 2 3 4 5 6 7 export GOROOT=/usr/local/go export GOPATH=/var/local/go export PATH=$PATH:$GOROOT/bin:$GOPATH/bin export GOPROXY=\"https://goproxy.cn,direct\" # 在linux中设置临时目录，windows不用 export TMPDIR=/tmp 最后使配置生效 source ~/.bashrc。 Windows 下载 https://golang.google.cn/dl/go1.17.3.windows-amd64.zip，直接解压到安装目录。 如D:\\Go，然后把D:\\Go\\bin目录添加到PATH环境变量中。 设置GOPATH和GOROOT环境变量： GOPATH=D:\\goproject。 GOROOT=D:\\GO\\。 也可以选择 https://golang.google.cn/dl/go1.17.3.windows-amd64.msi，双击运行程序，根据提示来操作安装。 GOROOT、GOPATH GOROOT Go软件的安装包绝对路径，默认是/usr/local/go。 GOPATH $GOPATH允许有多个目录，当有多个目录时，请注意分隔符，Windows中的分隔符是分号(;)。 当有多个目录时默认将go get命令获取的包存放在第一个目录下，当在GOPATH模式下运行时是这样处理的。 $GOPATH目录下约定有三个子目录： src目录：存放源代码（如.go，.c，.h，.s等文件）。 按照Go默认约定，src目录是go run，go install等命令的当前工作路径（即在此路径下执行上述命令）。 src也是用户代码存放的主要目录，所有的源代码都存放在这个目录下面，一般一个项目和一个目录对应。 当在GOPATH模式下运行时是这样处理的，但是Go官方在Go 1.11版本后不再推荐使用GOPATH模式编写Go代码，因此src目录无用处。 pkg目录：存放编译时生成的中间文件（比如：.a）。 bin目录：存放编译后生成的可执行文件，比如后面安装的delve插件或多版本go软件就是在这个目录里。 管理Go安装 安装多个Go版本 在同一台机器上安装多个Go版本。例如，我们可能希望在多个Go版本上测试代码。 注意：需要使用这种形式安装需要先安装git。 多版本go安装步骤 要安装其他Go版本，运行go install命令，指定要安装的版本的下载位置。如下示例安装版本1.10.7： go install golang.org/dl/go1.10.7@latest这里使用go install编译并安装指定的包来实现多版本go安裝，生成后的可执行文件在bin目录下（$GOPATH/bin）。 go1.10.7 download下载，需要切换到$GOPATH/bin下去执行，生成的安装路径在/root/sdk/go1.10.7。 1 2 $ go install golang.org/dl/go1.10.7@latest # 安装并编译go1.10.7版本 $ go1.10.7 download 要使用新下载的版本运行命令，如下所示： 1 2 $ go1.10.7 version go version go1.10.7 linux/amd64 当你安装了多个版本时，可以使用如下命令查看每个版本的安装位置： 1 $ go1.10.7 env GOROOT 要卸载下载的版本时，只需要删除其由GOROOT环境变量和go.X.Y.Z二进制文件指定的安装目录即可。 卸载Go 使用如下所描述的步骤从系统中删除Go。 Linux / macOS / FreeBSD 删除go目录：通常是/usr/local/go目录。 从PATH环境变量中删除Go bin目录。 在Linux和FreeBSD下，编辑/etc/profile或$HOME/.profile。 如果您使用macOS软件包安装了Go，请删除/etc/paths.d/go文件。 Windows 删除Go的最简单方法是通过Windows控制面板中的 Add/Remove 程序： 在控制面板中，双击Add/Remove程序。 在Add/Remove程序中，选择要卸载的软件，单击卸载，然后按照提示进行操作。 要使用工具删除Go，您还可以使用命令行： 通过运行以下命令使用命令行卸载：msiexec /x go{{version}}.windows-{{cpu-arch}}.msi /q 注意：对 Windows 使用此卸载过程将自动删除由原始安装创建的 Windows 环境变量。 ",
   "wordCount" : "175",
   "inLanguage": "zh",
-  "image":"https://heliu.site/posts/golang/install/images/install-cover.png","datePublished": "2019-01-14T00:00:00Z",
+  "image":"https://helium.github.io/posts/golang/install/images/install-cover.png","datePublished": "2019-01-14T00:00:00Z",
   "dateModified": "2022-03-22T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -141,14 +141,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/install/install/"
+    "@id": "https://helium.github.io/posts/golang/install/install/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -170,8 +170,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -198,32 +198,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -235,7 +235,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/install/">第1章 安装环境</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/install/">第1章 安装环境</a></div>
     <h1 class="post-title entry-hint-parent">
       Install Golang
     </h1>
@@ -271,8 +271,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://heliu.site/tags/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85/" target="_blank" rel="noopener">环境安装</a>
+            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium.github.io/tags/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85/" target="_blank" rel="noopener">环境安装</a>
         </ul>
       </span>
       
@@ -283,7 +283,7 @@
 
 </div>
   </header> 
-<figure class="entry-cover1"><img loading="eager" src="https://heliu.site/posts/golang/install/images/install-cover.png" alt="">
+<figure class="entry-cover1"><img loading="eager" src="https://helium.github.io/posts/golang/install/images/install-cover.png" alt="">
         
 </figure><aside id="toc-container" class="toc-container wide">
     <div class="toc">
@@ -617,16 +617,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
-      <li><a href="https://heliu.site/tags/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85/">环境安装</a></li>
+      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium.github.io/tags/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85/">环境安装</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/type/typ/">
+  <a class="prev" href="https://helium.github.io/posts/golang/type/typ/">
     <span class="title">« 上一页</span>
     <br>
     <span>type</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/sync/waitgroup/">
+  <a class="next" href="https://helium.github.io/posts/golang/sync/waitgroup/">
     <span class="title">下一页 »</span>
     <br>
     <span>sync.WaitGroup</span>

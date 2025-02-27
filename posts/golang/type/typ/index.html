@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, type关键字">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/type/typ/">
+<link rel="canonical" href="https://helium.github.io/posts/golang/type/typ/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/type/typ/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/type/typ/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="type" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/type/typ/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/golang/type/typ/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2020-02-22T00:00:00+00:00" />
 <meta property="article:modified_time" content="2020-02-22T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="type"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://heliu.site/posts/golang/"
+      "item": "https://helium.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第5章 type关键字",
-      "item": "https://heliu.site/posts/golang/type/"
+      "item": "https://helium.github.io/posts/golang/type/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "type",
-      "item": "https://heliu.site/posts/golang/type/typ/"
+      "item": "https://helium.github.io/posts/golang/type/typ/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": " 定义结构体、接口、类型别名等。 定义自定义类型： 自定义类型由一组值以及作用于这些值的方法组成。 类型一般有类型别名，往往从现有类型组合通过type关键字构造出一个新的类型。 自定义类型 Go基础数据类型： bool、complex64、complex128、float32、float64。 int、int8、int16、int32、int64、rune、string。 uint、uint8、uint16、uint32、uint64、byte、uintptr。 使用type关键字可以定义自己的类型，可以使用type定义一个新的结构体。 也可以把一个已经存在的类型作为基础类型而定义新类型，然后在代码中使用新的类型名字。 1 type IZ int IZ是一种新类型，然后可以使用下面方式声明变量。 1 var a IZ = 5 可以看到int是变量a的底层类型，这也使得他们之间成为相互转化的可能。 定义多个类型如下： 1 2 3 4 5 type ( IZ int FZ float64 STR string ) 在type IZ int中，IZ就是在int类型基础上构建的新名称，这称为自定义类型，使用IZ来操作int类型的数据。 这种方法定义之后的类型可以拥有更多的特性，但是在类型转换时必须显示转换。 每个值都必须在经过编译后属于某个类型（编辑器必须能够推断出所有值得类型）因为Go是一种静态类型语言。 在必要以及可行的情况下，一种类型的值可以被转换成另外一种类型的值。 Go语言不存在隐式转换，因此所有的转换都必须显式说明，就像调用一个函数一样（类型在这里的作用可以看作是一种函数）。 1 valueOfTypeB = typeB(valueOfTypeA) 类型B的值 = 类型B(类型A的值)。 type TZ int中，新类型TZ不会拥有原基础类型所附带的方法。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 package main import ( \"fmt\" ) type A struct { Face int } func (a A) f () { fmt.Println(\"hi \", a.Face) } // 自定义新类型Aa。没有基础类型A的方法 type Aa A func main() { var s A = A{Face:9} s.f() // hi 9 var sa Aa = Aa{Face:90} //sa.f() // 方法不存在 fmt.Println(sa) // {90} } 通过type关键字在原有类型基础上构造出一个新类型，需要针对新类型来重新创建新方法。 类型别名 类型别名在Go1.9版本中实现，将别名类型和原类型这两个类型视为完全一致。 1 type IZ = int 与type IZ int不同，type IZ = int只是为int取了个别名，而type IZ int却是定义了新类型。 自定义类型不会拥有原类型附带的方法，而别名拥有原类型附带的方法，类型别名拥有原类型全部的方法。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 package main import ( \"fmt\" ) type A struct { Face int } func (a A) f () { fmt.Println(\"hi \", a.Face) } // 自定义新类型Aa。没有基础类型A的方法 type Aa = A func main() { var s A = A{Face:9} s.f() // hi 9 var sa Aa = Aa{Face:90} sa.f() // hi 90 fmt.Println(sa) // {90} } Go语言不存在类型继承。 函数也是一个确定的类型，就是以函数签名作为类型，函数签名：函数的参数和返回值。 1 type typeFunc func(int, int) int 可以在函数体中的某处返回使用类型为typeFunc的变量varfunc。 1 return varfunc 自定义类型不会继承原有类型的方法，但接口方法或组合类型的内嵌元素则保留原有的方法。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 package main import ( \"fmt\" ) // Mutex 用两种方法，Lock和Unlock type Mutex struct{} func (m *Mutex) Lock() {} func (m *Mutex) Unlock() {} //NewMutex 和 Mutex 的数据结构一样，但是其方法是空的 type NewMutex Mutex // PtrMutex 的方法也是空的 type PtrMutex Mutex // PrintableMutex 拥有Lock和Unlock方法 type PrintableMutex struct { Mutex\t// 组合 } func main() {} ",
   "wordCount" : "315",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2020-02-22T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2020-02-22T00:00:00Z",
   "dateModified": "2020-02-22T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/type/typ/"
+    "@id": "https://helium.github.io/posts/golang/type/typ/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/type/">第5章 type关键字</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/type/">第5章 type关键字</a></div>
     <h1 class="post-title entry-hint-parent">
       type
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://heliu.site/tags/type%E5%85%B3%E9%94%AE%E5%AD%97/" target="_blank" rel="noopener">Type关键字</a>
+            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium.github.io/tags/type%E5%85%B3%E9%94%AE%E5%AD%97/" target="_blank" rel="noopener">Type关键字</a>
         </ul>
       </span>
       
@@ -661,16 +661,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
-      <li><a href="https://heliu.site/tags/type%E5%85%B3%E9%94%AE%E5%AD%97/">Type关键字</a></li>
+      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium.github.io/tags/type%E5%85%B3%E9%94%AE%E5%AD%97/">Type关键字</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/sync/mutex/">
+  <a class="prev" href="https://helium.github.io/posts/golang/sync/mutex/">
     <span class="title">« 上一页</span>
     <br>
     <span>sync.Mutex</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/install/install/">
+  <a class="next" href="https://helium.github.io/posts/golang/install/install/">
     <span class="title">下一页 »</span>
     <br>
     <span>Install Golang</span>

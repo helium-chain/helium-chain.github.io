@@ -9,18 +9,18 @@
 <meta name="keywords" content="redis">
 <meta name="description" content="redis 命令介绍。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/redis/command/">
+<link rel="canonical" href="https://helium.github.io/posts/redis/command/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/redis/command/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/redis/command/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="redis 通用命令" />
 <meta property="og:description" content="redis 命令介绍。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/redis/command/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/redis/command/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2023-03-02T00:00:00+00:00" />
 <meta property="article:modified_time" content="2023-03-02T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="redis 通用命令"/>
 <meta name="twitter:description" content="redis 命令介绍。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Redis",
-      "item": "https://heliu.site/posts/redis/"
+      "item": "https://helium.github.io/posts/redis/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "redis 通用命令",
-      "item": "https://heliu.site/posts/redis/command/"
+      "item": "https://helium.github.io/posts/redis/command/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " redis官方网站：https://redis.io/ redis官方命令文档：https://redis.io/docs/latest/commands/ redis是 NoSql 数据库，以键值对的形式存储。 redis 命令行客户端 Redis 安装完成后就自带了命令行客户端：redis-cli，使用方式如下： redis-cli [options] [commonds] 其中常见的 options 有： -h 127.0.0.1：指定要连接的 redis 节点的 IP 地址，默认是 127.0.0.1。 -p 6379：指定要连接的 redis 节点的端口，默认是 6379。 -a 123456：指定redis的访问密码。 commonds 就是 Redis 的操作命令，例如： ping：与redis服务端做心跳测试，服务端正常会返回pong。 不指定commond时，会进入redis-cli的交互控制台。 Redis 默认有16个仓库，编号从0至15。通过配置文件可以设置仓库数量，但是不超过16，并且不能自定义仓库名称。(建议只设置一个数据库) 如果是基于 redis-cli 连接 Redis 服务，可以通过 select 命令来选择数据库：select 0。 redis 通用命令 通用指令是部分数据类型的，都可以使用的指令。 官网地址：https://redis.io/docs/latest/commands/?group=generic redis客户端查询命令：help @generic。 COPY 将一个key的值复制到一个新key。\n语法：\nCOPY source destination [DB destination-db] [REPLACE] 使用示例： # 设置key/value SET dolly \"sheep\" # 克隆dolly COPY dolly clone GET clone DEL 删除一个或多个key。\n语法：\nDEL key [key ...] 使用示例： redis\u003e SET key1 \"Hello\" \"OK\" redis\u003e SET key2 \"World\" \"OK\" redis\u003e DEL key1 key2 key3 (integer) 2 DUMP 返回存储在键中的值的序列化表示形式。\n语法：\nDUMP key 使用示例： \u003e SET mykey 10 OK \u003e DUMP mykey \"\\x00\\xc0\\n\\n\\x00n\\x9fWE\\x0e\\xaec\\xbb\" EXISTS 确定是否存在一个或多个key。\n语法：\nEXISTS key [key ...] 示例： redis\u003e SET key1 \"Hello\" \"OK\" redis\u003e EXISTS key1 (integer) 1 redis\u003e EXISTS nosuchkey (integer) 0 redis\u003e SET key2 \"World\" \"OK\" redis\u003e EXISTS key1 key2 nosuchkey (integer) 2 EXPIRE 以秒为单位设置密钥的过期时间（单位/秒）。 语法： NX - 仅当key没有过期时间时有效。 XX - 仅当key有过期时间时有效。 GT - 仅当新过期时间大于当前过期时间时有效。 LT - 仅当新过期时间小于当前过期时间时有效。 EXPIRE key seconds [NX | XX | GT | LT] 示例： redis\u003e SET mykey \"Hello\" \"OK\" redis\u003e EXPIRE mykey 10 (integer) 1 redis\u003e TTL mykey (integer) 10 redis\u003e SET mykey \"Hello World\" \"OK\" redis\u003e TTL mykey (integer) -1 redis\u003e EXPIRE mykey 10 XX (integer) 0 redis\u003e TTL mykey (integer) -1 redis\u003e EXPIRE mykey 10 NX (integer) 1 redis\u003e TTL mykey (integer) 10 EXPIREAT 将key的过期时间设置为Unix时间戳。 语法： NX - 仅当key没有过期时间时有效。 XX - 仅当key有过期时间时有效。 GT - 仅当新过期时间大于当前过期时间时有效。 LT - 仅当新过期时间小于当前过期时间时有效。 EXPIREAT key unix-time-seconds [NX | XX | GT | LT] 示例： redis\u003e SET mykey \"Hello\" \"OK\" redis\u003e EXISTS mykey (integer) 1 redis\u003e EXPIREAT mykey 1293840000 (integer) 1 redis\u003e EXISTS mykey (integer) 0 EXPIRETIME 以Unix时间戳形式返回key的过期时间。 语法： PEXPIRETIME key 示例： redis\u003e SET mykey \"Hello\" \"OK\" redis\u003e PEXPIREAT mykey 33177117420000 (integer) 1 redis\u003e PEXPIRETIME mykey (integer) 33177117420000 KEYS 返回与模式匹配的所有key名。（正式环境中不建议使用）\n语法：\nKEYS pattern 支持的全局样式模式: h?llo matches hello, hallo and hxllo h*llo matches hllo and heeeello h[ae]llo matches hello and hallo, but not hillo h[^e]llo matches hallo, hbllo, … but not hello h[a-b]llo matches hallo and hbllo 果要逐字匹配特殊字符，请使用\\来转义它们。\n示例： # 设置firstname Jack、lastname Stuntman、age 35 redis\u003e MSET firstname Jack lastname Stuntman age 35 \"OK\" redis\u003e KEYS *name* 1) \"lastname\" 2) \"firstname\" redis\u003e KEYS a?? 1) \"age\" redis\u003e KEYS * 1) \"lastname\" 2) \"firstname\" 3) \"age\" MIGRATE 自动将密钥从一个Redis实例传输到另一个Redis实例。 语法： MIGRATE host port \u003ckey | \"\"\u003e destination-db timeout [COPY] [REPLACE] [AUTH password | AUTH2 username password] [KEYS key [key ...]] 示例： MIGRATE 192.168.1.34 6379 \"\" 0 5000 KEYS key1 key2 key3 MOVE 将key移动到另一个数据库。 语法： MOVE key db OBJECT ENCODING 返回Redis对象的内部编码。（查看key的数据结构） 语法： OBJECT ENCODING key OBJECT FREQ 返回一个Redis对象的对数访问频率计数器。 语法： OBJECT FREQ key OBJECT IDLETIME 返回上一次访问Redis对象后的时间（秒）。 语法： OBJECT IDLETIME key 示例： # 距离上一次访问name经过了多少秒 127.0.0.1:6379\u003e OBJECT idletime name (integer) 141 127.0.0.1:6379\u003e OBJECT idletime name (integer) 147 127.0.0.1:6379\u003e OBJECT idletime name (integer) 149 OBJECT REFCOUNT 返回key值的引用计数。 语法： OBJECT REFCOUNT key 示例： 127.0.0.1:6379\u003e OBJECT REFCOUNT name (integer) 1 PERSIST 删除key的过期时间。 语法： PERSIST key 示例： redis\u003e SET mykey \"Hello\" \"OK\" redis\u003e EXPIRE mykey 10 (integer) 1 redis\u003e TTL mykey (integer) 10 redis\u003e PERSIST mykey (integer) 1 redis\u003e TTL mykey (integer) -1 PEXPIRE 以毫秒为单位设置key的过期时间。 语法： PEXPIRE key milliseconds [NX | XX | GT | LT] NX - 仅当key没有过期时间时有效。\nXX - 仅当key有过期时间时有效。\nGT - 仅当新过期时间大于当前过期时间时有效。\nLT - 仅当新过期时间小于当前过期时间时有效。\n示例： redis\u003e SET mykey \"Hello\" \"OK\" redis\u003e PEXPIRE mykey 1500 (integer) 1 redis\u003e TTL mykey (integer) 2 redis\u003e PTTL mykey (integer) 1499 redis\u003e PEXPIRE mykey 1000 XX (integer) 1 redis\u003e TTL mykey (integer) 1 redis\u003e PEXPIRE mykey 1000 NX (integer) 0 redis\u003e TTL mykey (integer) 1 PEXPIREAT 将key的过期时间设置为Unix毫秒时间戳。 语法： PEXPIREAT key unix-time-milliseconds [NX | XX | GT | LT] NX - 仅当key没有过期时间时有效。\nXX - 仅当key有过期时间时有效。\nGT - 仅当新过期时间大于当前过期时间时有效。\nLT - 仅当新过期时间小于当前过期时间时有效。\n示例： redis\u003e SET mykey \"Hello\" \"OK\" redis\u003e PEXPIREAT mykey 1555555555005 (integer) 1 redis\u003e TTL mykey (integer) -2 redis\u003e PTTL mykey (integer) -2 PEXPIRETIME 以Unix毫秒时间戳的形式返回key的过期时间。\n语法：\nPEXPIRETIME key 示例： redis\u003e SET mykey \"Hello\" \"OK\" redis\u003e PEXPIREAT mykey 33177117420000 (integer) 1 redis\u003e PEXPIRETIME mykey (integer) 33177117420000 PTTL 以毫秒为单位返回key的过期时间。\n语法：\nPTTL key 示例： redis\u003e SET mykey \"Hello\" \"OK\" redis\u003e EXPIRE mykey 1 (integer) 1 redis\u003e PTTL mykey (integer) 999 RANDOMKEY 从数据库返回一个随机的key名。\n语法：\nRANDOMKEY 示例： [root@hcss-ecs-7943 ~]# docker exec -it redis redis-cli 127.0.0.1:6379\u003e RANDOMKEY \"name\" RENAME 重命名key并覆盖目标。\n语法：\nRENAME key newkey 示例： redis\u003e SET mykey \"Hello\" \"OK\" redis\u003e RENAME mykey myotherkey \"OK\" redis\u003e GET myotherkey \"Hello\" RENAMENX 仅当目标key名（newkey）不存在时才重命名key。\n语法：\nRENAMENX key newkey 示例： redis\u003e SET mykey \"Hello\" \"OK\" redis\u003e SET myotherkey \"World\" \"OK\" redis\u003e RENAMENX mykey myotherkey (integer) 0 redis\u003e GET myotherkey \"World\" RESTORE 从值的序列化表示创建key。\n语法：\nRESTORE key ttl serialized-value [REPLACE] [ABSTTL] [IDLETIME seconds] [FREQ frequency] 示例： redis\u003e DEL mykey 0 redis\u003e RESTORE mykey 0 \"\\n\\x17\\x17\\x00\\x00\\x00\\x12\\x00\\x00\\x00\\x03\\x00\\ x00\\xc0\\x01\\x00\\x04\\xc0\\x02\\x00\\x04\\xc0\\x03\\x00\\ xff\\x04\\x00u#\u003c\\xc0;.\\xe9\\xdd\" OK redis\u003e TYPE mykey list redis\u003e LRANGE mykey 0 -1 1) \"1\" 2) \"2\" 3) \"3\" SCAN 遍历数据库中的key名。\n语法：\nSCAN cursor [MATCH pattern] [COUNT count] [TYPE type] 示例： redis 127.0.0.1:6379\u003e scan 0 1) \"17\" 2) 1) \"key:12\" 2) \"key:8\" 3) \"key:4\" 4) \"key:14\" 5) \"key:16\" 6) \"key:17\" 7) \"key:15\" 8) \"key:10\" 9) \"key:3\" 10) \"key:7\" 11) \"key:1\" redis 127.0.0.1:6379\u003e scan 17 1) \"0\" 2) 1) \"key:5\" 2) \"key:18\" 3) \"key:0\" 4) \"key:2\" 5) \"key:19\" 6) \"key:13\" 7) \"key:6\" 8) \"key:9\" 9) \"key:11\" SORT 对列表、集合或已排序集合中的元素进行排序，并可选择存储结果。\n语法：\nSORT key [BY pattern] [LIMIT offset count] [GET pattern [GET pattern ...]] [ASC | DESC] [ALPHA] [STORE destination] SORT_RO 返回列表、集合或已排序集合的已排序元素。\n语法：\nSORT_RO key [BY pattern] [LIMIT offset count] [GET pattern [GET pattern ...]] [ASC | DESC] [ALPHA] 示例： SORT_RO mylist BY weight_*-\u003efieldname GET object_*-\u003efieldname TOUCH 在更新最后一次访问key的时间后，返回指定键中现有key的个数。\n语法：\nTOUCH key [key ...] 示例： redis\u003e SET key1 \"Hello\" \"OK\" redis\u003e SET key2 \"World\" \"OK\" redis\u003e TOUCH key1 key2 (integer) 2 TTL 以秒为单位返回key的过期时间。\n语法：\nTTL key 示例： redis\u003e SET mykey \"Hello\" \"OK\" redis\u003e EXPIRE mykey 10 (integer) 1 redis\u003e TTL mykey (integer) 10 TYPE 确定存储在key中的值的类型。\n语法：\nTYPE key 示例： redis\u003e SET key1 \"value\" \"OK\" redis\u003e LPUSH key2 \"value\" (integer) 1 redis\u003e SADD key3 \"value\" (integer) 1 redis\u003e TYPE key1 \"string\" redis\u003e TYPE key2 \"list\" redis\u003e TYPE key3 \"set\" UNLINK 异步删除一个或多个key。\n语法：\nUNLINK key [key ...] 示例： redis\u003e SET key1 \"Hello\" \"OK\" redis\u003e SET key2 \"World\" \"OK\" redis\u003e UNLINK key1 key2 key3 (integer) 2 WAIT 阻塞，直到连接发送的上述所有写命令的异步复制完成。\n语法：\nWAIT numreplicas timeout 示例： \u003e SET foo bar OK \u003e WAIT 1 0 (integer) 1 \u003e WAIT 2 1000 (integer) 1 WAITAOF 阻塞，直到连接发送的所有上述写命令都被写入主服务器和/或副本的仅追加文件。\n语法：\nWAITAOF numlocal numreplicas timeout 示例： \u003e SET foo bar OK \u003e WAITAOF 1 0 0 1) (integer) 1 2) (integer) 0 \u003e WAITAOF 0 1 1000 1) (integer) 1 2) (integer) 0 ",
   "wordCount" : "1041",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2023-03-02T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2023-03-02T00:00:00Z",
   "dateModified": "2023-03-02T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/redis/command/"
+    "@id": "https://helium.github.io/posts/redis/command/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/redis/">Redis</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/redis/">Redis</a></div>
     <h1 class="post-title entry-hint-parent">
       redis 通用命令
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/redis/" target="_blank" rel="noopener">Redis</a>
+            <a href="https://helium.github.io/tags/redis/" target="_blank" rel="noopener">Redis</a>
         </ul>
       </span>
       
@@ -1077,15 +1077,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/redis/">Redis</a></li>
+      <li><a href="https://helium.github.io/tags/redis/">Redis</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/redis/cluster/">
+  <a class="prev" href="https://helium.github.io/posts/redis/cluster/">
     <span class="title">« 上一页</span>
     <br>
     <span>redis 分片集群</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/redis/string/">
+  <a class="next" href="https://helium.github.io/posts/redis/string/">
     <span class="title">下一页 »</span>
     <br>
     <span>redis string</span>

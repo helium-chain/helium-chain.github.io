@@ -2,72 +2,72 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Pgsql on Helium</title>
-    <link>https://heliu.site/tags/pgsql/</link>
+    <link>https://helium.github.io/tags/pgsql/</link>
     <description>Recent content in Pgsql on Helium</description>
     <image>
       <title>Helium</title>
-      <url>https://heliu.site/favicon-32x32.png</url>
-      <link>https://heliu.site/favicon-32x32.png</link>
+      <url>https://helium.github.io/favicon-32x32.png</url>
+      <link>https://helium.github.io/favicon-32x32.png</link>
     </image>
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
     <lastBuildDate>Wed, 25 Sep 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://heliu.site/tags/pgsql/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://helium.github.io/tags/pgsql/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>安装</title>
-      <link>https://heliu.site/posts/postgresql/install/</link>
+      <link>https://helium.github.io/posts/postgresql/install/</link>
       <pubDate>Fri, 19 May 2023 00:00:00 +0000</pubDate>
-      <guid>https://heliu.site/posts/postgresql/install/</guid>
+      <guid>https://helium.github.io/posts/postgresql/install/</guid>
       <description>PostgreSQL docker 安装介绍。</description>
     </item>
     <item>
       <title>客户端命令</title>
-      <link>https://heliu.site/posts/postgresql/client/</link>
+      <link>https://helium.github.io/posts/postgresql/client/</link>
       <pubDate>Sun, 22 Sep 2024 00:00:00 +0000</pubDate>
-      <guid>https://heliu.site/posts/postgresql/client/</guid>
+      <guid>https://helium.github.io/posts/postgresql/client/</guid>
       <description>💥本文章相关postgreSQL版本14.4</description>
     </item>
     <item>
       <title>用户和角色</title>
-      <link>https://heliu.site/posts/postgresql/user-role/</link>
+      <link>https://helium.github.io/posts/postgresql/user-role/</link>
       <pubDate>Fri, 20 Sep 2024 00:00:00 +0000</pubDate>
-      <guid>https://heliu.site/posts/postgresql/user-role/</guid>
+      <guid>https://helium.github.io/posts/postgresql/user-role/</guid>
       <description>PostgreSQL 角色和用户。</description>
     </item>
     <item>
       <title>数据库与模式</title>
-      <link>https://heliu.site/posts/postgresql/database/</link>
+      <link>https://helium.github.io/posts/postgresql/database/</link>
       <pubDate>Mon, 23 Sep 2024 00:00:00 +0000</pubDate>
-      <guid>https://heliu.site/posts/postgresql/database/</guid>
+      <guid>https://helium.github.io/posts/postgresql/database/</guid>
       <description>💥本文章参考自PostgreSQL 14.4。</description>
     </item>
     <item>
       <title>查询</title>
-      <link>https://heliu.site/posts/postgresql/query/</link>
+      <link>https://helium.github.io/posts/postgresql/query/</link>
       <pubDate>Wed, 18 Sep 2024 00:00:00 +0000</pubDate>
-      <guid>https://heliu.site/posts/postgresql/query/</guid>
+      <guid>https://helium.github.io/posts/postgresql/query/</guid>
       <description>Query</description>
     </item>
     <item>
       <title>表和表空间</title>
-      <link>https://heliu.site/posts/postgresql/table/</link>
+      <link>https://helium.github.io/posts/postgresql/table/</link>
       <pubDate>Tue, 24 Sep 2024 00:00:00 +0000</pubDate>
-      <guid>https://heliu.site/posts/postgresql/table/</guid>
+      <guid>https://helium.github.io/posts/postgresql/table/</guid>
       <description>💥本文章参考自PostgreSQL 14.4。</description>
     </item>
     <item>
       <title>常用函数</title>
-      <link>https://heliu.site/posts/postgresql/function/</link>
+      <link>https://helium.github.io/posts/postgresql/function/</link>
       <pubDate>Thu, 19 Sep 2024 00:00:00 +0000</pubDate>
-      <guid>https://heliu.site/posts/postgresql/function/</guid>
+      <guid>https://helium.github.io/posts/postgresql/function/</guid>
       <description>pgSQL 常用函数简介。</description>
     </item>
     <item>
       <title>设置默认时区</title>
-      <link>https://heliu.site/posts/postgresql/timezone/</link>
+      <link>https://helium.github.io/posts/postgresql/timezone/</link>
       <pubDate>Wed, 25 Sep 2024 00:00:00 +0000</pubDate>
-      <guid>https://heliu.site/posts/postgresql/timezone/</guid>
+      <guid>https://helium.github.io/posts/postgresql/timezone/</guid>
       <description>💥本文章所有相关PostgreSQL 14版本。</description>
     </item>
   </channel>

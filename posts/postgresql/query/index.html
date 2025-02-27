@@ -9,18 +9,18 @@
 <meta name="keywords" content="pgsql">
 <meta name="description" content="Query">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/postgresql/query/">
+<link rel="canonical" href="https://helium.github.io/posts/postgresql/query/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/postgresql/query/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/postgresql/query/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="查询" />
 <meta property="og:description" content="Query" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/postgresql/query/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/postgresql/query/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-09-18T00:00:00+00:00" />
 <meta property="article:modified_time" content="2024-09-18T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="查询"/>
 <meta name="twitter:description" content="Query"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "PostgreSQL",
-      "item": "https://heliu.site/posts/postgresql/"
+      "item": "https://helium.github.io/posts/postgresql/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "查询",
-      "item": "https://heliu.site/posts/postgresql/query/"
+      "item": "https://helium.github.io/posts/postgresql/query/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " SQL 语句不分区大小写，但是通常将关键字（SELECT、 FROM 等）进行大写，其他内容使 用小写，便于阅读。 简单查询 单表查询 查询员工姓氏。 SELECT first_name, last_name FROM employees; 查询员工薪水。 SELECT first_name, last_name, salary * 12 AS annual_income FROM employees; 查询所有数据。(在实际项目中，应该避免使用 SELECT *，因为应用程序可能并不需要全部的字段，而且表 结构可能会发生改变，明确指定的字段名称可以减少不确定性。) SELECT * FROM employees; 无表查询 有的时候，我们可能会遇到这样的查询语句： SELECT 2 + 3; 去重 查询员工表中的部门编号(去重)。 注意：NULL 的结果并没有去重。 SELECT DISTINCT department_id FROM employees; 注释 在 PostgreSQL 中，以两个连字符（–）开始，直到这一行结束的内容表示注释： -- 这是标准 SQL 注释方式 SELECT DISTINCT first_name FROM employees; 注释的内容会在语法分析之前替换成空格，因此不会被服务器执行。另外， PostgreSQL 还 支持 C 语言风格的注释方法（/* … */）。例如：(注释允许嵌套) SELECT DISTINCT first_name /* 这是一个多行注释， DISTINCT 表示排除重复值 /* 这是一个嵌套的注释 */ */ FROM employees; 条件查询 WHERE WHERE 子句的语法如下： SELECT column1, column2, ... FROM table WHERE conditions; 查询薪水为 10000 的员工。 SELECT first_name, last_name, salary FROM employees WHERE salary = 10000; PostgreSQL 提供了以下比较运算符。 运算符 描述 示例 = 等于 manager_id = 100 != 不等于 department_id != 50 \u003c\u003e 不等于 job_id \u003c\u003e ‘SA_REP’ \u003e 大于 salary \u003e 10000 \u003e= 大于等于 hire_date \u003e= ‘2007-01-01’ \u003c 小于 salary \u003c 15000 \u003c= 小于等于 employee_id \u003c= 123 BETWEEN 位于范围之内(包含两端的值) salary BETWEEN 10000 AND 15000 IN 属于列表之中 job_id IN (‘AC_MGR’, ‘HR_REP’, ‘IT_PROG’) SELECT first_name, last_name, salary FROM employees WHERE salary BETWEEN 11000 AND 12000; 模式匹配 LIKE 查询姓氏（last_name）以“Kin”开头的员工。 百分号（%）可以匹配零个或者多个任意字符。 下划线（_）可以匹配一个任意字符。 例如： “%en”匹配以“en”结束的字符串。 “%en%”匹配包含“en”的字符串。 “B_g”匹配“Big”、 “Bug”等。 SELECT first_name, last_name FROM employees WHERE last_name LIKE'Kin%'; 如果字符串中存在这两个通配符（%或_），可以在它们前面加上一个反斜杠（\\）进行转义。 SELECT 1 WHERE 'this is 25%' LIKE'%25\\%'; 也可以通过 ESCAPE 子句指定其他的转义字符。 SELECT 1 WHERE 'this is 25%' LIKE'%25@%' ESCAPE'@'; NOT LIKE NOT LIKE 运算符匹配与 LIKE 相反的结果。 SELECT first_name, last_name FROM employees WHERE last_name NOT LIKE'Kin%'; LIKE 运算符区分大小写， PostgreSQL 同时还提供了不区分大小写的 ILIKE 运算符。 SELECT first_name, last_name FROM employees WHERE last_name LIKE'kin%'; 更多参看官方文档：https://www.postgresql.org/docs/current/functions-matching.html 空值判断 根据 SQL 标准，空值使用 NULL 表示。 空值是一个特殊值，代表了未知数据。 如果使用常规的比较运算符与 NULL 进行比较，总是返回空值。 NULL = 0; -- 结果为空值 NULL = NULL; -- 结果为空值 NULL != NULL; -- 结果为空值 IS NULL 查询部门编号为空的员工。 SELECT first_name, last_name, department_id FROM employees WHERE department_id IS NULL; IS NOT NULL 查询部门编号不为空的员工。 SELECT first_name, last_name, department_id FROM employees WHERE department_id IS NOT NULL; 复杂条件 WHERE 子句可以包含多个条件，使用逻辑运算符（AND、 OR、 NOT）将它们进行组合，并根据最终的逻辑值进行过滤。 AND AND（逻辑与）运算符的逻辑真值表如下： 对于 AND 运算符，只有当它两边的结果都为真时，最终结果才为真。 否则最终结果为假，不返回结果。 对于 AND 运算符，只有当它两边的结果都为真时，最终结果才为真；否则最终结果为假，不返回结果。 TRUE FALSE NULL TRUE TRUE FALSE NULL FALSE FALSE FALSE FALSE NULL NULL FALSE NULL 查询返回薪水为 10000，并且姓氏为“King”的员工。 SELECT first_name, last_name, salary FROM employees WHERE salary = 10000 AND last_name = 'King'; OR OR（逻辑或）运算符的逻辑真值表如下： OR 逻辑或运算符只要有一个条件为真，结果就为真。 TRUE FALSE NULL TRUE TRUE TRUE TRUE FALSE TRUE FALSE NULL NULL TRUE NULL NULL 查询返回薪水为 10000，或者姓氏为“King”的员工。 SELECT first_name, last_name, salary FROM employees WHERE salary = 10000 OR last_name = 'King'; NOT NOT（逻辑非） 运算符用于取反操作，它的逻辑真值表如下： NOT TRUE FALSE FALSE TRUE NULL NULL 注意，对于未知的 NULL 值，经过 NOT 处理之后仍然是未知值。 除此之外， NOT 还可以结合前面介绍的运算符一起使用： NOT BETWEEN，位于范围之外。 NOT IN，不在列表之中。 NOT LIKE，不匹配模式。 NOT IS NULL，不为空，等价于 IS NOT NULL。 最后，当查询条件包含复杂逻辑时，它们的运算优先级从高到低排列如下： | 条件运算符 | 描述 | | =, !=, \u003c\u003e, \u003c, \u003c=, \u003e, \u003e= | 比较运算 | | IS [NOT] NULL, [NOT] LIKE, [NOT] BETWEEN, [NOT] IN, [NOT] EXISTS | 比较运算 | | NOT | 逻辑否定 | | AND | 逻辑与 |\n注意 对于逻辑运算符 AND 和 OR，需要注意的是，它们使用短路运算。 也就是说，只要前面的表达式能够决定最终的结果，不进行后面的计算。 这样能够提高运算效率。因此，以下语句不会产生除零错误： SELECT 1 WHERE 1 = 0 AND 1/0 = 1; SELECT 1 WHERE 1 = 1 OR 1/0 = 1; 还需要注意的一个问题是，当我们组合 AND 和 OR 运算符时， AND 运算符优先级更高，总是先执行。 由于 AND 优先级高，查询返回的是薪水为 24000 并且姓氏为“King”的员工，或者薪水为10000 的员工。 SELECT first_name, last_name, salary FROM employees WHERE salary = 10000 OR salary = 24000 AND last_name = 'King'; 如果相要返回姓氏为“King”，并且薪水为 10000 或 24000 的员工，可以使用括号修改优先级。 SELECT first_name, last_name, salary FROM employees WHERE ( salary = 10000 OR salary = 24000 ) AND last_name = 'King'; 排序 单列排序 单列排序是指按照某个字段或者表达式进行排序，用法如下： ORDER BY 表示按照某个字段进行排序， ASC 表示升序排序（Ascending）， DESC 表示降序排序（Descending），默认值为 ASC。 SELECT column1, column2, ... FROM table ORDER BY column1 [ASC | DESC]; 查询部门编号为 60 的员工，并且按照薪水从高到低进行排序显示。 SELECT first_name, last_name, salary FROM employees WHERE department_id = 60 ORDER BY salary DESC; 多列排序 对于单列排序，有可能存在多个数据值相同的情况。此时，可以再指定其他的排序字段进行处理。 首先基于第一个排序字段进行排序，对于可能存在的相同值，再基于第二个字段进行排序，依此类推。 SELECT column1, column2, ... FROM table ORDER BY column1 ASC, column2 DESC, ...; 查询返回部门编号为 60 的员工，并且按照薪水从高到低进行排序显示，如果薪水相同，再按照名字（first_name）降序排列。 SELECT first_name, last_name, salary FROM employees WHERE department_id = 60 ORDER BY salary DESC, first_name DESC; ORDER BY 后的排序字段可以是 SELECT 列表中没有的字段。以下语句返回了员工的姓名和薪水，按照入职先后进行显示。 -- 默认升序 ASC SELECT first_name, last_name, salary FROM employees ORDER BY hire_date; 除了在 ORDER BY 后指定字段名或者表达式之外，也可以简单的使用它们在 SELECT 列表中出现的顺序来表示。 -- 默认升序 ASC SELECT first_name, last_name, salary FROM employees ORDER BY 1, 3; PostgreSQL 对于字符类型的数据进行排序时不区分大小写，“CAT”和“cat”顺序相同。 CREATE TABLE tbl_char(c1 varchar(10)); INSERT INTO tbl_char VALUES('CAT'), ('cat'), ('dog'); SELECT * FROM tbl_char ORDER BY c1; 空值排序 在 SQL 中，空值是一个特殊的值，使用 NULL 表示。 SELECT first_name, last_name, commission_pct FROM employees WHERE first_name = 'Peter' ORDER BY commission_pct; PostgreSQL 支持使用 NULLS FIRST（空值排在最前）和 NULLS LAST（空值排在最后）指定空值的排序位置；升序排序时默认为 NULLS LAST，降序排序时默认为 NULLS FIRST。 我们修改上面的示例，将“Peter Vargas”排在最前，但仍然按照佣金百分比进行升序显示。 SELECT first_name, last_name, commission_pct FROM employees WHERE first_name = 'Peter' ORDER BY commission_pct NULLS FIRST; 限定结果数量 Top-N 这类查询通常是为了找出排名中的前 N 个记录，例如以下语句查询薪水最高的前 10 名员工，使用 FETCH 语法： SELECT first_name, last_name, salary FROM employees ORDER BY salary DESC FETCH FIRST 10 ROWS ONLY; 其中，FIRST 也可以写成 NEXT，ROWS 也可以写成 ROW。结果返回了排序之后的前 10 条记录。 SELECT first_name, last_name, salary FROM employees ORDER BY salary DESC FETCH NEXT 10 ROW ONLY; 使用 LIMIT 语法也可以实现相同的功能。 SELECT first_name, last_name, salary FROM employees ORDER BY salary DESC LIMIT 10; 分页 SQL 实现这种功能需要引入另一个子句：OFFSET。 假设我们的应用提供了分页显示，每页显示 10 条记录。现在用户点击了下一页，需要显示第 11 到第 20 条记录。使用标准 SQL 语法实现如下： OFFSET 表示先忽略掉多少行数据，然后再返回后面的结果。 ROWS 也可以写成 ROW。 对于应用程序而言，只需要传入不同的 OFFSET 偏移量和FETCH 数量，就可以在结果中任意导航。 SELECT first_name, last_name, salary FROM employees ORDER BY salary DESC OFFSET 10 ROWS FETCH FIRST 10 ROWS ONLY; 使用 LIMIT 加上 OFFSET 同样可以实现分页效果。(不支持 LIMIT 10, 10) SELECT first_name, last_name, salary FROM employees ORDER BY salary DESC LIMIT 10 OFFSET 10; 注意 我们先看一下完整的 FETCH 和 LIMIT 语法： SELECT column1, column2, ... FROM table [WHERE conditions] [ORDER BY column1 ASC, column2 DESC, ...] [OFFSET m {ROW | ROWS}] [FETCH { FIRST | NEXT } [ num_rows] { ROW | ROWS } ONLY]; SELECT column1, column2, ... FROM table [WHERE conditions] [ORDER BY column1 ASC, column2 DESC, ...] [LIMIT { num_rows| ALL } ] [OFFSET m {ROW | ROWS}]; 在使用以上功能时需要注意以下问题： FETCH 是标准 SQL 语法， LIMIT 是 PostgreSQL 扩展语法。 如果没有指定 ORDER BY，限定数量之前并没有进行排序，是一个随意的结果。 OFFSET 偏移量必须为 0 或者正整数。默认为 0， NULL 等价于 0。 FETCH 限定的数量必须为 0 或者正整数。默认为 1， NULL 等价于不限定数量。 LIMIT 限定的数量必须为 0 或者正整数， 没有默认值。ALL 或者 NULL 表示不限定数量。 随着 OFFSET 的增加，查询的性能会越来越差。因为服务器需要计算更多的偏移量，即使这些数据不需要被返回前端。 分组 聚合函数 聚合函数（aggregate function）针对一组数据行进行运算，并且返回单个结果。 PostgreSQL支持以下常见的聚合函数： AVG - 计算一组值的平均值。 COUNT - 统计一组值的数量。 MAX - 计算一组值的最大值。 MIN - 计算一组值的最小值。 SUM - 计算一组值的和值。 STRING_AGG - 连接一组字符串。 查询 IT 部门所有员工的平均薪水、员工总数、最高薪水、最低薪水、以及薪水总计： SELECT AVG ( salary ), COUNT ( * ), MAX ( salary ), MIN ( salary ), SUM ( salary ) FROM employees WHERE department_id = 60; 关于聚合函数，需要注意两点： 函数参数前添加 DISTINCT 关键字，可以在计算时排除重复值。 忽略参数中的 NULL 值。 SELECT COUNT ( * ), COUNT ( DISTINCT salary ), COUNT ( commission_pct ) FROM employees WHERE department_id = 60; PostgreSQL 为聚合函数提供了一个 FILTER 扩展选项，可以用于汇总满足特定条件的数据。 其中，FILTER 选项可以指定一个 WHERE 条件，只有满足条件的数据才会进行汇总。 因此，示例中的第一个 COUNT 函数返回了月薪大于等于 10000 的员工数量， 第二个 COUNT 函数返回了月薪小于 10000 的员工数量。 SELECT COUNT ( * ) FILTER ( WHERE salary \u003e= 10000 ) high_sal, COUNT ( * ) FILTER ( WHERE salary \u003c 10000 ) low_sal FROM employees; STRING_AGG 函数将 IT 部门员工的名字使用分号进行分隔，按照薪水从高到低排序后连接成一个字符串。 SELECT STRING_AGG ( first_name, ';' ORDER BY salary DESC ) FROM employees WHERE department_id = 60; 更多聚合函数参看官方文档：https://www.postgresql.org/docs/current/functions-aggregate.html 分组聚合 每个部门内所有员工的平均薪水、员工总数、最高薪水、最低薪水、以及薪水总计。 查询执行时，首先根据 GROUP BY 子句中的列（department_id）进行分组，然后使用聚合函数汇总组内的数据。 最后一条数据是针对部门编号字段为空的数据进行的分组汇总，GROUP BY 将所有的 NULL 分为一组。 SELECT department_id, AVG ( salary ), COUNT ( * ), MAX ( salary ), MIN ( salary ), SUM ( salary ) FROM employees GROUP BY department_id ORDER BY department_id; GROUP BY 并不一定需要与聚合函数一起使用。 SELECT department_id FROM employees GROUP BY department_id ORDER BY department_id; 查询的结果就是不同的部门编号分组，这种查询的结果与 DISTINCT 效果相同。 SELECT DISTINCT department_id FROM employees ORDER BY department_id; GROUP BY 不仅可以按照一个字段进行分组，也可以使用多个字段将数据分成更多的组。 查询将员工按照不同的部门和职位组合进行分组，然后进行汇总。 SELECT department_id, job_id, AVG ( salary ), COUNT ( * ), MAX ( salary ), MIN ( salary ), SUM ( salary ) FROM employees GROUP BY department_id, job_id ORDER BY department_id, job_id; 使用了 GROUP BY 子句进行分组操作之后需要注意一点，就是 SELECT 列表中只能出现分组字段或者聚合函数，不能再出现表中的其他字段。下面是一个错误的示例： SELECT department_id, job_id, AVG ( salary ), COUNT ( * ), MAX ( salary ), MIN ( salary ), SUM ( salary ) FROM employees GROUP BY department_id; 错误的原因在于 job_id 既不是分组的条件，也不是聚合函数。查询要求按照部门进行分组汇总，但是每个部门存在多个不同的职位，数据库无法知道需要显示哪个职位编号。 分组过滤 例如找出平均薪水值大于 10000 的部门，直观的想法就是在 WHERE 子句中增加一个过滤条件，例如： 不过查询并没有返回期望的结果，而是出现了一个错误： WHERE 子句中不允许出现聚合函数。 因为在 SQL 询中，如果同时存在 WHERE 子句和 GROUP BY 子句，WHERE 子句在 GROUP BY 子句之前执行。 因此，WHERE 子句无法对分组后的结果进行过滤。 SELECT department_id, AVG ( salary ), COUNT ( * ), MAX ( salary ), MIN ( salary ), SUM ( salary ) FROM employees WHERE AVG ( salary ) \u003e 10000 GROUP BY department_id ORDER BY department_id; WHERE 子句执行时还没有进行分组计算，它只能基于分组之前的数据进行过滤。如果需要对分组后的结果进行过滤，需要使用 HAVING 子句。以上查询的正确写法如下： HAVING 出现在 GROUP BY 之后，也在它之后执行，因此能够使用聚合函数进行过滤。 SELECT department_id, AVG ( salary ), COUNT ( * ), MAX ( salary ), MIN ( salary ), SUM ( salary ) FROM employees GROUP BY department_id HAVING AVG ( salary ) \u003e 10000 ORDER BY department_id; 我们可以同时使用 WHERE 子句进行数据行的过滤，使用 HAVING 进行分组结果的过滤。 SELECT department_id, COUNT ( * ) AS headcount FROM employees WHERE salary \u003e 10000 GROUP BY department_id HAVING COUNT ( * ) \u003e 2; -- 这里 COUNT(*) 修改为 headcount 报错 高级选项 PostgreSQL 除了支持基本的 GROUP BY 分组操作之外，还支持 3 种高级的分组选项：GROUPING SETS、 ROLLUP 以及 CUBE。 GROUPING SETS 选项 GROUPING SETS 是 GROUP BY 的扩展选项，用于指定自定义的分组集。举例来说，以下是一个销售数据表： CREATE TABLE sales ( item VARCHAR(10), year VARCHAR(4), quantity INT ); INSERT INTO sales VALUES('apple', '2018', 800); INSERT INTO sales VALUES('apple', '2018', 1000); INSERT INTO sales VALUES('banana', '2018', 500); INSERT INTO sales VALUES('banana', '2018', 600); INSERT INTO sales VALUES('apple', '2019', 1200); INSERT INTO sales VALUES('banana', '2019', 1800); 按照产品（item）和年度（year）进行分组汇总时，所有可能的 4 种分组集包括： 按照产品和年度的组合进行分组； 按照产品进行分组； 按照年度进行分组； 所有数据分为一组。 可以通过以下多个查询获取所有分组集的分组结果：(将四种查询结果合并到一起) -- 按照产品和年度的组合进行分组 SELECT item, YEAR, SUM ( quantity ) FROM sales GROUP BY item, YEAR; -- 按照产品进行分组 SELECT item, NULL AS YEAR, SUM ( quantity ) FROM sales GROUP BY item; -- 按照年度进行分组 SELECT NULL AS item, YEAR, SUM ( quantity ) FROM sales GROUP BY YEAR; -- 所有数据分为一组 SELECT NULL AS item, NULL AS YEAR, SUM ( quantity ) FROM sales; 使用集合运算符（UNION ALL）将 4 个查询结果合并到一起。但是这种方法存在一些问题：首先，查询语句比较冗长，查询的次数随着分组字段的增加呈指数增长；其次，多次查询意味着需要多次扫描同一张表，存在性能上的问题。 GROUPING SETS 是 GROUP BY 的扩展选项，能够为这种查询需求提供更加简单有效的解决方法。我们使用分组集改写上面的示例： SELECT item, YEAR, SUM ( quantity ) FROM sales GROUP BY GROUPING SETS ( ( item, YEAR ), ( item ), ( YEAR ), ( ) ); GROUPING SETS 选项用于定义分组集，每个分组集都需要包含在单独的括号中，空白的括号（()）表示将所有数据当作一个组处理。 查询的结果等于前文 4 个查询的合并结果，但是语句更少，可读性更强；而且 PostgreSQL 执行时只需要扫描一次销售表，性能更加优化。 默认的 GROUP BY 使用由所有分组字段构成的一个分组集，本示例中为 ((item, year))。 CUBE 选项 随着分组字段的增加，即使通过 GROUPING SETS 列出所有可能的分组方式也会显得比较麻烦。 设想一下使用 4 个字段进行分组统计的场景，所有可能的分组集共计有 16 个。这种情况下编写查询语句仍然很复杂，为此 PostgreSQL 提供了简写形式的 GROUPING SETS：CUBE和ROLLUP。 CUBE 表示所有可能的分组集，例如： CUBE ( c1, c2, c3 ); -- 等价于： GROUPING SETS ( ( c1, c2, c3 ), ( c1, c2 ), ( c1, c3 ), ( c2, c3 ), ( c1 ), ( c2 ), ( c3 ), ( ) ); 因此，我们可以进一步将上面的示例改写如下： SELECT item, YEAR, SUM ( quantity ) FROM sales GROUP BY CUBE ( item, YEAR ); ROLLUP 选项 GROUPING SETS 第二种简写形式就是 ROLLUP，用于生成按照层级进行汇总的结果，类似于财务报表中的小计、合计和总计。例如： ROLLUP ( c1, c2, c3 ) -- 等价于： GROUPING SETS ( ( c1, c2, c3 ), ( c1, c2 ), ( c1 ), ( ) ) 查询返回按照产品和年度组合进行统计的销量小计，加上按照产品进行统计的销量合计，再加上所有销量的总计： SELECT item, YEAR, SUM ( quantity ) FROM sales GROUP BY ROLLUP ( item, YEAR ); 查看结果时，需要根据每个字段上的空值进行判断。比如第一行的产品和年度都为空，因此它是所有销量的总计。为了便于查看，可以将空值进行转换显示： COALESCE 函数返回第一个非空的参数值。 SELECT COALESCE ( item, '所有产品' ) AS \"产品\", COALESCE ( YEAR, '所有年度' ) AS \"年度\", SUM ( quantity ) AS \"销量\" FROM sales GROUP BY ROLLUP ( item, YEAR ); 可以根据需要返回按照某些组合进行统计的结果，以下查询返回按照产品和年度组合进行统计的销量小计，加上按照产品进行统计的销量合计： SELECT COALESCE ( item, '所有产品' ) AS \"产品\", COALESCE ( YEAR, '所有年度' ) AS \"年度\", SUM ( quantity ) AS \"销量\" FROM sales GROUP BY item, ROLLUP ( YEAR ); 对于 CUBE 和 ROLLUP 而言，每个元素可以是单独的字段或表达式，也可以是使用括号包含的列表。如果是括号中的列表，产生分组集时它们必须作为一个整体。例如： 因为 c1 和 c2 是一个整体， c3 和 c4 是一个整体。 CUBE ( (c1, c2), (c3, c4) ); -- 等价于 GROUPING SETS ( ( c1, c2, c3, c4 ), ( c1, c2 ), ( c3, c4 ), ( ) ); ROLLUP ( c1, (c2, c3), c4 ); -- 等价于 GROUPING SETS ( ( c1, c2, c3, c4 ), ( c1, c2, c3 ), ( c1 ), ( ) ); GROUPING 函数 区分是分组产生的 NULL 还是源数据中的 NULL。PostgreSQL 提供了一个分组函数： GROUPING。 GROUPING 函数如果只有一个参数，返回整数 0 或者 1。 如果某个统计结果使用的分组集包含了函数中的参数字段，该函数返回 0，否则返回 1。 GROUPING 函数如果包含多个参数，针对每个参数返回整数 0 或者 1，然后将它们按照二进制数值连接到一起。比如说，第1行数据中的GROUPING(item, year)结果等于GROUPING(item)和 GROUPING(year)结果的二进制数值连接，也就是 3（二进制的 11） SELECT item AS \"产品\", YEAR AS \"年度\", SUM ( quantity ) AS \"销量\", GROUPING ( item ), GROUPING ( YEAR ), GROUPING ( item, YEAR ) FROM sales GROUP BY ROLLUP ( item, YEAR ); 通过使用 GROUPING 函数，我们可以正确显示分组中的 NULL 值和源数据中的 NULL 值： SELECT CASE GROUPING( item ) WHEN 1 THEN '所有产品' ELSE item END AS \"产品\", CASE GROUPING ( YEAR ) WHEN 1 THEN '所有年度' ELSE YEAR END AS \"年度\", SUM ( quantity ) AS \"销量\" FROM sales GROUP BY ROLLUP ( item, YEAR ); CASE 条件表达式 CASE 表达式的作用就是为 SQL 语句增加类似于 IF-THEN-ELSE 的逻辑处理功能，可以根据不同的条件返回不同的结果。 PostgreSQL 支持两种形式的条件表达式：简单 CASE 表达式和搜索 CASE 表达式。 另外，为了方便空值处理，PostgreSQL 还提供了两个缩写形式的 CASE 表达式（函数）：NULLIF 和 COALEASE。 简单 CASE 表达式 简单 CASE 表达式的语法如下： CASE expression WHEN value1 THEN result1 WHEN value2 THEN result2 [...] [ELSE default_result] END; 表达式的计算过程如下所示。\n首先计算表达式（expression）的值，然后依次与 WHEN 列表中的值（value1， value2， …）进行比较。 找到第一个匹配的值，然后返回对应 THEN 列表中的结果（result1， result2， …）。 如果没有找到匹配的值，返回 ELSE 中的默认值。如果没有指定 ELSE，返回 NULL。 下面的查询使用简单 CASE 表达式统计每个部门的人数，并且转换为列的方式显示。\nSELECT SUM ( CASE department_id WHEN 10 THEN 1 ELSE 0 END ) AS dept_10_count, SUM ( CASE department_id WHEN 20 THEN 1 ELSE 0 END ) AS dept_20_count, SUM ( CASE department_id WHEN 30 THEN 1 ELSE 0 END ) AS dept_30_count FROM employees; -- | dept_10_count|dept_20_count|dept_30_count| -- |--------------|-------------|-------------| -- | 1 | 2 | 6 | 需要注意的是每个分支的结果必须具有相同的数据类型，否则会产生类型错误。 例如，以下示例对于不同条件返回的数据类型不一致： SELECT first_name, last_name, CASE department_id WHEN 10 THEN 'Administration' WHEN 20 THEN 20 WHEN 30 THEN 'Purchasing' ELSE 'Others' END AS department_name FROM employees; -- SQL 错误 [22P02]: ERROR: invalid input syntax for integer: \"Others\" Position: 183 简单 CASE 表达式在进行计算的时候，使用的是等值比较（=），能够支持简单的逻辑处理。 如果想要基于更加复杂的条件进行判断，例如根据某个列的取值范围返回不同的信息，或者判断表达式的值是否为空，都需要使用更加强大的搜索 CASE 表达式。 搜索 CASE 表达式 搜索 CASE 表达式的语法如下： CASE WHEN condition1 THEN result1 WHEN condition2 THEN result2 ... [ELSE default_result] END 表达式的计算过程如下所示。 按照顺序依次计算 WHEN 子句中的条件（condition1, condition2, …），找到第一个结果为真的分支，返回相应的结果。 如果没有任何条件为真，返回 ELSE 中的默认值；如果此时没有指定 ELSE，返回空值。 搜索 CASE 表达式可以在 WHEN 子句中构造复杂的条件，完成各种逻辑处理。首先，所有的简单 CASE 表达式都可以替换称等价的搜索CASE 表达式。我们将前面的示例改写如下： SELECT SUM ( CASE WHEN department_id = 10 THEN 1 ELSE 0 END ) AS dept_10_count, SUM ( CASE WHEN department_id = 20 THEN 1 ELSE 0 END ) AS dept_20_count, SUM ( CASE WHEN department_id = 30 THEN 1 ELSE 0 END ) AS dept_30_count FROM employees; -- | dept_10_count|dept_20_count|dept_30_count| -- |--------------|-------------|-------------| -- | 1 | 2 | 6 | 以下示例根据薪水的范围将员工的收入分为高中低三个档次： SELECT e.first_name, e.last_name, e.salary, CASE WHEN e.salary \u003c 5000 THEN '低' WHEN e.salary \u003c 15000 THEN '中' ELSE'高' END AS salary_level FROM employees e; 既然是表达式， CASE 表达式除了可以用于 SELECT 列表，也可以出现在其他 SQL 子句中，例如 WHERE 条件子句、 GROUP BY 分组子句、 ORDER BY 排序子句等。以下示例除了将薪水显示为三个档次，同时还按照档次和名字进行排序： SELECT e.first_name, e.last_name, e.salary, CASE WHEN e.salary \u003c 5000 THEN '低' WHEN e.salary \u003c 15000 THEN '中' ELSE '高' END AS salary_level FROM employees e ORDER BY CASE WHEN e.salary \u003c 5000 THEN 3 WHEN e.salary \u003c 15000 THEN 2 ELSE 1 END, first_name; 缩写函数 除了以上两种形式的 CASE 表达式之外， PostgreSQL 还提供了两个与 NULL 相关的缩写 CASE 表达式（函数）： NULLIF 和 COALEASE。 NULLIF 函数的用法如下： NULLIF 函数包含 2 个参数，如果第一个参数等于第二个参数，返回 NULL。 否则，返回第一个参数的值。 NULLIF(expression_1, expression_2) 它可以使用等价的 CASE 表达式表示为： CASE WHEN expression_1 = expression_2 THEN NULL ELSE expression_1 END 以下示例说明了 NULLIF 函数的效果： SELECT NULLIF(1, 1), NULLIF('A', 'B'); -- |nullif|nullif(1)| -- |------|---------| -- |NULL |A | NULLIF 函数的一个常见用途是防止除零错误： SELECT 1 / 0; -- 除零错误 SELECT 1 / NULLIF(0 , 0); COALEASE 函数的语法如下： COALESCE 函数接受多个参数，并且返回第一个非空的参数值。 如果所有参数都为空值，返回 NULL 值。 COALESCE(expression_1, expression_2, expression_3, ...) 它可以使用等价的 CASE 表达式表示为： CASE WHEN expression_1 IS NOT NULL THEN expression_1 WHEN expression_2 IS NOT NULL THEN expression_2 WHEN expression_3 IS NOT NULL THEN expression_3 ... END 以下示例将佣金比率为空的数据显示为 0： SELECT e.first_name, e.last_name, e.commission_pct, COALESCE ( e.commission_pct, 0 ) FROM employees e; ",
   "wordCount" : "2376",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-09-18T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-09-18T00:00:00Z",
   "dateModified": "2024-09-18T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/postgresql/query/"
+    "@id": "https://helium.github.io/posts/postgresql/query/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/postgresql/">PostgreSQL</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/postgresql/">PostgreSQL</a></div>
     <h1 class="post-title entry-hint-parent">
       查询
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/pgsql/" target="_blank" rel="noopener">Pgsql</a>
+            <a href="https://helium.github.io/tags/pgsql/" target="_blank" rel="noopener">Pgsql</a>
         </ul>
       </span>
       
@@ -1725,15 +1725,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/pgsql/">Pgsql</a></li>
+      <li><a href="https://helium.github.io/tags/pgsql/">Pgsql</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/postgresql/database/">
+  <a class="prev" href="https://helium.github.io/posts/postgresql/database/">
     <span class="title">« 上一页</span>
     <br>
     <span>数据库与模式</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/grpc/mode/">
+  <a class="next" href="https://helium.github.io/posts/grpc/mode/">
     <span class="title">下一页 »</span>
     <br>
     <span>通信模式</span>

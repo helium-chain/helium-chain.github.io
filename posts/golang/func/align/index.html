@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, 函数">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/func/align/">
+<link rel="canonical" href="https://helium.github.io/posts/golang/func/align/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/func/align/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/func/align/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="内存对齐和逃逸分析" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/func/align/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/golang/func/align/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-08-05T00:00:00+00:00" />
 <meta property="article:modified_time" content="2024-08-05T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="内存对齐和逃逸分析"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://heliu.site/posts/golang/"
+      "item": "https://helium.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第9章 Function",
-      "item": "https://heliu.site/posts/golang/func/"
+      "item": "https://helium.github.io/posts/golang/func/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "内存对齐和逃逸分析",
-      "item": "https://heliu.site/posts/golang/func/align/"
+      "item": "https://helium.github.io/posts/golang/func/align/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": "内存对齐 在C语言函数调用中，通过栈传递的参数需要对齐到平台的位宽。 假如通过栈传递4个char类型的参数，GCC生成的 32 位程序需要 16 字节空间，64 位程序需要 32 字节栈空间。 如果传递大量参数，则这种对齐方式会存在很大的栈空间浪费。 Go语言函数栈帧中返回值和参数的对齐方式与 struct 类似，对于有返回值和参数的函数，可以把所有返回值和所有参数等价成两个 struct： 一个【返回值 struct】 和一个【参数 struct】。 因为内存对齐方式更加紧凑，所以在支持大量参数和返回值时能够做到较高的栈空间利用率。 通过如下示例可以验证函数参数和返回值的对齐方式与 struct 成员的对齐方式是一致的，代码如下： 以上的描述都是在函数通过栈传递参数和返回值的基础上的。在go1.18后版本中采用了寄存器传参。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 package main type args struct { a int8 // 1 b int64 // 8 c int32 // 4 d int16 // 2 } //go:noinline func f1(a args) (r args) { println(\u0026r.d, \u0026r.c, \u0026r.b, \u0026r.a, \u0026a.d, \u0026a.c, \u0026a.b, \u0026a.a) return } //go:noinline func f2(aa int8, ab int64, ac int32, ad int16) (ra int8, rb int64, rc int32, rd int16) { println(\u0026rd, \u0026rc, \u0026rb, \u0026ra, \u0026ad, \u0026ac, \u0026ab, \u0026aa) return } func main() { f1(args{}) // 0xc000034744 r.d // 0xc000034740 r.c // 0xc000034738 r.b // 0xc000034730 r.a // 0xc00003476c a.d // 0xc000034768 a.c // 0xc000034760 a.b // 0xc000034758 a.a f2(0, 0, 0, 0) // 0xc00003473a rd // 0xc00003473c rc // 0xc000034740 rb // 0xc000034739 ra // 0xc00003476c ad // 0xc000034768 ac // 0xc000034760 ab // 0xc000034758 aa } 汇编代码 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 TEXT main.main(SB) /mnt/hgfs/workspace/helium/main.go func main() { 0x4551e0 493b6610 CMPQ 0x10(R14), SP 0x4551e4 7657 JBE 0x45523d 0x4551e6 4883ec38 SUBQ $0x38, SP 0x4551ea 48896c2430 MOVQ BP, 0x30(SP) 0x4551ef 488d6c2430 LEAQ 0x30(SP), BP f1(args{}) 0x4551f4 c644241800 MOVB $0x0, 0x18(SP) # a.a 0x4551f9 48c744242000000000 MOVQ $0x0, 0x20(SP) # a.b 0x455202 c744242800000000 MOVL $0x0, 0x28(SP) # a.c 0x45520a 66c744242c0000 MOVW $0x0, 0x2c(SP) # a.d 0x455211 0fb6442418 MOVZX 0x18(SP), AX # a.a AX 0x455216 488b5c2420 MOVQ 0x20(SP), BX # a.b BX 0x45521b 8b4c2428 MOVL 0x28(SP), CX # a.c CX 0x45521f 31ff XORL DI, DI # a.d DI 0x455221 e83a000000 CALL main.f1(SB) f2(0, 0, 0, 0) 0x455226 31c0 XORL AX, AX # aa AX 0x455228 31db XORL BX, BX # ab BX 0x45522a 31c9 XORL CX, CX # ac CX 0x45522c 31ff XORL DI, DI # ad DI 0x45522e e8ad010000 CALL main.f2(SB) } 0x455233 488b6c2430 MOVQ 0x30(SP), BP 0x455238 4883c438 ADDQ $0x38, SP 0x45523c c3 RET func main() { 0x45523d 0f1f00 NOPL 0(AX) 0x455240 e81bcdffff CALL runtime.morestack_noctxt.abi0(SB) 0x455245 eb99 JMP main.main(SB) 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 TEXT main.f1(SB) /mnt/hgfs/workspace/helium/main.go func f1(a args) (r args) { 0x4551e0 493b6610 CMPQ 0x10(R14), SP 0x4551e4 0f8642010000 JBE 0x45532c 0x4551ea 4883ec68 SUBQ $0x68, SP 0x4551ee 48896c2460 MOVQ BP, 0x60(SP) 0x4551f3 488d6c2460 LEAQ 0x60(SP), BP # 参数分配栈大小空间 0x4551f8 88442470 MOVB AL, 0x70(SP) # a.a 0x4551fc 48895c2478 MOVQ BX, 0x78(SP) # a.b 0x455201 898c2480000000 MOVL CX, 0x80(SP) # a.c 0x455208 6689bc2484000000 MOVW DI, 0x84(SP) # a.d # 返回值分配栈大小空间 0x455210 c644240800 MOVB $0x0, 0x8(SP) # r.a 0x455215 48c744241000000000 MOVQ $0x0, 0x10(SP) # r.b 0x45521e c744241800000000 MOVL $0x0, 0x18(SP) # r.c 0x455226 66c744241c0000 MOVW $0x0, 0x1c(SP) # r.d println(\u0026r.d, \u0026r.c, \u0026r.b, \u0026r.a, \u0026a.d, \u0026a.c, \u0026a.b, \u0026a.a) ... ... 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 TEXT main.f2(SB) /mnt/hgfs/workspace/helium/main.go func f2(aa int8, ab int64, ac int32, ad int16) (ra int8, rb int64, rc int32, rd int16) { 0x455360 493b6610 CMPQ 0x10(R14), SP 0x455364 0f8631010000 JBE 0x45549b 0x45536a 4883ec60 SUBQ $0x60, SP 0x45536e 48896c2458 MOVQ BP, 0x58(SP) 0x455373 488d6c2458 LEAQ 0x58(SP), BP # 参数传参，使用寄存器，但是参数空间还是没有优化 0x455378 88442468 MOVB AL, 0x68(SP) # aa 0x45537c 48895c2470 MOVQ BX, 0x70(SP) # ab 0x455381 894c2478 MOVL CX, 0x78(SP) # ac 0x455385 66897c247c MOVW DI, 0x7c(SP) # ad # 返回值分配栈大小空间 0x45538a c644240900 MOVB $0x0, 0x9(SP) # ra 0x45538f 48c744241000000000 MOVQ $0x0, 0x10(SP) # rb 0x455398 c744240c00000000 MOVL $0x0, 0xc(SP) # rc 0x4553a0 66c744240a0000 MOVW $0x0, 0xa(SP) # rd println(\u0026rd, \u0026rc, \u0026rb, \u0026ra, \u0026ad, \u0026ac, \u0026ab, \u0026aa) ... ... 逃逸分析 什么是逃逸分析 局部变量地址作为返回值(1) 在解释逃逸分析之前，先来思考一个场景，如果一个函数把自已栈帧上某个局部变量的地址作为返回值返回。 会有什么问题？示例代码如下： 1 2 3 4 5 6 7 8 9 10 11 package main func main() { println(*newInt()) } //go:noinline func newInt() *int { var a int return \u0026a } 前面对函数栈布局的讲解 newInt() 函数的局部变量a应该分配在函数栈的 locals 区间。 在newInt()函数返回后，它的栈随即销毁，返回的变量a的地址就会变成一个悬挂指针，caller 中对该地址进行的所有读写都是不合法的，会造成程序逻辑错误甚至崩溃。 事实是这样的吗？上述分析有个前提条件，即变量 a 被分配在栈上。假如编译器能够检测到这种模式，而自动把变量 a 改为堆分配，就不存在上述问题了。 反编译 newInt() 函数，看一下结果，代码如下： 重点关注上述汇编代码中 runtime.newobject() 函数调用，该函数是 Go 语言内置函数 new() 的具体实现，用来在运行阶段分配单个对象。 CALL 指令 AX 寄存器就是 *int 类型，也是返回的值。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 TEXT main.newInt(SB) /mnt/hgfs/workspace/helium/main.go func newInt() *int { 0x455240 493b6610 CMPQ 0x10(R14), SP # 栈增长判断 0x455244 7643 JBE 0x455289 0x455246 4883ec28 SUBQ $0x28, SP 0x45524a 48896c2420 MOVQ BP, 0x20(SP) 0x45524f 488d6c2420 LEAQ 0x20(SP), BP 0x455254 48c744241000000000 MOVQ $0x0, 0x10(SP) # *int 临时返回值空间 var a int 0x45525d 488d05bc4a0000 LEAQ 0x4abc(IP), AX # type.int 元类型 # func newobject(typ *_type) unsafe.Pointer # 这里调用 newobject 函数进行了堆分配 0x455264 e8d75cfbff CALL runtime.newobject(SB) # AX=*int 类型 0x455269 4889442418 MOVQ AX, 0x18(SP) 0x45526e 48c70000000000 MOVQ $0x0, 0(AX) # *a=0 return \u0026a 0x455275 488b442418 MOVQ 0x18(SP), AX 0x45527a 4889442410 MOVQ AX, 0x10(SP) # 返回值 AX 0x45527f 488b6c2420 MOVQ 0x20(SP), BP 0x455284 4883c428 ADDQ $0x28, SP 0x455288 c3 RET func newInt() *int { 0x455289 e8d2ccffff CALL runtime.morestack_noctxt.abi0(SB) 0x45528e ebb0 JMP main.newInt(SB) 局部变量地址作为返回值(2) 如果把 newInt() 函数中的取地址运算改成使用内置函数 new()，效果也是一样的，代码如下： 1 2 3 4 //go:noinline func newInt() *int { return new(int) } 相关汇编： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 $ go build -gcflags=\"-N -l\" -o ./h1 myzx.cn/helium $ go tool objdump -S -s '^main.newInt$' ./h1 TEXT main.newInt(SB) /mnt/hgfs/workspace/helium/main.go func newInt() *int { 0x455240 493b6610 CMPQ 0x10(R14), SP 0x455244 7637 JBE 0x45527d 0x455246 4883ec28 SUBQ $0x28, SP 0x45524a 48896c2420 MOVQ BP, 0x20(SP) 0x45524f 488d6c2420 LEAQ 0x20(SP), BP 0x455254 48c744241000000000 MOVQ $0x0, 0x10(SP) # *int 返回值空间 return new(int) # func newobject(typ *_type) unsafe.Pointer 0x45525d 488d05bc4a0000 LEAQ 0x4abc(IP), AX # type.int 元类型 0x455264 e8d75cfbff CALL runtime.newobject(SB) # AX=*int 0x455269 4889442418 MOVQ AX, 0x18(SP) 0x45526e 4889442410 MOVQ AX, 0x10(SP) 0x455273 488b6c2420 MOVQ 0x20(SP), BP 0x455278 4883c428 ADDQ $0x28, SP 0x45527c c3 RET func newInt() *int { 0x45527d 0f1f00 NOPL 0(AX) 0x455280 e8dbccffff CALL runtime.morestack_noctxt.abi0(SB) 0x455285 ebb9 JMP main.newInt(SB) 当函数局部变量的生命周期超过函数栈的生命周期时，编译器把该局部变量由栈分配改为堆分配，即变量从栈上逃逸到堆上。 不逃逸分析 只要使用了new()函数就会造成堆分配?\n前面逃逸分析代码示例中将函数的某个局部变量的地址作为返回值返回，或者通过内置函数 new() 动态分配变量并返回其地址。 其中内置函数new()有着非常明显的堆分配的含义，是不是只要使用了new()函数就会造成堆分配呢？ 进一步猜想，如果对局部变量进行取地址操作会被转换为new()函数调用，那就不会进行所谓的逃逸分析了。 先验证new()函数与堆分配是否有必然关系，代码如下： 1 2 3 4 5 //go:noinline func New() int { p := new(int) return *p } 反编译new()函数，得到的汇编代码如下： 即便代码中使用了new()函数，只要变量的生命周期没有超过过当前函数栈的生命周期，编译器就不会进行堆分配。 事实上，只要代码逻辑允许，编译器总是倾向于把变量分配在栈上，因为比配在堆上更高效。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 TEXT main.New(SB) /mnt/hgfs/workspace/helium/main.go func New() int { 0x455240 4883ec20 SUBQ $0x20, SP 0x455244 48896c2418 MOVQ BP, 0x18(SP) 0x455249 488d6c2418 LEAQ 0x18(SP), BP 0x45524e 48c7042400000000 MOVQ $0x0, 0(SP) # 返回地址 int p := new(int) # new 函数直接是在栈上分配的 0x455256 48c744240800000000 MOVQ $0x0, 0x8(SP) # 0x8(SP) 用作int类型存储 0 0x45525f 488d4c2408 LEAQ 0x8(SP), CX # CX=0x8(SP); 也就是 *int 0x455264 48894c2410 MOVQ CX, 0x10(SP) # 0x10(SP); *int return *p 0x455269 8401 TESTB AL, 0(CX) 0x45526b 488b442408 MOVQ 0x8(SP), AX 0x455270 48890424 MOVQ AX, 0(SP) 0x455274 488b6c2418 MOVQ 0x18(SP), BP 0x455279 4883c420 ADDQ $0x20, SP 0x45527d c3 RET 这也就是本节所谓的不逃逸分析，或者说未逃逸分析，这种说法并不严谨，主要是为了突出编译器倾向于让变量不逃逸。 不逃逸判断 包级别指针(1) 本节主要探索编译器进行逃逸分析时追踪的范围，以及在什么情况下就认为变量逃逸了或者确定变量没有逃逸。 前面研究变量逃逸所有的方法，主要通过让函数返回局部变量的地址，使局部变量的生命周期超过对应函数栈帧的生命周期。 按照这个规则来猜想，如果把局部变量的地址赋值给包级别的指针变量，应该也会造成变量逃逸。 准备一个示例，代码如下： 1 2 3 4 5 6 7 var pt *int //go:noinline func setNew() { var a int pt = \u0026a } 反编译 setNew() 函数，代码如下： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 TEXT main.setNew(SB) /mnt/hgfs/workspace/helium/main.go func setNew() { 0x455220 493b6610 CMPQ 0x10(R14), SP # 栈增长判断 0x455224 765d JBE 0x455283 0x455226 4883ec20 SUBQ $0x20, SP 0x45522a 48896c2418 MOVQ BP, 0x18(SP) 0x45522f 488d6c2418 LEAQ 0x18(SP), BP var a int 0x455234 488d05e54a0000 LEAQ 0x4ae5(IP), AX # type.int 元类型 0x45523b 0f1f440000 NOPL 0(AX)(AX*1) # func newobject(typ *_type) unsafe.Pointer # 这里直接调用了 newobject 堆分配了 int 0x455240 e8fb5cfbff CALL runtime.newobject(SB) # *int 0x455245 4889442410 MOVQ AX, 0x10(SP) 0x45524a 48c70000000000 MOVQ $0x0, 0(AX) # a = 0 pt = \u0026a 0x455251 488b4c2410 MOVQ 0x10(SP), CX # CX=0x10(SP)=*int # 判断是否开启写屏障，因为可能在GC阶段，变量的赋值需要写屏障 0x455256 833d0320090000 CMPL $0x0, runtime.writeBarrier(SB) 0x45525d 7403 JE 0x455262 0x45525f 90 NOPL 0x455260 eb09 JMP 0x45526b 0x455262 48890db7320600 MOVQ CX, main.pt(SB) # 给全局变量 pt 赋值 0x455269 eb0e JMP 0x455279 0x45526b 488d3dae320600 LEAQ main.pt(SB), DI # 写屏障开启的时候调用写屏障相关函数，记录指针的变更，已帮助GC 0x455272 e8a9d0ffff CALL runtime.gcWriteBarrierCX(SB) 0x455277 eb00 JMP 0x455279 } 0x455279 488b6c2418 MOVQ 0x18(SP), BP 0x45527e 4883c420 ADDQ $0x20, SP 0x455282 c3 RET func setNew() { 0x455283 e8d8ccffff CALL runtime.morestack_noctxt.abi0(SB) 0x455288 eb96 JMP main.setNew(SB) 通过 runtime.newobject() 函数调用就能确定，变量a逃逸到了堆上，验证了上述猜想。 包级别指针(2) 进一步还可以验证逃逸分析的依赖传递性，准备示例代码如下： 1 2 3 4 5 6 7 8 9 var pp **int //go:noinline func dep() { var a int var p *int p = \u0026a pp = \u0026p } 反编译 dep() 函数： 可以发现，变量 p 和 a 都逃逸了。 p 的地址被赋值给包级别的指针变量 pp，而 a 的地址又被赋值给了 p，因为 p 逃逸造成 a 也逃逸了。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 TEXT main.dep(SB) /mnt/hgfs/workspace/helium/main.go func dep() { 0x455220 493b6610 CMPQ 0x10(R14), SP # 栈增长判断 0x455224 0f86b0000000 JBE 0x4552da 0x45522a 4883ec28 SUBQ $0x28, SP 0x45522e 48896c2420 MOVQ BP, 0x20(SP) 0x455233 488d6c2420 LEAQ 0x20(SP), BP var a int 0x455238 488d05e14a0000 LEAQ 0x4ae1(IP), AX # type.int 元类型; 0x45523f 90 NOPL # func newobject(typ *_type) unsafe.Pointer 0x455240 e8fb5cfbff CALL runtime.newobject(SB) # 堆分配了 a 变量; AX *int 0x455245 4889442418 MOVQ AX, 0x18(SP) # 0x18(SP); 是a的内存空间，指向堆分配数据 0x45524a 48c70000000000 MOVQ $0x0, 0(AX) # 初始化 0 var p *int 0x455251 488d0508320000 LEAQ 0x3208(IP), AX # type *int 元类型 # func newobject(typ *_type) unsafe.Pointer 0x455258 e8e35cfbff CALL runtime.newobject(SB) # **int 0x45525d 4889442410 MOVQ AX, 0x10(SP) 0x455262 833df71f090000 CMPL $0x0, runtime.writeBarrier(SB) 0x455269 7402 JE 0x45526d 0x45526b eb09 JMP 0x455276 0x45526d 48c70000000000 MOVQ $0x0, 0(AX) 0x455274 eb11 JMP 0x455287 0x455276 4889c7 MOVQ AX, DI 0x455279 31c0 XORL AX, AX 0x45527b 0f1f440000 NOPL 0(AX)(AX*1) 0x455280 e89bcfffff CALL runtime.gcWriteBarrier(SB) 0x455285 eb00 JMP 0x455287 p = \u0026a 0x455287 488b7c2410 MOVQ 0x10(SP), DI 0x45528c 488b442418 MOVQ 0x18(SP), AX 0x455291 833dc81f090000 CMPL $0x0, runtime.writeBarrier(SB) 0x455298 7402 JE 0x45529c 0x45529a eb06 JMP 0x4552a2 0x45529c 488907 MOVQ AX, 0(DI) 0x45529f 90 NOPL 0x4552a0 eb07 JMP 0x4552a9 0x4552a2 e879cfffff CALL runtime.gcWriteBarrier(SB) 0x4552a7 eb00 JMP 0x4552a9 pp = \u0026p 0x4552a9 488b442410 MOVQ 0x10(SP), AX 0x4552ae 833dab1f090000 CMPL $0x0, runtime.writeBarrier(SB) 0x4552b5 7402 JE 0x4552b9 0x4552b7 eb09 JMP 0x4552c2 0x4552b9 48890560320600 MOVQ AX, main.pp(SB) 0x4552c0 eb0e JMP 0x4552d0 0x4552c2 488d3d57320600 LEAQ main.pp(SB), DI 0x4552c9 e852cfffff CALL runtime.gcWriteBarrier(SB) 0x4552ce eb00 JMP 0x4552d0 } 0x4552d0 488b6c2420 MOVQ 0x20(SP), BP 0x4552d5 4883c428 ADDQ $0x28, SP 0x4552d9 c3 RET func dep() { 0x4552da e881ccffff CALL runtime.morestack_noctxt.abi0(SB) 0x4552df 90 NOPL 0x4552e0 e93bffffff JMP main.dep(SB) 假如某个函数有一个参数和一个返回值，类型都是整型指针，函数只是简单地把参数作为返回值。 在函数间传递 就像下面的 gom.RetArg() 函数，代码如下： 1 2 3 4 5 6 package gom //go:noinline func RetArg(p *int) *int { return p } 在另一个包中 arg() 函数调用了 inner.RetArg() 函数将局部变量 a 的地址作为参数，并返回了一个 int 类型的返回值。 代码如下： 1 2 3 4 5 6 7 package main //go:noinline func arg() int { var a int return *gom.RetArg(\u0026a) } 在 arg() 函数中并没有把变量 a 的地址作为返回值，也不存在到某个包级别指针变量的依赖链路，所以变量a是否会逃逸的关键就在于inner.RetArg()函数。 inner. RetArg()函数只是把传过去的指针又传了回来，而且作为被调用者来讲，它的生命周期是完全包含在arg()函数的生命周期以内的，所以不应该造成变量 a 逃逸。 事实到底如何呢? 还要通过反编译验证，节选部分关键汇编代码如下： 变量a确实是在栈上分配的，也就说明编译器参考了inner.RetArg()函数的具体实现，基于代码逻辑判定变量 a 没有逃逸。 虽然代码中通过**noinline阻止了内联优化，但是没能阻止编译器参考函数实现**。 假如通过某种方式能够阻止编译器参考函数实现，又会有什么样的结果呢? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 TEXT main.arg(SB) /mnt/hgfs/workspace/helium/main.go func arg() int { 0x455240 493b6610 CMPQ 0x10(R14), SP # 栈增长判断 0x455244 7643 JBE 0x455289 0x455246 4883ec28 SUBQ $0x28, SP 0x45524a 48896c2420 MOVQ BP, 0x20(SP) 0x45524f 488d6c2420 LEAQ 0x20(SP), BP 0x455254 48c744240800000000 MOVQ $0x0, 0x8(SP) # return int var a int 0x45525d 48c744241000000000 MOVQ $0x0, 0x10(SP) return *gom.RetArg(\u0026a) # 可以看出这里调用gom.RetArg函数时参数直接是在栈上分配的，并没有堆分配 0x455266 488d442410 LEAQ 0x10(SP), AX 0x45526b e870ffffff CALL example.com/helium/gom.RetArg(SB) 0x455270 4889442418 MOVQ AX, 0x18(SP) 0x455275 8400 TESTB AL, 0(AX) 0x455277 488b00 MOVQ 0(AX), AX 0x45527a 4889442408 MOVQ AX, 0x8(SP) 0x45527f 488b6c2420 MOVQ 0x20(SP), BP 0x455284 4883c428 ADDQ $0x28, SP 0x455288 c3 RET func arg() int { 0x455289 e8d2ccffff CALL runtime.morestack_noctxt.abi0(SB) 0x45528e ebb0 JMP main.arg(SB) linkname 机制 可以使用 linkname 机制，连同修改后的 arg() 函数的代码如下： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 package main import ( \"example.com/helium/gom\" _ \"unsafe\" // 使用了 go:linkname 必须要引入 unsafe 包 ) func main() { arg() } //go:linkname retArg example.com/helium/gom.RetArg func retArg(p *int) *int //go:noinline func arg() int { var a int var b int return *gom.RetArg(\u0026a) + retArg(\u0026b) } 再次反编译 arg() 函数，节选变量 a 和 b 分配相关的汇编代码如下： 变量 a 依旧是栈分配，变量 b 已经逃逸了。 在上述代码中的 retArg() 函数只是个函数声明没有给出具体实现，通过 linkname 机制让链接器在链接阶段链接到 inner.RetArg() 函数。 retArg() 函数只有声明没有实现，而且编译器不会跟踪 linkname，所以无法根据代码逻辑判定变量 b 到底有没有逃逸。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 TEXT main.arg(SB) /mnt/hgfs/workspace/helium/main.go func arg() int { 0x455240 493b6610 CMPQ 0x10(R14), SP # 栈增长判断 0x455244 7677 JBE 0x4552bd 0x455246 4883ec40 SUBQ $0x40, SP 0x45524a 48896c2438 MOVQ BP, 0x38(SP) 0x45524f 488d6c2438 LEAQ 0x38(SP), BP 0x455254 48c744241000000000 MOVQ $0x0, 0x10(SP) # return int var a int 0x45525d 48c744241800000000 MOVQ $0x0, 0x18(SP) # a,0 var b int 0x455266 488d05b34a0000 LEAQ 0x4ab3(IP), AX # type.int 0x45526d e8ce5cfbff CALL runtime.newobject(SB) # *int 0x455272 4889442430 MOVQ AX, 0x30(SP) # 变量b，堆分配了 0x455277 48c70000000000 MOVQ $0x0, 0(AX) return *gom.RetArg(\u0026a) + *retArg(\u0026b) 0x45527e 488d442418 LEAQ 0x18(SP), AX 0x455283 e858ffffff CALL example.com/helium/gom.RetArg(SB) 0x455288 4889442428 MOVQ AX, 0x28(SP) 0x45528d 488b442430 MOVQ 0x30(SP), AX 0x455292 e849ffffff CALL example.com/helium/gom.RetArg(SB) 0x455297 4889442420 MOVQ AX, 0x20(SP) 0x45529c 488b4c2428 MOVQ 0x28(SP), CX 0x4552a1 8401 TESTB AL, 0(CX) 0x4552a3 8400 TESTB AL, 0(AX) 0x4552a5 488b09 MOVQ 0(CX), CX 0x4552a8 480308 ADDQ 0(AX), CX 0x4552ab 48894c2410 MOVQ CX, 0x10(SP) 0x4552b0 4889c8 MOVQ CX, AX 0x4552b3 488b6c2438 MOVQ 0x38(SP), BP 0x4552b8 4883c440 ADDQ $0x40, SP 0x4552bc c3 RET func arg() int { 0x4552bd 0f1f00 NOPL 0(AX) 0x4552c0 e89bccffff CALL runtime.morestack_noctxt.abi0(SB) 0x4552c5 e976ffffff JMP main.arg(SB) 把逻辑上没有逃逸的变量分配到堆上不会造成错误，只是效率低一些。 但是把逻辑上逃逸了的变量分配到栈上就会造成悬挂指针等问题。 因此编译器只有在能够确定变量没有逃逸的情况下，才会将其分配到栈上，在能够确定变量已经逃逸或无法确定到底有没有逃逸的情况下，都要按照已经逃逸来处理。 这也就解释了为什么在上述代码中的变量 b 逻辑上没逃逸却被分配在了堆上。 函数示例 示例一 1 2 3 4 5 6 7 8 9 10 11 12 13 14 package main func main() { sum(1, 2) } // sum 计算a, b的平方和 func sum(a, b int) int { a2 := a * a b2 := b * b c := a2 + b2 return c } main.main汇编： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 TEXT main.main(SB) /mnt/hgfs/g/hello1/hello.go # 判断栈是否溢出 0x10(R14)指向g.stackguard0位置 hello.go:3 0x45b4a0 493b6610 cmp rsp, qword ptr [r14+0x10] cmp 0x10(R14), rsp # 跳转到0x45b4cf处设置栈信息，在重新调main.main函数 hello.go:3 0x45b4a4 7629 jbe 0x45b4cf jbe 0x45b4cf # 为当前栈预分配参数空间，第一个8B存储runtime.main的rbp，第二个8B存储main.sun的参数b为1，第三个8B存储main.sun的参数a为2 hello.go:3 0x45b4a6 4883ec18 sub rsp, 0x18 sub 0x18, rsp # 把runtime.main的栈rbp存入0x10(rsp)处 hello.go:3 0x45b4aa 48896c2410 mov qword ptr [rsp+0x10], rbp mov rbp, 0x10(rsp) # 从新设置当前main.main的栈rbp值为0x10(rsp)处 hello.go:3 0x45b4af 488d6c2410 lea rbp, ptr [rsp+0x10] lea 0x10(rsp), rbp # 为main.sum准备第一个参数，放入寄存器AX中 hello.go:4 0x45b4b4 b801000000 mov eax, 0x1 mov 0x1, AX # 为main.sum准备第二个参数，放入寄存器BX中 hello.go:4 0x45b4b9 bb02000000 mov ebx, 0x2 mov 0x2, BX hello.go:4 0x45b4be 6690 data16 nop hello.go:4 0x45b4c0 e81b000000 call $main.sum call $main.sum # 把runtime.main的栈rbp值从0x10(rsp)处放入rbp寄存器 hello.go:5 0x45b4c5 488b6c2410 mov rbp, qword ptr [rsp+0x10] mov 0x10(rsp), rbp # rsp寄存器恢复调用main.main之前情况 hello.go:5 0x45b4ca 4883c418 add rsp, 0x18 add 0x18, rsp # 返回，rsp-8弹出返回地址给rip返回的runtime.main继续执行 hello.go:5 0x45b4ce c3 ret ret hello.go:3 0x45b4cf e88ccdffff call $runtime.morestack_noctxt call $runtime.morestack_noctxt .:0 0x45b4d4 ebca jmp $main.main jmp $main.main main.sum汇编： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 TEXT main.sum(SB) /mnt/hgfs/g/hello1/hello.go # 为main.sum栈预分配0x28空间 hello.go:8 0x45b4e0 4883ec28 sub rsp, 0x28 sub 0x28, rsp # 把main.main的rbp存储到0x20(rsp)位置 hello.go:8 0x45b4e4 48896c2420 mov qword ptr [rsp+0x20], rbp mov rbp, 0x20(rsp) # 从新设置main.sum的rbp值 hello.go:8 0x45b4e9 488d6c2420 lea rbp, ptr [rsp+0x20] lea 0x20(rsp), rbp # 把传递的第一个参数入栈，注意看这里参参数栈分配在main.main的栈上 hello.go:8 0x45b4ee 4889442430 mov qword ptr [rsp+0x30], rax mov AX, 0x30(rsp) # a = 1 # 把传递的第二个参数入栈，注意看这里参参数栈分配在main.main的栈上 hello.go:8 0x45b4f3 48895c2438 mov qword ptr [rsp+0x38], rbx mov BX, 0x38(rsp) # b = 2 # 初始化rsp的第一个8字节吗，返回值空间初始化 hello.go:8 0x45b4f8 48c7042400000000 mov qword ptr [rsp], 0x0 mov 0x0, (rsp) # return # 为乘法运算做准备，把变量a的值放入寄存器 hello.go:9 0x45b500 488b4c2430 mov rcx, qword ptr [rsp+0x30] mov 0x30(rsp), CX # 为乘法运算做准备，把变量a的值放入寄存器 hello.go:9 0x45b505 488b542430 mov rdx, qword ptr [rsp+0x30] mov 0x30(rsp), DX # 乘法运算，结果存储在DX中 hello.go:9 0x45b50a 480fafd1 imul rdx, rcx imul CX, DX # a*a # 0X18(rsp)的地址为变量a2 hello.go:9 0x45b50e 4889542418 mov qword ptr [rsp+0x18], rdx mov DX, 0X18(rsp) # a2=a*a # 为乘法运算做准备，把变量b的值放入寄存器 hello.go:10 0x45b513 488b4c2438 mov rcx, qword ptr [rsp+0x38] mov 0x38(rsp), CX # 为乘法运算做准备，把变量b的值放入寄存器 hello.go:10 0x45b518 488b542438 mov rdx, qword ptr [rsp+0x38] mov 0x38(rsp), DX # 乘法运算，结果存储在DX中 hello.go:10 0x45b51d 480fafd1 imul rdx, rcx imul CX, DX # b*b # 0X10(rsp)的地址为变量b2 hello.go:10 0x45b521 4889542410 mov qword ptr [rsp+0x10], rdx mov DX, 0x10(rsp) # b2 = b*b # 把a2值放入CX寄存器 hello.go:11 0x45b526 488b4c2418 mov rcx, qword ptr [rsp+0x18] mov 0x18(rsp), CX # 计算 a2 + b2 hello.go:11 0x45b52b 488d0411 lea rax, ptr [rcx+rdx*1] lea (CX+DX*1), AX # a2+b2 # a2 + b2 值存入0x8(rsp)是变量的值 hello.go:11 0x45b52f 4889442408 mov qword ptr [rsp+0x8], rax mov AX, 0x8(rsp) # c = a2+b2 # a2 + b2 值存入(rsp) 该值是返回值空间 hello.go:13 0x45b534 48890424 mov qword ptr [rsp], rax mov AX, (rsp) # return # 弹出main.main的rbp hello.go:13 0x45b538 488b6c2420 mov rbp, qword ptr [rsp+0x20] mov 0x20(rsp), rbp # 使rsp指向main.main的栈rsp位置 .:0 0x45b53d 4883c428 add rsp, 0x28 add 0x28, rsp # 弹出main.main的下一条指令地址 .:0 0x45b541 c3 ret ret 栈分布情况： // 我们看一下代码在14行时也就是main.sum函数返回前的栈布局情况 // // 栈底 // ---------------------------- 高地址 // | b // ---------------------------- // | a runtime.main函数栈帧 // ---------------------------- // | 返回到runtime.main的地址 +0x48 // -----------\u003e ---------------------------- \u003c------------------------------------- // | 调用函数runtime.main的rbp +0x40 // ---------------------------- // | main.sum的第二个参数 0x2 +0x38 // ---------------------------- main.main函数栈帧 // | main.sum的第一个参数 0x1 +0x30 // ---------------------------- // | 返回到main.main的地址 +0x28 // -----------\u003e ---------------------------- \u003c------------------------------------- // | 调用函数main.main的rbp +0x20 // ---------------------------- // | 变量a2 0x1 +0x18 // ---------------------------- // | 变量b2 0x4 +0x10 main.sum函数栈帧 // ---------------------------- // | 变量c 0x5 +0x8 // ---------------------------- // | main.sum的返回值地址 0x5 +0x0 // -----------\u003e ---------------------------- \u003c------------------------------------- 编译指令 编译指令：go build -gcflags=\"-N -l\" slice1.go。 查看具体方法的汇编指令：go tool objdump -S -s ‘^main.main$’ slice1。 ",
   "wordCount" : "2921",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-08-05T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-08-05T00:00:00Z",
   "dateModified": "2024-08-05T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/func/align/"
+    "@id": "https://helium.github.io/posts/golang/func/align/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/func/">第9章 Function</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/func/">第9章 Function</a></div>
     <h1 class="post-title entry-hint-parent">
       内存对齐和逃逸分析
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://heliu.site/tags/%E5%87%BD%E6%95%B0/" target="_blank" rel="noopener">函数</a>
+            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium.github.io/tags/%E5%87%BD%E6%95%B0/" target="_blank" rel="noopener">函数</a>
         </ul>
       </span>
       
@@ -1677,16 +1677,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
-      <li><a href="https://heliu.site/tags/%E5%87%BD%E6%95%B0/">函数</a></li>
+      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium.github.io/tags/%E5%87%BD%E6%95%B0/">函数</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/func/stack/">
+  <a class="prev" href="https://helium.github.io/posts/golang/func/stack/">
     <span class="title">« 上一页</span>
     <br>
     <span>函数调用栈</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/func/value/">
+  <a class="next" href="https://helium.github.io/posts/golang/func/value/">
     <span class="title">下一页 »</span>
     <br>
     <span>Function Value</span>

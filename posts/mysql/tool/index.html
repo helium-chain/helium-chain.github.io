@@ -9,18 +9,18 @@
 <meta name="keywords" content="mysql">
 <meta name="description" content="mysql 常用工具。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/mysql/tool/">
+<link rel="canonical" href="https://helium.github.io/posts/mysql/tool/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/mysql/tool/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/mysql/tool/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="mysql 工具" />
 <meta property="og:description" content="mysql 常用工具。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/mysql/tool/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/mysql/tool/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2022-07-13T00:00:00+00:00" />
 <meta property="article:modified_time" content="2022-07-13T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="mysql 工具"/>
 <meta name="twitter:description" content="mysql 常用工具。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Mysql",
-      "item": "https://heliu.site/posts/mysql/"
+      "item": "https://helium.github.io/posts/mysql/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "mysql 工具",
-      "item": "https://heliu.site/posts/mysql/tool/"
+      "item": "https://helium.github.io/posts/mysql/tool/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": "系统数据库 Mysql数据库安装完成后，自带了一下四个数据库，具体作用如下： 数据库 含义 mysql 存储MySQL服务器正常运行所需要的各种信息 （时区、主从、用户、权限等） information_schema 提供了访问数据库元数据的各种表和视图，包含数据库、表、字段类型及访问权限等 performance_schema 为MySQL服务器运行时状态提供了一个底层监控功能，主要用于收集数据库服务器性能参数 sys 包含了一系列方便 DBA 和开发人员利用 performance_schema 性能数据库进行性能调优和诊断的视图 mysql mysql不是指mysql服务，而是指mysql的客户端工具。 语法： mysql [options] [database] 选项： -u, --user=name # 指定用户名 -p, --password[=name] # 指定密码 -h, --host=name # 指定服务器IP或域名 -P, --port=port # 指定连接端口 -e, --execute=name # 执行SQL语句并退出 -e选项可以在Mysql客户端执行SQL语句，而不用连接到MySQL数据库再执行，对于一些批处理脚本，这种方式尤其方便。 mysql -uroot –p123456 db01 -e \"select * from table\"; mysqladmin mysqladmin 是一个执行管理操作的客户端程序。可以用它来检查服务器的配置和当前状态、创建并删除数据库等。 -- 帮助文档 mysqladmin --help 语法: mysqladmin [options] command ... 选项: -u, --user=name # 指定用户名 -p, --password[=name] # 指定密码 -h, --host=name # 指定服务器IP或域名 -P, --port=port # 指定连接端口 -- 删除库test01 mysqladmin -uroot –p1234 drop 'test01'; -- 查看版本 mysqladmin -uroot –p1234 version; mysqlbinlog 由于服务器生成的二进制日志文件以二进制格式保存，所以如果想要检查这些文本的文本格式，就会使用到mysqlbinlog 日志管理工具。 语法： mysqlbinlog [options] log-files1 log-files2 ... 选项： -d, --database=name # 指定数据库名称，只列出指定的数据库相关操作。 -o, --offset=n # 忽略掉日志中的前n行命令。 -r,--result-file=name # 将输出的文本格式日志输出到指定文件。 -s, --short-form # 显示简单格式， 省略掉一些信息。 --start-datatime=date1 --stop-datetime=date2 # 指定日期间隔内的所有日志。 --start-position=pos1 --stop-position=pos2 # 指定位置间隔内的所有日志。 查看 binlog.000008 这个二进制文件中的数据信息。 mysqlbinlog -s binlog.000008 mysqlshow mysqlshow 客户端对象查找工具，用来很快地查找存在哪些数据库、数据库中的表、表中的列或者索引。 语法： mysqlshow [options] [db_name [table_name [col_name]]] 选项： --count # 显示数据库及表的统计信息（数据库，表 均可以不指定） -i # 显示指定数据库或者指定表的状态信息 -- 查询test库中每个表中的字段书，及行数 mysqlshow -uroot -p2143 test --count -- 查询test库中book表的详细情况 mysqlshow -uroot -p2143 test book --count -- 查询每个数据库的表的数量及表中记录的数量 mysqlshow -uroot -p1234 --count -- 查看数据库db01的统计信息 mysqlshow -uroot -p1234 db01 --count -- 查看数据库db01中的course表的信息 mysqlshow -uroot -p1234 db01 course --count -- 查看数据库db01中的course表的id字段的信息 mysqlshow -uroot -p1234 db01 course id --count mysqldump mysqldump 客户端工具用来备份数据库或在不同数据库之间进行数据迁移。备份内容包含创建表，及插入表的SQL语句。 语法： mysqldump [options] db_name [tables] mysqldump [options] --database/-B db1 [db2 db3...] mysqldump [options] --all-databases/-A 连接选项： -u, --user=name # 指定用户名 -p, --password[=name] # 指定密码 -h, --host=name # 指定服务器ip或域名 -P, --port= # 指定连接端口 输出选项： --add-drop-database # 在每个数据库创建语句前加上 drop database 语句 --add-drop-table # 在每个表创建语句前加上 drop table 语句 , 默认开启 ; 不开启 (--skip-add-drop-table) -n, --no-create-db # 不包含数据库的创建语句 -t, --no-create-info # 不包含数据表的创建语句 -d --no-data # 不包含数据 -T, --tab=name # 自动生成两个文件：一个.sql文件，创建表结构的语句；一个.txt文件，数据文件 -- 备份db01数据库 mysqldump -uroot -p1234 db01 \u003e db01.sql -- 备份db01数据库中的表数据，不备份表结构(-t) mysqldump -uroot -p1234 -t db01 \u003e db01.sql -- 将db01数据库的表的表结构与数据分开备份(-T) mysqldump -uroot -p1234 -T /root db01 score mysqlimport/source mysqlimport mysqlimport 是客户端数据导入工具，用来导入mysqldump 加 -T 参数后导出的文本文件。 语法： mysqlimport [options] db_name textfile1 [textfile2...] mysqlimport -uroot -p2143 test /tmp/city.txt source 如果需要导入sql文件,可以使用mysql中的source指令: 语法： source /root/xxxxx.sql ",
   "wordCount" : "315",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2022-07-13T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2022-07-13T00:00:00Z",
   "dateModified": "2022-07-13T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/mysql/tool/"
+    "@id": "https://helium.github.io/posts/mysql/tool/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/mysql/">Mysql</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/mysql/">Mysql</a></div>
     <h1 class="post-title entry-hint-parent">
       mysql 工具
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/mysql/" target="_blank" rel="noopener">Mysql</a>
+            <a href="https://helium.github.io/tags/mysql/" target="_blank" rel="noopener">Mysql</a>
         </ul>
       </span>
       
@@ -525,15 +525,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/mysql/">Mysql</a></li>
+      <li><a href="https://helium.github.io/tags/mysql/">Mysql</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/mysql/innodb/">
+  <a class="prev" href="https://helium.github.io/posts/mysql/innodb/">
     <span class="title">« 上一页</span>
     <br>
     <span>mysql innodb</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/mysql/master/">
+  <a class="next" href="https://helium.github.io/posts/mysql/master/">
     <span class="title">下一页 »</span>
     <br>
     <span>mysql 主从复制</span>

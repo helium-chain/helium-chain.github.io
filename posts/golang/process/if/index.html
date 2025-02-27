@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, 流程控制">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/process/if/">
+<link rel="canonical" href="https://helium.github.io/posts/golang/process/if/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/process/if/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/process/if/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="流程控制(条件语句)" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/process/if/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/golang/process/if/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2019-08-02T00:00:00+00:00" />
 <meta property="article:modified_time" content="2020-02-11T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="流程控制(条件语句)"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://heliu.site/posts/golang/"
+      "item": "https://helium.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第3章 流程控制",
-      "item": "https://heliu.site/posts/golang/process/"
+      "item": "https://helium.github.io/posts/golang/process/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "流程控制(条件语句)",
-      "item": "https://heliu.site/posts/golang/process/if/"
+      "item": "https://helium.github.io/posts/golang/process/if/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": "if语句 if语句后紧跟一个或多个语句组成，注意布尔表达式不能用0或1。 如果表达式求值为true，则执行\"if\"分支，否则执行\"else\"分支。 GoLang不支持三目运算 a \u003e b ? a : b，官方的解释是三目运算会导致复杂的表达式。 1 2 3 4 5 6 7 8 // 1) if expr { } //\tOR // 2) if Init; expr { } if 布尔表达式 {\t// 布尔表达式为true时执行 } else { // 布尔表达式为false时执行 } 由于if和switch都接受初始化语句，因此通常会看到用于设置局部变量的语句。 该语句在计算表达式之前执行。 if和else if后都可以跟【Init; expr】语句。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 package main import ( \"fmt\" ) func main() { // 这里注意，这里使用的是 ; 不是 , // 1. ;分号：用于分隔语句 // 2. ,逗号：常用语分隔变量多返回赋值形式 if x := 1; x \u003c 10 { fmt.Println(\"12345\") } else if x \u003e 0 { // else if x = 2; x \u003e 0 {} fmt.Println(\"6789\") } else { fmt.Println(\"147258369\") } // be equivalent to // 注意：xx 的作用域，当前分支以后都适用 { xx := 1 if xx \u003c 10 { fmt.Println(\"12345\") } else { if xx \u003e 0 { fmt.Println(\"6789\") } else { fmt.Println(\"147258369\") } } } // else if 全部都可以转换成if else形式，这里是为了更好的理解初始化语句所在块位置 // Output: // 12345 // 12345 } 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 func Ts() { rand.Seed(time.Now().UnixNano()) n := rand.Intn(100) // 1. 验证 if Init; expr {} 语句 // 2. 验证 else if Init; expr {} 语句 if x := 2; x+n \u003e 5 { print(x) // 2 } else if x = 1; x-n \u003e 2 { print(x) // 1 } else if n == 2 { print(x) // 1 } else { print(x) // 1 } } 当if语句没有进入下一个语句，即正文以break、continue、goto或return结尾时，省略不必要的else。 1 2 3 4 f, err := os.Open(name) if err != nil { return err } break语句 一个break的作用范围为该语句出现的最内部的结构，它可以用于任何形式的for循环。 在switch或select语句中，break语句的作用是跳过整个代码块，继续执行switch或select外后续的代码。 语句中如果有标签，则必须是包含for、switch或select语句的标签。并且该标签是可以执行终止的。 break两个作用： 针对for关键字结束循环。 针对switch、select关键字跳出整个代码块。但switch和select的case后是默认自带break，如果显示写上也只是跳出switch和select块。 break在switch中可以作为if分支结束条件。 1 2 3 4 5 6 7 switch { case true: if true { break\t// 比如这里，退出case分支 } // 其他代码 ... } 因此在switch或select块中使用break关键字只能跳出【当前】switch或select块。如果想跳出外层for循环则需要break Label加上标签名称。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 package main import ( \"fmt\" ) func main() { fmt.Println(\"start\") OuterLoop:\t// 定义标签 for i := 0; i \u003c 3; i++ { fmt.Println(\"i 循环：\", i) for j := 0; j \u003c 3; j++ { fmt.Println(\"j 循环：\", j) // switch和select默认是自带break的 switch j { case 0: fmt.Println(\"break\") break // break 只是跳出switch语句块，不会跳出到for块 case 2: fmt.Println(\"2 OuterLoop\") // switch默认带有break语句，这里指明break语句要跳出的标签位置 break OuterLoop // 直接跳出整个循环 } fmt.Println(\"switch:\", j) } } fmt.Println(\"end\") // Output: // start // i 循环： 0 // j 循环： 0 // break // switch: 0 // j 循环： 1 // switch: 1 // j 循环： 2 // 2 OuterLoop // end } 注意break label; label(标签)只能是之前出现的，continue关键字也是。但是goto关键字却可以跳转到后面的标签处。 continue语句 关键字continue用在关键字for（结束本次循环，继续下次循环），但不是无条件执行下一次循环，执行之前依旧需要满足循环的判断条件。 如果有一个标签，那么它必须是一个封闭的for语句，并且是当前执行进程的标签。 1 2 3 4 5 6 7 8 9 RowLoop: for y, row := range rows { for x, data := range row { if data == endOfRow { continue RowLoop } row[x] = data + bias(x, y) } } 使用示例： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 func main() { rows := []string{\"hello\", \"world\"} rowLoop: for _, row := range rows { for _, data := range row { if data == 'l' { // continue 用于结束本次循环，进行下一次循环 continue rowLoop } fmt.Printf(\"%c\\n\", data) } } // Output: // h // e // w // o // r } 标签 for、switch、select语句都可以配合标签（label）形式的标识符使用。标签可以在代码的任何地方（函数体内）。 即某一行第一个可以冒号（:）结尾的单词（Gofmt 会将后续代码自动移至下一行） 标签的名称是大小写敏感的，为了提升可读性（可以首字母大小，可读性比较高就行）。 1 2 ERROR: // Error or err log.Panic(\"error\")\t// 标签后的代码 标签用于break、continue、goto语句，定义从未使用的标签是非法的，不能编译成功。（定义了标签一定要使用） goto语句 goto语句是跳转到具体有相同函数内相应标签的语句。（结合标签使用，通常用在一些公共代码部分或循环逻辑处） 1 goto ERROR Go语言不鼓励多层嵌套使用标签和goto语句，因为它们会导致非常糟糕的程序设计，而且总有更加可读的替代方案来实现相同得需求。 块外的goto语句不能跳转到该块内的标签。（只能平级跳或跳出到外层块） 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 // 以下代码不能通过编译 package main import \"fmt\" var x int = 10 func main() { if x % 2 == 1 { goto L1 // L1标签在块内 } for x \u003c 10 { x-- fmt.Println(x) L1: // 在for内部 x-- fmt.Println(x) } } goto语句是可以跳转到后面出现的标签的，前提是满足块外的goto语句不能跳转到块内的标签。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 package main import ( \"fmt\" ) var x = 10 func main() { goto TL // 向后跳转到TL处，这种比较少用，因为接下面的代码永久不会执行 fmt.Println(x) // 这行代码不会执行 TL: fmt.Println(\"TL\") // Output: // TL } goto多用于跳转到前面代码的标签处，这样就形成了循环。 总结 goto、break、continue：三个语句都可以配合标签(label)使用。 标签名区分大小写，定义后若不使用会造成编译错误。 continue、break配合标签(label)可用于多层循环跳出。 goto是调整执行位置，与continue、break配合标签(label)的结果并不相同。 ",
   "wordCount" : "711",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2019-08-02T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2019-08-02T00:00:00Z",
   "dateModified": "2020-02-11T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/process/if/"
+    "@id": "https://helium.github.io/posts/golang/process/if/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/process/">第3章 流程控制</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/process/">第3章 流程控制</a></div>
     <h1 class="post-title entry-hint-parent">
       流程控制(条件语句)
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://heliu.site/tags/%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6/" target="_blank" rel="noopener">流程控制</a>
+            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium.github.io/tags/%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6/" target="_blank" rel="noopener">流程控制</a>
         </ul>
       </span>
       
@@ -900,16 +900,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
-      <li><a href="https://heliu.site/tags/%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6/">流程控制</a></li>
+      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium.github.io/tags/%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6/">流程控制</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/basic/string-type/">
+  <a class="prev" href="https://helium.github.io/posts/golang/basic/string-type/">
     <span class="title">« 上一页</span>
     <br>
     <span>字符串(类型结构)</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/process/for/">
+  <a class="next" href="https://helium.github.io/posts/golang/process/for/">
     <span class="title">下一页 »</span>
     <br>
     <span>流程控制(循环语句)</span>

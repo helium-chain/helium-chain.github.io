@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, Golang">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/goroutine/sysmon/">
+<link rel="canonical" href="https://helium.github.io/posts/golang/goroutine/sysmon/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/goroutine/sysmon/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/goroutine/sysmon/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="sysmon 监控线程" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/goroutine/sysmon/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/golang/goroutine/sysmon/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-07-30T00:00:00+00:00" />
 <meta property="article:modified_time" content="2024-07-30T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="sysmon 监控线程"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://heliu.site/posts/golang/"
+      "item": "https://helium.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第12章 Goroutine",
-      "item": "https://heliu.site/posts/golang/goroutine/"
+      "item": "https://helium.github.io/posts/golang/goroutine/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "sysmon 监控线程",
-      "item": "https://heliu.site/posts/golang/goroutine/sysmon/"
+      "item": "https://helium.github.io/posts/golang/goroutine/sysmon/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": "runtime.main 监控线程在runtime.main中被创建。 func main() { // ... if GOARCH != \"wasm\" { // no threads on wasm yet, so no sysmon // systemstack()函数切换到g0栈去运行闭包函数 systemstack(func() { // newm新创建一个线程，从sysmon入口函数开始执行 newm(sysmon, nil, -1) // 监控线程sysmon不需要P就能运行 }) } // ... } variables // forcegcperiod is the maximum time in nanoseconds between garbage // collections. If we go this long without a garbage collection, one // is forced to run. // // This is a variable for testing purposes. It normally doesn't change. // // forceegcperiod是两次垃圾回收之间的最大时间，单位为纳秒。 // 如果这么长时间都没有垃圾收集，那么垃圾收集将被迫运行。 // 这是一个用于测试的变量。它通常不会改变。 var forcegcperiod int64 = 2 * 60 * 1e9 // 2min sysmon() 前面创建监控线程可以看出，监控线程是没有绑定P的。 这个监控线程是一个独立的线程，无需P即可运行，sysmon每20us ~ 10ms运行一次。 timer在每次调度器调度和窃取其他g的时候触发，这种具有一定的随机性和不确定性，系统监控线程触发依然是一个兜底保障。 监控线程主要职责： 最长10ms间隔执行一次网络轮询（保证I/O轮询）。因为netpoll是随机的，不是定时间段的。 抢占超过时间片的G。 超过预定时间，发起一轮GC。 总是在没有P的情况下运行，因此不允许写屏障。 文件位置：go1.19.3/src/runtime/proc.go。 5131 5132 5133 5134 5135 5136 5137 5138 5139 5140 5141 5142 5143 5144 5145 5146 5147 5148 5149 5150 5151 5152 5153 5154 5155 5156 5157 5158 5159 5160 5161 5162 5163 5164 5165 5166 5167 5168 5169 5170 5171 5172 5173 5174 5175 5176 5177 5178 5179 5180 5181 5182 5183 5184 5185 5186 5187 5188 5189 5190 5191 5192 5193 5194 5195 5196 5197 5198 5199 5200 5201 5202 5203 5204 5205 5206 5207 5208 5209 5210 5211 5212 5213 5214 5215 5216 5217 5218 5219 5220 5221 5222 5223 5224 5225 5226 5227 5228 5229 5230 5231 5232 5233 5234 5235 5236 5237 5238 5239 5240 5241 5242 5243 5244 5245 5246 5247 5248 5249 5250 5251 5252 5253 5254 5255 5256 5257 5258 5259 5260 5261 5262 5263 5264 5265 5266 5267 5268 5269 5270 5271 5272 5273 5274 5275 5276 5277 5278 5279 5280 5281 5282 5283 5284 5285 5286 5287 5288 5289 5290 5291 5292 5293 5294 5295 5296 5297 5298 5299 5300 5301 5302 5303 5304 5305 5306 5307 5308 5309 5310 5311 5312 5313 5314 5315 5316 5317 5318 5319 5320 5321 5322 5323 5324 5325 5326 5327 5328 5329 5330 5331 5332 5333 5334 5335 5336 5337 5338 5339 5340 5341 5342 5343 5344 5345 5346 5347 5348 5349 5350 5351 5352 5353 5354 5355 5356 5357 5358 5359 5360 5361 5362 5363 5364 5365 5366 5367 5368 5369 5370 5371 5372 5373 5374 5375 5376 5377 5378 5379 // Always runs without a P, so write barriers are not allowed. // //go:nowritebarrierrec func sysmon() { lock(\u0026sched.lock) sched.nmsys++ // 系统M数量 checkdead() // 检查死锁 unlock(\u0026sched.lock) lasttrace := int64(0) // 最后跟踪时间 // idle：在以下两种情况下才会重置为0 // 1. 有陷入系统调度的P需要被抢占时。 // 2. sysmon从深度睡眠中醒来时。 // 进入深度睡眠在这两种条件下： // 1. STW期间，sysmon可以进入深度睡眠。 // 2. 在所有P都空闲时(可能都陷入系统调用)。 // 其他情况idle会累加，因此sysmon的调度间隔会趋向于10ms。这一个goroutine运行的时间片时间值。 idle := 0 // how many cycles in succession we had not wokeup somebody // 下次sysmon运行的时间间隔，微秒。根据idle计算而来。 delay := uint32(0) for { // 1) 计算下次运行时间间隔 // 1. 默认20us。(20微秒)。 // 2. 连续50个周期无事可做则翻倍时间，后面依次翻倍。 // 3. 最高10ms。(10毫秒)。 if idle == 0 { // start with 20us sleep... delay = 20 } else if idle \u003e 50 { // start doubling the sleep after 1ms... delay *= 2\t} if delay \u003e 10*1000 { // up to 10ms delay = 10 * 1000\t} // 系统调用sleep delay微秒 usleep(delay) // sysmon should not enter deep sleep if schedtrace is enabled so that // it can print that information at the right time. // // It should also not enter deep sleep if there are any active P's so // that it can retake P's from syscalls, preempt long running G's, and // poll the network if all P's are busy for long stretches. // // It should wakeup from deep sleep if any P's become active either due // to exiting a syscall or waking up due to a timer expiring so that it // can resume performing those duties. If it wakes from a syscall it // resets idle and delay as a bet that since it had retaken a P from a // syscall before, it may need to do it again shortly after the // application starts work again. It does not reset idle when waking // from a timer to avoid adding system load to applications that spend // most of their time sleeping. // // 如果启用了 schedtrace，sysmon 不应进入深度睡眠，以便它可以在正确的时间打印该信息 // 如果有任何活动的P，它也不应该进入深度睡眠，以便它可以从系统调用中重新获取P， // 抢占长时间运行的G，并在所有P长时间忙碌时轮询网络 // 如果任何 P 由于退出系统调用或由于计时器到期而唤醒， // 它应该从深度睡眠中唤醒，以便它可以恢复执行这些职责 // 果它从系统调用中唤醒，它会重置空闲和延迟作为赌注，因为它之前已经从系统调用中重新获得了P， // 它可能需要在应用程序再次开始工作后不久再次这样做 // 它不会在从计时器唤醒时重置空闲，以避免将系统负载添加到大部分时间都在休眠的应用程序 now := nanotime() // 当前时间 // 2) 满足以下条件工作线程会进入深度睡眠： // 1. STW正在等待其他P停下来，这段时间sysmon线程可以深度睡眠，在start the world时会唤醒sysmon。 // 2. 全部P都处于空闲，这段时间sysmon线程可以深度睡眠，这可能是处于系统调用中时，系统调用返回时会唤醒sysmon。 if debug.schedtrace \u003c= 0 \u0026\u0026 (sched.gcwaiting != 0 || atomic.Load(\u0026sched.npidle) == uint32(gomaxprocs)) { lock(\u0026sched.lock) // mutex lock // 加锁后，再次判断一次原因是获取锁这段时间可能条件不成立了。 if atomic.Load(\u0026sched.gcwaiting) != 0 || atomic.Load(\u0026sched.npidle) == uint32(gomaxprocs) { syscallWake := false // 系统调用唤醒? // 2.1) 最近一次timer的触发时间点或没有timer时都应该sleep。 // timeSleepUntil函数只会在sysmon和checkdead函数中被调用： // 1. next表示最先触发timer的时间点，timeSleepUntil函数会遍历所有的P取选择最小的timer触发时间点。 // 2. 返回 maxWhen = 1\u003c\u003c63 - 1，表示没有定时器。 next, _ := timeSleepUntil() // 2.2) 还未到触发timer的时间点时或没有timer，这段时间可以sleep。 if next \u003e now {\tatomic.Store(\u0026sched.sysmonwait, 1) // sched.sysmonwait = 1 unlock(\u0026sched.lock)\t// Make wake-up period small enough // for the sampling to be correct. // // 使唤醒周期足够小，以保证取样正确。 // 2.3) 计算睡眠时间间隔最大值1分钟。 sleep := forcegcperiod / 2 // 1min if next-now \u003c sleep { sleep = next - now } // osRelaxMinNS 表示如果下一个计时器从现在开始少于 60 毫秒，则 sysmon 不应该 osRelax // 由于 osRelaxing 可能会将计时器分辨率降低到 15.6 毫秒，这将计时器错误保持在大约 4 分之一以下 // const osRelaxMinNS = 0 shouldRelax := sleep \u003e= osRelaxMinNS if shouldRelax { // osRelax 在与所有空闲的 P 之间转换时由调度程序调用 // 在 linux amd64 下该函数为空 osRelax(true)\t} // 2.4) 在sched.sysmonnote上睡眠sleep纳秒。 // 睡眠 sleep ns 时间，睡眠在 sched.sysmonnote 上。 // 最长情况会睡眠1min，也就是全部P都无事可做时。 // sleep时间后，也就是最新的timer需要触发的时间点，唤醒监控线程。 // 当 STW 正在进行时，这里会把监控线程sleep 1min，在start the world时会唤醒 // 在sched.sysmonnote上的监控线程。 // 当系统调用返回，在runtime_exitsyscall()函数中会响应的唤醒 // 在sched.sysmonnote上的监控线程。 // syscallWake = true。 syscallWake = notetsleep(\u0026sched.sysmonnote, sleep) if shouldRelax { osRelax(false) } lock(\u0026sched.lock) // sched.sysmonwait = 0;sched.sysmonnote.key = 0; atomic.Store(\u0026sched.sysmonwait, 0) noteclear(\u0026sched.sysmonnote) } // 由系统调用醒来或触发timer时间点已经过了，重置计时。 if syscallWake { idle = 0 delay = 20 } } unlock(\u0026sched.lock) } lock(\u0026sched.sysmonlock) // Update now in case we blocked on sysmonnote or spent a long time // blocked on schedlock or sysmonlock above. // // 如果我们在sysmonnote上被阻塞，或者在上面的schedlock或sysmonlock上花了很长时间阻塞，现在更新。 now = nanotime() // trigger libc interceptors if needed if *cgo_yield != nil { asmcgocall(*cgo_yield, nil) } // 3) network poll; 网络轮询。 // 网络轮询的时间间隔设置为10ms。 // poll network if not polled for more than 10ms // // 超过10ms没有进行网络轮询，则进行网络轮询。 // sched.lastpoll：记录的是上次执行netpoll的时间。 // 1. 如果等于0，则表示某个线程正在阻塞式地执行netpoll。 // 2. 大于0，则是上次执行时间点。 lastpoll := int64(atomic.Load64(\u0026sched.lastpoll)) // 以下三种情况不会轮询网络： // 1. 没有初始化 netpoll 时。 // 2. 其他线程阻塞式访问 netpoll 时。 // 3. 上次轮询时间还没到 10ms 时。 // 需要查看network：已初始化 \u0026\u0026 没有其他线程在阻塞调用epoll \u0026\u0026 上次epoll已超过10ms了 if netpollinited() \u0026\u0026 lastpoll != 0 \u0026\u0026 lastpoll+10*1000*1000 \u003c now { // CAS更新 sched.lastpoll 时间。 atomic.Cas64(\u0026sched.lastpoll, uint64(lastpoll), uint64(now)) // 3.1) 轮询 poll。参数0立即返回。 // network poll是否有就绪的事件。 // 传递参数0表示epoll轮询wait等待函数立即返回。 // 非阻塞式轮询，返回就绪的goroutine列表。 list := netpoll(0) // non-blocking - returns list of goroutines // 存在就绪的 goroutine。 if !list.empty() { // Need to decrement number of idle locked M's // (pretending that one more is running) before injectglist. // Otherwise it can lead to the following situation: // injectglist grabs all P's but before it starts M's to run the P's, // another M returns from syscall, finishes running its G, // observes that there is no work to do and no other running M's // and reports deadlock. // // 设置 sched.nmidlelocked += -1 incidlelocked(-1) // 处理准备好的goroutine // 该函数在调度循环函数中有详细注解。 injectglist(\u0026list) incidlelocked(1) } } // 在 linux amd64 下不会触发。 if GOOS == \"netbsd\" \u0026\u0026 needSysmonWorkaround { // netpoll is responsible for waiting for timer // expiration, so we typically don't have to worry // about starting an M to service timers. (Note that // sleep for timeSleepUntil above simply ensures sysmon // starts running again when that timer expiration may // cause Go code to run again). // // However, netbsd has a kernel bug that sometimes // misses netpollBreak wake-ups, which can lead to // unbounded delays servicing timers. If we detect this // overrun, then startm to get something to handle the // timer. // // See issue 42515 and // https://gnats.netbsd.org/cgi-bin/query-pr-single.pl?number=50094. if next, _ := timeSleepUntil(); next \u003c now { startm(nil, false) } } if atomic.Load(\u0026scavenge.sysmonWake) != 0 { // Kick the scavenger awake if someone requested it. wakeScavenger() } // 4) 检查所有的P查看是否存在运行时间太长的G需要设置抢占请求。 // 1. goroutine运行时间超过10ms时需要抢占。 // 2. goroutine陷入系统调用，运行时间超过10ms或在第二轮来是sysmon系统调用还没返回时。 // 陷入系统调用而抢占P的情况： // 1. 运行时间超过10ms，可能一开始就陷入系统调用，或中途陷入系统调用。不论那种情况都应该抢占。 // 2. 运行时间没到10ms，但是两轮sysmon了还是在系统调用中，需要抢占P。这时候时间间隔在(0, 20ms)这个范围。 // retake P's blocked in syscalls // and preempt long running G's // // 重新获取在系统调用中阻塞的 P 并抢占长时间运行的 G // retake函数返回值，陷入系统调用的需要抢占的P的数量。 if retake(now) != 0 { // 为什么陷入系统调度的P需要重置监控频率？ // 原因是陷入系统调度的P，把时间调回20us，下轮监控线程来时判断是否还在系统调用中。 idle = 0 } else { idle++ } // 5) GC相关，定时检查GC是否该触发了 // check if we need to force a GC // t.test()：判断是否满足定时GC间隔2分钟的条件 // forcegc.idle.Load()：当前定时GC是空闲的 if t := (gcTrigger{kind: gcTriggerTime, now: now}); t.test() \u0026\u0026 atomic.Load(\u0026forcegc.idle) != 0 { lock(\u0026forcegc.lock) // 获取互斥锁 forcegc.idle = 0 // 标记本轮定时GC开始了 var list gList // goroutine的列表，最后会把里面的goroutine放入P的本地队列 list.push(forcegc.g)// forcegchelper goroutine 加入本地队列，去触发goroutine injectglist(\u0026list) // list 加入P的本地队列等待M调用，等待forcegchelper()函数继续运行吧 unlock(\u0026forcegc.lock)// 解锁 } if debug.schedtrace \u003e 0 \u0026\u0026 lasttrace+int64(debug.schedtrace)*1000000 \u003c= now { lasttrace = now schedtrace(debug.scheddetail \u003e 0) } unlock(\u0026sched.sysmonlock) } } ",
   "wordCount" : "1397",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-07-30T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-07-30T00:00:00Z",
   "dateModified": "2024-07-30T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/goroutine/sysmon/"
+    "@id": "https://helium.github.io/posts/golang/goroutine/sysmon/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/goroutine/">第12章 Goroutine</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/goroutine/">第12章 Goroutine</a></div>
     <h1 class="post-title entry-hint-parent">
       sysmon 监控线程
     </h1>
@@ -275,7 +275,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
         </ul>
       </span>
       
@@ -917,15 +917,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
+      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/goroutine/mstart/">
+  <a class="prev" href="https://helium.github.io/posts/golang/goroutine/mstart/">
     <span class="title">« 上一页</span>
     <br>
     <span>GMP 调度模型</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/goroutine/newm/">
+  <a class="next" href="https://helium.github.io/posts/golang/goroutine/newm/">
     <span class="title">下一页 »</span>
     <br>
     <span>工作线程的唤醒和创建</span>

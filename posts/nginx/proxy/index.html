@@ -9,18 +9,18 @@
 <meta name="keywords" content="nginx">
 <meta name="description" content="nginx 反向代理及SSL。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/nginx/proxy/">
+<link rel="canonical" href="https://helium.github.io/posts/nginx/proxy/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/nginx/proxy/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/nginx/proxy/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="nginx 反向代理" />
 <meta property="og:description" content="nginx 反向代理及SSL。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/nginx/proxy/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/nginx/proxy/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-08-16T00:00:00+00:00" />
 <meta property="article:modified_time" content="2024-08-16T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="nginx 反向代理"/>
 <meta name="twitter:description" content="nginx 反向代理及SSL。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Nginx",
-      "item": "https://heliu.site/posts/nginx/"
+      "item": "https://helium.github.io/posts/nginx/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "nginx 反向代理",
-      "item": "https://heliu.site/posts/nginx/proxy/"
+      "item": "https://helium.github.io/posts/nginx/proxy/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " Nginx反向代理模块的指令是由ngx_http_proxy_module模块进行解析，该模块在安装Nginx的时候已经自己加装到Nginx中。 指令 proxy_pass指令 该指令用来设置被代理服务器地址，可以是主机名称、IP地址加端口号形式。 语法 proxy_pass URL; 默认值 — 位置 location URL:为要设置的被代理服务器地址，包含传输协议(http,https://)、主机名称或IP地址加端口号、URI等要素。 server { listen 80; server_name localhost; location / { # 客户端访问 http://localhost/index.html 效果一样没区别 #proxy_pass http://192.168.200.146; #proxy_pass http://192.168.200.146/; } } server{ listen 80; server_name localhost; location /server{ # 客户端访问 http://localhost/server/index.html 地址不变 #proxy_pass http://192.168.200.146; # 客户端访问 http://localhost/server/index.html # 地址变为 http://localhost/index.html #proxy_pass http://192.168.200.146/; } } proxy_set_header指令 该指令可以更改Nginx服务器接收到的客户端请求的请求头信息，然后将新的请求头发送给代理的服务器。 语法 proxy_set_header field value; 默认值 proxy_set_header Host $proxy_host; | proxy_set_header Connection close; 位置 http、server、location server { listen 8080; server_name localhost; location /server { proxy_pass http://192.168.200.146:8080/; proxy_set_header username TOM; } } proxy_redirect指令 该指令是用来重置头信息中的\"Location\"和\"Refresh\"的值。 语法 proxy_redirect redirect replacement; | proxy_redirect default; | proxy_redirect off; 默认值 proxy_redirect default; 位置 http、server、location server { listen 8081; server_name localhost; location / { proxy_pass http://192.168.1.146:8081/; # http://192.168.1.146 代码的地址 # http://192.168.1.133 来源的地址 proxy_redirect http://192.168.1.146 http://192.168.1.133; } } proxy_redirect redirect replacement： redirect:目标,Location的值 replacement:要替换的值 proxy_redirect default： 将location块的uri变量作为replacement proxy_redirect off：关闭proxy_redirect的功能。 示例 nginx 代理三台内容不一的服务器。 server { listen 8082; server_name localhost; location /server1 { proxy_pass http://192.168.1.146:9001/; } location /server2 { proxy_pass http://192.168.1.146:9002/; } location /server3 { proxy_pass http://192.168.1.146:9003/; } } ",
   "wordCount" : "163",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-08-16T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-08-16T00:00:00Z",
   "dateModified": "2024-08-16T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/nginx/proxy/"
+    "@id": "https://helium.github.io/posts/nginx/proxy/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/nginx/">Nginx</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/nginx/">Nginx</a></div>
     <h1 class="post-title entry-hint-parent">
       nginx 反向代理
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/nginx/" target="_blank" rel="noopener">Nginx</a>
+            <a href="https://helium.github.io/tags/nginx/" target="_blank" rel="noopener">Nginx</a>
         </ul>
       </span>
       
@@ -515,15 +515,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/nginx/">Nginx</a></li>
+      <li><a href="https://helium.github.io/tags/nginx/">Nginx</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/nginx/rewrite/">
+  <a class="prev" href="https://helium.github.io/posts/nginx/rewrite/">
     <span class="title">« 上一页</span>
     <br>
     <span>nginx Rewrite</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/elasticsearch/desc/">
+  <a class="next" href="https://helium.github.io/posts/elasticsearch/desc/">
     <span class="title">下一页 »</span>
     <br>
     <span>正向索引和倒排索引</span>

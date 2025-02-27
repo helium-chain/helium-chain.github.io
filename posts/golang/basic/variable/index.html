@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, 基础类型">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/basic/variable/">
+<link rel="canonical" href="https://helium.github.io/posts/golang/basic/variable/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/basic/variable/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/basic/variable/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="变量" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/basic/variable/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/golang/basic/variable/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2019-01-27T00:00:00+00:00" />
 <meta property="article:modified_time" content="2022-07-17T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="变量"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://heliu.site/posts/golang/"
+      "item": "https://helium.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第2章 基础类型",
-      "item": "https://heliu.site/posts/golang/basic/"
+      "item": "https://helium.github.io/posts/golang/basic/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "变量",
-      "item": "https://heliu.site/posts/golang/basic/variable/"
+      "item": "https://helium.github.io/posts/golang/basic/variable/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": " 变量名让你能够把程序中准备使用的每一段数据都赋值给一个简短、易于记忆的名字。 变量声明及使用 变量的定义 1 2 // 关键字 标识符 [类型] = 值 var identifier [type] = value 显示声明变量：在声明变量时指定变量的类型。 隐式声明变量：在声明变量时并未指定变量的类型，而是在编译阶段编译器根据变量值自动判断类型。 整数类型(正数或负数，十进制、十六进制、八进制、二进制)：编译器会全部识别为int类型，如：var a = 123。 字符串：编译器识别为string类型，如：var b = \"a1\"。 浮点数：编译器识别为float64类型，如：var c = -1.0。 复数：编译器识别为complecx128类型，如：var d = 1i。 字符类型：编译器识别为rune (int32) 类型，如：var e = 'a'。 其他类型根据情况判断，如：var f = map[string]int{}这一定是map，其他类似。 1 2 3 4 5 6 7 8 9 10 11 // 显式声明 设置值 // 结构 data=\"hello world!\" len=12 var name string = \"hello world!\"\tvar sex uint8 sex = 1 // 显式声明 未设置值 默认取值 \"\" var name string\t// 隐式声明 编辑器会自动推断变量类型，而常量则是在上下文中转换 var name = \"hello\"\t// 系统默认推导为string类型 简单声明 简单申明使用:=，当声明一个变量时当前变量在当前作用域内未被声明过时。(只能用于函数内) 1 name := \"hello\" // 系统默认推导string 多变量赋值 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 // 1. 不同数据类型 // name和sex变量，编辑器默认推导为string类型 // age变量，编辑器默认推断为int类型 var name, sex, age = \"hello\", \"男\", 1 // 2. 相同数据类型，a、b、c变量都为bool类型 var a, b, c bool a, b, c = false, true, false // 3. 一起声明 var ( aa uint // 数值类型 默认值 0 bb string // 字符串类型 默认值 \"\" cc [3]int // 数组类型 默认值 [0,0,0] ) // 4. 或者在函数内 // 这种形式比较特殊，当前name或sex或age中只要有一个变量在【当前作用域】中未被声明过时才能使用 // 其余的全部退还为赋值操作，比较常用的是f, err := os.Open(\"./t.txt\")这里的err被多次使用退化为赋值操作 name, sex, age := \"hello\", \"男\", 1 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 // 在if的作用域中时（这里的bb和err在该作用域中都没有声明过，因此默认为内部变量） if bb, err := tt(); err != nil { // bb declared and not used log.Println(err, bb) } // 等价于 { // if的作用域内，声明bb和err【局部】变量 bb, err := tt() if err != nil { log.Println(err, bb) } } // \u003e --------------------------------------------------------------- var bb byte = 'a' // 作用域外的 bb 变量 // 这里bb在if外，而err在if内作用域，因此if内的bb会生成if内的变量覆盖外层bb变量 if bb, err := tt(); err != nil { // bb declared and not used log.Println(err, bb) // 作用域内的 bb 变量 } // 等价于 var bb byte = 'a' { // if的作用域内，声明bb和err【局部】变量，因为在该作用域内都没有bb和err变量 bb, err := tt() if err != nil { log.Println(err, bb) } } 总结，:=会在当前作用域寻找变量，如果找到则使用它，如果未找到则声明一个新变量。 注意，:=必须要求左边存在至少一个未定义的变量。:=只能在函数内使用。 变量交换 1 2 3 4 5 6 7 8 9 10 var a, b string = \"world\", \"hello\" fmt.Println(a, b) // world hello // 1. 交换变量值 a, b = b, a fmt.Println(a, b) // hello world // 2. 变量交换等价于 temp := a a = b b = temp 标识符 由字母、数字、下划线（_）组成，其中首字符不能为数字，区分大小写（同一字母的大小写代表不同的标识）。 Go语言规范： 标识符：命名程序实体，如变量名和类型名。 标识符是一个或多个Unicode字母和数字的序列。 标识符中的一个字符必须是Unicode字母（下划线_也被认为是字母）。 identifiter = letter {letter | unicode_digit} letter = unicode_letter | _：letter 包含字母（包括除英文字母以外的字母）和下划线。 unicode_digit = 0 1 2 3 4 5 6 7 8 9：数字（这里也包括除阿拉伯数字以外的数字）。 在Go语言中，命名标识符时，通常选择英文的52个大小写字母以及数字0~9和下划线来组合成合适的标识符。 1 2 3 4 5 6 7 8 9 10 // Go语言变量声明使用关键字 var // 下面这种形式 多用于定义全局变量，通常在函数外被定义 var ( a int b bool str string 浮点 float32\t// 中文也可以作为变量标识符，在Unicode里的字符都能 ) var a, b int 关键字 Go语言中关键字是保留字，不能作为变量标识符，关键字一共有25个。 Go 关键字 break：用于跳出for循环，跳出switch和select块。 switch和select都默认自带break（如果写了break默认跳出当前块）。 continue：用于for循环，表示结束本次循环继续下次循环。 default：用于switch和select结构的默认分支，当所有case都不满足时执行default分支。 func：用于定义函数或方法或函数类型变量。 interface：用于定义接口类型。 select：选择结构，主要用于chan类型在，注意在select中不能使用关键字fallthrough。 case：用于select和switch关键字中，表示一个分支块。 defer：主要用于func关键字定义的函数和方法体中，表示当前语句在函数退出时执行。 go：主要用于创建一个goroutine放入P中等待被线程调用，这也是创建协程的关键。 map：用于定义字典类型。 struct：用于定义结构体类型。 chan：用于定义通道类型，chan的主要作用是在各个goroutine间通信的通道。 else：与if关键字配合使用，当上面所有条件都不满足时默认执行else分支的代码块。 goto：跳转语句，配合标签能任意跳转到指定代码处，多在函数内使用。 package：用于.go文件的包声明，多用于.go文件的第一行代码。 switch：选择分支结构，常与case、default、fallthrough一起使用。 const：用于定义常量。 fallthrough：用于switch的case块中，表示继续运行下一个case块代码而不检查是否满足条件。 该关键字多用于迁移其他语言代码兼用使用，正常开发中不建议使用。 if：分支选择结构多与else或else if一起使用。 range：与for关键字一起使用，从slice、map、string、array、chan等中迭代元素。 注意range会拷贝slice、array需要迭代的集合副本，以便于原集合区分。 type：多用于定义类型关键字。 for：用于开始一个循环。 import：导入其他包文件关键字。 return：用于函数或方法中，表示结束当前函数并返回给定值。 在没有返回值的函数中也可以使用return来返回函数。 var：用于定义变量的关键字。 注意事项 变量必须先定义才能使用，变量的类型和赋值的类型必须一致。 变量名不能冲突（同一个作用域内不能冲突）。 简短定义方式，只能在函数内被定义。 同一个作用域中，已存在同名的变量，则之后的声明初始化，则退化为赋值操作。 前提是，最少要有一个新的变量被定义，且在同一作用域。 变量定义了如不使用编译通不过。 1 2 3 4 5 6 x := 12 // 定义变量x默认推导为int类型 x, y = 1, \"hello\" // 变量x重新赋值为1， 定义变量y默认推导为string类型 // 这种情况经常出现在接收错误情况下，第二个err变量退化为赋值操作 file1, err := os.Open(\"a.txt\") // 在当前作用域声明file1和err变量 file2, err := os.Open(\"b.txt\") // 当前作用域已有err变量直接使用，声明file2变量 作用域 在顶层声明的常量（如const a int = 1），类型（如type a int），变量（如var a = 1）函数的标识符（如func name() int）的范围是包块。 导入包名称范围是包含导入声明的文件的文件块。 导入包名称范围是包含导入声明的文件的文件块。 在函数内声明的常量或变量标识符的范围从声明语句的末尾开始，到最内层包含块的末尾结束。 在函数内声明的类型标识符的范围从标识符开始，到最内层包含块的末尾结束。 块中声明的标识符可以在内部块中重新声明。 作用域就类似一棵树结构，而每个树枝相当于块，在树干定义的变量能被这个树干分成出的树枝或树枝的树枝使用，而在树枝中重复定义树干的变量则会屏蔽调树干定义的变量。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 package main import ( \"fmt\" ) // 全局变量 var x int = 10 // ---------- 假设全局作用域就是树干编号SU01 func main() { fmt.Println(x) // 10\t// 局部变量 x := 1 // ---------- 而在main函数中的局部变量就SU01的树枝SZ01 fmt.Println(x) // 1 // 局部块 { fmt.Println(x) // 1 // 局部变量 x := 2 // ---------- 而在SZ01定义的块及是SZ01的树枝SZ02 fmt.Println(x) // 2 } fmt.Println(x) // 1 // Output: // 10 // 1 // 1 // 2 // 1 } 未使用的变量 未使用的全局变量编译不会报错。 函数内未使用定义的变量编译会报错，import导入的包，未使用编译会报错。 1 2 3 4 5 6 7 8 9 10 11 12 package main import ( //\"fmt\" // 1. 未使用的import包，编译会报错 ) var x int = 10 // 未使用的全局变量编译不会报错 func main() { // 2. 函数内未使用的变量编译会报错 x := 1\t// 10:2: x declared and not used } 下划线 _ ：是特殊标识符，用来忽略结果。该变量是只写，并且是系统定义好的变量，可以随意使用不分作用域。 下划线在import中 import：导入其他package包文件。 当前 _ 用于 import 中，仅仅是为了调用 init() 函数，所以无法通过包名来调用包中的其他函数和全局变量。 项目目录结构如下： src目录 | +--- main.go | +--- hello目录 | +--- hello.go 1 2 3 4 5 6 7 8 9 10 11 // ./src/main.go 文件 package main import _ \"./hello\" // 这里导入使用下划线 func main() { // hello.Print() // 编译报错：./main.go:6:5: undefined: hello // Output: // imp-init() come here. } 1 2 3 4 5 6 7 8 9 10 11 12 // ./src/hello/hello.go 文件 package hello import \"fmt\" func init() { fmt.Println(\"imp-init() come here.\") } func Print() { fmt.Println(\"Hello!\") } 其他示例 1 2 3 4 5 6 7 import \"database/sql\" import _ \"github.com/go-sql-driver/mysql\" // 第二个import就是不直接使用mysql包 // 1. 只是执行一下这个包的init函数 // 2. 把mysql的驱动注册到sql包里 // 3. 然后程序里就可以使用sql包来访问mysql数据库了 下划线当做变量使用 _ ：当做变量使用，表示丢弃，是只写变量，不能读取。 下划线用作判断切片下标是否越界时，_ = a[3]，有助于帮助编译器进行边界越界检查。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 package main import ( \"os\" ) func main() { buf := make([]byte, 1024) // os.Open 打开文件 返回文件句柄 *os.File 和错误类型 error f, _ := os.Open(\"/Users/***/Desktop/text.txt\") // _表示抛弃函数返回的err defer f.Close() for { n, _ := f.Read(buf) if n == 0 { break } os.Stdout.Write(buf[:n]) } } 下划线在编译原理中 在编译原理中语法分析中，分析const ()关键字区分组时存在这样结构。 1 2 3 4 // 取地址 表示一类分组地址 type Group struct { _ int } 总结 下划线用在import中，仅仅是执行导入包的所有init()函数。 下划线在变量中，表示抛弃该值： 不占用命名空间，不会分配内存。 多次使用不存在重复声明问题。 很多时候_用于占位，表示忽略值。 我们可以把_当做是一个系统已经声明的全局只写变量，直接使用即可，不需要像_ := a这种形式 参考 为什么指针被誉为 C 语言灵魂？，关于指针。 ",
   "wordCount" : "889",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2019-01-27T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2019-01-27T00:00:00Z",
   "dateModified": "2022-07-17T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/basic/variable/"
+    "@id": "https://helium.github.io/posts/golang/basic/variable/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/basic/">第2章 基础类型</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/basic/">第2章 基础类型</a></div>
     <h1 class="post-title entry-hint-parent">
       变量
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://heliu.site/tags/%E5%9F%BA%E7%A1%80%E7%B1%BB%E5%9E%8B/" target="_blank" rel="noopener">基础类型</a>
+            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium.github.io/tags/%E5%9F%BA%E7%A1%80%E7%B1%BB%E5%9E%8B/" target="_blank" rel="noopener">基础类型</a>
         </ul>
       </span>
       
@@ -1045,16 +1045,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
-      <li><a href="https://heliu.site/tags/%E5%9F%BA%E7%A1%80%E7%B1%BB%E5%9E%8B/">基础类型</a></li>
+      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium.github.io/tags/%E5%9F%BA%E7%A1%80%E7%B1%BB%E5%9E%8B/">基础类型</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/basic/type/">
+  <a class="prev" href="https://helium.github.io/posts/golang/basic/type/">
     <span class="title">« 上一页</span>
     <br>
     <span>内置类型</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/basic/const/">
+  <a class="next" href="https://helium.github.io/posts/golang/basic/const/">
     <span class="title">下一页 »</span>
     <br>
     <span>常量</span>

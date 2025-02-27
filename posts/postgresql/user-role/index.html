@@ -9,18 +9,18 @@
 <meta name="keywords" content="pgsql">
 <meta name="description" content="PostgreSQL 角色和用户。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/postgresql/user-role/">
+<link rel="canonical" href="https://helium.github.io/posts/postgresql/user-role/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/postgresql/user-role/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/postgresql/user-role/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="用户和角色" />
 <meta property="og:description" content="PostgreSQL 角色和用户。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/postgresql/user-role/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/postgresql/user-role/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-09-20T00:00:00+00:00" />
 <meta property="article:modified_time" content="2024-09-20T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="用户和角色"/>
 <meta name="twitter:description" content="PostgreSQL 角色和用户。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "PostgreSQL",
-      "item": "https://heliu.site/posts/postgresql/"
+      "item": "https://helium.github.io/posts/postgresql/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "用户和角色",
-      "item": "https://heliu.site/posts/postgresql/user-role/"
+      "item": "https://helium.github.io/posts/postgresql/user-role/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " PostgreSQL 通过角色的概念来控制数据库的访问权限。 角色又包含了两种概念，具有登录权限的角色称为用户，包含其他成员（也是角色）的角色称为组（group）。 因此，一个角色可以是一个用户，也可以是一个组，或者两者都是。 角色可以拥有数据库对象（例如表和函数），并且可以将这些对象上的权限授予其他角色，从而控制对象的访问。此外，一个组中的成员可以拥有该组所拥有的权限。 创建角色 在 PostgreSQL 中，使用 CREATE ROLE 语句创建角色：(其中，name 指定了要创建的角色名称。) CREATE ROLE name; 如果想要显示当前数据库集群中已有的角色，可以查询系统目录 pg_roles： SELECT rolname FROM pg_roles;。 shoping=# SELECT rolname FROM pg_roles; rolname --------------------------- pg_database_owner pg_read_all_data pg_write_all_data pg_monitor pg_read_all_settings pg_read_all_stats pg_stat_scan_tables pg_read_server_files pg_write_server_files pg_execute_server_program pg_signal_backend postgres tony admin (14 rows) 或者使用 psql 中的 \\du 命令： postgres=# \\du List of roles Role name | Attributes | Member of -----------+------------------------------------------------------------+----------- admin | Create role, Create DB, Cannot login | {} postgres | Superuser, Create role, Create DB, Replication, Bypass RLS | {} tony | Password valid until 2025-01-01 00:00:00+00 | {} 其中的 postgres 是系统初始化数据库时创建的默认角色，它是一个超级用户。 前一个命令中多出的角色都是系统提供的默认角色，用于提供针对一些特定的常用特权和信息的访问权限。 每个默认角色包含的具体权限可以参考官方文档。 默认角色 说明 pg_database_owner 具有创建和管理数据库的权限 pg_read_all_data 具有读取所有数据库数据的权限 pg_write_all_data 具有写入所有数据库数据的权限 pg_monitor 具有访问监控函数和视图的权限，用于查看数据库的运行状态 pg_read_all_settings 具有读取所有服务器配置参数的权限 pg_read_all_stats 具有读取所有服务器统计信息的权限 pg_stat_scan_tables 具有执行表扫描操作的权限，用于监控 pg_read_server_files 具有读取服务器文件系统的权限 pg_write_server_files 具有写入服务器文件系统的权限 pg_execute_server_program 具有执行服务器端程序的权限 pg_signal_backend 具有向后台进程发送信号的权限 postgres 这是数据库系统中的超级用户，拥有所有可能的权限 角色属性 创建角色语法：\\h CREATE ROLE。 CREATE ROLE和CREATE USER语法完全相同，不过USER默认指定LOGIN选项，而ROLE默认NOLOGIN。 常用CREATE ROLE创建角色组，使用CREATE USER创建用户，然后指定用户属于角色组。角色组再指定具体的权限。 Command: CREATE ROLE Description: define a new database role Syntax: CREATE ROLE name [ [ WITH ] option [ ... ] ] where option can be: SUPERUSER | NOSUPERUSER | CREATEDB | NOCREATEDB | CREATEROLE | NOCREATEROLE | INHERIT | NOINHERIT | LOGIN | NOLOGIN | REPLICATION | NOREPLICATION | BYPASSRLS | NOBYPASSRLS | CONNECTION LIMIT connlimit | [ ENCRYPTED ] PASSWORD 'password' | PASSWORD NULL | VALID UNTIL 'timestamp' | IN ROLE role_name [, ...] | IN GROUP role_name [, ...] | ROLE role_name [, ...] | ADMIN role_name [, ...] | USER role_name [, ...] | SYSID uid URL: https://www.postgresql.org/docs/14/sql-createrole.html 属性介绍 SUPERUSER | NOSUPERUSER SUPERUSER：如果指定，角色将拥有超级用户权限，可以执行任何操作，包括系统管理操作，如关闭数据库和访问任何数据库对象。 NOSUPERUSER（默认）：角色不是超级用户，不能执行所有系统管理操作。 CREATEDB | NOCREATEDB CREATEDB：允许角色创建新的数据库。 NOCREATEDB（默认）：角色不能创建新的数据库。 CREATEROLE | NOCREATEROLE CREATEROLE：允许角色创建和删除其他角色，以及赋予或撤销它们的能力。 NOCREATEROLE（默认）：角色不能创建或删除其他角色。 INHERIT | NOINHERIT INHERIT（默认）：角色自动继承它所属角色的权限。 NOINHERIT：角色不会自动继承它所属角色的权限。 LOGIN | NOLOGIN LOGIN：角色可以用来登录数据库。 NOLOGIN（默认）：角色不能用来登录数据库，通常用于创建权限组。 REPLICATION | NOREPLICATION REPLICATION：角色可以用来进行流复制，即允许角色连接到服务器并请求复制数据。 NOREPLICATION（默认）：角色不能用于复制。 BYPASSRLS | NOBYPASSRLS BYPASSRLS：允许角色绕过行级安全策略。 NOBYPASSRLS（默认）：角色不能绕过行级安全策略。 CONNECTION LIMIT connlimit CONNECTION LIMIT connlimit：限制角色可以同时拥有的并发连接数。connlimit是一个非负整数。如果没有指定或设置为0，则没有限制。 [ ENCRYPTED ] PASSWORD 'password' | PASSWORD NULL [ ENCRYPTED ] PASSWORD 'password'：指定角色的密码，并可选择是否加密存储。如果使用ENCRYPTED关键字，则密码将被加密存储。 PASSWORD NULL：明确指定角色没有密码。 VALID UNTIL 'timestamp' VALID UNTIL 'timestamp'：指定角色密码的有效期限，超出此期限后，密码将不再有效。 IN ROLE role_name [, …] IN ROLE role_name：将新角色立即添加到指定的角色中，使其自动继承那些角色的权限。 IN GROUP role_name [, …] IN GROUP role_name：与IN ROLE相同，用于兼容性。 ROLE role_name [, …] ROLE role_name：指定新角色将直接或间接继承的角色的列表。 ADMIN role_name [, …] ADMIN role_name：指定新角色将拥有管理员权限的角色列表。 USER role_name [, …] USER role_name：指定新角色将拥有的用户角色的列表。 SYSID uid SYSID uid：指定角色的系统ID（通常不需要设置，因为PostgreSQL会自动分配）。 角色可以拥有属性，属性确定了角色拥有的特权，并且在登录时与客户端认证系统进行交互。 常见的角色属性包括： 登录特权，只有具有 LOGIN 属性的角色才能连接数据库。具有 LOGIN 角色的用户可以被看作一个“数据库用户”。 使用以下语句创建具有登录特权的角色： CREATE ROLE name LOGIN; CREATE USER name; CREATE USER 与 CREATE ROLE 都可以用于创建角色，只不过 CREATE USER 默认包含了 LOGIN 选项，而 CREATE ROLE 没有。 超级用户，数据的超级用户可以避开所有的权限检查，只验证登录权限。因此，这是一个很危险的特权，使用时需要特别小心；最好在日常的操作中避免使用超级用户。使用以下命令创建一个新的超级用户： CREATE ROLE name SUPERUSER; 只有超级用户才能创建其他的超级用户。 创建数据库，只有明确授权的角色才能够创建数据库（超级用户除外，因为他们可以避开权限检查）。使用以下语句创建一个具有数据库创建特权的角色： CREATE ROLE name CREATEDB; 创建角色，只有明确授权的角色才能够创建其他角色（超级用户除外，因为他们可以避开权限检查）。使用以下命令创建一个具有角色创建特权的角色： CREATE ROLE name CREATEROLE; 具有 CREATEROLE 特权的角色还可以修改或删除其他角色，以及为这些角色授予或者撤销成员角色。但是，针对超级用户的创建、修改、删除，以及它的成员变更，需要超级用户特权；CREATEROLE 特权无法针对超级用户执行这些操作。 启动复制，只有明确授权的角色才能够启动流复制（超级用户除外，因为他们可以避开权限检查）。用于流复制的角色还需要拥有 LOGIN 特权。使用以下语句创建可以用于流复制的角色： CREATE ROLE name REPLICATION LOGIN; 密码，只有当用户连接数据库使用的客户端认证方法要求提供密码时，密码属性才有意义。password 和 md5 认证方法需要使用密码。数据库的密码与操作系统的密码相互独立。使用以下语句在创建角色时指定密码： CREATE ROLE name PASSWORD 'string'; 我们在创建角色时，可以根据需要指定某些属性。例如，以下命令创建一个具有登录特权的角色 tony，并且为它指定了密码以及密码过期时间： CREATE ROLE tony WITH LOGIN PASSWORD 'Pass2022' VALID UNTIL '2025-01-01'; -- CREATE USER tony WITH PASSWORD 'Pass2022' VALID UNTIL '2025-01-01'; 使用该用户连接到 postgres 数据库： -h 表示数据库服务器的地址。 -p 表示服务的监听端口。 -U 表示登录使用的用户名。 最后的 postgres 代表要连接的数据库。 详细的命令行参数可以使用 psql –help 查看或者参考官方文档。 $ psql -h localhost -p 5432 -U tony postgres # psql (14.4 (Debian 14.4-1.pgdg110+1)) # Type \"help\" for help. $ postgres=\u003e \\c # You are now connected to database \"postgres\" as user \"tony\". 以下命令创建一个管理角色 admin，它具有创建数据库和创建角色的特权： $ psql -h localhost -p 5432 -U postgres shoping # psql (14.4 (Debian 14.4-1.pgdg110+1)) # Type \"help\" for help. $ shoping=# CREATE ROLE admin CREATEDB CREATEROLE; # CREATE ROLE $ shoping=# \\du List of roles # Role name | Attributes | Member of # -----------+------------------------------------------------------------+----------- # admin | Create role, Create DB, Cannot login | {} # postgres | Superuser, Create role, Create DB, Replication, Bypass RLS | {} # tony | Password valid until 2025-01-01 00:00:00+00 | {} 创建一个开发者角色。 -- 开发者 developer 角色 CREATE ROLE developer CREATEDB CREATEROLE NOINHERIT REPLICATION NOBYPASSRLS CONNECTION LIMIT 100; shoping=# \\du+ List of roles Role name | Attributes | Member of | Description -----------+-------------------------------------------------------------------+-----------+------------- admin | Create role, Create DB, Cannot login | {} | developer | No inheritance, Create role, Create DB, Cannot login, Replication+| {} | | 100 connections | | postgres | Superuser, Create role, Create DB, Replication, Bypass RLS | {} | tony | Password valid until 2025-01-01 00:00:00+00 | {} | 对象授权 当我们使用新创建的用户（tony）连接数据库（hrdb）之后，执行以下查询语句： hrdb=\u003e SELECT * FROM employees; # ERROR: permission denied for table employees 以上语句执行错误是因为用户没有相应对象上的访问权限。 PostgreSQL 使 GRANT 语句进行数据库对象的授权操作。以表为例，基本的授权语法如下： 其中，privilege_list权限列表可以是SELECT、INSERT、UPDATE、DELETE、TRUNCATE等，ALL表示表上的所有权限。 GRANT privilege_list | ALL ON [ TABLE ] table_name TO role_name; GRANT语法 GRANT { { SELECT | INSERT | UPDATE | DELETE | TRUNCATE | REFERENCES | TRIGGER } [, ...] | ALL [ PRIVILEGES ] } ON { [ TABLE ] table_name [, ...] | ALL TABLES IN SCHEMA schema_name [, ...] } TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] 权限类型 SELECT：允许用户查询表中的数据。 INSERT：允许用户向表中插入新数据。 UPDATE：允许用户更新表中的数据。 DELETE：允许用户从表中删除数据。 TRUNCATE：允许用户清空表中的所有数据。 REFERENCES：允许用户在另一个表的外键列中引用当前表的列。 TRIGGER：允许用户定义表上的触发器。 ALL PRIVILEGES：包括上述所有权限。 对象类型 TABLE：表名。 ALL TABLES IN SCHEMA：指定模式中的所有表。 用户和角色 role_specification：可以是一个角色名称、用户名称或特殊的角色标识符，如PUBLIC、CURRENT_ROLE、CURRENT_USER、SESSION_USER。 选项 WITH GRANT OPTION：如果指定了这个选项，被授予权限的用户或角色可以将这些权限进一步授予其他用户或角色。 GRANTED BY role_specification：指定权限的来源角色。 示例 -- 授予用户john对表employees的SELECT和UPDATE权限 GRANT SELECT, UPDATE ON employees TO john; -- 授予用户john对模式hr中的所有表的SELECT和UPDATE权限 GRANT SELECT, UPDATE ON ALL TABLES IN SCHEMA hr TO john; -- 授予用户john对模式hr中的所有表的SELECT、UPDATE和DELETE权限，并且允许他将这些权限授予其他用户 GRANT SELECT, UPDATE, DELETE ON ALL TABLES IN SCHEMA hr TO john WITH GRANT OPTION; -- 授予角色admin对数据库mydatabase的所有权限，并且权限来源于角色superuser GRANT ALL PRIVILEGES ON DATABASE mydatabase TO admin GRANTED BY superuser; 使用GRANT命令时，应确保理解每个选项的含义，并根据实际需求进行选择。此外，要注意权限的传递和潜在的安全风险，特别是在使用WITH GRANT OPTION时。 例如，使用 postgres 用户连接 hrdb 数据库后执行以下语句： GRANT SELECT, INSERT, UPDATE, DELETE ON employees, departments, jobs TO tony; 该语句将employees、departments和jobs表上的增删改查权限授予了tony用户。此时tony用户就可以访问这些表中的数据。 SELECT first_name, last_name FROM employees; 对表进行授权的 GRANT 语句还支持一些其他选项： GRANT privilege_list | ALL ON ALL TABLES IN SCHEMA schema_name TO role_name; ALL TABLES IN SCHEMA 表示某个模式中的所有表，可以方便批量授权操作。例如： 该语句将 public 模式中所有表的查询权限授予 tony 用户。 GRANT SELECT ON ALL TABLES IN SCHEMA public TO tony; 我们也可以在 GRANT 语句的最后指定一个 WITH GRANT OPTION，意味着被授权的角色可以将该权限授权其他角色。例如： 此时，tony 用户不但拥有这些表上的访问权限，还可以将这些权限授予其他角色。 GRANT SELECT, INSERT, UPDATE, DELETE ON employees, departments, jobs TO tony WITH GRANT OPTION; 除了授权表的访问权限之外， GRANT 语句还支持字段、视图、序列、数据库、函数、过程、模式等对象的授权操作。授权操作的语句基本都类似，具体可以参考官方文档。 GRANT语法(指定字段) GRANT { { SELECT | INSERT | UPDATE | REFERENCES } ( column_name [, ...] ) [, ...] | ALL [ PRIVILEGES ] ( column_name [, ...] ) } ON [ TABLE ] table_name [, ...] TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] 权限类型 SELECT：允许用户查询表中的数据。 INSERT：允许用户向表中插入新数据。 UPDATE：允许用户更新表中的数据。 REFERENCES：允许用户在另一个表的外键列中引用当前表的列。 ALL PRIVILEGES：包括上述所有权限。 列名称 column_name：指定表中列的名称。 示例 -- 授予用户john对表employees中列name的SELECT和UPDATE权限 GRANT SELECT, UPDATE ON employees (name) TO john; -- 授予用户john对表employees中所有列的SELECT、INSERT、UPDATE和DELETE权限 GRANT SELECT, INSERT, UPDATE, DELETE ON employees (name, salary, hire_date) TO john; -- 授予用户john对表employees中所有列的SELECT、INSERT、UPDATE和DELETE权限，并且允许他将这些权限授予其他用户 GRANT SELECT, INSERT, UPDATE, DELETE ON employees (name, salary, hire_date) TO john WITH GRANT OPTION; -- 授予用户john对表employees中所有列的SELECT、INSERT、UPDATE和DELETE权限，并且权限来源于角色superuser GRANT SELECT, INSERT, UPDATE, DELETE ON employees (name, salary, hire_date) TO john GRANTED BY superuser; 开发者角色授予权限。 shoping=# GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO developer; GRANT 撤销授权 与授权操作相反的就是撤销权限，PostgreSQL使REVOKE语句撤销数据库对象上的权限。同样以表为例，基本的撤销授权语句如下： REVOKE privilege_list | ALL ON TABLE table_name FROM role_name; 其中的参数和 GRANT 语句一致。例如： 该语句撤销了用户 tony 访问 employees、 departments 以及 jobs 表的权限。 REVOKE SELECT, INSERT, UPDATE, DELETE ON employees, departments, jobs FROM tony; REVOKE 语句也支持对某个模式中的所有对象进行操作： REVOKE privilege_list | ALL ON ALL TABLES IN SCHEMA schema_name FROM role_name; 例如以下语句撤销了用户 tony 在 public 模式中所有表上的查询权限： REVOKE SELECT ON ALL TABLES IN SCHEMA public FROM tony; 与 GRANT 语句对应，REVOKE 语句还支持字段、视图、序列、数据库、函数、过程、模式等对象的撤销授权操作。撤销授权的语句基本都类似，具体可以参考官方文档。 角色成员 在现实的环境中，管理员通常需要管理大量的用户和对象权限。为了便于权限管理，减少复杂度，可以将用户进行分组，然后以组为单位进行权限的授予和撤销操作。 为此，PostgreSQL 引入了组（group）角色的概念。具体来说，就是创建一个代表组的角色，然后将该组的成员资格授予其他用户，让其成为该组的成员。 首先，使用以下创建一个组角色： CREATE ROLE group_name; 按照习惯，组角色通常不具有 LOGIN 特权，也就是不能作为一个用户登录。 例如，我们可以先创建一个组 managers： CREATE ROLE managers; 然后，使用与对象授权操作相同的 GRANT 和 REVOKE 语句为组添加和删除成员： GRANT group_name TO user_role, ... ; REVOKE group_name FROM user_role, ... ; 我们将用户 tony 添加为组 managers 的成员： GRANT managers TO tony; 另外， PostgreSQL 不允许设置循环的成员关系，也就是两个角色互相为对方的成员。 postgres=# GRANT managers TO admin; ERROR: role \"managers\" is a member of role \"admin\" 最后，不能将特殊角色 PUBLIC 设置为任何组的成员。 首先，组中的成员可以通过 SET ROLE 命令将自己的角色临时性“变成”该组角色。此时，当前数据库会话拥有该组角色的权限，而不是登录用户的权限；并且会话创建的任何数据库对象归组角色所有，而不是登录用户所有。 其次，对于具有 INHERIT 属性的角色，将会自动继承它所属的组的全部特权，包括这些组通过继承获得的特权。 考虑以下示例： 使用角色 user1 登录之后，数据库会话将会拥有 user1 自身的特权和 net_admins 所有的特权，因为 user1“继承”了 net_admins 的特权。但是，会话还不具有 sys_admins 所有的特权，因为即使user1 间接地成为了 sys_admins 的成员，通过 net_admins 获得的成员资格具有 NOINHERIT 属性，也就不会自动继承权限。 CREATE ROLE user1 LOGIN INHERIT; CREATE ROLE net_admins NOINHERIT; CREATE ROLE sys_admins NOINHERIT; GRANT net_admins TO user1; GRANT sys_admins TO net_admins; 如果执行了以下语句： 会话将会拥有 net_admins 所有的特权，但是不会拥有 user1 自身的特权，也不会继承sys_admins 所有的特权。 SET ROLE net_admins; 如果执行了以下语句： 会话将会拥有 sys_admins 所有的特权，但是不会拥有 user1 或者 net_admins 所有的特权。 SET ROLE sys_admins; 如果想要恢复初始状态的会话特权，可以执行以下任意语句： SET ROLE user1; SET ROLE NONE; RESET ROLE; 创建账户授予开发角色。 shoping=# CREATE USER pg2022 WITH ENCRYPTED PASSWORD '123456' VALID UNTIL '2026-01-01'; CREATE ROLE shoping=# \\du+ List of roles Role name | Attributes | Member of | Description -----------+-------------------------------------------------------------------+-----------+------------- admin | Create role, Create DB, Cannot login | {} | developer | No inheritance, Create role, Create DB, Cannot login, Replication+| {} | | 100 connections | | pg2022 | Password valid until 2026-01-01 00:00:00+00 | {} | postgres | Superuser, Create role, Create DB, Replication, Bypass RLS | {} | tony | Password valid until 2025-01-01 00:00:00+00 | {} | shoping=# GRANT developer TO pg2022; GRANT ROLE shoping=# \\du+ List of roles Role name | Attributes | Member of | Description -----------+-------------------------------------------------------------------+-------------+------------- admin | Create role, Create DB, Cannot login | {} | developer | No inheritance, Create role, Create DB, Cannot login, Replication+| {} | | 100 connections | | pg2022 | Password valid until 2026-01-01 00:00:00+00 | {developer} | postgres | Superuser, Create role, Create DB, Replication, Bypass RLS | {} | tony | Password valid until 2025-01-01 00:00:00+00 | {} | 删除角色 删除角色的语句如下： shoping=# \\h DROP ROLE Command: DROP ROLE Description: remove a database role Syntax: DROP ROLE [ IF EXISTS ] name [, ...] URL: https://www.postgresql.org/docs/14/sql-droprole.html 如果删除的是组角色，该组中的成员关系会自动从组中删除，但是这些成员角色自身不会受到任何影响。 以下示例删除了角色 admin： postgres=# drop role admin; DROP ROLE 由于角色可以拥有数据库中的对象，也可以拥有访问其他对象的权限，删除角色通常不仅仅只是一个简单的 DROP ROLE 语句。在删除角色之前，需要删除它所拥有的对象，或者将这些对象重新赋予其他的角色；同时还需要撤销授予该角色的权限。 语法帮助文档 CREATE ROLE shoping=# \\h CREATE ROLE Command: CREATE ROLE Description: define a new database role Syntax: CREATE ROLE name [ [ WITH ] option [ ... ] ] where option can be: SUPERUSER | NOSUPERUSER | CREATEDB | NOCREATEDB | CREATEROLE | NOCREATEROLE | INHERIT | NOINHERIT | LOGIN | NOLOGIN | REPLICATION | NOREPLICATION | BYPASSRLS | NOBYPASSRLS | CONNECTION LIMIT connlimit | [ ENCRYPTED ] PASSWORD 'password' | PASSWORD NULL | VALID UNTIL 'timestamp' | IN ROLE role_name [, ...] | IN GROUP role_name [, ...] | ROLE role_name [, ...] | ADMIN role_name [, ...] | USER role_name [, ...] | SYSID uid URL: https://www.postgresql.org/docs/14/sql-createrole.html CREATE USER shoping=# \\h CREATE USER Command: CREATE USER Description: define a new database role Syntax: CREATE USER name [ [ WITH ] option [ ... ] ] where option can be: SUPERUSER | NOSUPERUSER | CREATEDB | NOCREATEDB | CREATEROLE | NOCREATEROLE | INHERIT | NOINHERIT | LOGIN | NOLOGIN | REPLICATION | NOREPLICATION | BYPASSRLS | NOBYPASSRLS | CONNECTION LIMIT connlimit | [ ENCRYPTED ] PASSWORD 'password' | PASSWORD NULL | VALID UNTIL 'timestamp' | IN ROLE role_name [, ...] | IN GROUP role_name [, ...] | ROLE role_name [, ...] | ADMIN role_name [, ...] | USER role_name [, ...] | SYSID uid URL: https://www.postgresql.org/docs/14/sql-createuser.html GRANT shoping=# \\h GRANT Command: GRANT Description: define access privileges Syntax: GRANT { { SELECT | INSERT | UPDATE | DELETE | TRUNCATE | REFERENCES | TRIGGER } [, ...] | ALL [ PRIVILEGES ] } ON { [ TABLE ] table_name [, ...] | ALL TABLES IN SCHEMA schema_name [, ...] } TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] GRANT { { SELECT | INSERT | UPDATE | REFERENCES } ( column_name [, ...] ) [, ...] | ALL [ PRIVILEGES ] ( column_name [, ...] ) } ON [ TABLE ] table_name [, ...] TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] GRANT { { USAGE | SELECT | UPDATE } [, ...] | ALL [ PRIVILEGES ] } ON { SEQUENCE sequence_name [, ...] | ALL SEQUENCES IN SCHEMA schema_name [, ...] } TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] GRANT { { CREATE | CONNECT | TEMPORARY | TEMP } [, ...] | ALL [ PRIVILEGES ] } ON DATABASE database_name [, ...] TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] GRANT { USAGE | ALL [ PRIVILEGES ] } ON DOMAIN domain_name [, ...] TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] GRANT { USAGE | ALL [ PRIVILEGES ] } ON FOREIGN DATA WRAPPER fdw_name [, ...] TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] GRANT { USAGE | ALL [ PRIVILEGES ] } ON FOREIGN SERVER server_name [, ...] TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] GRANT { EXECUTE | ALL [ PRIVILEGES ] } ON { { FUNCTION | PROCEDURE | ROUTINE } routine_name [ ( [ [ argmode ] [ arg_name ] arg_type [, ...] ] ) ] [, ...] | ALL { FUNCTIONS | PROCEDURES | ROUTINES } IN SCHEMA schema_name [, ...] } TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] GRANT { USAGE | ALL [ PRIVILEGES ] } ON LANGUAGE lang_name [, ...] TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] GRANT { { SELECT | UPDATE } [, ...] | ALL [ PRIVILEGES ] } ON LARGE OBJECT loid [, ...] TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] GRANT { { CREATE | USAGE } [, ...] | ALL [ PRIVILEGES ] } ON SCHEMA schema_name [, ...] TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] GRANT { CREATE | ALL [ PRIVILEGES ] } ON TABLESPACE tablespace_name [, ...] TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] GRANT { USAGE | ALL [ PRIVILEGES ] } ON TYPE type_name [, ...] TO role_specification [, ...] [ WITH GRANT OPTION ] [ GRANTED BY role_specification ] GRANT role_name [, ...] TO role_specification [, ...] [ WITH ADMIN OPTION ] [ GRANTED BY role_specification ] where role_specification can be: [ GROUP ] role_name | PUBLIC | CURRENT_ROLE | CURRENT_USER | SESSION_USER URL: https://www.postgresql.org/docs/14/sql-grant.html REVOKE shoping=# \\h REVOKE Command: REVOKE Description: remove access privileges Syntax: REVOKE [ GRANT OPTION FOR ] { { SELECT | INSERT | UPDATE | DELETE | TRUNCATE | REFERENCES | TRIGGER } [, ...] | ALL [ PRIVILEGES ] } ON { [ TABLE ] table_name [, ...] | ALL TABLES IN SCHEMA schema_name [, ...] } FROM role_specification [, ...] [ GRANTED BY role_specification ] [ CASCADE | RESTRICT ] REVOKE [ GRANT OPTION FOR ] { { SELECT | INSERT | UPDATE | REFERENCES } ( column_name [, ...] ) [, ...] | ALL [ PRIVILEGES ] ( column_name [, ...] ) } ON [ TABLE ] table_name [, ...] FROM role_specification [, ...] [ GRANTED BY role_specification ] [ CASCADE | RESTRICT ] REVOKE [ GRANT OPTION FOR ] { { USAGE | SELECT | UPDATE } [, ...] | ALL [ PRIVILEGES ] } ON { SEQUENCE sequence_name [, ...] | ALL SEQUENCES IN SCHEMA schema_name [, ...] } FROM role_specification [, ...] [ GRANTED BY role_specification ] [ CASCADE | RESTRICT ] REVOKE [ GRANT OPTION FOR ] { { CREATE | CONNECT | TEMPORARY | TEMP } [, ...] | ALL [ PRIVILEGES ] } ON DATABASE database_name [, ...] FROM role_specification [, ...] [ GRANTED BY role_specification ] [ CASCADE | RESTRICT ] REVOKE [ GRANT OPTION FOR ] { USAGE | ALL [ PRIVILEGES ] } ON DOMAIN domain_name [, ...] FROM role_specification [, ...] [ GRANTED BY role_specification ] [ CASCADE | RESTRICT ] REVOKE [ GRANT OPTION FOR ] { USAGE | ALL [ PRIVILEGES ] } ON FOREIGN DATA WRAPPER fdw_name [, ...] FROM role_specification [, ...] [ GRANTED BY role_specification ] [ CASCADE | RESTRICT ] REVOKE [ GRANT OPTION FOR ] { USAGE | ALL [ PRIVILEGES ] } ON FOREIGN SERVER server_name [, ...] FROM role_specification [, ...] [ GRANTED BY role_specification ] [ CASCADE | RESTRICT ] REVOKE [ GRANT OPTION FOR ] { EXECUTE | ALL [ PRIVILEGES ] } ON { { FUNCTION | PROCEDURE | ROUTINE } function_name [ ( [ [ argmode ] [ arg_name ] arg_type [, ...] ] ) ] [, ...] | ALL { FUNCTIONS | PROCEDURES | ROUTINES } IN SCHEMA schema_name [, ...] } FROM role_specification [, ...] [ GRANTED BY role_specification ] [ CASCADE | RESTRICT ] REVOKE [ GRANT OPTION FOR ] { USAGE | ALL [ PRIVILEGES ] } ON LANGUAGE lang_name [, ...] FROM role_specification [, ...] [ GRANTED BY role_specification ] [ CASCADE | RESTRICT ] REVOKE [ GRANT OPTION FOR ] { { SELECT | UPDATE } [, ...] | ALL [ PRIVILEGES ] } ON LARGE OBJECT loid [, ...] FROM role_specification [, ...] [ GRANTED BY role_specification ] [ CASCADE | RESTRICT ] REVOKE [ GRANT OPTION FOR ] { { CREATE | USAGE } [, ...] | ALL [ PRIVILEGES ] } ON SCHEMA schema_name [, ...] FROM role_specification [, ...] [ GRANTED BY role_specification ] [ CASCADE | RESTRICT ] REVOKE [ GRANT OPTION FOR ] { CREATE | ALL [ PRIVILEGES ] } ON TABLESPACE tablespace_name [, ...] FROM role_specification [, ...] [ GRANTED BY role_specification ] [ CASCADE | RESTRICT ] REVOKE [ GRANT OPTION FOR ] { USAGE | ALL [ PRIVILEGES ] } ON TYPE type_name [, ...] FROM role_specification [, ...] [ GRANTED BY role_specification ] [ CASCADE | RESTRICT ] REVOKE [ ADMIN OPTION FOR ] role_name [, ...] FROM role_specification [, ...] [ GRANTED BY role_specification ] [ CASCADE | RESTRICT ] where role_specification can be: [ GROUP ] role_name | PUBLIC | CURRENT_ROLE | CURRENT_USER | SESSION_USER URL: https://www.postgresql.org/docs/14/sql-revoke.html DROP ROLE shoping=# \\h DROP ROLE Command: DROP ROLE Description: remove a database role Syntax: DROP ROLE [ IF EXISTS ] name [, ...] URL: https://www.postgresql.org/docs/14/sql-droprole.html DROP USER shoping=# \\h DROP USER Command: DROP USER Description: remove a database role Syntax: DROP USER [ IF EXISTS ] name [, ...] URL: https://www.postgresql.org/docs/14/sql-dropuser.html ",
   "wordCount" : "2867",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-09-20T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-09-20T00:00:00Z",
   "dateModified": "2024-09-20T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/postgresql/user-role/"
+    "@id": "https://helium.github.io/posts/postgresql/user-role/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/postgresql/">PostgreSQL</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/postgresql/">PostgreSQL</a></div>
     <h1 class="post-title entry-hint-parent">
       用户和角色
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/pgsql/" target="_blank" rel="noopener">Pgsql</a>
+            <a href="https://helium.github.io/tags/pgsql/" target="_blank" rel="noopener">Pgsql</a>
         </ul>
       </span>
       
@@ -1296,15 +1296,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/pgsql/">Pgsql</a></li>
+      <li><a href="https://helium.github.io/tags/pgsql/">Pgsql</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/postgresql/client/">
+  <a class="prev" href="https://helium.github.io/posts/postgresql/client/">
     <span class="title">« 上一页</span>
     <br>
     <span>客户端命令</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/grpc/proto/">
+  <a class="next" href="https://helium.github.io/posts/grpc/proto/">
     <span class="title">下一页 »</span>
     <br>
     <span>proto3</span>

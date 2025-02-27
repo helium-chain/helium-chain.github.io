@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, 包管理">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/package/publish-mod/">
+<link rel="canonical" href="https://helium.github.io/posts/golang/package/publish-mod/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/package/publish-mod/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/package/publish-mod/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="开发和发布模块" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/package/publish-mod/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/golang/package/publish-mod/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2020-06-28T00:00:00+00:00" />
 <meta property="article:modified_time" content="2023-07-25T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="开发和发布模块"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://heliu.site/posts/golang/"
+      "item": "https://helium.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第4章 包管理",
-      "item": "https://heliu.site/posts/golang/package/"
+      "item": "https://helium.github.io/posts/golang/package/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "开发和发布模块",
-      "item": "https://heliu.site/posts/golang/package/publish-mod/"
+      "item": "https://helium.github.io/posts/golang/package/publish-mod/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": " 您可以将相关包收集到模块中，然后发布模块供其他开发人员使用。本主题概述了开发和发布模块。 为了支持开发、发布和使用模块，您可以使用： 您开发和发布模块的工作流程，随着时间的推移使用新版本对其进行修改。请参阅【开发和发布模块的工作流程】。 帮助模块用户理解并以稳定方式升级到新版本的设计实践。请参【阅设计和开发】。 用于发布模块和检索其代码的去中心化系统。您使您的模块可供其他开发人员从您自己的存储库中使用并使用版本号发布。请参阅 去中心化出版。 一个包搜索引擎和文档浏览器(pkg.go.dev)，开发人员可以在其中找到您的模块。请参阅包发现。 一种模块版本编号约定，用于向使用您的模块的开发人员传达对稳定性和向后兼容性的期望。请参阅 版本控制。 Go 工具使其他开发人员更容易管理依赖项，包括获取模块的源代码、升级等。请参阅管理依赖项。 也可以看看： 如果您只是对使用其他人开发的软件包感兴趣，那么这不是您的主题。相反，请参阅管理依赖项。 有关包含一些模块开发基础知识的教程，请参阅教程：创建 Go 模块。 开发和发布模块的工作流程 当您想为其他人发布您的模块时，您可以采用一些约定来简化这些模块的使用。 模块发布和版本控制工作流程中更详细地描述了以下高级步骤。 设计和编码模块将包含的包。 使用约定将代码提交到您的存储库，以确保其他人可以通过 Go 工具使用它。 发布模块以使其可被开发人员发现。 随着时间的推移，使用使用版本编号约定的版本来修改模块，以表明每个版本的稳定性和向后兼容性。 设计和开发 如果模块中的功能和包形成一个连贯的整体，您的模块将更容易被开发人员找到和使用。当你设计一个模块的公共 API 时，尽量保持它的功能集中和离散。 此外，在设计和开发模块时考虑到向后兼容性可以帮助其用户升级，同时最大限度地减少他们自己的代码的流失。您可以在代码中使用某些技术来避免发布破坏向后兼容性的版本。有关这些技术的更多信息，请参阅Go博客上的保持模块兼容。 在发布模块之前，您可以使用replace指令在本地文件系统上引用它。这使得在模块仍在开发时编写调用模块中的函数的客户端代码变得更加容易。有关详细信息，请参阅模块发布和版本控制工作流程中的“针对未发布的模块进行编码” 。 去中心化出版 在Go中，您通过在存储库中标记其代码来发布您的模块，以使其可供其他开发人员使用。 您不需要将模块推送到集中式服务，因为Go工具可以直接从您的存储库（使用模块的路径定位，这是一个省略了该方案的URL）或从代理服务器下载您的模块。 在他们的代码中导入你的包后，开发人员使用Go工具（包括go get命令）下载你的模块代码以进行编译。为了支持此模型，您遵循约定和最佳实践，使Go工具（代表其他开发人员）可以从存储库中检索模块的源代码。 例如，Go工具使用你指定的模块的模块路径，以及你用来标记模块以发布的模块版本号，为它的用户定位和下载模块。 有关源和发布约定以及最佳实践的更多信息，请参阅管理模块源。 有关发布模块的分步说明，请参阅发布模块。 包发现 在您发布了您的模块并且有人使用Go工具获取了它之后，它将在Go包发现站点pkg.go.dev上可见。在那里，开发人员可以搜索该站点以找到它并阅读其文档。 要开始使用该模块，开发人员从该模块导入包，然后运行go get命令下载其源代码以进行编译。 有关开发人员如何查找和使用模块的更多信息，请参阅管理依赖项。 版本控制 当您随着时间的推移修改和改进您的模块时，您会分配版本号（基于语义版本控制模型），旨在表明每个版本的稳定性和向后兼容性。这有助于使用您的模块的开发人员确定模块何时稳定以及升级是否可能包括行为的重大变化。您可以通过在存储库中标记模块的源代码来指示模块的版本号。 有关开发主要版本更新的更多信息，请参阅开发主要版本更新。 有关如何为Go模块使用语义版本控制模型的更多信息，请参阅模块版本编号。 模块发布和版本控制工作流程 当您开发供其他开发人员使用的模块时，您可以遵循有助于确保使用该模块的开发人员获得可靠、一致的体验的工作流程。 本主题描述了该工作流中的高级步骤。 有关模块开发的概述，请参阅开发和发布模块。 也可以看看 如果您只想在代码中使用外部包，请务必查看管理依赖项。 对于每个新版本，您都用其版本号表示对模块的更改。有关更多信息，请参阅模块版本编号。 常见的工作流程步骤 以下序列说明了示例新模块的发布和版本控制工作流程步骤。有关每个步骤的更多信息，请参阅本主题中的部分。\n开始一个模块并组织它的源代码，使开发人员更容易使用和维护。如果您是开发模块的新手，请查看教程：创建Go模块。在 Go 的去中心化模块发布系统中，如何组织代码很重要。有关更多信息，请参阅管理模块源。 设置为编写调用未发布模块中的函数的本地客户端代码。在发布模块之前，对于使用诸如go get。 在此阶段测试模块代码的一个好方法是在它位于调用代码的本地目录中时尝试它。有关本地开发的更多信息，请参阅针对未发布的模块进行编码。 当模块的代码准备好供其他开发人员试用时，开始发布v0预发布版本，例如alpha和beta。有关更多信息，请参阅发布预发布版本。 发布一个不保证稳定**的v0，但用户可以尝试。**有关更多信息，请参阅发布第一个（不稳定）版本。 在您的 v0 版本发布后，您可以（并且应该！）继续 发布它的新版本。这些新版本可能包括错误修复（补丁版本）、对模块公共 API 的添加（次要版本），甚至是重大更改。由于v0版本不保证稳定性或向后兼容性，因此您可以对其版本进行重大更改。有关更多信息，请参阅发布错误修复和发布非破坏性API更改。 当您准备好发布的稳定版本时，您可以将预发布版本发布为alphas和betas。有关更多信息，请参阅发布预发布版本。 发布 v1 作为第一个稳定版本。这是对模块稳定性做出承诺的第一个版本。有关更多信息，请参阅发布第一个稳定版本。 在 v1 版本中，继续修复错误，并在必要时对模块的公共 API 进行添加。有关更多信息，请参阅发布错误修复和发布非破坏性 API 更改。 如果无法避免，请在新的主要版本中发布重大更改。主要版本更新——例如从 v1.xx 到 v2.xx——对于模块的用户来说可能是一个非常具有破坏性的升级。这应该是最后的手段。有关更多信息，请参阅发布重大 API 更改。 ",
   "wordCount" : "89",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2020-06-28T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2020-06-28T00:00:00Z",
   "dateModified": "2023-07-25T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/package/publish-mod/"
+    "@id": "https://helium.github.io/posts/golang/package/publish-mod/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/package/">第4章 包管理</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/package/">第4章 包管理</a></div>
     <h1 class="post-title entry-hint-parent">
       开发和发布模块
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/" target="_blank" rel="noopener">包管理</a>
+            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium.github.io/tags/%E5%8C%85%E7%AE%A1%E7%90%86/" target="_blank" rel="noopener">包管理</a>
         </ul>
       </span>
       
@@ -462,16 +462,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
-      <li><a href="https://heliu.site/tags/%E5%8C%85%E7%AE%A1%E7%90%86/">包管理</a></li>
+      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium.github.io/tags/%E5%8C%85%E7%AE%A1%E7%90%86/">包管理</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/package/use-mod/">
+  <a class="prev" href="https://helium.github.io/posts/golang/package/use-mod/">
     <span class="title">« 上一页</span>
     <br>
     <span>创建模块</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/array/use/">
+  <a class="next" href="https://helium.github.io/posts/golang/array/use/">
     <span class="title">下一页 »</span>
     <br>
     <span>数组使用</span>

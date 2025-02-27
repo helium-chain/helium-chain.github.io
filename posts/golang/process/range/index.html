@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, 流程控制">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/process/range/">
+<link rel="canonical" href="https://helium.github.io/posts/golang/process/range/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/process/range/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/process/range/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="流程控制(range迭代)" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/process/range/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/golang/process/range/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2019-10-05T00:00:00+00:00" />
 <meta property="article:modified_time" content="2020-07-20T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="流程控制(range迭代)"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://heliu.site/posts/golang/"
+      "item": "https://helium.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第3章 流程控制",
-      "item": "https://heliu.site/posts/golang/process/"
+      "item": "https://helium.github.io/posts/golang/process/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "流程控制(range迭代)",
-      "item": "https://heliu.site/posts/golang/process/range/"
+      "item": "https://helium.github.io/posts/golang/process/range/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": "迭代string range迭代string，key为int类型，value为rune类型。 1 2 3 4 5 str := \"hello world! Gopher\" for i, v := range str { // 【int, rune】 fmt.Println(i, v) // original body } 上面迭代字符串代码等效于下面代码。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 // 1) 获取字符串长度 // 字符串总长度，该长度是字节数量用于遍历字符串的总长度 lenTemp := len(str) // 下一次遍历的下标位置，这是由于utf8是不定长编码需要记录上一次处理后的位置 var nextIndexTemp int\t// 2) key/value // 注意：这里的key和value，定义在for外，也是\u0026i和\u0026v是固定的原因 var i int // 遍历用到的索引，也就是index var v rune // 遍历出来存储的值，也就是value // 遍历字符串 for indexTemp := 0; indexTemp \u003c lenTemp; indexTemp = nextIndexTemp { // 获取开头8bit的大小，因为该8bit能区分存储的是ASCII 1bit还是多个使用utf8编码的字节 valueTemp := rune(str[indexTemp])\t// utf8.RuneSelf = 0x80 = 128 单字符最大值 // ASCII码字符占1字节，该条件满足说明，存储的是ASCII码占用一个字节 if valueTemp \u003c utf8.RuneSelf {\tnextIndexTemp = indexTemp + 1 } else { // 该条件满足说明是使用utf8编码的多个字节占用， // 使用decoderune获取该Unicode值和在Utf8中编码占用的字节大小数目 // decoderune解码字符串str从indexTemp位置开始，具体方法在runtime/utf8.go文件中 // 该函数与utf8编码相关 // valueTemp解析的rune，nextIndexTemp当前的indexTemp+解析的rune的长度 valueTemp, nextIndexTemp = decoderune(str, indexTemp)\t} // 3) 拷贝赋值 // 注意：这里就是为什么for range中取\u0026i和\u0026v地址是固定的原因 i = indexTemp // 当前获取到的索引 v = valueTemp // 当前获取到的字符 fmt.Println(i, v) // original body } decoderune()。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 // runtime/utf8.go 文件中decoderune方法 // decoderune returns the non-ASCII rune at the start of // s[k:] and the index after the rune in s. // // decoderune assumes that caller has checked that // the to be decoded rune is a non-ASCII rune. // // If the string appears to be incomplete or decoding problems // are encountered (runeerror, k + 1) is returned to ensure // progress when decoderune is used to iterate over a string. func decoderune(s string, k int) (r rune, pos int) { pos = k // 解析开始位置 if k \u003e= len(s) { // 已经到字符串的最大长度了 return runeError, k + 1 } s = s[k:] // 从k位置分割字符串 switch { // [t2, t3) --\u003e [11000000, 11100000) case t2 \u003c= s[0] \u0026\u0026 s[0] \u003c t3: // 该字段2字节编码 // 0080-07FF two byte sequence // [locb, hicb] 是第二个字节的范围大小 [10000000, 10111111] if len(s) \u003e 1 \u0026\u0026 (locb \u003c= s[1] \u0026\u0026 s[1] \u003c= hicb) { // 从编码中取出编码的数据组成rune // mask2 = 00011111，maskx = 00111111 r = rune(s[0]\u0026mask2)\u003c\u003c6 | rune(s[1]\u0026maskx) pos += 2 if rune1Max \u003c r { return } } // [t3, t4) --\u003e [11100000, 11110000) case t3 \u003c= s[0] \u0026\u0026 s[0] \u003c t4: // 该字段3字节编码 // 0800-FFFF three byte sequence if len(s) \u003e 2 \u0026\u0026 (locb \u003c= s[1] \u0026\u0026 s[1] \u003c= hicb) \u0026\u0026 (locb \u003c= s[2] \u0026\u0026 s[2] \u003c= hicb) { r = rune(s[0]\u0026mask3)\u003c\u003c12 | rune(s[1]\u0026maskx)\u003c\u003c6 | rune(s[2]\u0026maskx) pos += 3 if rune2Max \u003c r \u0026\u0026 !(surrogateMin \u003c= r \u0026\u0026 r \u003c= surrogateMax) { return } } // [t4, t5) --\u003e [11110000, 11111000) case t4 \u003c= s[0] \u0026\u0026 s[0] \u003c t5: // 该字段4字节编码 // 10000-1FFFFF four byte sequence if len(s) \u003e 3 \u0026\u0026 (locb \u003c= s[1] \u0026\u0026 s[1] \u003c= hicb) \u0026\u0026 (locb \u003c= s[2] \u0026\u0026 s[2] \u003c= hicb) \u0026\u0026 (locb \u003c= s[3] \u0026\u0026 s[3] \u003c= hicb) { r = rune(s[0]\u0026mask4)\u003c\u003c18 | rune(s[1]\u0026maskx)\u003c\u003c12 | rune(s[2]\u0026maskx)\u003c\u003c6 | rune(s[3]\u0026maskx) pos += 4 if rune3Max \u003c r \u0026\u0026 r \u003c= maxRune { return } } } return runeError, k + 1 } for-range不能遍历*string类型。 for-range对于字符串并没有复制一份字符串进行编码，其实也不必要因为字符串的语义本来就是不可变数据。 迭代array range迭代array，key为int类型，value为数组的元素类型。 1 2 3 4 5 arr := [5]int{0,1,2,3,4} for i, v := range arr { // 【int, int】 fmt.Println(i, v) // original body } 上面迭代数组代码等效于下面代码。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 // 1) 获取数组长度 // 注意：这里支持指针数组，比如len(*[2]int) == 2 lenTemp := len(arr) // 2) 拷贝数组 // 注意：这里支持指针数组，比如arr是*[2]int // 这里也就是为什么使用数组指针和数组本身的性能差异， // 使用数组指针这里的赋值是指针赋值，而使用数组这里是值复制当数据量大时性能差别还是比较明显 rangeArr := arr // 复制一份需要遍历的数组，注意这里的副本是与原数组没有任何联系 // 3) key/value // 注意：这里的key和value，定义在for外，也是\u0026i和\u0026v是固定的原因 var i, v int // 定义遍历需要接收的key和value变量 // for range的编译等同代码 for indexTemp := 0; indexTemp \u003c lenTemp; indexTemp++ { // 注意：这里支持指针数组赋值 valueTemp := rangeArr[indexTemp] // 数组支持语法糖 // 4) 拷贝赋值 // 注意：这里就是为什么for range中取\u0026i和\u0026v地址是固定的原因 i = indexTemp // 拷贝赋值 v = valueTemp // 拷贝赋值 fmt.Println(i, v) // original body } 数组遍历和切片遍历最主要的区别就是遍历副本，数组的副本与原数组没有任何关联只是值全部相同而已，而切片则是副本和原切片数共用同一个底层数组。 range能遍历【数组指针】而【不能】遍历切片指针，这得益于数值指针在赋值和len()函数上Go支持的【语法糖】转换使得range对数组指针同样适用。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 // range遍历指针数组时，会解引用数组指针拷贝副本遍历 package main import \"fmt\" func main() { var aa *[2]string = new([2]string) // 1) 语法糖1：赋值 //(*aa)[0] = \"a\" aa[0] = \"a\" // 语法糖 //(*aa)[1] = \"bb\" aa[1] = \"bb\"// 语法糖 // 2) 语法糖2：取值 // c := (*aa)[1] c := aa[1] // 语法糖 // 3) 语法糖3：求长度 // l := len(aa) // len(*aa) // 在Go中支持数组的指针相关的语法糖，所以导致使用数组和数组指针好像并没有多大的区别 // 比如数组指针aa能使用aa[0] = \"a\"这种形式赋值，也能使用len(aa)这种形式求长度， // 其他类型的指针则不支持 // 这些语法糖也导致了能使用range遍历数组指针 // range 拷贝 *aa 副本遍历 for i, s := range aa { // 当数组很大时，遍历数组指针是一个不错的选择 if i == 0 { aa[1] = \"cc\" } fmt.Println(i, s) } fmt.Println(aa) // Output: // 0 a // 1 cc // \u0026[a cc] } 验证数组遍历是值拷贝。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 {\tslice1 := [4]int{0,1,2,3} // 这里拷贝的是数组的副本，因此if条件成立不会影响值 for i, v := range slice1 { // [4]int if i == 1 { slice1[3] += 10 } fmt.Println(i, v) } fmt.Println(slice1) // Output: // 0 0 // 1 1 // 2 2 // 3 3 // [0 1 2 13] } { slice1 := [4]int{0,1,2,3} // 这里拷贝的是数组的指针，因此if条件成立会影响值 for i, v := range \u0026slice1 { // *[4]int if i == 1 { slice1[3] += 10 } fmt.Println(i, v) } // Output: // 0 0 // 1 1 // 2 2 // 3 13 } 迭代slice 遍历slice前会先获取slice的长度lenTemp来作为循环次数，循环体中，每次循环会先获取元素值。 如果for-range中接收index和value的话，则会对index和value进行一次赋值。 数组与数组指针的遍历过程与slice基本一致，但是也有区别，区别在于副本复制的是与原数组是一个完全不相干的数组。 for-range迭代slice，key为int，value为存储的元素类型。 1 2 3 4 5 slice1 := []int{0,1,2,3} for i, v := range slice1 { // 【int, int】 fmt.Println(i, v) // original body } 上面迭代切片代码等效于下面代码。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 // 1) 拷贝切片 // 注意：拷贝的切片与原切片共用了同一个底层数组 // 也需要注意，len和cap也拷贝元切片的值，因此for range修改不起作用， rangeSlice := slice1 // 2) 获取切片长度，也是遍历的次数 // 遍历的此时切片长度是固定的 lenTemp := len(rangeSlice) // 拿到需要遍历的切片总长度 // 3) key/value // 注意：这里的key和value，定义在for外，也是\u0026i和\u0026v是固定的原因 var i, v int // 定义遍历需要的key和value变量 // for range的编译等同代码 for indexTemp := 0; indexTemp \u003c lenTemp; indexTemp++ { valueTemp := rangeSlice[indexTemp] // 4) 拷贝赋值 // 注意：这里就是为什么for range中取\u0026i和\u0026v地址是固定的原因 i = indexTemp v = valueTemp fmt.Println(i, v) // original body } 由于循环开始前循环次数就已经确定了，所以循环过程中新添加的元素是无法遍历到的。 但是循环过程中修改后面还未循环的值，则会影响，这是由于在range循环前赋值的副本与原切片共用了一个底层数组导致的，所以能相互影响。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 { slice1 := []int{0,1,2,3} for i, v := range slice1 { // 【int, int】 if i == 1 { slice1[3] += 10 } fmt.Println(i, v) } // Output: // 0 0 // 1 1 // 2 2 // 3 13 } 迭代channel channel遍历是依次从channel中读取数据，读取前是不知道里面有多少个元素的。 如果channel中没有元素，则会阻塞等待，如果channel已被关闭，则会解除阻塞并退出循环。 for-range迭代channel，只能获取一个值，key为channel存储的元素类型。 1 2 3 4 5 6 c := make(chan int) // range遍历chan for v := range c { // 【int】 fmt.Println(v) // original body } 上面迭代channel代码等效于下面代码。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 // 这里是\u0026v为什么都是同一个地址的原因 var v int // v其实就是固定的一个变量 for { // 注意如果不关闭channel这里会一直阻塞 // 我们知道 \u003c- 符号会调用相关的函数，如果chan关闭了会返回false退出循环 value_temp, ok := \u003c- c\t// 有数据则会直接返回数据，没有数据则会阻塞，通过chan的学习知道阻塞意味着 // 当前goroutine被调离调度循环等待数据到来被重新调起 // ok = false，通道已经关闭。 if !ok { break } // 2) 拷贝值 v = value_temp fmt.Println(v) // original body } 编译后的伪代码，与上面等价。关于chanrecv2()在channel中介绍。 1 2 3 4 5 6 7 8 9 10 11 12 13 var v int for { ok := chanrecv2(c, \u0026value_temp) if !ok { break } v = index_temp fmt.Println(v) // original body } 注意： 使用for-range遍历channel时只能获取一个返回值。 【for-range \u003c-ch】情况，该情况可以用在 【channel map、channel array|*array、channel slice、channel string】。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 func chanTs2() { ch := make(chan map[int]int) // 注意：这里是 \u003c-ch，前面的是 ch for k, v := range \u003c-ch { println(k, v) } // --------------------------- // as 等价于下面代码 // --------------------------- // 注意：这里只会执行一次 a := \u003c-ch for k, v := range a { println(k, v) } } 迭代map for-range迭代map，key为map的键，value为map的值。 1 2 3 4 5 map1 := map[string]string{\"one\":\"1\", \"tow\":\"2\"} for i, v := range map1 { // 【string, string】 fmt.Println(i, v) // original body } 上面迭代map代码等效于下面代码。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 // 1) key/value // 这里也是为什么\u0026i和\u0026v是一个固定的地址的原因 // 定义遍历所需要的key和value变量 var i, v string // 2) map_iteration_struct // map_iteration_struct是一个hiter结构体，存储着map的遍历相关信息 var hiter map_iteration_struct\t// mapiterinit 初始化map参看runtime/map.go文件 // hiter是一个哈希迭代结构，mapiternext迭代下一个哈希 for mapiterinit(type, range, \u0026hiter); hiter.key != nil; mapiternext(\u0026hiter) { index_temp := *hiter.key value_temp := *hiter.val // 3) 拷贝数据 i = index_temp v = value_temp fmt.Println(i, v) // original body } 遍历map时没有指定循环次数，循环体与遍历slice类似。由于map底层实现与slice不同，map底层使用 hash表实现的。 插入数据位置是随机的，所以遍历过程中新插入的数据不能保证遍历到。 以下相关的函数在map篇中还会详细的讨论。 type hiter struct。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 // A hash iteration structure. // If you modify hiter, also change cmd/compile/internal/reflectdata/reflect.go // and reflect/value.go to match the layout of this structure. type hiter struct { // 当前遍历的key地址 key unsafe.Pointer // Must be in first position. Write nil to indicate iteration end (see cmd/compile/internal/walk/range.go). // 当前遍历的elem地址 elem unsafe.Pointer // Must be in second position (see cmd/compile/internal/walk/range.go). // 当前map的类型结构 t *maptype // 当前map的内存结构 h *hmap\t// 当前map的常规桶地址 buckets unsafe.Pointer // bucket ptr at hash_iter initialization time // 当前正在遍历的桶 bptr *bmap // current bucket 当前存储桶 // h.extra.overflow overflow *[]*bmap // keeps overflow buckets of hmap.buckets alive\t// h.extra.oldoverflow oldoverflow *[]*bmap // keeps overflow buckets of hmap.oldbuckets alive // 开始遍历的桶号，随机的，用于开始遍历的起点以及结束遍历的终点 startBucket uintptr // bucket iteration started at // tophash偏移值，在[0,7]中随机生成的值，用于后续 i + offset \u0026 7 用作偏移量 offset uint8 // intra-bucket offset to start from during iteration (should be big enough to hold bucketCnt-1) // 当前遍历已过最大桶(1 \u003c\u003c B)时被设置为true wrapped bool // already wrapped around from end of bucket array to beginning // 初始化时桶的数量 1 \u003c\u003c B B uint8 // 当前桶遍历的索引，默认值从0开始，该值配合offset遍历tophash，i + offset \u0026 7 i uint8 // 初始化时是startBucket的值 // 1. bptr == nil时bucket存储需要遍历的桶号 // 2. bptr != nil时bucket下个桶的桶号 bucket uintptr // 存储的是当前迭代器的桶号 // noCheck.不需要检查，数据在bptr桶里面 // 其他需要检查 checkBucket uintptr // 需要检查的桶号 } mapiterinit()。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 // mapiterinit initializes the hiter struct used for ranging over maps. // The hiter struct pointed to by 'it' is allocated on the stack // by the compilers order pass or on the heap by reflect_mapiterinit. // Both need to have zeroed hiter since the struct contains pointers. // mapiterinit 初始化用于在map上的 hiter 结构 // 'it' 指向的 hiter 结构由编译器顺序传递在堆栈上分配，或者由 reflect_mapiterinit 在堆上分配。 // 由于结构包含指针，因此两者都需要将 hiter 归零。 // // 迭代初始化 // t *maptype：当前map的元素类型 // h *hmap：当前map的内存结构 // it *hiter：迭代器结构 func mapiterinit(t *maptype, h *hmap, it *hiter) { if raceenabled \u0026\u0026 h != nil { callerpc := getcallerpc() racereadpc(unsafe.Pointer(h), callerpc, abi.FuncPCABIInternal(mapiterinit)) } it.t = t // 存储当前map的类型结构地址 if h == nil || h.count == 0 { // 如果当前map为空直接返回 return } if unsafe.Sizeof(hiter{})/goarch.PtrSize != 12 { // 判断hiter结构是否正确 throw(\"hash_iter size incorrect\") // see cmd/compile/internal/reflectdata/reflect.go } it.h = h // 存储当前map的内存结构地址 // grab snapshot of bucket state it.B = h.B // 记录当前map的桶数量 it.buckets = h.buckets // 记录当前map的常规桶地址 if t.bucket.ptrdata == 0 { // 判断当前桶类型的ptrdata字段，该字段为0说明存储的都是标量数据 // 分配当前切片并记住指向当前切片和旧切片的指针。 // 即使表增长 and/or 在我们迭代时将溢出桶添加到表中，这也会保留所有相关的溢出桶。 h.createOverflow() // 创建溢出桶 it.overflow = h.extra.overflow it.oldoverflow = h.extra.oldoverflow } // decide where to start // 决定从哪里开始 r := uintptr(fastrand()) // 生成随机数决定从哪里开始 // bucketCntBits = 3 if h.B \u003e 31-bucketCntBits { // 如果当前的桶数 \u003e 31 - 3 r += uintptr(fastrand()) \u003c\u003c 31 } it.startBucket = r \u0026 bucketMask(h.B) // 确定开始的桶号，这里也是for range随机的原因 it.offset = uint8(r \u003e\u003e h.B \u0026 (bucketCnt - 1)) // 开始的tophash位置处 // iterator state it.bucket = it.startBucket // 记住我们有一个迭代器。 // 可以与另一个 mapiterinit() 并发运行。\t// iterator = 1 存在桶正在在使用迭代器标志 // oldIterator = 2 存在旧桶正在使用迭代器标志 // 设置正在迭代的标志位 if old := h.flags; old\u0026(iterator|oldIterator) != iterator|oldIterator { atomic.Or8(\u0026h.flags, iterator|oldIterator) // 原子锁设置hmap的flags参数标志正在使用迭代器 } mapiternext(it) } mapiternext()。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 // 向下寻找下一个key func mapiternext(it *hiter) { h := it.h // 获取当前hmap内存结构 if raceenabled { callerpc := getcallerpc() racereadpc(unsafe.Pointer(h), callerpc, abi.FuncPCABIInternal(mapiternext)) } // 当前有hashWriting操作时，比如m[k]=v或delete函数时都会报错 if h.flags\u0026hashWriting != 0 { throw(\"concurrent map iteration and map write\") } t := it.t // 获取map的结构 // 本次需要遍历的桶号 bucket := it.bucket // 当前的桶号 // 本次需要遍历的桶，如果为nil说明需要去bucket寻找 b := it.bptr // 当前存储桶 // 本次应该遍历的索引 i := it.i // 遍历索引默认0 checkBucket := it.checkBucket // 遍历一遍当前桶及其溢出桶直到b=nil next: // 当前桶遍历完时，切换到下一个桶去遍历 if b == nil { // 当前遍历的桶和开始的桶相等 并且 已经遍历过了最大桶数，说明遍历了一圈了 if bucket == it.startBucket \u0026\u0026 it.wrapped { // 结束遍历的条件 // end of iteration it.key = nil it.elem = nil return } // h.growing() 当前正在扩容中 if h.growing() \u0026\u0026 it.B == h.B { // h.growing()当前map正处于扩容状态 // 迭代器是在增长过程中启动的，但增长尚未完成。 // 如果我们查看的bucket尚未填充（即，旧bucket未被清空），那么我们需要遍历旧buckets，只返回将迁移到此bucket的buckets。 oldbucket := bucket \u0026 it.h.oldbucketmask() // 旧桶的桶号 b = (*bmap)(add(h.oldbuckets, oldbucket*uintptr(t.bucketsize)))\t// 获取桶位置 // 当前桶的tophash[0]不是2|3|4时，说明数据没有被迁移 if !evacuated(b) {\tcheckBucket = bucket // 需要检查的桶号 } else { // 说明数据在新桶里面，数据已被迁移 b = (*bmap)(add(it.buckets, bucket*uintptr(t.bucketsize)))\tcheckBucket = noCheck } } else { // 1.没有扩容 2.扩容了但是it.B != h.B b = (*bmap)(add(it.buckets, bucket*uintptr(t.bucketsize))) // 新桶 checkBucket = noCheck } bucket++ // 桶号加一 // 当前桶号等于最大桶号 if bucket == bucketShift(it.B) { // bucketShift(it.B) 等于 1 \u003e\u003e B bucket = 0 // 标记从0号桶开始 it.wrapped = true // 标记已经过了最大桶了 } i = 0 // 新桶重置索引为0 } // 遍历当前桶的所有元素\tbucketCnt = 8 // 从当前桶遍历数据 for ; i \u003c bucketCnt; i++ { offi := (i + it.offset) \u0026 (bucketCnt - 1) // 根据it.offset偏移量开始随机遍历元素[0,7] // b.tophash[offi] \u003c= 1 或 evacuatedEmpty = 4 表示桶数据为空 if isEmpty(b.tophash[offi]) || b.tophash[offi] == evacuatedEmpty { // 如果当前位置为0或1或4表示桶为空 continue } k := add(unsafe.Pointer(b), dataOffset+uintptr(offi)*uintptr(t.keysize)) // 偏移到当前key位置 if t.indirectkey() { // 判断当前key存储是否是已指针存储而不是存储的key本身 k = *((*unsafe.Pointer)(k)) } // 偏移到当前elem位置 e := add(unsafe.Pointer(b), dataOffset+bucketCnt*uintptr(t.keysize)+uintptr(offi)*uintptr(t.elemsize)) // checkBucket != noCheck 数据在旧桶 并且 !h.sameSizeGrow() 翻倍扩容 // 需要验证桶时，旧桶存在数据 if checkBucket != noCheck \u0026\u0026 !h.sameSizeGrow() { // 存在没有迁移完的旧桶时，去检查旧桶 // t.reflexivekey() 为true表示 k == k 始终成立 // t.reflexivekey() || t.key.equal(k, k) -\u003e k == k 始终成立情况 if t.reflexivekey() || t.key.equal(k, k) { // 如果oldbucket中的项不是针对迭代中的当前新bucket，请跳过它 hash := t.hasher(k, uintptr(h.hash0)) if hash\u0026bucketMask(it.B) != checkBucket { // 需要跳过的情况 continue } } else { // k == k 不是始终成立 // b.tophash[offi]\u00261 的最低位 参看数据迁移部分的去向 if checkBucket\u003e\u003e(it.B-1) != uintptr(b.tophash[offi]\u00261) { continue } } } // 将找到的k和e保存到hiter中 // evacuatedX = 2、evacuatedY = 3 // b.tophash[offi] != evacuatedX \u0026\u0026 b.tophash[offi] != evacuatedY 存在有效数据 // !(t.reflexivekey() || t.key.equal(k, k))\t-\u003e x == x 不是始终成立 if (b.tophash[offi] != evacuatedX \u0026\u0026 b.tophash[offi] != evacuatedY) || !(t.reflexivekey() || t.key.equal(k, k)) { // 这是需要的数据，我们可以返回它 // 或 // key!=key，因此无法删除或更新条目，因此我们可以只返回它 // 这对我们来说很幸运，因为当key!=key关键是我们找不到它 it.key = k if t.indirectelem() { e = *((*unsafe.Pointer)(e)) } it.elem = e } else { // 数据被迁移到其他地方了 // 自从迭代器启动以来，哈希表一直在增长 // 这个key的数据现在在其他地方 // 检查数据的当前哈希表 // 此代码处理以下情况： //\t已被删除、更新或删除并重新插入 //\t注意：我们需要重新标记密钥，因为它可能已更新为equal()，但不是相同的key（例如+0.0 vs-0.0） rk, re := mapaccessK(t, h, k) // 根据key去寻找相应的数据，可能是新桶也可能是旧桶 // 每寻找到，可能key已被删除 if rk == nil { continue // key has been deleted } it.key = rk it.elem = re } it.bucket = bucket // 回写桶号 // 记录当前正在遍历的桶 if it.bptr != b { // avoid unnecessary write barrier; see issue 14921 it.bptr = b\t// 避免不必要的写入障碍 } it.i = i + 1 // i加一 it.checkBucket = checkBucket return } b = b.overflow(t) // 如果上面桶遍历完接到去后面桶找 i = 0 goto next } mapaccessK()。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 // returns both key and elem. Used by map iterator // 根据key找到相应的值 func mapaccessK(t *maptype, h *hmap, key unsafe.Pointer) (unsafe.Pointer, unsafe.Pointer) { if h == nil || h.count == 0 { return nil, nil } hash := t.hasher(key, uintptr(h.hash0)) // 当前key生成的hash值 m := bucketMask(h.B) // (1 \u003c\u003c B) - 1 b := (*bmap)(add(h.buckets, (hash\u0026m)*uintptr(t.bucketsize))) // key存储的当前桶 // 是否在扩容中 if c := h.oldbuckets; c != nil { if !h.sameSizeGrow() {\t// 翻倍扩容 // There used to be half as many buckets; mask down one more power of two. m \u003e\u003e= 1 } // 去旧桶里面查看数据是否被迁移了 oldb := (*bmap)(add(c, (hash\u0026m)*uintptr(t.bucketsize)))\t// 数据没有被迁移 tophash[0] != [2,3,4] if !evacuated(oldb) { b = oldb } } top := tophash(hash) // tophash bucketloop: // 遍历当前桶及溢出桶寻找 key for ; b != nil; b = b.overflow(t) { for i := uintptr(0); i \u003c bucketCnt; i++ { if b.tophash[i] != top { if b.tophash[i] == emptyRest { // emptyRest = 0 break bucketloop } continue } // 找到了key // 1. 可能是hash冲突则还需要向后去查找 // 2. 确实找到了key直接返回即可 k := add(unsafe.Pointer(b), dataOffset+i*uintptr(t.keysize)) if t.indirectkey() { k = *((*unsafe.Pointer)(k)) } // key匹配成功 if t.key.equal(key, k) { e := add(unsafe.Pointer(b), dataOffset+bucketCnt*uintptr(t.keysize)+i*uintptr(t.elemsize)) if t.indirectelem() { e = *((*unsafe.Pointer)(e)) } return k, e } } } return nil, nil } 总结 for-range不支持【字符串指针】、【切片指针】、【map指针】、【channel指针】，但支持【数组指针】遍历。 ",
   "wordCount" : "2902",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2019-10-05T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2019-10-05T00:00:00Z",
   "dateModified": "2020-07-20T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/process/range/"
+    "@id": "https://helium.github.io/posts/golang/process/range/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/process/">第3章 流程控制</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/process/">第3章 流程控制</a></div>
     <h1 class="post-title entry-hint-parent">
       流程控制(range迭代)
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://heliu.site/tags/%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6/" target="_blank" rel="noopener">流程控制</a>
+            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium.github.io/tags/%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6/" target="_blank" rel="noopener">流程控制</a>
         </ul>
       </span>
       
@@ -1819,16 +1819,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
-      <li><a href="https://heliu.site/tags/%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6/">流程控制</a></li>
+      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium.github.io/tags/%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6/">流程控制</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/process/for/">
+  <a class="prev" href="https://helium.github.io/posts/golang/process/for/">
     <span class="title">« 上一页</span>
     <br>
     <span>流程控制(循环语句)</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/process/switch/">
+  <a class="next" href="https://helium.github.io/posts/golang/process/switch/">
     <span class="title">下一页 »</span>
     <br>
     <span>流程控制(switch)</span>

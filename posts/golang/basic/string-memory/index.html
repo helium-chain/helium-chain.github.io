@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, 基础类型">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/basic/string-memory/">
+<link rel="canonical" href="https://helium.github.io/posts/golang/basic/string-memory/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/basic/string-memory/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/basic/string-memory/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="字符串(内存布局)" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/basic/string-memory/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/golang/basic/string-memory/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2019-05-21T00:00:00+00:00" />
 <meta property="article:modified_time" content="2022-09-24T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="字符串(内存布局)"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://heliu.site/posts/golang/"
+      "item": "https://helium.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第2章 基础类型",
-      "item": "https://heliu.site/posts/golang/basic/"
+      "item": "https://helium.github.io/posts/golang/basic/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "字符串(内存布局)",
-      "item": "https://heliu.site/posts/golang/basic/string-memory/"
+      "item": "https://helium.github.io/posts/golang/basic/string-memory/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": "内存结构 字符串结构 1 2 3 4 5 6 type stringStruct struct { // 指向底层数组，连续分配的字节 Data unsafe.Pointer // 记录着字符串的字节长度 Len int } 字符串内存分布 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 package main import ( \"fmt\" \"unsafe\" ) func main() { // 如上：str的地址为0x01f050存储的值是0x4a1160，0x4a1160则是字符h的首地址存储的值是0x68(字符h) var str string = \"hello world!\" // 把变量str当成StringStruct结构看待 // 字符串的内存大小存在_type.size中，更多参考runtime/type.go文件 sizeOf := unsafe.Sizeof(str) // 字符串占用内存大小(B):16 fmt.Printf(\"字符串占用内存大小(B):%d\\n\", sizeOf) // \u0026str:0x01f050 // 这里需要明白的是结构体存储的是第一个字段的地址 fmt.Printf(\"\u0026str:%#x\\n\", \u0026str) // \u0026StringStruct.data // \u0026StringStruct.Len l := (*int)(unsafe.Pointer(uintptr(unsafe.Pointer(\u0026str)) + unsafe.Sizeof(int(0)))) // 字符串长度:12 (0x0c) fmt.Printf(\"字符串长度:%d\\n\", *l) data := *(*int)(unsafe.Pointer(\u0026str)) // 数据存储地址：0x4a1160 fmt.Printf(\"数据存储地址：%#x\\n\", data) // 获取指定数据，不推荐分开操作指针比如这里的data写成两个表达式 // uintptr(unsafe.Pointer(nil)) =\u003e 0 //b0 := *(*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(nil)) // + uintptr(data))) b0 := **(**byte)(unsafe.Pointer(\u0026s1))\t// h // str[0]:h fmt.Printf(\"str[0]:%c\\n\", b0) // 不建议这样分开写成两段，取str[8]的值 //b8 := *(*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(nil)) + // uintptr(data) + 8*unsafe.Sizeof(byte('0')))) b8 := (**(**[9]byte)(unsafe.Pointer(\u0026str)))[8] // str[8]:r fmt.Printf(\"str[8]:%c\\n\", b8) // Output: // 字符串占用内存大小(B):16 // \u0026str:0xc000088230 // 字符串长度:12 // 数据存储地址：0x103fb6b // str[0]:h // str[8]:r } 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 package main import ( \"fmt\" \"unsafe\" ) // stringHeader 字符串结构 type stringHeader struct { Data uintptr Len uintptr } func main() { var s0 string = \"hello\" // 获取字符串长度 l := (*stringHeader)(unsafe.Pointer(\u0026s0)).Len fmt.Printf(\"字符串长度：%d\\n\", l) // s0[0] s00 := **(**byte)(unsafe.Pointer(\u0026s0)) fmt.Printf(\"s[0]：%c\\n\", s00) // s0[4] // *(*uintptr)(unsafe.Pointer(\u0026s0)) s04 := *(*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(nil)) + *(*uintptr)(unsafe.Pointer(\u0026s0)) + 4*unsafe.Sizeof(byte('0')))) fmt.Printf(\"s[4]：%c\\n\", s04) // ------------------------------------------------------------------------------------------------------- // 获取字符每个字符 s1 := \"helxo\" fmt.Printf(\"%c\\n\", **(**byte)(unsafe.Pointer(\u0026s1))) // h fmt.Printf(\"%c\\n\", **(**uint16)(unsafe.Pointer(\u0026s1)) \u003e\u003e 8) // e fmt.Printf(\"%c\\n\", **(**uint32)(unsafe.Pointer(\u0026s1)) \u003e\u003e 16 \u0026 0b00000000_11111111) // l fmt.Printf(\"%c\\n\", **(**uint32)(unsafe.Pointer(\u0026s1)) \u003e\u003e 24) // x fmt.Printf(\"%c\\n\", **(**uint64)(unsafe.Pointer(\u0026s1)) \u003e\u003e 32 \u0026 0b00000000_00000000_00000000_11111111)\t// o a := **(**[5]byte)(unsafe.Pointer(\u0026s1)) fmt.Println(a) // 字符不允许被修改，所以这里需要处理一下 str1 := \"hello world!\" // 编译时会被分配到只读代码段 str1 = str1 + \" ds\" // 运行时会分配到内存中，语言层面上限制了只读 // ab1 是 [12]byte 类型 ab1 := **(**[12]byte)(unsafe.Pointer(\u0026str1))\t// 对比下面的区别 ab1[0] = 101 fmt.Println(ab1, str1) // [101 101 108 108 111 32 119 111 114 108 100 33] hello world! ds // ab 是 *[12]byte 类型 ab := *(**[12]byte)(unsafe.Pointer(\u0026str1)) (*ab)[0] = 101 fmt.Println(*ab, str1) // [101 101 108 108 111 32 119 111 114 108 100 33] eello world! ds // 指针数组对比上面 ac := new([12]byte) // *[12]byte (*ac)[0] = 96 fmt.Println(*ac) // [96 0 0 0 0 0 0 0 0 0 0 0] } 字符串按值传参 以下我们可以看出，字符串在函数间传递传递的是stringStruct结构体。 按值传参也是直接新创建个变量地址保存stringStruct结构体，其字符串指向的底层数组是没有发生变化的。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 package main import ( \"fmt\" \"unsafe\" ) func main() { var str string = \"hello world!\" fmt.Printf(\"\u0026str:%#x\\n\", \u0026str) // 以下区别： // uintptr(unsafe.Pointer(\u0026str)) 得到uintptr类型就是\u0026str地址，这是一个特例其他类型不允许这样转换 // (*uintptr)(unsafe.Pointer(\u0026str)) 得到*uintptr类型也是\u0026str地址，不建议使用 // *(*uintptr)(unsafe.Pointer(\u0026str)) 得到uintptr类型是str存储首uintptr长度字节的值 l := (*int)(unsafe.Pointer(uintptr(unsafe.Pointer(\u0026str)) + unsafe.Sizeof(int(0)))) // 字符串长度:12 fmt.Printf(\"字符串长度:%d\\n\", *l) data := *(*int)(unsafe.Pointer(\u0026str)) // 数据存储地址：0x103fb6b fmt.Printf(\"数据存储地址：%#x\\n\", data) ts(str) // Output: // \u0026str:0xc000036240 // 字符串长度:12 // 数据存储地址：0x9dfb6b // \u0026s:0xc000036250 // 字符串长度:12 // 数据存储地址：0x9dfb6b } func ts(s string) { fmt.Printf(\"\u0026s:%#x\\n\", \u0026s) l := (*int)(unsafe.Pointer(uintptr(unsafe.Pointer(\u0026s)) + unsafe.Sizeof(int(0)))) // 字符串长度:12 fmt.Printf(\"字符串长度:%d\\n\", *l) data := *(*int)(unsafe.Pointer(\u0026s)) // 数据存储地址：0x103fb6b fmt.Printf(\"数据存储地址：%#x\\n\", data) } 1 2 3 4 5 6 7 8 9 10 11 func ts() { // 0xc00000a028 -\u003e 0xc00001c0a8 -\u003e 1 str1 := 1 // int str := \u0026str1 // *int fmt.Printf(\"%p\\n\", \u0026str) // 0xc00000a028 fmt.Printf(\"%p\\n\", str) // 0xc00001c0a8 fmt.Printf(\"%#v\\n\", uintptr(unsafe.Pointer(\u0026str))) // 0xc00000a028 fmt.Printf(\"%#v\\n\", (*uintptr)(unsafe.Pointer(\u0026str))) // (*uintptr)(0xc00000a028) fmt.Printf(\"%#v\\n\", *(*uintptr)(unsafe.Pointer(\u0026str))) // 0xc00001c0a8 } []byte与string []byte和string都可以表示字符串，它们数据结构不同，其衍生出来的方法也不同。 string擅长的场景： 需要字符串比较、不需要nil字符串。 []byte擅长的场景： 修改字符串的时候、函数返回值，需要使用nil来表示含义、需要切片操作。 str2 := str1 字符串间赋值会共用同一个底层数组？ 字符串间赋值，【会】共用同一个底层数组。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 { var str1 = \"hello\" str2 := str1 // 同用了一个底层数组 // 因为字符串时只读类型，因此赋值共用同一个底层也没有问题。 fmt.Println(*(*stringStruct)(unsafe.Pointer(\u0026str1))) // {15567553 5} fmt.Println(*(*stringStruct)(unsafe.Pointer(\u0026str2))) // {15567553 5} }\ttype stringStruct struct { str uintptr len uintptr } s := []byte(str) 字符串强制转成[]byte是否共用同一个底层数组？ 【不会】同用一个底层数组。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 package main import ( \"fmt\" \"unsafe\" ) func main() { str := \"hello\" s := []byte(str) s[0] = 'e' fmt.Println(str, s) // 探究字符串强制转换成切片底层数组是否发生变化 fmt.Printf(\"字符串指向底层数组：%x\\n\", *(*uintptr)(unsafe.Pointer(\u0026str))) fmt.Printf(\"str[0]:%c\\n\", *(*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(nil)) + *(*uintptr)(unsafe.Pointer(\u0026str))))) fmt.Printf(\"切片指向的底层数组：%x\\n\", *(*uintptr)(unsafe.Pointer(\u0026s))) fmt.Printf(\"切片s[0]地址：%p\\n\", \u0026s[0]) // Output: // hello [101 101 108 108 111] // 字符串指向底层数组：12e9c2 // str[0]:h // 切片指向的底层数组：c00000e0b0 // 切片s[0]地址：0xc00000e0b0 } string 转 []byte 1 2 3 4 5 6 7 8 9 10 11 12 package main import \"fmt\" func main() { s := \"hello Go语言\" // 下面代码可以看出，s和b并【没有】共用同一个底层数组 b := []byte(s) // 这里会调用 runtime.stringtoslicebyte 函数 fmt.Println(b) } stringtoslicebyte() string转slice byte，string -\u003e []byte。 参数： buf *tmpBuf：type tmpBuf [32]byte，[32]byte数组用于转换大小在32字节的临时存储转换容器。上一章的\"修改字符串\"节string转[]byte后cap值为32就是这个参数的原因。 s string：转换字符串。 返回值： []byte：转换后的slice byte。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 func stringtoslicebyte(buf *tmpBuf, s string) []byte { var b []byte // nil // tmpBuf 容量够 s 的本次转换 if buf != nil \u0026\u0026 len(s) \u003c= len(buf) { // 这里也就是 []byte(string) 没用共用一个底层数组的原因所在 *buf = tmpBuf{} // 清空 并 初始化新的容量 {0xxxx, 0, 32} b = buf[:len(s)]\t} else { // 容器大小不够，需要重新申请大小 b = rawbyteslice(len(s)) } // copy([]byte, string) int copy(b, s) // 拷贝字符串中的数据 return b } rawbyteslice() rawbyteslice分配一个新的byte slice。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 // rawbyteslice allocates a new byte slice. The byte slice is not zeroed. func rawbyteslice(size int) (b []byte) { // 因为是 byte 所以直接传 size 大小即可，匹配最近接的内存块规格大小 cap := roundupsize(uintptr(size)) // 调整size大小 // 这里是 []byte(string) 没用共用一个底层数组的原因所在 p := mallocgc(cap, nil, false) // 申请cap大小内存，p是申请后的内存地址 if cap != uintptr(size) { // 清零多余的这部分内存块 memclrNoHeapPointers(add(p, uintptr(size)), cap-uintptr(size)) } // 将申请的大小赋值个返回值b *(*slice)(unsafe.Pointer(\u0026b)) = slice{p, size, int(cap)} return } []byte 转 string 1 2 3 4 5 6 7 8 9 10 11 12 package main import \"fmt\" func main() { b := []byte{'h', 'e', 'l', 'l', 'o'} // 下面源码可以看出，b和s并【没有】共用同一个底层数组 s := string(b) // 这里会调用 runtime.slicebytetostring 函数 fmt.Println(s) } slicebytetostring() slicebytetostring将字节切片转换为字符串，string([]byte)。 它由编译器插入到生成的代码中。 ptr是一个指针，指向切片的第一个元素; n是切片的长度。 buf是一个固定大小的缓冲区，如果结果没有escape转义字符，它就不是nil。 参数： buf *tmpBuf：type tmpBuf [32]byte，[32]byte数组 用于转换大小在32字节的临时存储转换容器。 ptr *byte：[]byte切片的底层数组地址，也就是slice.data的值。 n int：切片的长度，也就是slice.len的值。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 // slicebytetostring converts a byte slice to a string. // It is inserted by the compiler into generated code. // ptr is a pointer to the first element of the slice; // n is the length of the slice. // Buf is a fixed-size buffer for the result, // it is not nil if the result does not escape. func slicebytetostring(buf *tmpBuf, ptr *byte, n int) (str string) { // 没有需要转换的 if n == 0 { // Turns out to be a relatively common case. // Consider that you want to parse out data between parens in \"foo()bar\", // you find the indices and convert the subslice to string. return \"\" } if raceenabled { racereadrangepc(unsafe.Pointer(ptr), uintptr(n), getcallerpc(), abi.FuncPCABIInternal(slicebytetostring)) } if msanenabled { msanread(unsafe.Pointer(ptr), uintptr(n)) } if asanenabled { asanread(unsafe.Pointer(ptr), uintptr(n)) } // 当[]byte 只有一个字符时 if n == 1 {\t// staticuint64s是一个[256]uint64的数组，也就是ASCII的数组数组 // 这里可以看出并不是用的同一个底层数组。 p := unsafe.Pointer(\u0026staticuint64s[*ptr])\tif goarch.BigEndian {\t// 某些平台需要字节对齐 p = add(p, 7) } stringStructOf(\u0026str).str = p // 赋值给字符串的str stringStructOf(\u0026str).len = 1 // 赋值给字符串的len return } var p unsafe.Pointer if buf != nil \u0026\u0026 n \u003c= len(buf) { // 当长度在32范围内时 p = unsafe.Pointer(buf)\t// 直接使用buf的容量当做地址 } else { p = mallocgc(uintptr(n), nil, false) // 申请n大小的内存地址备用 } stringStructOf(\u0026str).str = p stringStructOf(\u0026str).len = n memmove(p, unsafe.Pointer(ptr), uintptr(n)) // 将ptr地址长度为n字节的内容移动到p中 return } 1 2 3 4 5 6 7 8 type stringStruct struct { str unsafe.Pointer len int } func stringStructOf(sp *string) *stringStruct { return (*stringStruct)(unsafe.Pointer(sp)) } string 转 []rune 1 2 3 4 5 6 7 8 9 10 11 12 package main import \"fmt\" func main() { s := \"hello Go语言\" // 下面代码可以看出，s和b并【没有】共用同一个底层数组 b := []rune(s) // 这里会调用 runtime.stringtoslicerune 函数 fmt.Println(b) } stringtoslicerune() string转slice rune，[]rune(string)。 参数： buf *[tmpStringBufSize]rune：*[32]rune 32位缓存rune。 s string：目标字符串。 返回值： []rune：转换后的切片。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 // string to slice rune func stringtoslicerune(buf *[tmpStringBufSize]rune, s string) []rune { // two passes. // unlike slicerunetostring, no race because strings are immutable. n := 0 for range s { // 遍历s统计rune的总量 n++ } var a []rune if buf != nil \u0026\u0026 n \u003c= len(buf) { // 满足32字节 *buf = [tmpStringBufSize]rune{} a = buf[:n] } else { a = rawruneslice(n) // 向系统申请n大小的内存 } n = 0 for _, r := range s { // 通过遍历将s存储到a中 a[n] = r n++ } return a } rawruneslice() 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 // rawruneslice allocates a new rune slice. The rune slice is not zeroed. func rawruneslice(size int) (b []rune) { if uintptr(size) \u003e maxAlloc/4 { // 内存溢出情景 throw(\"out of memory\") } // rune = int32 占4字节，匹配最接近的内存块 mem := roundupsize(uintptr(size) * 4) // 这里是没有使用同一个地址的原因 // 向系统申请内存的大小是直接，而size表示的字符的个数，所以这里是需要乘以4的 p := mallocgc(mem, nil, false)\tif mem != uintptr(size)*4 { memclrNoHeapPointers(add(p, uintptr(size)*4), mem-uintptr(size)*4) // 清零未使用的那部分内存块 } *(*slice)(unsafe.Pointer(\u0026b)) = slice{p, size, int(mem / 4)} // 申请后的赋值返回 return } []rune 转 string 1 2 3 4 5 6 7 8 9 10 11 12 package main import \"fmt\" func main() { b := []rune{104, 101, 108, 108, 111, 32, 71, 111, 35821, 35328} // 下面源码可以看出，b和s并【没有】共用同一个底层数组 s := string(b) // 这里会调用 runtime.slicerunetostring 函数 fmt.Println(s) } slicerunetostring() slice rune 转 string，string([]rune)。 参数： buf *tmpBuf：type tmpBuf [32]byte，[32]byte数组用于转换大小在32字节的临时存储转换容器。 a []rune：转换的切片。 返回值： string：转换后的字符串。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 // slice rune to string func slicerunetostring(buf *tmpBuf, a []rune) string { if raceenabled \u0026\u0026 len(a) \u003e 0 { racereadrangepc(unsafe.Pointer(\u0026a[0]), uintptr(len(a))*unsafe.Sizeof(a[0]), getcallerpc(), abi.FuncPCABIInternal(slicerunetostring)) } if msanenabled \u0026\u0026 len(a) \u003e 0 { msanread(unsafe.Pointer(\u0026a[0]), uintptr(len(a))*unsafe.Sizeof(a[0])) } if asanenabled \u0026\u0026 len(a) \u003e 0 { asanread(unsafe.Pointer(\u0026a[0]), uintptr(len(a))*unsafe.Sizeof(a[0])) } var dum [4]byte // 临时容器 // 记录[]rune切片转string需要的总字节数量 byte size1 := 0\tfor _, r := range a { // 【int rune】 // encoderune 函数解码r并把值存入第一个参数中，返回解码的字节数量 size1 += encoderune(dum[:], r)\t} // 返回一个s和b底层数组相关联的，这里size1+3是为了兼容最后一个是ASCII情况 s, b := rawstringtmp(buf, size1+3)\tsize2 := 0\t// 统计数量 for _, r := range a { // check for race // 可能存在 []rune 中 '' 这种数据 if size2 \u003e= size1 { break } // 也就是这里实现了将数据写入字符串地址中，因为切片和字符串共用同一个底层数组 // encoderune该函数的作用是将r解码并存入第一个参数位置，并返回r的编码字节长度 size2 += encoderune(b[size2:], r)\t} return s[:size2] // 切割字符串s得到的依然是字符串类型 } rawstringtmp() 1 2 3 4 5 6 7 8 9 10 // 返回一个s和b共用同一个底层数组 func rawstringtmp(buf *tmpBuf, l int) (s string, b []byte) { if buf != nil \u0026\u0026 l \u003c= len(buf) { // 如果满足32字节内 b = buf[:l] s = slicebytetostringtmp(\u0026b[0], len(b)) // 处理s和b的关联关系 } else { s, b = rawstring(l) // 从新申请一块内存 关联s和b的底层数组关联关系 } return } slicebytetostringtmp() 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 // slicebytetostringtmp returns a \"string\" referring to the actual []byte bytes. // // Callers need to ensure that the returned string will not be used after // the calling goroutine modifies the original slice or synchronizes with // another goroutine. // // The function is only called when instrumenting // and otherwise intrinsified by the compiler. // // Some internal compiler optimizations use this function. // - Used for m[T1{... Tn{..., string(k), ...} ...}] and m[string(k)] // where k is []byte, T1 to Tn is a nesting of struct and array literals. // - Used for \"\u003c\"+string(b)+\"\u003e\" concatenation where b is []byte. // - Used for string(b)==\"foo\" comparison where b is []byte. func slicebytetostringtmp(ptr *byte, n int) (str string) { if raceenabled \u0026\u0026 n \u003e 0 { racereadrangepc(unsafe.Pointer(ptr), uintptr(n), getcallerpc(), abi.FuncPCABIInternal(slicebytetostringtmp)) } if msanenabled \u0026\u0026 n \u003e 0 { msanread(unsafe.Pointer(ptr), uintptr(n)) } if asanenabled \u0026\u0026 n \u003e 0 { asanread(unsafe.Pointer(ptr), uintptr(n)) } // 通过参数返回一个ptr和返回str相关联的底层数组 stringStructOf(\u0026str).str = unsafe.Pointer(ptr)\tstringStructOf(\u0026str).len = n return } rawstring() 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 // rawstring allocates storage for a new string. The returned // string and byte slice both refer to the same storage. // The storage is not zeroed. Callers should use // b to set the string contents and then drop b. func rawstring(size int) (s string, b []byte) { // 向系统申请内存 p := mallocgc(uintptr(size), nil, false) stringStructOf(\u0026s).str = p stringStructOf(\u0026s).len = size *(*slice)(unsafe.Pointer(\u0026b)) = slice{p, size, size} return } string -\u003e string[:] 这种情况下没有新申请内存，而是【共用】的之前的内存。 1 2 3 4 5 6 7 8 9 10 11 12 13 package main import \"fmt\" func main() { s := \"hello Go语言\" // 字符串使用切片生成的依然是字符串类型，同用一个底层数据。 // 下面我们来分析下main.main的汇编码 看看这一行是如何操作的 s1 := s[:] fmt.Println(s1) // s1的类型为string } 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 # s1 := s[:] 情况 # 比较栈是否溢出 r14存储的当前groutine string.go:5\t0x496680 493b6610 cmp rsp, qword ptr [r14+0x10]\tstring.go:5\t0x496684 0f86b9000000 jbe 0x496743 # 给main.main函数栈预分配0x78大小 string.go:5\t0x49668a 4883ec78 sub rsp, 0x78\t# 将runtime.main函数的栈基址rsp入栈，以便main.main执行完好恢复 string.go:5\t0x49668e 48896c2470 mov qword ptr [rsp+0x70], rbp\t# 将rbp指向main.main的新栈基位置，表示main.main的栈信息范围 string.go:5\t0x496693 488d6c2470 lea rbp, ptr [rsp+0x70]\t# 该操作等于将字符串s的底层数组地址放入rcx string.go:6\t0x496698 488d0de87c0100 lea rcx, ptr [rip+0x17ce8]\t# 则部操作为给s.str赋值。s.data=rip+0x17ce8 string.go:6\t0x49669f 48894c2438 mov qword ptr [rsp+0x38], rcx # 该操作为给s.len赋值，标明字符串长度大小。s.len=14 string.go:6\t0x4966a4 48c74424400e000000 mov qword ptr [rsp+0x40], 0xe\t# 以下两行是第9行代码 s1 := s[:]\t# 可以看见是公共用的同一个底层数组。 string.go:9\t0x4966ad 48894c2428 mov qword ptr [rsp+0x28], rcx\tstring.go:9\t0x4966b2 48c74424300e000000 mov qword ptr [rsp+0x30], 0xe 修改第10行s1 := s[:]为s1 := s[:5]。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 # s1 := s[:5] 情况 string.go:5\t0x496680 493b6610 cmp rsp, qword ptr [r14+0x10] string.go:5\t0x496684 0f86c6000000 jbe 0x496750 string.go:5\t0x49668a 4883ec78 sub rsp, 0x78 string.go:5\t0x49668e 48896c2470 mov qword ptr [rsp+0x70], rbp string.go:5\t0x496693 488d6c2470 lea rbp, ptr [rsp+0x70] # 这里几行给s赋值 string.go:6\t0x496698 488d0de87c0100 lea rcx, ptr [rip+0x17ce8]\tstring.go:6\t0x49669f 48894c2438 mov qword ptr [rsp+0x38], rcx string.go:6\t0x4966a4 48c74424400e000000 mov qword ptr [rsp+0x40], 0xe string.go:9\t0x4966ad eb00 jmp 0x4966af string.go:9\t0x4966af eb00 jmp 0x4966b1 # 这几行s[:5]，为什么这里的rip+0x17ccf和上面的rip+0x17ce8不一致？ # 原因是Go采用的地址加偏移量的形式，这里与前面的差量所以偏移量有所变化 # 还有个原因是编译阶段的字符串是被存储在代码段的，所以通过这种形式， # 如果是被存储在栈或堆上呢，栈则是rsp+偏移量的形式 string.go:9\t0x4966b1 488d0dcf7c0100 lea rcx, ptr [rip+0x17ccf]\tstring.go:9\t0x4966b8 48894c2428 mov qword ptr [rsp+0x28], rcx string.go:9\t0x4966bd 48c744243005000000 mov qword ptr [rsp+0x30], 0x5 # 更多s1 := s[2:5]基本和上面情况差不多 注意 不要命名标识符和包名称一样，这样会导致引用包名称时需要添加特殊别名称，比如命名函数名称bytes()和bytes包一致，导致bytes包需要别名称bytes2 \"bytes\"。 参考 字符串内存布局 字符串内存布局 字符串内存 unicode、utf8、utf16、utf32 ",
   "wordCount" : "2437",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2019-05-21T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2019-05-21T00:00:00Z",
   "dateModified": "2022-09-24T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/basic/string-memory/"
+    "@id": "https://helium.github.io/posts/golang/basic/string-memory/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/basic/">第2章 基础类型</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/basic/">第2章 基础类型</a></div>
     <h1 class="post-title entry-hint-parent">
       字符串(内存布局)
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://heliu.site/tags/%E5%9F%BA%E7%A1%80%E7%B1%BB%E5%9E%8B/" target="_blank" rel="noopener">基础类型</a>
+            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium.github.io/tags/%E5%9F%BA%E7%A1%80%E7%B1%BB%E5%9E%8B/" target="_blank" rel="noopener">基础类型</a>
         </ul>
       </span>
       
@@ -1818,16 +1818,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
-      <li><a href="https://heliu.site/tags/%E5%9F%BA%E7%A1%80%E7%B1%BB%E5%9E%8B/">基础类型</a></li>
+      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium.github.io/tags/%E5%9F%BA%E7%A1%80%E7%B1%BB%E5%9E%8B/">基础类型</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/basic/string/">
+  <a class="prev" href="https://helium.github.io/posts/golang/basic/string/">
     <span class="title">« 上一页</span>
     <br>
     <span>字符串</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/basic/string-splice/">
+  <a class="next" href="https://helium.github.io/posts/golang/basic/string-splice/">
     <span class="title">下一页 »</span>
     <br>
     <span>字符串(&#43;拼接)</span>

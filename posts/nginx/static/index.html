@@ -9,18 +9,18 @@
 <meta name="keywords" content="nginx">
 <meta name="description" content="nginx 静态资源缓存、压缩、防盗链。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/nginx/static/">
+<link rel="canonical" href="https://helium.github.io/posts/nginx/static/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/nginx/static/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/nginx/static/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="nginx 静态资源优化" />
 <meta property="og:description" content="nginx 静态资源缓存、压缩、防盗链。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/nginx/static/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/nginx/static/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2021-05-17T00:00:00+00:00" />
 <meta property="article:modified_time" content="2021-05-17T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="nginx 静态资源优化"/>
 <meta name="twitter:description" content="nginx 静态资源缓存、压缩、防盗链。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Nginx",
-      "item": "https://heliu.site/posts/nginx/"
+      "item": "https://helium.github.io/posts/nginx/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "nginx 静态资源优化",
-      "item": "https://heliu.site/posts/nginx/static/"
+      "item": "https://helium.github.io/posts/nginx/static/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": "资源优化 sendfile指令 用来开启高效的文件传输模式。 可以在 http、server、location 位置。 语法：sendfile on/off。默认值 sendfile off。 sendfile指令能避免静态资源文件从内核缓冲区拷贝到用户缓冲区，又从用户缓冲区拷贝到Socket缓冲区。 server { listen 80; server_name localhost； sendfile on; location / { root html; index index.html; } } tcp_nopush指令 该指令必须在sendfile打开的状态下才会生效，主要是用来提升网络包的传输’效率’。 该指令开启只要缓冲区有数据就会发送给客户端，而不需要等待缓冲区满了才发送。 可以在 http、server、location 位置。 语法：tcp_nopush on/off。默认值 tcp_nopush off。 server { listen 80; server_name localhost； sendfile on; tcp_nopush on; location / { root html; index index.html; } } tcp_nodelay指令 该指令必须在keep-alive连接开启的情况下才生效，来提高网络包传输的’实时性’。 可以在 http、server、location 位置。 该指令开启时数据是先存在缓冲区的，等待缓冲区满了再发送给客户端。 语法：tcp_nodelay on/off。默认值 tcp_nodelay on。 server { listen 80; server_name localhost； sendfile on; tcp_nopush on; tcp_nodelay on; location / { root html; index index.html; } } 资源压缩 以下指令都来自ngx_http_gzip_module模块，该模块会在nginx安装的时候内置到nginx的安装环境中。 gzip指令 用于开启或者关闭gzip功能。 可以在 http、server、location 位置。 语法：gzip on/off。默认值 gzip off。 server { listen 80; server_name localhost； gzip on; location / { root html; index index.html; } } gzip_types指令 该指令可以根据响应页的MIME类型选择性地开启Gzip压缩功能。 可以在 http、server、location 位置。 语法：gzip_types mime-type …。默认值 gzip_types text/html。 所选择的值可以从mime.types文件中进行查找，也可以使用\"*“代表所有。 server { listen 80; server_name localhost； gzip on; # 多个使用空格隔开 gzip_types text/plain text/css application/json application/javascript text/xml; location / { root html; index index.html; } } gzip_comp_level指令 该指令用于设置Gzip压缩程度，级别从1-9,1表示要是程度最低，要是效率最高，9刚好相反，压缩程度最高，但是效率最低最费时间。 可以在 http、server、location 位置。 语法：gzip_comp_level level。默认值 gzip_comp_level 1。 server { listen 80; server_name localhost； gzip on; # 多个使用空格隔开 gzip_types text/plain text/css application/json application/javascript text/xml; gzip_comp_level 6; # 6是个不错的中间值 location / { root html; index index.html; } } gzip_vary指令 该指令用于设置使用Gzip进行压缩发送是否携带“Vary:Accept-Encoding”头域的响应头部。主要是告诉接收方，所发送的数据经过了Gzip压缩处理。 可以在 http、server、location 位置。 语法：gzip_vary on/off。默认值 gzip_vary off。 server { listen 80; server_name localhost； gzip on; # 多个使用空格隔开 gzip_types text/plain text/css application/json application/javascript text/xml; gzip_comp_level 6; # 6是个不错的中间值 gzip_vary on; location / { root html; index index.html; } } gzip_buffers指令 该指令用于处理请求压缩的缓冲区数量和大小。 可以在 http、server、location 位置。 语法：gzip_buffers number size。默认值 gzip_buffers 32 4k|16 8k。 其中number:指定Nginx服务器向系统申请缓存空间个数，size指的是每个缓存空间的大小。 主要实现的是申请number个每个大小为size的内存空间。 server { listen 80; server_name localhost； gzip on; # 多个使用空格隔开 gzip_types text/plain text/css application/json application/javascript text/xml; gzip_comp_level 6; # 6是个不错的中间值 gzip_vary on; gzip_buffers 16 8k; location / { root html; index index.html; } } gzip_disable指令 针对不同种类客户端发起的请求，可以选择性地开启和关闭Gzip功能。 可以在 http、server、location 位置。 语法：gzip_disable regex …。 regex:根据客户端的浏览器标志(user-agent)来设置，支持使用正则表达式。指定的浏览器标志不使用Gzip.该指令一般是用来排除一些明显不支持Gzip的浏览器。 server { listen 80; server_name localhost； gzip on; # 多个使用空格隔开 gzip_types text/plain text/css application/json application/javascript text/xml; gzip_comp_level 6; # 6是个不错的中间值 gzip_vary on; gzip_buffers 16 8k; gzip_disable \"msie6\"; # 禁用IE6的gzip压缩，因为它有bug location / { root html; index index.html; } } gzip_http_version指令 针对不同的HTTP协议版本，可以选择性地开启和关闭Gzip功能。 可以在 http、server、location 位置。 语法：gzip_http_version 1.0|1.1。默认值 gzip_http_version 1.1。 该指令是指定使用Gzip的HTTP最低版本，该指令一般采用默认值即可。 server { listen 80; server_name localhost； gzip on; # 多个使用空格隔开 gzip_types text/plain text/css application/json application/javascript text/xml; gzip_comp_level 6; # 6是个不错的中间值 gzip_vary on; gzip_buffers 16 8k; gzip_disable \"msie6\"; # 禁用IE6的gzip压缩，因为它有bug gzip_http_version 1.1; location / { root html; index index.html; } } gzip_min_length指令 该指令针对传输数据的大小，可以选择性地开启和关闭Gzip功能。 可以在 http、server、location 位置。 语法：gzip_min_length length。默认值 gzip_min_length 20。 Gzip压缩功能对大数据的压缩效果明显，但是如果要压缩的数据比较小的化，可能出现越压缩数据量越大的情况，因此我们需要根据响应内容的大小来决定是否使用Gzip功能。建议设置为1K或以上。单位：bytes[字节] / kb[千字节] / M[兆]。 server { listen 80; server_name localhost； gzip on; # 多个使用空格隔开 gzip_types text/plain text/css application/json application/javascript text/xml; gzip_comp_level 6; # 6是个不错的中间值 gzip_vary on; gzip_buffers 16 8k; gzip_disable \"msie6\"; # 禁用IE6的gzip压缩，因为它有bug gzip_http_version 1.1; gzip_min_length 2M; location / { root html; index index.html; } } gzip_proxied指令 该指令设置是否对服务端返回的结果进行Gzip压缩。 可以在 http、server、location 位置。 语法：gzip_proxied off|expired|no-cache|no-store|private|no_last_modified|no_etag|auth|any。 默认值：gzip_proxied off。 off - 关闭Nginx服务器对后台服务器返回结果的Gzip压缩 expired - 启用压缩，如果header头中包含 “Expires” 头信息 no-cache - 启用压缩，如果header头中包含 “Cache-Control:no-cache” 头信息 no-store - 启用压缩，如果header头中包含 “Cache-Control:no-store” 头信息 private - 启用压缩，如果header头中包含 “Cache-Control:private” 头信息 no_last_modified - 启用压缩,如果header头中不包含 “Last-Modified” 头信息 no_etag - 启用压缩 ,如果header头中不包含 “ETag” 头信息 auth - 启用压缩 , 如果header头中包含 “Authorization” 头信息 any - 无条件启用压缩 server { listen 80; server_name localhost； gzip on; # 多个使用空格隔开 gzip_types text/plain text/css application/json application/javascript text/xml; gzip_comp_level 6; # 6是个不错的中间值 gzip_vary on; gzip_buffers 16 8k; gzip_disable \"msie6\"; # 禁用IE6的gzip压缩，因为它有bug gzip_http_version 1.1; gzip_min_length 2M; gzip_proxied off; location / { root html; index index.html; } } 小结 这些配置在很多地方可能都会用到，所以我们可以将这些内容抽取到一个配置文件中，然后通过include指令把配置文件再次加载到nginx.conf配置文件中。 include nginx_gzip.conf 开启sendfile以后，在读取磁盘上的静态资源文件的时候，可以减少拷贝的次数，可以不经过用户进程将静态文件通过网络设备发送出去，但是Gzip要想对资源压缩，是需要经过用户进程进行操作的。可以使用ngx_http_gzip_static_module模块(手动加载)的gzip_static指令来解决。压缩文件也需要我们手动压缩好。 语法：gzip_static on | off | always。 资源缓存 缓存的优点：减少网络带宽消耗、降低服务器压力、减少网络延迟，加快页面打开速度。 HTTP协议中和页面缓存相关的字段。 ——–header——– 说明 Expires 缓存过期的日期和时间 Cache-Control 设置和缓存相关的配置信息 Last-Modified 请求资源最后修改时间 ETag 请求变量的实体标签的当前值，比如文件的MD5值 expires指令 该指令用来控制页面缓存的作用。可以通过该指令控制HTTP应答中的“Expires\"和”Cache-Control”。 可以在 http、server、location 位置。 语法：默认值 expires off。 epoch: 指定Expires的值为'1 January,1970,00:00:01 GMT’(1970-01-01 00:00:00)，Cache-Control的值no-cache epoch: 指定Expires的值为'1 January,1970,00:00:01 GMT’(1970-01-01 00:00:00)，Cache-Control的值no-cache max:指定Expires的值为'31 December2037 23:59:59GMT’ (2037-12-31 23:59:59) ，Cache-Control的值为10年 off:默认不缓存。 expires [modified] time expires epoch|max|off; server { listen 80; server_name localhost； location ~* \\.(jpg|jpeg|png|gif|ico|css|js)$ { expires 30d; # 缓存30天 add_header Cache-Control \"public, no-transform\"; # 添加缓存控制头 } } add_header指令 用来添加指定的响应头和响应值。 可以在 http、server、location 位置。 语法：add_header name value [always]。 server { listen 80; server_name localhost； location ~* \\.(jpg|jpeg|png|gif|ico|css|js)$ { expires 30d; # 缓存30天 add_header Cache-Control \"public, no-transform\"; # 添加缓存控制头 } } 跨域 同源策略：是一种约定，是浏览器最核心也是最基本的安全功能，如果浏览器少了同源策略，则浏览器的正常功能可能都会受到影响。 有两台服务器分别为A,B,如果从服务器A的页面发送异步请求到服务器B获取数据，如果服务器A和服务器B不满足同源策略，则就会出现跨域问题。 同源：协议、域名(IP)、端口相同即为同源。 http://192.168.200.131/user/1 https://192.168.200.131/user/1 不同源 http://192.168.200.131/user/1 http://192.168.200.132/user/1 不同源 http://192.168.200.131/user/1 http://192.168.200.131:8080/user/1 不同源 http://www.nginx.com/user/1 http://www.nginx.org/user/1 不同源 http://192.168.200.131/user/1 http://192.168.200.131:8080/user/1 不同源 http://www.nginx.org:80/user/1 http://www.nginx.org/user/1 同源 add_header 指令，添加允许跨域标识。 Access-Control-Allow-Origin**: 直译过来是允许跨域访问的源地址信息，可以配置多个(多个用逗号分隔)，也可以使用*代表所有源。 Access-Control-Allow-Methods:直译过来是允许跨域访问的请求方式，值可以为 GET POST PUT DELETE…,可以全部设置，也可以根据需要设置，多个用逗号分隔。 location /getUser{ add_header Access-Control-Allow-Origin *; add_header Access-Control-Allow-Methods GET,POST,PUT,DELETE; default_type application/json; return 200 '{\"id\":1,\"name\":\"TOM\",\"age\":18}'; } 防盗链 HTTP的头信息Referer,当浏览器向web服务器发送请求的时候，一般都会带上Referer,来告诉浏览器该网页是从哪个页面链接过来的。 后台服务器可以根据获取到的这个Referer信息来判断是否为自己信任的网站地址，如果是则放行继续访问，如果不是则可以返回403(服务端拒绝访问)的状态信息。 valid_referers 指令 nginx会通就过查看referer自动和valid_referers后面的内容进行匹配，如果匹配到了就将$invalid_referer变量置0，如果没有匹配到，则将$invalid_referer变量置为1，匹配的过程中不区分大小写。 可以在 server、location 中。 语法：valid_referers none|blocked|server_names|string…。 none: 如果Header中的Referer为空，允许访问。 blocked:在Header中的Referer不为空，但是该值被防火墙或代理进行伪装过，如不带\"http://\" 、“https://“等协议头的资源允许访问。 server_names:指定具体的域名或者IP。 string: 可以支持正则表达式和*的字符串。如果是正则表达式，需要以~开头表示，例如 # 防盗链配置 location ~* \\.(jpg|jpeg|png|gif)$ { # 设置一个referrer白名单，只有referrer是以下域名之一的请求才会被允许 valid_referers none blocked heliu.site *.heliu.site; # 如果referrer不在白名单中，返回一个错误图片或者重定向 if ($invalid_referer) { # 返回一个错误图片 return 403; # 或者你可以选择重定向到一个错误页面或者图片 # rewrite ^/ http://yourdomain.com/403.jpg last; } # 如果referrer有效，正常服务静态文件 try_files $uri /helium.png; } location ~*\\.(png|jpg|gif){ valid_referers none blocked www.baidu.com 192.168.1.222 *.example.com example.* www.example.org ~\\.google\\.; if ($invalid_referer){ return 403; } root /usr/local/nginx/html; } 针对目录进行防盗链。 # images 目录 location /images { valid_referers none blocked www.baidu.com 192.168.200.222 *.example.com example.* www.example.org ~\\.google\\.; if ($invalid_referer){ return 403; } root /usr/local/nginx/html; } 更严格的防盗链参看nginx第三方模块ngx_http_accesskey_module。 ",
   "wordCount" : "778",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2021-05-17T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2021-05-17T00:00:00Z",
   "dateModified": "2021-05-17T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/nginx/static/"
+    "@id": "https://helium.github.io/posts/nginx/static/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/nginx/">Nginx</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/nginx/">Nginx</a></div>
     <h1 class="post-title entry-hint-parent">
       nginx 静态资源优化
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/nginx/" target="_blank" rel="noopener">Nginx</a>
+            <a href="https://helium.github.io/tags/nginx/" target="_blank" rel="noopener">Nginx</a>
         </ul>
       </span>
       
@@ -864,15 +864,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/nginx/">Nginx</a></li>
+      <li><a href="https://helium.github.io/tags/nginx/">Nginx</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/nginx/server/">
+  <a class="prev" href="https://helium.github.io/posts/nginx/server/">
     <span class="title">« 上一页</span>
     <br>
     <span>nginx server块</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/nginx/rewrite/">
+  <a class="next" href="https://helium.github.io/posts/nginx/rewrite/">
     <span class="title">下一页 »</span>
     <br>
     <span>nginx Rewrite</span>

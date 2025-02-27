@@ -2,23 +2,23 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>第1章 安装环境 on Helium</title>
-    <link>https://heliu.site/posts/golang/install/</link>
+    <link>https://helium.github.io/posts/golang/install/</link>
     <description>Recent content in 第1章 安装环境 on Helium</description>
     <image>
       <title>Helium</title>
-      <url>https://heliu.site/favicon-32x32.png</url>
-      <link>https://heliu.site/favicon-32x32.png</link>
+      <url>https://helium.github.io/favicon-32x32.png</url>
+      <link>https://helium.github.io/favicon-32x32.png</link>
     </image>
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
     <lastBuildDate>Tue, 22 Mar 2022 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://heliu.site/posts/golang/install/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://helium.github.io/posts/golang/install/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Install Golang</title>
-      <link>https://heliu.site/posts/golang/install/install/</link>
+      <link>https://helium.github.io/posts/golang/install/install/</link>
       <pubDate>Mon, 14 Jan 2019 00:00:00 +0000</pubDate>
-      <guid>https://heliu.site/posts/golang/install/install/</guid>
+      <guid>https://helium.github.io/posts/golang/install/install/</guid>
       <description>Go 软件安装。</description>
     </item>
   </channel>

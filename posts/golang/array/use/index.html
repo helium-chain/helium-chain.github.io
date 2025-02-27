@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, 数组">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/array/use/">
+<link rel="canonical" href="https://helium.github.io/posts/golang/array/use/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/array/use/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/array/use/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="数组使用" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/array/use/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/golang/array/use/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2020-03-09T00:00:00+00:00" />
 <meta property="article:modified_time" content="2022-09-19T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="数组使用"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://heliu.site/posts/golang/"
+      "item": "https://helium.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第6章 Array",
-      "item": "https://heliu.site/posts/golang/array/"
+      "item": "https://helium.github.io/posts/golang/array/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "数组使用",
-      "item": "https://heliu.site/posts/golang/array/use/"
+      "item": "https://helium.github.io/posts/golang/array/use/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": "数组的定义 🚀 数组是具有相同唯一类型的一组已编码且长度固定的数据项序列。 这是一种同构的数据结构，这种类型可以是任意的基础类型，如整型、字符串或自定义类型。 数组长度必须是一个常量表达式（编译期间能确定的值），并且是一个非负数。 数组的长度也是数组类型的一部分，[5]int和[10]int是属于不同类型。 如果想让数组元素，类型为任意类型，可以使用空接口interface{}作为类型，但使用时，必须先做一个类型判断。 访问越界，如果下标在数组合法范围之外，则触发访问越界，会panic。 数组是值类型，赋值和传参会复制整个数组，而不是指针。因此改变副本的值，不会改变本身的值。 只支持 “==\"、”!=\" 操作符。（不支持 “\u003e\"、\"\u003c\"、\"\u003e=\"、\"\u003c=\"，原因是大于、小于对于数组来说没啥意义，我们也不会比较两个数组谁大谁小） 指针数组 [n]*T，数组指针 *[n]T。 数组元素为空接口 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 package main import ( \"fmt\" \"unsafe\" ) func main() { // 数组 a 所占内存 16 * 5 = 80 字节 var a [5]interface{} = [5]interface{}{1, \"hello\", false, 0.23, 2i} // 空接口的结构构造，type eface struct {typ *_type, data uintptr} fmt.Printf(\"数组a占用内存的大小%d\\n\", unsafe.Sizeof(a))\t// 数组a占用内存的大小80 5*(8+8) // [5]interface {}{1, \"hello\", false, 0.23, (0+2i)} fmt.Printf(\"%#v\\n\", a) // 这里遍历可以改成遍历 \u0026a，这样避免了大数组的复制 // 变量指针数组是Go的语法糖 for i, v := range a { // 【int, any】 fmt.Printf(\"i:%d v:%#v t:%T\\n\", i , v, v) // 必须要做断言才能使用，空接口.(具体类型) if ii, ok := v.(int); ok { fmt.Println(ii + 10) } } // Output: // 数组a占用内存的大小80 // [5]interface {}{1, \"hello\", false, 0.23, (0+2i)} // i:0 v:1 t:int // 11 // i:1 v:\"hello\" t:string // i:2 v:false t:bool // i:3 v:0.23 t:float64 // i:4 v:(0+2i) t:complex128 } 指针数组和数组指针 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 package main import \"fmt\" func main() { // 1. 指针数组，数组的元素是指针类型 var p1 [2]*int = [2]*int{} // [2]*int{nil, nil} fmt.Println(p1) var a int = 5 p1[1] = \u0026a fmt.Println(p1) // Output: // [ ] // [ 0xc00000e0b8] // 2. 数组指针 var p2 *[2]int fmt.Println(p2) a1 := [2]int{1, 2} p2 = \u0026a1 fmt.Printf(\"%#v\", p2) // Output // // \u0026[2]int{1, 2} } 数组和数组指针 在Go中数组和数组指针的用法基本一致，能遍历（range）、赋值、取值、求长度等，这是由于数组指针操作时存在语法糖支持。 切片(slice)则不允许这样操作，只有数组是特有的，为啥数组支持遍历数组地址，很大原因是大数据数组遍历的拷贝开销比较大，采用指针形式则不需要拷贝。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 { // *[5]int a1 := new([5]int) // 1) 语法糖： (*a1)[0] = 12 a1[0] = 12\t// 2) 语法糖： c := (*a1)[1] c := a1[1]\t// 3) 语法糖： l := len(*a1) l := len(a1)\t// 遍历a1，这是由于上面两个语法糖(2)(3)的支持 for i := range a1 { // 【int, int】 } } 数组的声明与使用 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 // 1) 指定索引 var a = [5]string{3:\"hello\", \"world\"} // [5]string{\"\", \"\", \"\", \"hello\", \"world\"} fmt.Printf(\"%#v\\n\", a) // 2) ... 只能用在最外层数组 // ... 的用法 // 1. 用于数组声明的最外层数组，自动统计数组长度。 // 2. 用作函数的最后一个参数，...T 表示可变参数 []T 切片形式。 // 3. 用作切片后 []T... 表示解引用。【append([]int{1,2}, []int{3,4,5}...)】 // 4. 只有在【append([]byte(\"hello \"), \"world\"...)】时可以使用 【string...】 形式其他地方不被允许。 // slice = append(slice, elem1, elem2) // slice = append(slice, anotherSlice...) // slice = append([]byte(\"hello \"), \"world\"...) // ... 作为解引用时，只能用在Slice和string中 var b = [...]string{3:\"hello\", \"world\"} // [5]string{\"\", \"\", \"\", \"hello\", \"world\"} fmt.Printf(\"%#v\\n\", b) // 3) 默认值，注意不是空数组，数组不存在空数组概念，数组中一定是存在值的即使是默认值 var c [2]uint8\t// [2]uint8{0, 0} // Output: // [5]string{\"\", \"\", \"\", \"hello\", \"world\"} // [5]string{\"\", \"\", \"\", \"hello\", \"world\"} 一维数组或多维数组 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 package main import ( \"fmt\" ) func main() { // 1. 常用初始化 var arrAge = [5]int{15,16,15,18,17}\t// [5]int{15,16,15,18,17}\t// 2. 指定索引位置的初始化 var arrName = [5]string{3:\"Chris\", 4:\"Ron\"}\t// [5]string{\"\",\"\",\"\",\"Chris\", \"Ron\"} var arrCount = [4]int{500, 2:100}\t// [4]int{500,0,100,0} // 3. 数组长度初始化根据元素多少决定 var arrLazy = [...]int{5,6,7,8,23}\t// [5]int{5,6,7,8,23}\tvar arrPack = [...]int{10,5:100}\t// [6]int{10,0,0,0,0,100} // 4. 不指定默认值 var arrRoom [20]int\t// [20]int{0,0,0,...} // 5. 使用new函数 var arrBed = new([20]int)\t// *[20]int{0,0,0,...} // 6. 数组类型是结构体 d := [...]struct{ name string\t// 占16字节 age uint8\t// 占1字节 内存对齐后 占8字节 }{ {\"user1\", 10}, {\"user2\", 20},\t// 别忘了最后一行的逗号，这是由于GO语法解析 } fmt.Println(unsafe.Sizeof(d))\t// 48 = (16+8) * 2 fmt.Printf(\"arrAge:%#v arrAge:Type:%T\\n\", arrAge, arrAge) fmt.Printf(\"arrName:%#v arrName:Type:%T\\n\", arrName, arrName) fmt.Printf(\"arrCount:%#v arrCount:Type:%T\\n\", arrCount, arrCount) fmt.Printf(\"arrLazy:%#v arrLazy:Type:%T\\n\", arrLazy, arrLazy) fmt.Printf(\"arrPack:%#v arrPack:Type:%T\\n\", arrPack, arrPack) fmt.Printf(\"arrRoom:%#v arrRoom:Type:%T\\n\", arrRoom, arrRoom) fmt.Printf(\"arrBed:%#v arrBed:Type:%T\\n\", arrBed, arrBed) fmt.Printf(\"d:%#v d:Type:%T\\n\", d, d) } /* * arrAge:[5]int{15, 16, 15, 18, 17} arrAge:Type:[5]int * arrName:[5]string{\"\", \"\", \"\", \"Chris\", \"Ron\"} arrName:Type:[5]string * arrCount:[4]int{500, 0, 100, 0} arrCount:Type:[4]int * arrLazy:[5]int{5, 6, 7, 8, 23} arrLazy:Type:[5]int * arrPack:[6]int{10, 0, 0, 0, 0, 100} arrPack:Type:[6]int * arrRoom:[20]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} arrRoom:Type:[20]int * arrBed:\u0026[20]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0} arrBed:Type:*[20]int * d: * [2]struct { name string; age uint8 } * { * struct { name string; age uint8 }{name:\"user1\", age:0xa}, * struct { name string; age uint8 }{name:\"user2\", age:0x14} * } * d:Type: * [2]struct { name string; age uint8 } */ Go语言中数组是一种值类型（不像C/C++中是指向首元素的指针），所以可以通过new()来创建。 // 申请 5 * 8 byte内存 var arr1 = new([5]int)\t// *[5]int 使用new([5]int)创建和var arr2 [5]int的区别，arr1的类型是 *[5]int，而arr2的类型是[5]int。 数组长度不同算作不同类型 在Go语言中，数组的长度都算在类型里，由于在数组的类型描述结构中记录着数组的长度。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 package main import ( \"fmt\" ) func main() { // 1) new([5]int) 创建的是数组指针 var arr1 = new([5]int) // *[5]int // 把数组 [5]int 看做如下构成： // a: struct { // a1 int // a2 int // a3 int // a4 int // a5 int // } // 则 arr1 = \u0026a // arr1类型:*[5]int, \u0026arr1:0xc00000a028, arr1:0xc000012420, \u0026arr1[0]:0xc000012420 fmt.Printf(\"arr1类型:%T, \u0026arr1:%p, arr1:%p, \u0026arr1[0]:%p\\n\", arr1, \u0026arr1, arr1, \u0026arr1[0]) // arr1:\u0026[5]int{0, 0, 0, 0, 0} fmt.Printf(\"arr1:%#v\\n\", arr1) // arr和arr1指向同一地址，因而修改arr1和arr同样也生效 arr := arr1 // arr类型:*[5]int, \u0026arr:0xc00000a038, arr:0xc000012420, \u0026arr[0]:0xc000012420 fmt.Printf(\"arr类型:%T, \u0026arr:%p, arr:%p, \u0026arr[0]:%p\\n\", arr, \u0026arr, arr, \u0026arr[0]) // arr:\u0026[5]int{0, 0, 0, 0, 0} fmt.Printf(\"arr:%#v\\n\", arr) arr1[2] = 100 // (*arr1)[2] = 100 fmt.Println(arr1[2], arr[2]) // 100 100 // 2) 非指针形式 [5]int var arr2 [5]int // newArr是arr2的副本，因此修改任何一个值都不会改变另外一个值 newArr := arr2 arr2[2] = 100 fmt.Println(arr2[2], newArr[2]) // 100 0 } 函数或方法时，如果参数是数组，需要注意参数不能过大。 由于把一个大数组传递给函数会消耗很多内存（值传递），可以使用其他方式传递。 传递数组的指针。 使用切片（常用选择）。 多维数组 1 2 3 [...][5]int{ {10,20},{30,40} } // len() 长度根据实际初始化时数组的长度来定，这里是 2 [3][2]int // len() 长度这里是 3 [2][2][2]float64 // 可以这样理解[2]([2]([2]float64)) 定义多维数组是，仅第一维允许使用 “...\"。 内置函数len()和cap()都返回第一维度长度。 len()获取的是数组的长度。 cap()获取的是数组的容量，这里也就是返回数组的长度。 定义数组时 “...” 表示长度不定，初始化时根据实际长度来确定数组的长度。 1 2 b := [...][5]int{ {10,20},{30,40,50,60} } fmt.Println(b[1][3], len(b)) // 60 2 数组元素可以通过索引（下标）来读取或者修改，所以从0开始。 遍历数组的方法可以使用for或者for-range。这两种对于切片一样适用。多维数组的遍历需要使用多层的嵌套。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 package main import ( \"fmt\" ) func main() { var arrAge = [5]int{18,20,15,22,16} for i := 0; i \u003c len(arrAge) ; i++ { // 【int, int】 fmt.Println(arrAge[i]) } fmt.Println(\"-------------------------\") for key, val := range arrAge { // 【int, int】 fmt.Println(key, val) } // Output: // 18 // 20 // 15 // 22 // 16 // ------------------------- // 0 18 // 1 20 // 2 15 // 3 22 // 4 16 } 数组之间比较 数组元素类型支持 == 或 != 操作符，那么数组也支持此操作。 但如果数组类型不一样则不支持（需要数组长度和数组类型一致，否则编译不通过）。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 package main import ( \"fmt\" ) func main() { var arrRoom [20]int var arrBed [20]int fmt.Println(arrRoom == arrBed) // true var a [2]int = [2]int{0, 1} var b [2]int = [2]int{0, 1} var c [2]int = [2]int{0, 2} fmt.Println(a == b) // true fmt.Println(a == c) // false // Output: // true // true // false } 数组比较的核心代码示例：以下代码抄自src/reflect/type.go文件。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 // typ表示数组的元类型_type，etyp则是数组元素的元类型_type // 举例如 [5]string 数组，这里的typ就是[5]string数组类型，etyp就是string类型 etyp := typ.common() // esize表示数组元素所在内存大小，这里的esize就是string类型的大小16字节 esize := etyp.Size() // 标记数组比较字段为nil，nil表示当前类型不可比较 array.equal = nil // 这里先标记默认值 // 判断etyp.equal也就是数组的元素类型(string)是否可以比较，如果该类型不可比较则当前数组也不可比较 if eequal := etyp.equal; eequal != nil { // 数组元素可以比较时，初始化数组的比较字段闭包形式 // p和q分表表示需要比较的两个数组地址 array.equal = func(p, q unsafe.Pointer) bool { // array.equal数组的比较方法 for i := 0; i \u003c count; i++ { // 遍历数组的所有元素，count记录数组元素的大小 pi := arrayAt(p, i, esize, \"i \u003c count\") // arrayAt偏移到p的每个元素位置，得到数组元素值 qi := arrayAt(q, i, esize, \"i \u003c count\") // arrayAt偏移到q的每个元素位置，得到数组元素值 // eequal则是数组元素类型的比较函数，这里举例是string比较函数 if !eequal(pi, qi) { // eequal数组元素类型的比较方法，比较pi和qi return false // 两个数组不相等时 } } return true // 两个数组一致时 } } 值拷贝行为会造成性能问题，通常会建议使用 slice，或数组指针。 多维数组遍历 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 package main import ( \"fmt\" ) func main() { // 二维数组，2X3 var f [2][3]int = [...][3]int{{1, 2, 3}, {7, 8, 9}} for k1, v1 := range f { // 【int, [3]int】 for k2, v2 := range v1 { // 【int, int】 fmt.Printf(\"(%d,%d)=%d \", k1, k2, v2) } fmt.Println() } // Output: // (0,0)=1 (0,1)=2 (0,2)=3 // (1,0)=7 (1,1)=8 (1,2)=9 } 数组拷贝和传参 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 package main import \"fmt\" func printArr(arr *[5]int) { arr[0] = 10 // (*arr)[0] // for i, v := range *arr for i, v := range arr { // 【int, int】 fmt.Println(i, v) } } func main() { var arr1 [5]int printArr(\u0026arr1) fmt.Println(arr1) arr2 := [...]int{2, 4, 6, 8, 10} printArr(\u0026arr2) fmt.Println(arr2) } /* * 0 10 * 1 0 * 2 0 * 3 0 * 4 0 * [10 0 0 0 0] * 0 10 * 1 4 * 2 6 * 3 8 * 4 10 * [10 4 6 8 10] */ 求数组所有元素之和 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 package main import ( \"fmt\" \"math/rand\" \"time\" ) // 求元素和 func sumArr(a *[10]int) int { var sum int = 0 for i := 0; i \u003c len(a); i++ { // 语法糖 len(*a) sum += a[i] // 语法糖 (*a)[i] } //for _, v := range a { //\tsum += v //} return sum } func main() { // 若想做一个真正的随机数，一般使用时间纳秒播种随机数 // seed()种子默认是1，rand.Seed(1) rand.Seed(time.Now().UnixNano()) var b [10]int for i := 0; i \u003c len(b); i++ { // 产生一个0到1000随机数 b[i] = rand.Intn(1000) } sum := sumArr(\u0026b) fmt.Printf(\"sum=%d\\n\", sum) // Output: // sum=3171 } 找出数组中和为给定值的两个元素的下标 例如数组[1,3,5,8,7]，找出两个元素之和等于8的下标分别是(0, 4)和(1, 2)。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 package main import \"fmt\" // 找出数组中和为给定值的两个元素的下标，例如数组[1,3,5,8,7]， // 找出两个元素之和等于8的下标分别是（0，4）和（1，2） // 求元素和，是给定的值 func myTest(a []int, target int) { for i := 0; i \u003c len(a); i++ { other := target - a[i] for j := i + 1; j \u003c len(a); j++ { if a[j] == other { fmt.Printf(\"(%d,%d)\\n\", i, j) } } } } func main() { b := [5]int{1, 3, 5, 8, 7} // b[:] 会引用数组b的地址，如果myTest函数修改参数a则会影响到b。 myTest(b[:], 8) } 随机打乱一个数组 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 package main import ( \"fmt\" \"math/rand\" \"time\" ) func main() { // 随机打乱一个数组 // 1) 给 [12]int 赋值 var ar [12]int = [12]int{} for i := range \u0026ar { ar[i] = i + 1 } fmt.Println(ar) rand.Seed(time.Now().UnixNano()) // 2) 打乱 [12]int n := len(ar) // 12 for i := 1; i \u003c n; i++ { // 根据随机数打乱ar j := rand.Int() % (i+1) ar[i], ar[j] = ar[j], ar[i] } fmt.Println(ar) } 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 package main import ( \"fmt\" \"math/rand\" \"time\" ) func shuffleArray(arr []int) { // 获取随机数种子 rand.Seed(time.Now().UnixNano()) // 遍历数组，随机交换元素 for i := len(arr) - 1; i \u003e 0; i-- { j := rand.Intn(i + 1) arr[i], arr[j] = arr[j], arr[i] } } func main() { arr := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20} shuffleArray(arr) fmt.Println(arr) } ... 的使用 用于数组时，...只能用在最外层数组。 用于数组申明的最外层数组，自动统计数组长度。 用作函数的最后一个参数，...T表示可变参数[]T切片形式。 用作切片后[]T...表示解引用。【append([]int{1,2}, []int{3,4,5}…)】 只有在【append([]byte(“hello “), “world”…)】时可以使用【string...】形式其他地方不被允许。 ...作为解引用时，只能用在Slice和string中。 append()相关用法。 slice = append(slice, elem1, elem2) slice = append(slice, anotherSlice...) slice = append([]byte(\"hello \"), \"world\"...) 注意 在Go语言中只有数组和数组指针能相互混用，其他类型则不能，比如切片和切片指针等。 1 2 3 4 5 6 7 8 9 10 11 12 { sl := [4]int{1,2,3,4} str3 := \u0026sl // str3[1]、range str3、len(str3) 等操作 _ = str3[1] // (*str3)[1] 语法糖 for range str3 {\t} _ = len(str3) // len(*str3) 语法糖 _ = cap(str3) // cap(*str3) 语法糖 } ",
   "wordCount" : "2030",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2020-03-09T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2020-03-09T00:00:00Z",
   "dateModified": "2022-09-19T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/array/use/"
+    "@id": "https://helium.github.io/posts/golang/array/use/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/array/">第6章 Array</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/array/">第6章 Array</a></div>
     <h1 class="post-title entry-hint-parent">
       数组使用
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://heliu.site/tags/%E6%95%B0%E7%BB%84/" target="_blank" rel="noopener">数组</a>
+            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium.github.io/tags/%E6%95%B0%E7%BB%84/" target="_blank" rel="noopener">数组</a>
         </ul>
       </span>
       
@@ -1564,16 +1564,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
-      <li><a href="https://heliu.site/tags/%E6%95%B0%E7%BB%84/">数组</a></li>
+      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium.github.io/tags/%E6%95%B0%E7%BB%84/">数组</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/package/publish-mod/">
+  <a class="prev" href="https://helium.github.io/posts/golang/package/publish-mod/">
     <span class="title">« 上一页</span>
     <br>
     <span>开发和发布模块</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/array/memory/">
+  <a class="next" href="https://helium.github.io/posts/golang/array/memory/">
     <span class="title">下一页 »</span>
     <br>
     <span>数组的内存布局</span>

@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, Goroutine">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/golang/goroutine/main/">
+<link rel="canonical" href="https://helium.github.io/posts/golang/goroutine/main/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/golang/goroutine/main/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/goroutine/main/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="main goroutine" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/golang/goroutine/main/" />
-<meta property="og:image" content="https://heliu.site/favicon-32x32.png" />
+<meta property="og:url" content="https://helium.github.io/posts/golang/goroutine/main/" />
+<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-07-29T00:00:00+00:00" />
 <meta property="article:modified_time" content="2024-07-29T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="main goroutine"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://heliu.site/posts/golang/"
+      "item": "https://helium.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第12章 Goroutine",
-      "item": "https://heliu.site/posts/golang/goroutine/"
+      "item": "https://helium.github.io/posts/golang/goroutine/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "main goroutine",
-      "item": "https://heliu.site/posts/golang/goroutine/main/"
+      "item": "https://helium.github.io/posts/golang/goroutine/main/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": " 本篇介绍《Go 执行流程》中，关于runtime·mainPC(SB)这个函数的相关内容。 runtime·mainPC(SB) 该函数是主线程goroutine注册的函数，首先会被唤起执行。 也是runtime.gogo()函数切换栈和代码地址跳转而来。 文件位置：go1.19.3/src/runtime/proc.go。 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 261 262 263 264 265 266 267 268 269 270 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285 286 287 288 289 290 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307 308 309 310 311 312 313 314 315 316 317 318 319 320 // The main goroutine. func main() { g := getg()\t// goroutine -\u003e runtime.main // Racectx of m0-\u003eg0 is used only as the parent of the main goroutine. // It must not be used for anything else. // // m0-\u003eg0 的 Racectx 仅用作主 goroutine 的父级 // 它不能用于其他任何事情，仅仅由于标识 g.m.g0.racectx = 0 // 0 表示主goroutime // Max stack size is 1 GB on 64-bit, 250 MB on 32-bit. // Using decimal instead of binary GB and MB because // they look nicer in the stack overflow failure message. // // 最大栈大小在 64 位上为 1 GB，在 32 位上为 250 MB。 // 使用十进制而不是二进制 GB 和 MB，因为它们在栈溢出失败消息中看起来更好。 if goarch.PtrSize == 8 { // maxstacksize 是单个goroutine栈大小的最大上限值。[2KB,1GB] maxstacksize = 1000000000 } else { maxstacksize = 250000000 } // An upper limit for max stack size. Used to avoid random crashes // after calling SetMaxStack and trying to allocate a stack that is too big, // since stackalloc works with 32-bit sizes. // // 栈大小的上限。用于避免在调用SetMaxStack并试图分配过大的栈之后的随机崩溃，因为stackalloc可以处理32位大小的栈。 // 用于判断单个goroutine栈大小上限。在newstack()函数中被使用。 maxstackceiling = 2 * maxstacksize // Allow newproc to start new Ms. // // 标记主线程runtime.main已启动，允许 newproc 启动新的M。 mainStarted = true // 【创建监控线程】，该线程独立于调度器之外，不需要跟P关联。 // wasm上还没有线程，所以没有sysmon。 if GOARCH != \"wasm\" { // no threads on wasm yet, so no sysmon // 切换到g0栈执行newm函数创建监控线程sysmon。 systemstack(func() { newm(sysmon, nil, -1) }) } // Lock the main goroutine onto this, the main OS thread, // during initialization. Most programs won't care, but a few // do require certain calls to be made by the main thread. // Those can arrange for main.main to run in the main thread // by calling runtime.LockOSThread during initialization // to preserve the lock. // // 在初始化期间，将main goroutine锁定到这个主操作系统线程上。 // 大多数程序不会在意，但有一些确实需要main线程进行某些调用。 // 它们可以通过调用runtime来安排main.main在主线程中运行。LockOSThread在初始化期间保存锁。 lockOSThread() // runtime.main初始化时只有m0这个线程 if g.m != \u0026m0 { throw(\"runtime.main not on m0\") } // Record when the world started. // Must be before doInit for tracing init. // // runtimeInitTime 是运行时开始的nanotime()。 // 记录the world started开始时间。 // 如果要跟踪init，必须在doInit之前。 runtimeInitTime = nanotime() if runtimeInitTime == 0 { throw(\"nanotime returning zero\") } if debug.inittrace != 0 { inittrace.id = getg().goid inittrace.active = true } // 初始化为runtime包完成的一组初始化，执行runtime包中所有的init函数。 // 必须在defer之前。递归调用runtime包的相关init()函数。 doInit(\u0026runtime_inittask) // Must be before defer. // Defer unlock so that runtime.Goexit during init does the unlock too. // // 延迟解锁，以便 runtime.Goexit 在 init 期间也进行解锁 needUnlock := true\t// 标记当前主线程还未被解锁，main函数退出了需要执行defer解锁 defer func() { if needUnlock { unlockOSThread() } }() // 创建GC相关的扫描器和清理器。 gcenable() // 清扫协程，参看GC相关 // main_init_done 是 cgocallbackg 使用的一个信号，表明初始化已经完成 // 它是在 _cgo_notify_runtime_init_done 之前完成的，所以所有的 cgo 调用都可以依赖它存在 // 当 main_init 完成时，它被关闭，这意味着 cgocallbackg 可以可靠地从中接收 main_init_done = make(chan bool) if iscgo { if _cgo_thread_start == nil { throw(\"_cgo_thread_start missing\") } if GOOS != \"windows\" { if _cgo_setenv == nil { throw(\"_cgo_setenv missing\") } if _cgo_unsetenv == nil { throw(\"_cgo_unsetenv missing\") } } if _cgo_notify_runtime_init_done == nil { throw(\"_cgo_notify_runtime_init_done missing\") } // Start the template thread in case we enter Go from // a C-created thread and need to create a new thread. startTemplateThread() cgocall(_cgo_notify_runtime_init_done, nil) } // 递归调用main包相关引用包的init()函数 doInit(\u0026main_inittask) // Disable init tracing after main init done to avoid overhead // of collecting statistics in malloc and newproc // // 在主初始化完成后禁用初始化跟踪以避免在 malloc 和 newproc 中收集统计信息的开销 inittrace.active = false close(main_init_done)\t// 关闭main_init_done，此时在main_init_done上面的goroutine将被执行 needUnlock = false\t// 标记当前主线程OS已被解锁 unlockOSThread()\t// 解锁主线程 if isarchive || islibrary { // A program compiled with -buildmode=c-archive or c-shared // has a main, but it is not executed. // 使用 -buildmode=c-archive 或 c-shared 编译的程序有一个 main，但它不会被执行 return } // 进行间接调用，因为链接器在放置运行时时不知道主包的地址 // main.main函数是我们主包的地址所在 fn := main_main // make an indirect call, as the linker doesn't know the address of the main package when laying down the runtime fn() // 进入main.main开始执行代码 if raceenabled { racefini() } // Make racy client program work: if panicking on // another goroutine at the same time as main returns, // let the other goroutine finish printing the panic trace. // Once it does, it will exit. See issues 3934 and 20018. // // 让racy客户端程序工作：如果在main返回的同时在另一个goroutine上painc，让另一个goroutine完成打印painc跟踪 if atomic.Load(\u0026runningPanicDefers) != 0 { // Running deferred functions should not take long. for c := 0; c \u003c 1000; c++ { if atomic.Load(\u0026runningPanicDefers) == 0 { break } Gosched() } } if atomic.Load(\u0026panicking) != 0 { gopark(nil, nil, waitReasonPanicWait, traceEvGoStop, 1) } // 进入系统调用，退出进程，可以看出main goroutine并未返回，而是直接进入系统调用退出进程了 exit(0) // 保护性代码，如果exit意外返回，下面的代码也会让该进程crash死掉 for { var x *int32\t// 这里为nil *x = 0\t// 给一个不存在的地址赋值，会出错的 } } lockOSThread() 文件位置：go1.19.3/src/runtime/proc.go。 4416 4417 4418 4419 4420 //go:nosplit func lockOSThread() { getg().m.lockedInt++ dolockOSThread() } dolockOSThread() 下面的LockOSThread和lockOSThread在修改m.locked后调用dolockOSThread()。 在这个调用期间不允许抢占，否则这个函数中的m可能与调用者中的m不同。 文件位置：go1.19.3/src/runtime/proc.go。 4370 4371 4372 4373 4374 4375 4376 4377 4378 4379 4380 4381 4382 // dolockOSThread is called by LockOSThread and lockOSThread below // after they modify m.locked. Do not allow preemption during this call, // or else the m might be different in this function than in the caller. // //go:nosplit func dolockOSThread() { if GOARCH == \"wasm\" { return // no threads on wasm yet } _g_ := getg() _g_.m.lockedg.set(_g_) _g_.lockedm.set(_g_.m) } unlockOSThread() 文件位置：go1.19.3/src/runtime/proc.go。 4462 4463 4464 4465 4466 4467 4468 4469 4470 4471 //go:nosplit func unlockOSThread() { _g_ := getg() // 没有加锁时解锁。 if _g_.m.lockedInt == 0 { systemstack(badunlockosthread) } _g_.m.lockedInt-- dounlockOSThread() } dounlockOSThread() 文件位置：go1.19.3/src/runtime/proc.go。 4422 4423 4424 4425 4426 4427 4428 4429 4430 4431 4432 4433 4434 4435 4436 4437 // dounlockOSThread is called by UnlockOSThread and unlockOSThread below // after they update m-\u003elocked. Do not allow preemption during this call, // or else the m might be in different in this function than in the caller. // //go:nosplit func dounlockOSThread() { if GOARCH == \"wasm\" { return // no threads on wasm yet } _g_ := getg() if _g_.m.lockedInt != 0 || _g_.m.lockedExt != 0 { return } _g_.m.lockedg = 0 _g_.lockedm = 0 } doInit() type initTask struct initTask表示需要为包执行的初始化集合。 与../../test/initempty.go:initTask保持同步。 文件位置：go1.19.3/src/runtime/proc.go。 6272 6273 6274 6275 6276 6277 6278 6279 6280 6281 6282 6283 6284 6285 6286 6287 6288 // An initTask represents the set of initializations that need to be done for a package. // Keep in sync with ../../test/initempty.go:initTask type initTask struct { // TODO: pack the first 3 fields more tightly? // // 将前3个字段封装得更紧密? // state：0 未初始化；1 初始化中；2 已初始化 state uintptr // 0 = uninitialized, 1 = in progress, 2 = done ndeps uintptr // 当前包依赖几个包 nfns uintptr // 当前包有几个init函数 // followed by ndeps instances of an *initTask, one per package depended on // followed by nfns pcs, one per init function to run // // 然后是*initTask的ndeps实例，每个包依赖于一个nfns pcs，每个init函数运行一个 // ndeps 个 *initTask // 指向当前包结构的那些包的initTask // nfns 个 func() // 当前包的那些init函数 } 结构图：一个initTask就是一个包结构。 [ndeps]*initTask：包含当前包引用的其他包结构。 [nfns]func()：表示当前包定义的所有init()函数。 runtime.main函数中会递归从最后调用init()函数。 包初始化，静态初始化、非静态初始化。 静态初始化：包级别变量的初始化工作应该在程序代码开始使用这些变量前完成，参看包初始化文档。 非静态初始化：包级别变量m的初始值需要进行函数调用，并不是一个能够被编译器在编译阶段求值的表达式时。 doInit()函数：只是执行注册包的init()函数作用。 文件位置：go1.19.3/src/runtime/proc.go。 6294 6295 6296 6297 6298 6299 6300 6301 6302 6303 6304 6305 6306 6307 6308 6309 6310 6311 6312 6313 6314 6315 6316 6317 6318 6319 6320 6321 6322 6323 6324 6325 6326 6327 6328 6329 6330 6331 6332 6333 6334 6335 6336 6337 6338 6339 6340 6341 6342 6343 6344 6345 6346 6347 6348 6349 6350 6351 6352 6353 6354 6355 6356 6357 6358 6359 6360 6361 6362 6363 6364 func doInit(t *initTask) { switch t.state { // 已初始化 case 2: // fully initialized return // 正在初始化中 case 1: // initialization in progress\tthrow(\"recursive call during initialization - linker skew\") // 没有初始化 default: // not initialized yet\t// 标记当前包正在初始化中 t.state = 1 // initialization in progress // 遍历当前包依赖的包，t.ndeps记录的依赖的包数量 for i := uintptr(0); i \u003c t.ndeps; i++ { // 偏移到指定位置，获取到ndeps位置的*initTask数据 // 3*goarch.PtrSize 表示前state、ndeps、nfns所占的内存大小 p := add(unsafe.Pointer(t), (3+i)*goarch.PtrSize) // 64位占8字节 t2 := *(**initTask)(p) // *initTask // 这里也是导致从最内层的包开始倒叙执行初始化的原因 doInit(t2) // 递归 } // 如果当前包没有init函数，直接把包标记成2已完成并直接返回 if t.nfns == 0 { t.state = 2 // initialization done return } var ( start int64 // 调试模式情况使用，记录开始时间 before tracestat ) if inittrace.active { start = nanotime() // Load stats non-atomically since tracinit is updated only by this init goroutine. before = inittrace } // 偏移到init函数的地址处 firstFunc := add(unsafe.Pointer(t), (3+t.ndeps)*goarch.PtrSize) // 遍历并执行包注册的init函数，同一个包的不同go文件中init函数执行时是无序的 for i := uintptr(0); i \u003c t.nfns; i++ { p := add(firstFunc, i*goarch.PtrSize) // 偏移到init函数位置 f := *(*func())(unsafe.Pointer(\u0026p))\t// func() f()\t// 执行init函数 } // 调试模式下 打印相关参数 if inittrace.active { end := nanotime() // Load stats non-atomically since tracinit is updated only by this init goroutine. after := inittrace f := *(*func())(unsafe.Pointer(\u0026firstFunc)) pkg := funcpkgpath(findfunc(abi.FuncPCABIInternal(f))) var sbuf [24]byte print(\"init \", pkg, \" @\") print(string(fmtNSAsMS(sbuf[:], uint64(start-runtimeInitTime))), \" ms, \") print(string(fmtNSAsMS(sbuf[:], uint64(end-start))), \" ms clock, \") print(string(itoa(sbuf[:], after.bytes-before.bytes)), \" bytes, \") print(string(itoa(sbuf[:], after.allocs-before.allocs)), \" allocs\") print(\"\\n\") } // 标记当前包已初始化完成 t.state = 2 // initialization done } } gcenable() gcenable在runtime初始化之后被调用，在我们准备让用户代码运行之前被调用。 它启动 background sweeper goroutine，以及 background scavenger goroutine，并启动GC。 文件位置：go1.19.3/src/runtime/mgc.go。 更详情介绍参看GC篇文章。 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 // gcenable is called after the bulk of the runtime initialization, // just before we're about to start letting user code run. // It kicks off the background sweeper goroutine, the background // scavenger goroutine, and enables GC. func gcenable() { // Kick off sweeping and scavenging. // 启动 sweeping 和 scavenging。 c := make(chan int, 2) // 有缓冲2 go bgsweep(c) // 扫描 go bgscavenge(c) // 清扫 // 等待这两个goroutine运行起来。 \u003c-c \u003c-c // 现在运行时已经初始化，GC就可以了。 memstats.enablegc = true // now that runtime is initialized, GC is okay } bgsweep() 文件位置：go1.19.3/src/runtime/mgcsweep.go。 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285 286 287 288 289 290 291 292 293 294 295 296 297 298 299 300 301 func bgsweep(c chan int) { sweep.g = getg() // sweep g // 初始化锁排名 lockInit(\u0026sweep.lock, lockRankSweep) lock(\u0026sweep.lock) // mutex lock sweep.parked = true c \u003c- 1 // 通知 gcenable 函数解除阻塞 // 调离CPU goparkunlock(\u0026sweep.lock, waitReasonGCSweepWait, traceEvGoBlock, 1) for { for sweepone() != ^uintptr(0) { sweep.nbgsweep++ Gosched() } for freeSomeWbufs(true) { Gosched() } lock(\u0026sweep.lock) if !isSweepDone() { // This can happen if a GC runs between // gosweepone returning ^0 above // and the lock being acquired. unlock(\u0026sweep.lock) continue } sweep.parked = true goparkunlock(\u0026sweep.lock, waitReasonGCSweepWait, traceEvGoBlock, 1) } } bgscavenge() 后台清扫器。后台清扫程序在mheap结构体中比例清除统计信息所描述的线以下维护应用程序的RSS。 文件位置：go1.19.3/src/runtime/mgcscavenge.go。 608 609 610 611 612 613 614 615 616 617 618 619 620 621 622 623 624 625 626 627 628 629 // Background scavenger. // // The background scavenger maintains the RSS of the application below // the line described by the proportional scavenging statistics in // the mheap struct. func bgscavenge(c chan int) { scavenger.init() // scavenger 初始化 c \u003c- 1 // 通知 gcenable 函数解除阻塞 // 调离CPU scavenger.park() for { released, workTime := scavenger.run() if released == 0 { scavenger.park() continue } atomic.Xadduintptr(\u0026mheap_.pages.scav.released, released) scavenger.sleep(workTime) } } ",
   "wordCount" : "1845",
   "inLanguage": "zh",
-  "image": "https://heliu.site/favicon-32x32.png","datePublished": "2024-07-29T00:00:00Z",
+  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-07-29T00:00:00Z",
   "dateModified": "2024-07-29T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/golang/goroutine/main/"
+    "@id": "https://helium.github.io/posts/golang/goroutine/main/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/golang/goroutine/">第12章 Goroutine</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/goroutine/">第12章 Goroutine</a></div>
     <h1 class="post-title entry-hint-parent">
       main goroutine
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://heliu.site/tags/goroutine/" target="_blank" rel="noopener">Goroutine</a>
+            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium.github.io/tags/goroutine/" target="_blank" rel="noopener">Goroutine</a>
         </ul>
       </span>
       
@@ -1295,16 +1295,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/golang/">Golang</a></li>
-      <li><a href="https://heliu.site/tags/goroutine/">Goroutine</a></li>
+      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium.github.io/tags/goroutine/">Goroutine</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/golang/goroutine/user/">
+  <a class="prev" href="https://helium.github.io/posts/golang/goroutine/user/">
     <span class="title">« 上一页</span>
     <br>
     <span>user goroutine</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/golang/goroutine/mstart/">
+  <a class="next" href="https://helium.github.io/posts/golang/goroutine/mstart/">
     <span class="title">下一页 »</span>
     <br>
     <span>GMP 调度模型</span>

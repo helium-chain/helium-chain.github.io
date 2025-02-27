@@ -9,18 +9,18 @@
 <meta name="keywords" content="mysql">
 <meta name="description" content="mysql 分库分表策略。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://heliu.site/posts/mysql/table/">
+<link rel="canonical" href="https://helium.github.io/posts/mysql/table/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://heliu.site/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://heliu.site/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://heliu.site/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://heliu.site/apple-touch-icon.png">
-<link rel="mask-icon" href="https://heliu.site/apple-touch-icon.png">
+<link rel="icon" href="https://helium.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://heliu.site/posts/mysql/table/">
+<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/mysql/table/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,13 +77,13 @@
 <meta property="og:title" content="mysql 分库分表" />
 <meta property="og:description" content="mysql 分库分表策略。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://heliu.site/posts/mysql/table/" />
-<meta property="og:image" content="https://heliu.site/posts/mysql/images/mysql-030.png" /><meta property="article:section" content="posts" />
+<meta property="og:url" content="https://helium.github.io/posts/mysql/table/" />
+<meta property="og:image" content="https://helium.github.io/posts/mysql/images/mysql-030.png" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2022-09-05T00:00:00+00:00" />
 <meta property="article:modified_time" content="2022-09-05T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://heliu.site/posts/mysql/images/mysql-030.png" />
+<meta name="twitter:image" content="https://helium.github.io/posts/mysql/images/mysql-030.png" />
 <meta name="twitter:title" content="mysql 分库分表"/>
 <meta name="twitter:description" content="mysql 分库分表策略。"/>
 
@@ -97,19 +97,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://heliu.site/posts/"
+      "item": "https://helium.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Mysql",
-      "item": "https://heliu.site/posts/mysql/"
+      "item": "https://helium.github.io/posts/mysql/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "mysql 分库分表",
-      "item": "https://heliu.site/posts/mysql/table/"
+      "item": "https://helium.github.io/posts/mysql/table/"
     }
   ]
 }
@@ -127,7 +127,7 @@
   "articleBody": " 随着互联网及移动互联网的发展，应用系统的数据量也是成指数式增长，若采用单数据库进行数据存储，存在以下性能瓶颈： IO瓶颈：热点数据太多，数据库缓存不足，产生大量磁盘IO，效率较低。请求数据太多，带宽不够，网络IO瓶颈。 CPU瓶颈：排序、分组、连接查询、聚合统计等SQL会耗费大量的CPU资源，请求数太多，CPU出现瓶颈。 为了解决上述问题，我们需要对数据库进行分库分表处理。分库分表的中心思想都是将数据分散存储，使得单一数据库/表的数据量变小来缓解单一数据库的性能问题，从而达到提升数据库性能的目的。 拆分策略 分库分表的形式，主要是两种：垂直拆分和水平拆分。 而拆分的粒度，一般又分为分库和分表，所以组成的拆分策略最终如下： ————————垂直拆分———————— ————————水平拆分———————— 垂直分库 水平分库 垂直分表 水平分表 垂直拆分 垂直分库 垂直分库：以表为依据，根据业务将不同表拆分到不同库中。 特点： 每个库的表结构都不一样。 每个库的数据也不一样。 所有库的并集是全量数据。 比较常用垂直分库，比如产品维度分商品表库和购物车表库。 垂直分表 垂直分表：以字段为依据，根据字段属性将不同字段拆分到不同表中。 特点： 每个表的结构都不一样。 每个表的数据也不一样，一般通过一列（主键/外键）关联。 所有表的并集是全量数据。 当我们的数据表有很多冗余字段时，可采取垂直分表，这样能把热点字段分为一个表，其他字段分为一个表。 水平拆分 水平分库 水平分库：以字段为依据，按照一定策略，将一个库的数据拆分到多个库中。 特点： 每个库的表结构都一样。 每个库的数据都不一样。 所有库的并集是全量数据。 水平分库很少见，不推荐这种。 水平分表 水平分表：以字段为依据，按照一定策略，将一个表的数据拆分到多个表中。 特点： 每个表的表结构都一样。 每个表的数据都不一样。 所有表的并集是全量数据。 水平分表比较常见，比如一张表的数据太大了超千万级别，导致索引检索变慢，可以采用水平分表。 一旦涉及水平分布，则需要考虑主键ID(雪花算法)、分多少张表，以及后面扩容问题。 常见的几种策略： hash取模：假设有用户表user，将其分成3个表user0,user1,user2。路由规则是对3取模,当uid=1时,对应到的是user1,uid=2时,对应的是user2。好处在于说，可以平均分配每个库的数据量和请求压力；坏处在于说扩容起来比较麻烦，会有一个数据迁移的过程，之前的数据需要重新计算 hash 值重新分配到不同的库或表。 范围分片：从1-100w一个表,100w-200w一个表。好处在于说，扩容的时候很简单，因为你只要预备好，给每个月都准备一个库就可以了，到了一个新的月份的时候，自然而然就会写新的库了；缺点，但是大部分的请求，都是访问最新的数据。 地理位置分片：华南区一个表,华北一个表。根据地区划分表。 时间分片：按月分片，按季度分片等等,可以做到冷热数据。 相关中间件 shardingJDBC：基于AOP原理，在应用程序中对本地执行的SQL进行拦截，解析、改写、路由处理。需要自行编码配置实现，只支持java语言，性能较高。 MyCat：数据库分库分表中间件，不用调整代码即可实现分库分表，支持多种语言，性能不及前者。 分库分表问题 分布式事务问题 如果我们做了垂直分库或者水平分库以后,就必然会涉及到跨库执行SQL的问题,这样就引发了互联网界的老大难问题-“分布式事务”。那要如何解决这个问题呢？ 使用分布式事务中间件。 使用MySQL自带的针对跨库的事务一致性方案(XA),不过性能要比单库的慢10倍左右。 能否避免掉跨库操作(比如将用户和商品放在同一个库中) 跨库join的问题 分库分表后表之间的关联操作将受到限制，我们无法join位于不同分库的表，也无法join分表粒度不同的表，结果原本一次查询能够完成的业务，可能需要多次查询才能完成。粗略的解决方法： 全局表：基础数据，所有库都拷贝一份。 字段冗余：这样有些字段就不用join去查询了。 系统层组装：分别查询出所有，然后组装起来，较复杂。 横向扩容的问题 当我们使用HASH取模做分表的时候,针对数据量的递增,可能需要动态的增加表,此时就需要考虑因为reHash导致数据迁移的问题。 结果集合并、排序的问题 因为我们是将数据分散存储到不同的库、表里的,当我们查询指定数据列表时,数据来源于不同的子库或者子表,就必然会引发结果集合并、排序的问题。如果每次查询都需要排序、合并等操作,性能肯定会受非常大的影响。走缓存可能一条路! ",
   "wordCount" : "69",
   "inLanguage": "zh",
-  "image":"https://heliu.site/posts/mysql/images/mysql-030.png","datePublished": "2022-09-05T00:00:00Z",
+  "image":"https://helium.github.io/posts/mysql/images/mysql-030.png","datePublished": "2022-09-05T00:00:00Z",
   "dateModified": "2022-09-05T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -135,14 +135,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://heliu.site/posts/mysql/table/"
+    "@id": "https://helium.github.io/posts/mysql/table/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://heliu.site/favicon.ico"
+      "url": "https://helium.github.io/favicon.ico"
     }
   }
 }
@@ -164,8 +164,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://heliu.site/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://heliu.site/helium.png" alt="" aria-label="logo"
+            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -192,32 +192,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://heliu.site/" title="主页">
+                <a href="https://helium.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/posts" title="文章">
+                <a href="https://helium.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/archives" title="时间轴">
+                <a href="https://helium.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/tags/" title="标签">
+                <a href="https://helium.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://heliu.site/support" title="打赏">
+                <a href="https://helium.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -229,7 +229,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://heliu.site/">主页</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/">Article</a>&nbsp;»&nbsp;<a href="https://heliu.site/posts/mysql/">Mysql</a></div>
+    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/mysql/">Mysql</a></div>
     <h1 class="post-title entry-hint-parent">
       mysql 分库分表
     </h1>
@@ -265,7 +265,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://heliu.site/tags/mysql/" target="_blank" rel="noopener">Mysql</a>
+            <a href="https://helium.github.io/tags/mysql/" target="_blank" rel="noopener">Mysql</a>
         </ul>
       </span>
       
@@ -276,7 +276,7 @@
 
 </div>
   </header> 
-<figure class="entry-cover1"><img loading="eager" src="https://heliu.site/posts/mysql/images/mysql-030.png" alt="">
+<figure class="entry-cover1"><img loading="eager" src="https://helium.github.io/posts/mysql/images/mysql-030.png" alt="">
         
 </figure><aside id="toc-container" class="toc-container wide">
     <div class="toc">
@@ -533,15 +533,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://heliu.site/tags/mysql/">Mysql</a></li>
+      <li><a href="https://helium.github.io/tags/mysql/">Mysql</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://heliu.site/posts/mysql/master/">
+  <a class="prev" href="https://helium.github.io/posts/mysql/master/">
     <span class="title">« 上一页</span>
     <br>
     <span>mysql 主从复制</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/mysql/mycat/">
+  <a class="next" href="https://helium.github.io/posts/mysql/mycat/">
     <span class="title">下一页 »</span>
     <br>
     <span>mycat 分库分表中间件</span>
