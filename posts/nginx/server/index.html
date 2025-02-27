@@ -398,10 +398,10 @@
 <li>用来配置监听端口。</li>
 <li>语法：默认 <strong>listen *:80 | *:8000</strong></li>
 </ol>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">listen address[:port] [default_server]...; 
-
-listen port [default_server]...;
-</code></pre><ol start="3">
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">listen address</span><span class="err">[:</span><span class="k">port</span><span class="err">]</span> <span class="err">[</span><span class="k">default_server</span><span class="err">]...;</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">listen port </span><span class="err">[</span><span class="k">default_server</span><span class="err">]...;</span>
+</span></span></code></pre></div><ol start="3">
 <li>示例：</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl"># listen localhost:8000 监听指定的IP和端口

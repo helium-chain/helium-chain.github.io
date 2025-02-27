@@ -501,14 +501,14 @@
 </ul>
 </li>
 </ol>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">ALTER DATABASE name [ [ WITH ] option [ ... ] ]
-
-where option can be:
-
-    ALLOW_CONNECTIONS allowconn
-    CONNECTION LIMIT connlimit
-    IS_TEMPLATE istemplate
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 更改数据库连接限制(这个命令将数据库 mydatabase 的并发连接数限制为 50)
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">ALTER DATABASE name </span><span class="err">[</span> <span class="err">[</span> <span class="k">WITH </span><span class="err">]</span> <span class="k">option </span><span class="err">[</span> <span class="err">...</span> <span class="err">]</span> <span class="err">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">where option can be</span><span class="err">:</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">ALLOW_CONNECTIONS allowconn</span>
+</span></span><span class="line"><span class="cl">    <span class="k">CONNECTION LIMIT connlimit</span>
+</span></span><span class="line"><span class="cl">    <span class="k">IS_TEMPLATE istemplate</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 更改数据库连接限制(这个命令将数据库 mydatabase 的并发连接数限制为 50)
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">ALTER</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">mydatabase</span><span class="w"> </span><span class="k">CONNECTION</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">50</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- 禁止连接到数据库(这个命令禁止所有用户连接到 mydatabase 数据库)
@@ -520,8 +520,8 @@ where option can be:
 </ul>
 </li>
 </ol>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">ALTER DATABASE name RENAME TO new_name;
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 将数据库重命名(这个命令将数据库 mydatabase 重命名为 newdatabase)
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">ALTER DATABASE name RENAME TO new_name</span><span class="err">;</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 将数据库重命名(这个命令将数据库 mydatabase 重命名为 newdatabase)
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">ALTER</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">mydatabase</span><span class="w"> </span><span class="k">RENAME</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">newdatabase</span><span class="p">;</span><span class="w">
 </span></span></span></code></pre></div><ol start="4">
 <li>更改数据库所有者。
@@ -530,8 +530,8 @@ where option can be:
 </ul>
 </li>
 </ol>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">ALTER DATABASE name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 这个命令将数据库 mydatabase 的所有者更改为用户 myuser
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">ALTER DATABASE name OWNER TO </span><span class="err">{</span> <span class="k">new_owner </span><span class="err">|</span> <span class="k">CURRENT_ROLE </span><span class="err">|</span> <span class="k">CURRENT_USER </span><span class="err">|</span> <span class="k">SESSION_USER </span><span class="err">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 这个命令将数据库 mydatabase 的所有者更改为用户 myuser
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">ALTER</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">mydatabase</span><span class="w"> </span><span class="k">OWNER</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">myuser</span><span class="p">;</span><span class="w">
 </span></span></span></code></pre></div><ol start="5">
 <li>更改数据库使用的表空间。
@@ -540,8 +540,8 @@ where option can be:
 </ul>
 </li>
 </ol>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">ALTER DATABASE name SET TABLESPACE new_tablespace
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 这个命令将数据库 mydatabase 使用的表空间更改为 mytablespace
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">ALTER DATABASE name SET TABLESPACE new_tablespace</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 这个命令将数据库 mydatabase 使用的表空间更改为 mytablespace
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">ALTER</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">mydatabase</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">TABLESPACE</span><span class="w"> </span><span class="n">mytablespace</span><span class="p">;</span><span class="w">
 </span></span></span></code></pre></div><ol start="6">
 <li>设置数据库参数。
@@ -550,8 +550,8 @@ where option can be:
 </ul>
 </li>
 </ol>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">ALTER DATABASE name SET configuration_parameter { TO | = } { value | DEFAULT }
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 这个命令将数据库 mydatabase 的时区设置为 UTC
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">ALTER DATABASE name SET configuration_parameter </span><span class="err">{</span> <span class="k">TO </span><span class="err">|</span> <span class="o">=</span> <span class="p">}</span> <span class="p">{</span> <span class="k">value </span><span class="p">|</span> <span class="k">DEFAULT </span><span class="p">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 这个命令将数据库 mydatabase 的时区设置为 UTC
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">ALTER</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">mydatabase</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">timezone</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="s1">&#39;UTC&#39;</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- 禁用数据库 newdb 中的索引扫描
@@ -563,8 +563,8 @@ where option can be:
 </ul>
 </li>
 </ol>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">ALTER DATABASE name SET configuration_parameter FROM CURRENT
-</code></pre><ol start="8">
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">ALTER DATABASE name SET configuration_parameter FROM CURRENT</span>
+</span></span></code></pre></div><ol start="8">
 <li>重置配置参数到默认值。
 <ul>
 <li>RESET configuration_parameter: 重置配置参数到默认值。</li>
@@ -572,9 +572,9 @@ where option can be:
 </ul>
 </li>
 </ol>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">ALTER DATABASE name RESET configuration_parameter
-ALTER DATABASE name RESET ALL
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 重置数据库配置参数(这个命令将数据库 mydatabase 的时区配置参数重置为默认值)
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">ALTER DATABASE name RESET configuration_parameter</span>
+</span></span><span class="line"><span class="cl"><span class="k">ALTER DATABASE name RESET ALL</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 重置数据库配置参数(这个命令将数据库 mydatabase 的时区配置参数重置为默认值)
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">ALTER</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">mydatabase</span><span class="w"> </span><span class="k">RESET</span><span class="w"> </span><span class="n">timezone</span><span class="p">;</span><span class="w">
 </span></span></span></code></pre></div><ol start="9">
 <li>请确保在执行这些命令时，你有足够的权限来更改数据库配置，并且替换示例中的 mydatabase、myuser、mytablespace 等占位符为实际的数据库、用户和表空间名称。</li>
@@ -590,17 +590,17 @@ ALTER DATABASE name RESET ALL
 </ul>
 </li>
 </ol>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">Command:     DROP DATABASE
-Description: remove a database
-Syntax:
-DROP DATABASE [ IF EXISTS ] name [ [ WITH ] ( option [, ...] ) ]
-
-where option can be:
-
-    FORCE
-
-URL: https://www.postgresql.org/docs/14/sql-dropdatabase.html
-</code></pre><ol start="2">
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">Command</span><span class="err">:</span>     <span class="k">DROP DATABASE</span>
+</span></span><span class="line"><span class="cl"><span class="k">Description</span><span class="err">:</span> <span class="k">remove a database</span>
+</span></span><span class="line"><span class="cl"><span class="k">Syntax</span><span class="err">:</span>
+</span></span><span class="line"><span class="cl"><span class="k">DROP DATABASE </span><span class="err">[</span> <span class="k">IF EXISTS </span><span class="err">]</span> <span class="k">name </span><span class="err">[</span> <span class="err">[</span> <span class="k">WITH </span><span class="err">]</span> <span class="err">(</span> <span class="k">option </span><span class="err">[,</span> <span class="err">...]</span> <span class="err">)</span> <span class="err">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">where option can be</span><span class="err">:</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">FORCE</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">URL</span><span class="err">:</span> <span class="k">https</span><span class="err">://</span><span class="k">www</span><span class="err">.</span><span class="k">postgresql</span><span class="err">.</span><span class="k">org</span><span class="err">/</span><span class="k">docs</span><span class="err">/14/</span><span class="k">sql-dropdatabase</span><span class="err">.</span><span class="k">html</span>
+</span></span></code></pre></div><ol start="2">
 <li>删除一个数据库。
 <ul>
 <li>这个命令会删除名为 mydatabase 的数据库。如果数据库不存在，命令会报错。</li>
@@ -692,24 +692,24 @@ URL: https://www.postgresql.org/docs/14/sql-dropdatabase.html
 </ul>
 </li>
 </ol>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">testdb=# \h CREATE SCHEMA
-Command:     CREATE SCHEMA
-Description: define a new schema
-Syntax:
-CREATE SCHEMA schema_name [ AUTHORIZATION role_specification ] [ schema_element [ ... ] ]
-CREATE SCHEMA AUTHORIZATION role_specification [ schema_element [ ... ] ]
-CREATE SCHEMA IF NOT EXISTS schema_name [ AUTHORIZATION role_specification ]
-CREATE SCHEMA IF NOT EXISTS AUTHORIZATION role_specification
-
-where role_specification can be:
-
-    user_name
-  | CURRENT_ROLE
-  | CURRENT_USER
-  | SESSION_USER
-
-URL: https://www.postgresql.org/docs/14/sql-createschema.html
-</code></pre><ol start="2">
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">testdb</span><span class="o">=</span><span class="err">#</span> <span class="err">\</span><span class="k">h CREATE SCHEMA</span>
+</span></span><span class="line"><span class="cl"><span class="k">Command</span><span class="err">:</span>     <span class="k">CREATE SCHEMA</span>
+</span></span><span class="line"><span class="cl"><span class="k">Description</span><span class="err">:</span> <span class="k">define a new schema</span>
+</span></span><span class="line"><span class="cl"><span class="k">Syntax</span><span class="err">:</span>
+</span></span><span class="line"><span class="cl"><span class="k">CREATE SCHEMA schema_name </span><span class="p">[</span> <span class="k">AUTHORIZATION role_specification </span><span class="p">]</span> <span class="p">[</span> <span class="k">schema_element </span><span class="p">[</span> <span class="p">.</span><span class="err">..</span> <span class="err">]</span> <span class="err">]</span>
+</span></span><span class="line"><span class="cl"><span class="k">CREATE SCHEMA AUTHORIZATION role_specification </span><span class="err">[</span> <span class="k">schema_element </span><span class="err">[</span> <span class="err">...</span> <span class="err">]</span> <span class="err">]</span>
+</span></span><span class="line"><span class="cl"><span class="k">CREATE SCHEMA IF NOT EXISTS schema_name </span><span class="err">[</span> <span class="k">AUTHORIZATION role_specification </span><span class="err">]</span>
+</span></span><span class="line"><span class="cl"><span class="k">CREATE SCHEMA IF NOT EXISTS AUTHORIZATION role_specification</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">where role_specification can be</span><span class="err">:</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">user_name</span>
+</span></span><span class="line"><span class="cl">  <span class="err">|</span> <span class="k">CURRENT_ROLE</span>
+</span></span><span class="line"><span class="cl">  <span class="err">|</span> <span class="k">CURRENT_USER</span>
+</span></span><span class="line"><span class="cl">  <span class="err">|</span> <span class="k">SESSION_USER</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">URL</span><span class="err">:</span> <span class="k">https</span><span class="err">://</span><span class="k">www</span><span class="err">.</span><span class="k">postgresql</span><span class="err">.</span><span class="k">org</span><span class="err">/</span><span class="k">docs</span><span class="err">/14/</span><span class="k">sql-createschema</span><span class="err">.</span><span class="k">html</span>
+</span></span></code></pre></div><ol start="2">
 <li>创建一个新模式。(这个命令会创建一个名为 my_schema 的新模式)</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">CREATE</span><span class="w"> </span><span class="k">SCHEMA</span><span class="w"> </span><span class="n">my_schema</span><span class="p">;</span><span class="w">
@@ -763,15 +763,15 @@ URL: https://www.postgresql.org/docs/14/sql-createschema.html
 </ul>
 </li>
 </ol>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">postgres=# \h ALTER SCHEMA
-Command:     ALTER SCHEMA
-Description: change the definition of a schema
-Syntax:
-ALTER SCHEMA name RENAME TO new_name
-ALTER SCHEMA name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
-
-URL: https://www.postgresql.org/docs/14/sql-alterschema.html
-</code></pre><ol start="2">
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">postgres</span><span class="o">=</span><span class="err">#</span> <span class="err">\</span><span class="k">h ALTER SCHEMA</span>
+</span></span><span class="line"><span class="cl"><span class="k">Command</span><span class="err">:</span>     <span class="k">ALTER SCHEMA</span>
+</span></span><span class="line"><span class="cl"><span class="k">Description</span><span class="err">:</span> <span class="k">change the definition of a schema</span>
+</span></span><span class="line"><span class="cl"><span class="k">Syntax</span><span class="err">:</span>
+</span></span><span class="line"><span class="cl"><span class="k">ALTER SCHEMA name RENAME TO new_name</span>
+</span></span><span class="line"><span class="cl"><span class="k">ALTER SCHEMA name OWNER TO </span><span class="p">{</span> <span class="k">new_owner </span><span class="p">|</span> <span class="k">CURRENT_ROLE </span><span class="p">|</span> <span class="k">CURRENT_USER </span><span class="p">|</span> <span class="k">SESSION_USER </span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">URL</span><span class="err">:</span> <span class="k">https</span><span class="err">://</span><span class="k">www</span><span class="p">.</span><span class="k">postgresql</span><span class="err">.</span><span class="k">org</span><span class="err">/</span><span class="k">docs</span><span class="err">/14/</span><span class="k">sql-alterschema</span><span class="err">.</span><span class="k">html</span>
+</span></span></code></pre></div><ol start="2">
 <li>重命名一个模式。</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 这个命令会将名为 old_schema_name 的模式重命名为 new_schema_name。
@@ -821,14 +821,14 @@ URL: https://www.postgresql.org/docs/14/sql-alterschema.html
 </ul>
 </li>
 </ol>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">postgres=# \h DROP SCHEMA
-Command:     DROP SCHEMA
-Description: remove a schema
-Syntax:
-DROP SCHEMA [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
-
-URL: https://www.postgresql.org/docs/14/sql-dropschema.html
-</code></pre><ol start="2">
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">postgres</span><span class="o">=</span><span class="err">#</span> <span class="err">\</span><span class="k">h DROP SCHEMA</span>
+</span></span><span class="line"><span class="cl"><span class="k">Command</span><span class="err">:</span>     <span class="k">DROP SCHEMA</span>
+</span></span><span class="line"><span class="cl"><span class="k">Description</span><span class="err">:</span> <span class="k">remove a schema</span>
+</span></span><span class="line"><span class="cl"><span class="k">Syntax</span><span class="err">:</span>
+</span></span><span class="line"><span class="cl"><span class="k">DROP SCHEMA </span><span class="p">[</span> <span class="k">IF EXISTS </span><span class="p">]</span> <span class="k">name </span><span class="p">[,</span> <span class="p">.</span><span class="err">..]</span> <span class="err">[</span> <span class="k">CASCADE </span><span class="err">|</span> <span class="k">RESTRICT </span><span class="err">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">URL</span><span class="err">:</span> <span class="k">https</span><span class="err">://</span><span class="k">www</span><span class="err">.</span><span class="k">postgresql</span><span class="err">.</span><span class="k">org</span><span class="err">/</span><span class="k">docs</span><span class="err">/14/</span><span class="k">sql-dropschema</span><span class="err">.</span><span class="k">html</span>
+</span></span></code></pre></div><ol start="2">
 <li>删除一个模式。</li>
 </ol>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 这个命令会删除名为 schema_name 的模式，但如果该模式中有任何依赖的对象，则操作将失败。
@@ -872,10 +872,10 @@ URL: https://www.postgresql.org/docs/14/sql-dropschema.html
     <br>
     <span>proto3</span>
   </a>
-  <a class="next" href="https://heliu.site/posts/postgresql/datatype/">
+  <a class="next" href="https://heliu.site/posts/postgresql/query/">
     <span class="title">下一页 »</span>
     <br>
-    <span>数据类型</span>
+    <span>查询</span>
   </a>
 </nav>
 

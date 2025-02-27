@@ -496,32 +496,32 @@
 </ul>
 </li>
 </ol>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">Command:     CREATE ROLE
-Description: define a new database role
-Syntax:
-CREATE ROLE name [ [ WITH ] option [ ... ] ]
-
-where option can be:
-
-      SUPERUSER | NOSUPERUSER
-    | CREATEDB | NOCREATEDB
-    | CREATEROLE | NOCREATEROLE
-    | INHERIT | NOINHERIT
-    | LOGIN | NOLOGIN
-    | REPLICATION | NOREPLICATION
-    | BYPASSRLS | NOBYPASSRLS
-    | CONNECTION LIMIT connlimit
-    | [ ENCRYPTED ] PASSWORD &#39;password&#39; | PASSWORD NULL
-    | VALID UNTIL &#39;timestamp&#39;
-    | IN ROLE role_name [, ...]
-    | IN GROUP role_name [, ...]
-    | ROLE role_name [, ...]
-    | ADMIN role_name [, ...]
-    | USER role_name [, ...]
-    | SYSID uid
-
-URL: https://www.postgresql.org/docs/14/sql-createrole.html
-</code></pre>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">Command</span><span class="err">:</span>     <span class="k">CREATE ROLE</span>
+</span></span><span class="line"><span class="cl"><span class="k">Description</span><span class="err">:</span> <span class="k">define a new database role</span>
+</span></span><span class="line"><span class="cl"><span class="k">Syntax</span><span class="err">:</span>
+</span></span><span class="line"><span class="cl"><span class="k">CREATE ROLE name </span><span class="err">[</span> <span class="err">[</span> <span class="k">WITH </span><span class="err">]</span> <span class="k">option </span><span class="err">[</span> <span class="err">...</span> <span class="err">]</span> <span class="err">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">where option can be</span><span class="err">:</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="k">SUPERUSER </span><span class="err">|</span> <span class="k">NOSUPERUSER</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="k">CREATEDB </span><span class="err">|</span> <span class="k">NOCREATEDB</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="k">CREATEROLE </span><span class="err">|</span> <span class="k">NOCREATEROLE</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="k">INHERIT </span><span class="err">|</span> <span class="k">NOINHERIT</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="k">LOGIN </span><span class="err">|</span> <span class="k">NOLOGIN</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="k">REPLICATION </span><span class="err">|</span> <span class="k">NOREPLICATION</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="k">BYPASSRLS </span><span class="err">|</span> <span class="k">NOBYPASSRLS</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="k">CONNECTION LIMIT connlimit</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="err">[</span> <span class="k">ENCRYPTED </span><span class="err">]</span> <span class="k">PASSWORD </span><span class="err">&#39;</span><span class="k">password</span><span class="err">&#39;</span> <span class="err">|</span> <span class="k">PASSWORD NULL</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="k">VALID UNTIL </span><span class="err">&#39;</span><span class="k">timestamp</span><span class="err">&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="k">IN ROLE role_name </span><span class="err">[,</span> <span class="err">...]</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="k">IN GROUP role_name </span><span class="err">[,</span> <span class="err">...]</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="k">ROLE role_name </span><span class="err">[,</span> <span class="err">...]</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="k">ADMIN role_name </span><span class="err">[,</span> <span class="err">...]</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="k">USER role_name </span><span class="err">[,</span> <span class="err">...]</span>
+</span></span><span class="line"><span class="cl">    <span class="err">|</span> <span class="k">SYSID uid</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">URL</span><span class="err">:</span> <span class="k">https</span><span class="err">://</span><span class="k">www</span><span class="err">.</span><span class="k">postgresql</span><span class="err">.</span><span class="k">org</span><span class="err">/</span><span class="k">docs</span><span class="err">/14/</span><span class="k">sql-createrole</span><span class="err">.</span><span class="k">html</span>
+</span></span></code></pre></div>
 
 <p><details >
   <summary markdown="span">属性介绍</summary>
@@ -726,13 +726,13 @@ URL: https://www.postgresql.org/docs/14/sql-createrole.html
 <p><details >
   <summary markdown="span">GRANT语法</summary>
   <blockquote>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">GRANT { { SELECT | INSERT | UPDATE | DELETE | TRUNCATE | REFERENCES | TRIGGER }
-    [, ...] | ALL [ PRIVILEGES ] }
-    ON { [ TABLE ] table_name [, ...]
-         | ALL TABLES IN SCHEMA schema_name [, ...] }
-    TO role_specification [, ...] [ WITH GRANT OPTION ]
-    [ GRANTED BY role_specification ]
-</code></pre><ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">GRANT </span><span class="err">{</span> <span class="err">{</span> <span class="k">SELECT </span><span class="err">|</span> <span class="k">INSERT </span><span class="err">|</span> <span class="k">UPDATE </span><span class="err">|</span> <span class="k">DELETE </span><span class="err">|</span> <span class="k">TRUNCATE </span><span class="err">|</span> <span class="k">REFERENCES </span><span class="err">|</span> <span class="k">TRIGGER </span><span class="err">}</span>
+</span></span><span class="line"><span class="cl">    <span class="err">[,</span> <span class="err">...]</span> <span class="err">|</span> <span class="k">ALL </span><span class="err">[</span> <span class="k">PRIVILEGES </span><span class="err">]</span> <span class="err">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">ON </span><span class="err">{</span> <span class="err">[</span> <span class="k">TABLE </span><span class="err">]</span> <span class="k">table_name </span><span class="err">[,</span> <span class="err">...]</span>
+</span></span><span class="line"><span class="cl">         <span class="err">|</span> <span class="k">ALL TABLES IN SCHEMA schema_name </span><span class="err">[,</span> <span class="err">...]</span> <span class="err">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">TO role_specification </span><span class="err">[,</span> <span class="err">...]</span> <span class="err">[</span> <span class="k">WITH GRANT OPTION </span><span class="err">]</span>
+</span></span><span class="line"><span class="cl">    <span class="err">[</span> <span class="k">GRANTED BY role_specification </span><span class="err">]</span>
+</span></span></code></pre></div><ol>
 <li>权限类型
 <ul>
 <li>SELECT：允许用户查询表中的数据。</li>
@@ -826,12 +826,12 @@ URL: https://www.postgresql.org/docs/14/sql-createrole.html
 <p><details >
   <summary markdown="span">GRANT语法(指定字段)</summary>
   <blockquote>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">GRANT { { SELECT | INSERT | UPDATE | REFERENCES } ( column_name [, ...] )
-    [, ...] | ALL [ PRIVILEGES ] ( column_name [, ...] ) }
-    ON [ TABLE ] table_name [, ...]
-    TO role_specification [, ...] [ WITH GRANT OPTION ]
-    [ GRANTED BY role_specification ]
-</code></pre><ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">GRANT </span><span class="err">{</span> <span class="err">{</span> <span class="k">SELECT </span><span class="err">|</span> <span class="k">INSERT </span><span class="err">|</span> <span class="k">UPDATE </span><span class="err">|</span> <span class="k">REFERENCES </span><span class="err">}</span> <span class="err">(</span> <span class="k">column_name </span><span class="err">[,</span> <span class="err">...]</span> <span class="err">)</span>
+</span></span><span class="line"><span class="cl">    <span class="err">[,</span> <span class="err">...]</span> <span class="err">|</span> <span class="k">ALL </span><span class="err">[</span> <span class="k">PRIVILEGES </span><span class="err">]</span> <span class="err">(</span> <span class="k">column_name </span><span class="err">[,</span> <span class="err">...]</span> <span class="err">)</span> <span class="err">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">ON </span><span class="err">[</span> <span class="k">TABLE </span><span class="err">]</span> <span class="k">table_name </span><span class="err">[,</span> <span class="err">...]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">TO role_specification </span><span class="err">[,</span> <span class="err">...]</span> <span class="err">[</span> <span class="k">WITH GRANT OPTION </span><span class="err">]</span>
+</span></span><span class="line"><span class="cl">    <span class="err">[</span> <span class="k">GRANTED BY role_specification </span><span class="err">]</span>
+</span></span></code></pre></div><ol>
 <li>权限类型
 <ul>
 <li>SELECT：允许用户查询表中的数据。</li>
@@ -998,14 +998,14 @@ URL: https://www.postgresql.org/docs/14/sql-createrole.html
 <ol>
 <li>删除角色的语句如下：</li>
 </ol>
-<pre tabindex="0"><code class="language-ensp" data-lang="ensp">shoping=# \h DROP ROLE
-Command:     DROP ROLE
-Description: remove a database role
-Syntax:
-DROP ROLE [ IF EXISTS ] name [, ...]
-
-URL: https://www.postgresql.org/docs/14/sql-droprole.html
-</code></pre><ol start="2">
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ebnf" data-lang="ebnf"><span class="line"><span class="cl"><span class="k">shoping</span><span class="o">=</span><span class="err">#</span> <span class="err">\</span><span class="k">h DROP ROLE</span>
+</span></span><span class="line"><span class="cl"><span class="k">Command</span><span class="err">:</span>     <span class="k">DROP ROLE</span>
+</span></span><span class="line"><span class="cl"><span class="k">Description</span><span class="err">:</span> <span class="k">remove a database role</span>
+</span></span><span class="line"><span class="cl"><span class="k">Syntax</span><span class="err">:</span>
+</span></span><span class="line"><span class="cl"><span class="k">DROP ROLE </span><span class="p">[</span> <span class="k">IF EXISTS </span><span class="p">]</span> <span class="k">name </span><span class="p">[,</span> <span class="p">.</span><span class="err">..]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">URL</span><span class="err">:</span> <span class="k">https</span><span class="err">://</span><span class="k">www</span><span class="err">.</span><span class="k">postgresql</span><span class="err">.</span><span class="k">org</span><span class="err">/</span><span class="k">docs</span><span class="err">/14/</span><span class="k">sql-droprole</span><span class="err">.</span><span class="k">html</span>
+</span></span></code></pre></div><ol start="2">
 <li>如果删除的是组角色，该组中的成员关系会自动从组中删除，但是这些成员角色自身不会受到任何影响。</li>
 <li>以下示例删除了角色 admin：</li>
 </ol>

@@ -17,9 +17,9 @@
     <item>
       <title>安装</title>
       <link>https://heliu.site/posts/postgresql/install/</link>
-      <pubDate>Thu, 19 Sep 2024 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 19 May 2023 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/postgresql/install/</guid>
-      <description>pgSQL docker 安装介绍。</description>
+      <description>PostgreSQL docker 安装介绍。</description>
     </item>
     <item>
       <title>客户端命令</title>
@@ -41,13 +41,6 @@
       <pubDate>Mon, 23 Sep 2024 00:00:00 +0000</pubDate>
       <guid>https://heliu.site/posts/postgresql/database/</guid>
       <description>💥本文章参考自PostgreSQL 14.4。</description>
-    </item>
-    <item>
-      <title>数据类型</title>
-      <link>https://heliu.site/posts/postgresql/datatype/</link>
-      <pubDate>Mon, 23 Sep 2024 00:00:00 +0000</pubDate>
-      <guid>https://heliu.site/posts/postgresql/datatype/</guid>
-      <description>💥本文章所有相关PostgreSQL 14版本。</description>
     </item>
     <item>
       <title>查询</title>
