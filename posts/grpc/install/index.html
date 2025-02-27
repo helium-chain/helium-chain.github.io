@@ -9,18 +9,18 @@
 <meta name="keywords" content="grpc">
 <meta name="description" content="Go gRpc教程。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/grpc/install/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/grpc/install/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/grpc/install/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/grpc/install/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="本地环境搭建" />
 <meta property="og:description" content="Go gRpc教程。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/grpc/install/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/grpc/install/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-09-01T00:00:00+00:00" />
 <meta property="article:modified_time" content="2024-09-01T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="本地环境搭建"/>
 <meta name="twitter:description" content="Go gRpc教程。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "gRPC",
-      "item": "https://helium.github.io/posts/grpc/"
+      "item": "https://helium-chain.github.io/posts/grpc/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "本地环境搭建",
-      "item": "https://helium.github.io/posts/grpc/install/"
+      "item": "https://helium-chain.github.io/posts/grpc/install/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " 官网地址：https://grpc.io/ 前置条件： 安装 Go 软件。 安装 Protocol buffer 编译器，protoc 版本 3。 protocol 编译器的 Go 插件安装。 Protocol编译器 官方安装文档：https://grpc.io/docs/protoc-installation/。 选择你要的版本：https://github.com/google/protobuf/releases。 $ wget https://github.com/protocolbuffers/protobuf/releases/download/v26.1/protoc-26.1-linux-x86_64.zip 在$HOME/.local或您选择的目录下解压缩该文件。例如： $ unzip protoc-26.1-linux-x86_64.zip -d $HOME/.local 更新环境路径变量以包含可执行protoc的路径。例如：（添加环境变量） # 临时生效 $ export PATH=\"$PATH:$HOME/.local/bin\" 验证安装： $ protoc --version protoc 帮助文档： -IPATH, --proto_path=PATH：表示的是我们要在哪个路径下搜索.proto文件，这个参数既可以用-I指定，也可以使用--proto_path=指定。如果不指定该参数，则默认在当前路径下进行搜索；另外，该参数也可以指定多次，这也意味着我们可以指定多个路径进行搜索。 下面的--cpp_out、--csharp_out等，protoc支持的语言长达13种，且都是比较常见的，但是却没有Go。因此需要安装Google维护的第三方插件。 $ protoc --help Usage: protoc [OPTION] PROTO_FILES -IPATH, --proto_path=PATH 指定搜索路径 --plugin=EXECUTABLE: .... --cpp_out=OUT_DIR Generate C++ header and source. --csharp_out=OUT_DIR Generate C# source file. --java_out=OUT_DIR Generate Java source file. --kotlin_out=OUT_DIR Generate Kotlin file. --objc_out=OUT_DIR Generate Objective-C header and source. --php_out=OUT_DIR Generate PHP source file. --pyi_out=OUT_DIR Generate python pyi stub. --python_out=OUT_DIR Generate Python source file. --ruby_out=OUT_DIR Generate Ruby source file. Go 插件 官方安装文档：https://grpc.io/docs/languages/go/quickstart/。 protocol 编译器的 Go 插件安装：使用以下命令安装Go的protocol编译器插件。 这两个插件可以用来生成Golang版本的proto协议代码和gRPC代理代码。 # 安装最新版本 protoc-gen-go@latest; protoc-gen-go 生成pb序列化相关文件。 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34 # 安装最新版本 protoc-gen-go-grpc@latest; protoc-gen-go-grpc 生成grpc相关文件。 $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3 更新您的PATH，以便协议编译器可以找到插件： # 临时生效 $ export PATH=\"$PATH:$(go env GOPATH)/bin\" 验证： $ protoc-gen-go --version $ protoc-gen-go-grpc --version protoc-gen-go 插件 非内置的语言支持就得自己单独安装语言插件，比如--go_out=对应的是protoc-gen-go(生成pb序列化相关文件)，安装命令如下： # 最新版 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest # 指定版本 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34 protoc-gen-go要求pb文件必须指定go包的路径，即 // 指定包路径 option go_package = \"example.com/project/protos/fizz\"; // 如果想指定包名称添加下面代码 // package server // 也可写成这种形式，逗号后面即使包名称 // option go_package = \"example.com/project/protos/fizz;server\"; 支持相关参数：\n--go_out：指定go代码生成的基本路径。该参数会生成 xxx.pb.go 文件，包含所有类型的序列化和反序列化代码。 --go_opt：设定插件参数，protoc-gen-go提供了--go_opt来为其指定参数，并可以设置多个。 如果使用paths=import, 生成的文件会按go_package路径来生成，当然是在--go_out目录下，即 $go_out/$go_package/pb_filename.pb.go。(默认) 如果使用paths=source_relative，就在当前pb文件同路径下生成代码。注意pb的目录也被包含进去了。即 $go_out/$pb_filedir/$pb_filename.pb.go。 如果指定了module=$PREFIX标志，则输出文件将放在以Go包的导入路径命名的目录中(例如 .proto文件中的go_package选项提供的路径)，但指定的目录前缀将从输出文件名中删除。 可以使用如下命令生成代码：\n$ protoc --proto_path=src --go_out=out --go_opt=paths=source_relative foo.proto bar/baz.proto protoc-gen-go-grpc 插件 生成gRPC相关代码需要安装grpc-go相关的插件protoc-gen-go-grpc。 # 最新版本 $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest # 指定版本 $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3 支持相关参数： --go-grpc_out：指定grpc go代码生成的基本路径，该命令会生成 xxx_grpc.pb.go 文件，包含客户端/服务端调用的接口定义。 --go-grpc_opt：和protoc-gen-go类似。 环境变量 永久修改环境变量： 使用修改.bashrc文件进行环境变量的编辑，只对当前用户有用 使用修改/etc/profile文件进行环境变量的编辑，是对所有用户有用 $ vim /etc/profile # 添加 export PATH=\"$PATH:$(go env GOPATH)/bin:$HOME/.local/bin\" # 刷新 $ source /etc/profile 安装核心库 $ go get google.golang.org/grpc protoc 命令 paths=import：示按照生成的Go代码的包的全路径去创建目录层级。 # -I . 指定当前目录下搜索 .proto 文件 # --go_out=./service 指定文件输出目录为 ./service # --go_opt=paths=import 应该输出 $go_out/$go_package/hello.pb.go $ protoc -I . --go_out=./service --go_opt=paths=import hello.proto # 生成位置 $go_out/$go_package/hello_grpc.pb.go $ protoc -I . --go-grpc_out=./service --go-grpc_opt=paths=import hello.proto paths=source_relative：表示按照 proto源文件的目录层级去创建Go代码的目录层级，如果目录已存在则不用创建。 $ protoc -I ./pb \\ --go_out ./ecommerce --go_opt paths=source_relative \\ --go-grpc_out ./ecommerce --go-grpc_opt paths=source_relative \\ ./pb/product.proto ",
   "wordCount" : "291",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-09-01T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2024-09-01T00:00:00Z",
   "dateModified": "2024-09-01T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/grpc/install/"
+    "@id": "https://helium-chain.github.io/posts/grpc/install/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/grpc/">gRPC</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/grpc/">gRPC</a></div>
     <h1 class="post-title entry-hint-parent">
       本地环境搭建
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/grpc/" target="_blank" rel="noopener">Grpc</a>
+            <a href="https://helium-chain.github.io/tags/grpc/" target="_blank" rel="noopener">Grpc</a>
         </ul>
       </span>
       
@@ -539,15 +539,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/grpc/">Grpc</a></li>
+      <li><a href="https://helium-chain.github.io/tags/grpc/">Grpc</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/php/carbon/">
+  <a class="prev" href="https://helium-chain.github.io/posts/php/carbon/">
     <span class="title">« 上一页</span>
     <br>
     <span>Carbon包</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/postgresql/install/">
+  <a class="next" href="https://helium-chain.github.io/posts/postgresql/install/">
     <span class="title">下一页 »</span>
     <br>
     <span>安装</span>

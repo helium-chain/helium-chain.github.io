@@ -2,23 +2,23 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Goland on Helium</title>
-    <link>https://helium.github.io/tags/goland/</link>
+    <link>https://helium-chain.github.io/tags/goland/</link>
     <description>Recent content in Goland on Helium</description>
     <image>
       <title>Helium</title>
-      <url>https://helium.github.io/favicon-32x32.png</url>
-      <link>https://helium.github.io/favicon-32x32.png</link>
+      <url>https://helium-chain.github.io/favicon-32x32.png</url>
+      <link>https://helium-chain.github.io/favicon-32x32.png</link>
     </image>
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
     <lastBuildDate>Sun, 18 Apr 2021 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://helium.github.io/tags/goland/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://helium-chain.github.io/tags/goland/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>WSL2 &#43; Goland</title>
-      <link>https://helium.github.io/posts/tool/goland/</link>
+      <link>https://helium-chain.github.io/posts/tool/goland/</link>
       <pubDate>Sun, 18 Apr 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/tool/goland/</guid>
+      <guid>https://helium-chain.github.io/posts/tool/goland/</guid>
       <description>windows + wsl + goland</description>
     </item>
   </channel>

@@ -2,23 +2,23 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>第5章 type关键字 on Helium</title>
-    <link>https://helium.github.io/posts/golang/type/</link>
+    <link>https://helium-chain.github.io/posts/golang/type/</link>
     <description>Recent content in 第5章 type关键字 on Helium</description>
     <image>
       <title>Helium</title>
-      <url>https://helium.github.io/favicon-32x32.png</url>
-      <link>https://helium.github.io/favicon-32x32.png</link>
+      <url>https://helium-chain.github.io/favicon-32x32.png</url>
+      <link>https://helium-chain.github.io/favicon-32x32.png</link>
     </image>
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
     <lastBuildDate>Sat, 22 Feb 2020 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://helium.github.io/posts/golang/type/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://helium-chain.github.io/posts/golang/type/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>type</title>
-      <link>https://helium.github.io/posts/golang/type/typ/</link>
+      <link>https://helium-chain.github.io/posts/golang/type/typ/</link>
       <pubDate>Sat, 22 Feb 2020 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/type/typ/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/type/typ/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
   </channel>

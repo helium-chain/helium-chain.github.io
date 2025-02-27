@@ -9,18 +9,18 @@
 <meta name="keywords" content="grpc">
 <meta name="description" content="grpc Header 与 Trailer 介绍。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/grpc/header-trailer/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/grpc/header-trailer/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/grpc/header-trailer/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/grpc/header-trailer/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="Header 与 Trailer" />
 <meta property="og:description" content="grpc Header 与 Trailer 介绍。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/grpc/header-trailer/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/grpc/header-trailer/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-09-06T00:00:00+00:00" />
 <meta property="article:modified_time" content="2024-09-06T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="Header 与 Trailer"/>
 <meta name="twitter:description" content="grpc Header 与 Trailer 介绍。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "gRPC",
-      "item": "https://helium.github.io/posts/grpc/"
+      "item": "https://helium-chain.github.io/posts/grpc/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "Header 与 Trailer",
-      "item": "https://helium.github.io/posts/grpc/header-trailer/"
+      "item": "https://helium-chain.github.io/posts/grpc/header-trailer/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " Header 和 Trailer 都用于传递元数据，但它们在 RPC 调用中的使用时机和目的有所不同。 Header 和 Trailer 区别 在 gRPC 中，Header 和 Trailer 都用于传递元数据，但它们在 RPC 调用中的使用时机和目的有所不同： Header： 发送时机：Header 通常在 RPC 调用开始时发送，即在响应消息之前发送。 内容：它们通常包含与请求相关的元数据，比如请求的身份验证信息、内容类型、压缩算法等。 用途：Header 可以用来影响请求的处理，比如授权检查或者请求路由。 读取时机：在服务器端，Header 可以在处理请求的任何时间点读取；在客户端，通常在发送请求后立即读取响应的 Header。 Trailer： 发送时机：Trailer 在 RPC 调用结束时发送，即在所有响应消息发送完毕后发送。 内容：它们通常包含关于整个调用过程的状态信息，比如状态码、错误消息或者调用持续时间等。 用途：Trailer 用于提供关于整个调用结果的信息，特别是如果调用失败，它们可以提供额外的错误详情。 读取时机：在服务器端，Trailer 通常在响应发送完毕后设置；在客户端，通常在调用完成（成功或失败）后读取 Trailer。 主要区别： 发送时间点：Header 在调用开始时发送，而 Trailer 在调用结束时发送。 内容类型：Header 通常包含请求相关的元数据，Trailer 则包含响应相关的元数据。 读取时机：Header 在处理请求之前或期间读取，Trailer 在响应结束后读取。 在实际应用中，Header 和 Trailer 的使用取决于特定的需求和场景。例如，如果你需要在请求被完全处理之前就提供一些信息，那么使用 Header 是合适的；如果你需要在请求处理完毕后提供状态信息，那么使用 Trailer 是更好的选择。 因为trailer是在服务端发送完请求之后才发送的，所以client获取trailer的时候需要在stream.CloseAndRecv或者stream.Recv 返回非nil错误 (包含 io.EOF)之后。 如果stream.CloseAndRecv之前调用stream.Trailer()获取的是空。 stream, err := client.SomeStreamingRPC(ctx) // retrieve header header, err := stream.Header() // retrieve trailer // `trailer`会在rpc返回的时候，即这个请求结束的时候被发送 // 因此此时调用`stream.Trailer()`获取的是空 trailer := stream.Trailer() stream.CloseAndRecv() // retrieve trailer // `trailer`会在rpc返回的时候，即这个请求结束的时候被发送 // 因此此时调用`stream.Trailer()`才可以获取到值 trailer := stream.Trailer() Header 和 Trailer 使用场景 Header 和 Trailer 在 gRPC 应用中有着多种具体的应用场景，以下是一些常见的用途： Header 的应用场景： 身份验证和授权： 在 Header 中发送认证令牌（如 JWT、OAuth 2.0 tokens）供服务器端验证用户身份。 发送 API 密钥或者其他身份验证信息。 内容协商： 指定请求的 Accept 类型，告诉服务器期望的响应格式（如 application/grpc+proto）。 发送 Accept-Encoding 来指示客户端支持哪些压缩算法。 路由和负载均衡： 使用特定的 Header 字段来影响请求的路由，比如在微服务架构中进行服务发现。 携带请求相关的上下文信息，比如租户标识，用于多租户环境的路由。 缓存控制： 发送 Cache-Control 指示缓存策略。 发送 If-None-Match 或 If-Modified-Since 用于条件请求。 调试和跟踪： 发送请求 ID 或 Correlation ID 用于日志记录和请求跟踪。 Trailer 的应用场景： 状态和错误信息： 当发生错误时，在 Trailer 中发送详细的错误信息，特别是当响应体中不便包含这些信息时。 提供状态码和额外的状态描述。 元数据记录： 记录请求处理时间、服务器标识、处理请求的实例信息等。 提供关于响应生成过程的统计信息，如响应生成耗时。 链式调用信息： 在多个服务间进行链式调用时，使用 Trailer 传递链式调用的状态或结果。 流控和重试策略： 发送关于流控的信息，比如服务器端是否已满载，客户端是否应该重试。 提供关于请求重试的指导，比如建议的重试间隔或重试次数。 数据校验： 发送数据校验和（如 CRC、MD5），让客户端能够验证数据的完整性。 通过这些应用场景，可以看出 Header 和 Trailer 在 gRPC 通信中扮演着重要的角色，它们提供了请求和响应的上下文信息，增强了通信的灵活性和健壮性。正确地使用 Header 和 Trailer 可以让服务间的交互更加透明和高效。 在拦截器中，我们不但可以获取或修改接收到的metadata，甚至还可以截取并修改要发送出去的metadata。 比如：我们在客户端拦截器中从要发送给服务端的metadata中读取一个时间戳字段，如果没有则补充这个时间戳字段。 func orderUnaryClientInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error { var s string // 获取要发送给服务端的`metadata` md, ok := metadata.FromOutgoingContext(ctx) if ok \u0026\u0026 len(md.Get(\"time\")) \u003e 0 { s = md.Get(\"time\")[0] } else { // 如果没有则补充这个时间戳字段 s = \"inter\" + strconv.FormatInt(time.Now().UnixNano(), 10) ctx = metadata.AppendToOutgoingContext(ctx, \"time\", s) } log.Printf(\"call timestamp: %s\", s) // Invoking the remote method err := invoker(ctx, method, req, reply, cc, opts...) return err } 使用示例 在 gRPC 中，Header 和 Trailer 可以同时使用。实际上，这是相当常见的做法，因为它们服务于不同的目的，并且发送于不同的时间点。 在服务器端，你可以在处理请求时发送 Header，并在请求处理完毕后发送 Trailer。 package main import ( \"context\" \"fmt\" \"log\" \"net\" \"google.golang.org/grpc\" \"google.golang.org/grpc/metadata\" ) type server struct{} func (s *server) YourRPCMethod(ctx context.Context, req *YourRequest) (*YourResponse, error) { // 发送 Header header := metadata.New(map[string]string{\"header-key\": \"header-value\"}) grpc.SendHeader(ctx, header) // ... 处理请求 ... // 发送 Trailer trailer := metadata.New(map[string]string{\"trailer-key\": \"trailer-value\"}) grpc.SetTrailer(ctx, trailer) return \u0026YourResponse{}, nil } func main() { lis, err := net.Listen(\"tcp\", \":50051\") if err != nil { log.Fatalf(\"failed to listen: %v\", err) } s := grpc.NewServer() RegisterYourServiceServer(s, \u0026server{}) if err := s.Serve(lis); err != nil { log.Fatalf(\"failed to serve: %v\", err) } } 在客户端，你可以接收来自服务器的 Header 和 Trailer。 package main import ( \"context\" \"log\" \"google.golang.org/grpc\" \"google.golang.org/grpc/metadata\" ) func main() { conn, err := grpc.Dial(\"localhost:50051\", grpc.WithInsecure()) if err != nil { log.Fatalf(\"did not connect: %v\", err) } defer conn.Close() c := NewYourServiceClient(conn) ctx, cancel := context.WithTimeout(context.Background(), time.Second) defer cancel() // 发送请求并接收响应 stream, err := c.YourRPCMethod(ctx, \u0026YourRequest{}) if err != nil { log.Fatalf(\"could not call: %v\", err) } // 接收 Header header, err := stream.Header() if err != nil { log.Fatalf(\"could not get header: %v\", err) } log.Printf(\"Header: %v\", header) // 接收响应 resp, err := stream.Recv() if err != nil { log.Fatalf(\"could not receive response: %v\", err) } // 接收 Trailer trailer := stream.Trailer() log.Printf(\"Trailer: %v\", trailer) // 使用响应 // ... } 在这个例子中，服务器发送了 Header 和 Trailer，而客户端接收了它们。注意，Header 是通过 stream.Header() 获取的，而 Trailer 是在流结束时通过 stream.Trailer() 获取的。 在实际应用中，根据你的具体需求，你可以选择是否同时使用 Header 和 Trailer。它们是完全兼容的，可以一起使用来提供完整的请求和响应元数据。 google.golang.org/grpc func SendHeader 用于在服务器端发送初始的元数据（称为 Header）给客户端。这个函数应该在服务器端处理请求时调用，通常是在响应体发送之前。 // SendHeader sends header metadata. It may be called at most once, and may not // be called after any event that causes headers to be sent (see SetHeader for // a complete list). The provided md and headers set by SetHeader() will be // sent. // // The error returned is compatible with the status package. However, the // status code will often not match the RPC status as seen by the client // application, and therefore, should not be relied upon for this purpose. func SendHeader(ctx context.Context, md metadata.MD) error { stream := ServerTransportStreamFromContext(ctx) if stream == nil { return status.Errorf(codes.Internal, \"grpc: failed to fetch the stream from the context %v\", ctx) } if err := stream.SendHeader(md); err != nil { return toRPCErr(err) } return nil } 在服务器端的方法实现中，你可以使用 grpc.SendHeader 来发送 Header。以下是一个示例： package main import ( \"context\" \"log\" \"net\" \"google.golang.org/grpc\" \"google.golang.org/grpc/metadata\" ) type server struct{} func (s *server) YourRPCMethod(ctx context.Context, req *YourRequest) (*YourResponse, error) { // 创建要发送的 Header header := metadata.New(map[string]string{ \"header-key-1\": \"value-1\", \"header-key-2\": \"value-2\", }) // 发送 Header if err := grpc.SendHeader(ctx, header); err != nil { log.Printf(\"Failed to send header: %v\", err) return nil, err } // ... 处理请求 ... // 返回响应 return \u0026YourResponse{}, nil } func main() { lis, err := net.Listen(\"tcp\", \":50051\") if err != nil { log.Fatalf(\"failed to listen: %v\", err) } s := grpc.NewServer() RegisterYourServiceServer(s, \u0026server{}) if err := s.Serve(lis); err != nil { log.Fatalf(\"failed to serve: %v\", err) } } 注意事项： grpc.SendHeader 只能在服务器端调用，并且应该在发送任何响应消息之前调用。 你只能发送一次 Header。如果尝试发送多次，后续的调用将失败。 发送 Header 是一个异步操作，不会阻塞当前的服务方法。 Header 应该包含与请求相关的元数据，例如内容类型、授权信息等。 如果在发送 Header 前服务器端或客户端关闭了连接，Header 可能不会被发送。 在客户端，你可以通过调用响应流对象的 Header() 方法来接收 Header： // 假设 stream 是 gRPC 客户端流 header, err := stream.Header() if err != nil { log.Printf(\"Failed to receive header: %v\", err) } else { log.Printf(\"Received header: %v\", header) } 通过这种方式，服务器端可以在处理请求之前，向客户端发送一些重要的元数据。客户端可以根据这些元数据来调整其行为，例如处理授权、内容协商等。 func SetHeader SetHeader设置从服务器发送到客户端的报头元数据。所提供的上下文必须是传递给服务器处理程序的上下文。 流式rpc应该更喜欢ServerStream的SetHeader方法。 当多次调用时，所有提供的元数据将被合并。当发生以下情况之一时，所有元数据将被发送出去: 调用grpc.SendHeader，对于流处理程序，调用stream.SendHeader。 发送第一条响应消息。对于一元处理程序，这在处理程序返回时发生;对于流处理程序，这可能在流的SendMsg方法被调用时发生。发送RPC状态(错误或成功)。这在处理程序返回时发生。如果在上述任何事件之后调用SetHeader将失败。 返回的错误与状态包兼容。但是，状态码通常与客户端应用程序看到的RPC状态不匹配，因此不应该依赖于此目的。 // SetHeader sets the header metadata to be sent from the server to the client. // The context provided must be the context passed to the server's handler. // // Streaming RPCs should prefer the SetHeader method of the ServerStream. // // When called multiple times, all the provided metadata will be merged. All // the metadata will be sent out when one of the following happens: // // - grpc.SendHeader is called, or for streaming handlers, stream.SendHeader. // - The first response message is sent. For unary handlers, this occurs when // the handler returns; for streaming handlers, this can happen when stream's // SendMsg method is called. // - An RPC status is sent out (error or success). This occurs when the handler // returns. // // SetHeader will fail if called after any of the events above. // // The error returned is compatible with the status package. However, the // status code will often not match the RPC status as seen by the client // application, and therefore, should not be relied upon for this purpose. func SetHeader(ctx context.Context, md metadata.MD) error { if md.Len() == 0 { return nil } stream := ServerTransportStreamFromContext(ctx) if stream == nil { return status.Errorf(codes.Internal, \"grpc: failed to fetch the stream from the context %v\", ctx) } return stream.SetHeader(md) } grpc.SetHeader 和 grpc.SendHeader 的区别： grpc.SetHeader 用途：在服务器端，设置响应的 Header 元数据。 时机：在服务器端处理请求时调用。 行为：允许服务器多次调用 SetHeader 来设置或更新 Header 元数据。 发送时机：当服务器调用 grpc.SendHeader 或 grpc.SetTrailer 时，或者在发送第一个响应消息后，或者在发送 RPC 状态（成功或错误）后，这些 Header 元数据会被发送给客户端。 grpc.SendHeader 用途：在服务器端，发送已经设置好的 Header 元数据给客户端。 时机：在服务器端处理请求时调用，通常在响应体发送之前。 行为：SendHeader 只能调用一次，用于发送已经通过 SetHeader 设置的 Header 元数据。 发送时机：SendHeader 调用后，之前设置的 Header 元数据会被发送给客户端。 总结： grpc.SetHeader 用于服务器端设置 Header 元数据，允许多次调用来更新元数据。 grpc.SendHeader 用于服务器端发送 Header 元数据给客户端，只能调用一次。 在服务器端，通常你会先使用 grpc.SetHeader 设置元数据，然后在适当的时候调用 grpc.SendHeader 发送这些元数据。如果在发送响应消息之前没有调用 grpc.SendHeader，框架会自动在发送第一个响应消息后发送这些元数据。 func SetTrailer SetTrailer设置RPC返回时将发送的尾部元数据。当多次调用时，所有提供的元数据将被合并。 返回的错误与状态包兼容。但是，状态码通常与客户端应用程序看到的RPC状态不匹配，因此不应该依赖于此目的。 // SetTrailer sets the trailer metadata that will be sent when an RPC returns. // When called more than once, all the provided metadata will be merged. // // The error returned is compatible with the status package. However, the // status code will often not match the RPC status as seen by the client // application, and therefore, should not be relied upon for this purpose. func SetTrailer(ctx context.Context, md metadata.MD) error { if md.Len() == 0 { return nil } stream := ServerTransportStreamFromContext(ctx) if stream == nil { return status.Errorf(codes.Internal, \"grpc: failed to fetch the stream from the context %v\", ctx) } return stream.SetTrailer(md) } 用于服务器端设置 Trailer 元数据，这些元数据会在响应结束时发送给客户端。与 Header 元数据不同，Trailer 是在响应处理完毕后发送的，通常包含关于 RPC 调用状态的信息，如错误代码、错误消息或其他与响应相关的元数据。 以下是如何在服务器端使用 grpc.SetTrailer 的示例： 在这个例子中，我们创建了一个 Trailer 并使用 grpc.SetTrailer 设置它。这应该在响应处理完毕后调用，通常是在响应的最后一个消息发送之后。 请注意，grpc.SetTrailer 只能调用一次，且必须在响应发送完毕之前调用。如果在发送响应消息之前没有调用 grpc.SetTrailer，框架会自动在发送最后一个响应消息后发送这些 Trailer 元数据。 package main import ( \"context\" \"log\" \"net\" \"google.golang.org/grpc\" \"google.golang.org/grpc/metadata\" ) type server struct{} func (s *server) YourRPCMethod(ctx context.Context, req *YourRequest) (*YourResponse, error) { // ... 处理请求 ... // 设置 Trailer trailer := metadata.New(map[string]string{ \"error-code\": \"500\", \"error-message\": \"Internal server error\", }) grpc.SetTrailer(ctx, trailer) // ... 返回响应 ... } func main() { lis, err := net.Listen(\"tcp\", \":50051\") if err != nil { log.Fatalf(\"failed to listen: %v\", err) } s := grpc.NewServer() RegisterYourServiceServer(s, \u0026server{}) if err := s.Serve(lis); err != nil { log.Fatalf(\"failed to serve: %v\", err) } } 在客户端，你可以通过调用响应流对象的 Trailer() 方法来接收 Trailer： // 假设 stream 是 gRPC 客户端流 trailer := stream.Trailer() if trailer != nil { // 处理 Trailer 中的元数据 errorCode, ok := trailer[\"error-code\"] if ok \u0026\u0026 errorCode[0] == \"500\" { log.Printf(\"Received error code: %s\", errorCode[0]) } } 通过这种方式，服务器端可以在响应处理完毕后，向客户端发送一些重要的元数据，如错误信息或其他与响应相关的状态信息。客户端可以根据这些信息来处理错误或采取其他必要的行动。 type CallOption func Header Header返回一个calllooptions，用于检索一元RPC的Header元数据。 用于客户端接收来自服务端响应的 Header。 // Header returns a CallOptions that retrieves the header metadata // for a unary RPC. func Header(md *metadata.MD) CallOption { return HeaderCallOption{HeaderAddr: md} } 使用示例：客户端 func main() { // ... var opts1 []grpc.CallOption = []grpc.CallOption{ grpc.WaitForReady(false), grpc.Header(\u0026header), grpc.Trailer(\u0026tr), } // 执行rpc调用(这个方法在服务器端来实现并返回结构) resp, err := client.SayHello(ctx, \u0026pb.HelloRequest{RequestName: \"gh\", Age: 12}, opts1...) if err != nil { fmt.Printf(\"%v\\n\", err) return } fmt.Printf(\"Response-Header: %v\\n\", header) fmt.Println(resp.GetResponseMsg()) fmt.Printf(\"Response-Trailer: %v\\n\", tr) // ... } func Trailer Trailer返回一个calllooptions，用于检索一元RPC的Trailer元数据。 用于客户端接收来自服务端响应的 Trailer。 // Trailer returns a CallOptions that retrieves the trailer metadata // for a unary RPC. func Trailer(md *metadata.MD) CallOption { return TrailerCallOption{TrailerAddr: md} } 使用示例：客户端 func main() { // ... var opts1 []grpc.CallOption = []grpc.CallOption{ grpc.WaitForReady(false), grpc.Header(\u0026header), grpc.Trailer(\u0026tr), } // 执行rpc调用(这个方法在服务器端来实现并返回结构) resp, err := client.SayHello(ctx, \u0026pb.HelloRequest{RequestName: \"gh\", Age: 12}, opts1...) if err != nil { fmt.Printf(\"%v\\n\", err) return } fmt.Printf(\"Response-Header: %v\\n\", header) fmt.Println(resp.GetResponseMsg()) fmt.Printf(\"Response-Trailer: %v\\n\", tr) // ... } 特殊的元数据键 在 gRPC 中，有一些特殊的元数据键，它们具有特定的含义和用途。这些特殊键通常与 gRPC 协议的各个方面有关，包括但不限于状态、压缩、认证、流量控制等。以下是一些常见的特殊元数据键： grpc-status： 类型：字符串 描述：包含 RPC 的状态码。这个键通常在响应的 Trailer 中使用。 grpc-message： 类型：字符串 描述：包含 RPC 状态的详细消息。这个键通常在响应的 Trailer 中使用。 grpc-encoding： 类型：字符串 描述：指定请求或响应的压缩算法。例如，gzip。 grpc-timeout： 类型：字符串 描述：指定 RPC 调用的超时时间。例如，10s。 grpc-accept-encoding： 类型：字符串 描述：指定客户端支持的压缩算法。例如，gzip。 grpc-authority： 类型：字符串 描述：指定服务提供者的权威信息。例如，example.com:8080。 grpc-client-authority： 类型：字符串 描述：指定客户端的权威信息。例如，client.example.com:8080。 grpc-max-send-message-length： 类型：字符串 描述：指定客户端允许发送的最大消息长度。例如，1048576。 grpc-max-receive-message-length： 类型：字符串 描述：指定服务器允许接收的最大消息长度。例如，1048576。 grpc-compress-algorithm： 类型：字符串 描述：指定请求或响应的压缩算法。例如，gzip。 这些特殊键是由 gRPC 协议定义的，它们被用来在请求和响应中传递与 gRPC 协议相关的信息。在客户端和服务器端，这些键可以通过 grpc.Header 和 grpc.Trailer 函数来设置和访问。 ",
   "wordCount" : "1518",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-09-06T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2024-09-06T00:00:00Z",
   "dateModified": "2024-09-06T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/grpc/header-trailer/"
+    "@id": "https://helium-chain.github.io/posts/grpc/header-trailer/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/grpc/">gRPC</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/grpc/">gRPC</a></div>
     <h1 class="post-title entry-hint-parent">
       Header 与 Trailer
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/grpc/" target="_blank" rel="noopener">Grpc</a>
+            <a href="https://helium-chain.github.io/tags/grpc/" target="_blank" rel="noopener">Grpc</a>
         </ul>
       </span>
       
@@ -1019,15 +1019,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/grpc/">Grpc</a></li>
+      <li><a href="https://helium-chain.github.io/tags/grpc/">Grpc</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/grpc/metadata/">
+  <a class="prev" href="https://helium-chain.github.io/posts/grpc/metadata/">
     <span class="title">« 上一页</span>
     <br>
     <span>Metadata 元数据</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/grpc/err/">
+  <a class="next" href="https://helium-chain.github.io/posts/grpc/err/">
     <span class="title">下一页 »</span>
     <br>
     <span>错误处理</span>

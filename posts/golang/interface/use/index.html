@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, 接口">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/golang/interface/use/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/golang/interface/use/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/interface/use/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/golang/interface/use/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="接口(使用)" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/golang/interface/use/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/golang/interface/use/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-08-03T00:00:00+00:00" />
 <meta property="article:modified_time" content="2024-08-03T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="接口(使用)"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://helium.github.io/posts/golang/"
+      "item": "https://helium-chain.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第11章 Interface",
-      "item": "https://helium.github.io/posts/golang/interface/"
+      "item": "https://helium-chain.github.io/posts/golang/interface/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "接口(使用)",
-      "item": "https://helium.github.io/posts/golang/interface/use/"
+      "item": "https://helium-chain.github.io/posts/golang/interface/use/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": " 接口类型：是Go语言的一种数据类型，被设计成一个容器装载其他非接口类型。 接口是什么 接口是能装载任意其他类型的容器，接口分【空接口】和【非空接口】。 空接口：能装载其他任意非接口类型。 非空接口：也能装载其他非接口类型，但是必须实现了非空接口的所有方法集。 非空接口 定义了一组方法集合，这些方法集合只是被定义，并没有在接口中实现。 因此非空接口装载的类型必定是实现了非空接口定义的所有方法。 接口中定义的方法如果有非导出方法时（也就是小写字母开头的方法）只能在定义该接口的同一包中被其他类型实现。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 package gom type Connectable interface { // 这里接口定义非导出方法 // 只能是gom这个包范围的类型才能实现Connectable接口 connect() } type Point struct { X float64 } // Point 实现了 Connectable 接口 // gom 以外的包实现不了 Connectable 接口，因为包含小写方法 func (p Point) connect() { } 非空接口存储结构： 1 2 3 4 type iface struct { itab *itab // 存储非空接口和装载类型的相关信息 data unsafe.Pointer // 装载类型的动态值地址 } 空接口 没有必须实现的一组方法集合，因此非空接口能装载任意其他类型。 所有的类型包括自定义类型其实都已经实现了空接口interface{}，所以空接口interface{}可以存任意类型。 空接口存储结构： 1 2 3 4 type eface struct { typ *_type // 存储类型的类型元数据信息 data unsafe.Pointer // 存储类型的存储值地址 } 空接口和非空接口 接口类型的初始化变量的值为nil。 1 2 3 4 5 6 7 8 9 10 11 // 空接口初始值 type eface struct { typ *_type // nil data unsafe.Pointer // nil } // 非空接口初始值 type iface struct { itab *itab // nil data unsafe.Pointer // nil } 空接口示例 1 2 3 4 5 6 7 8 9 // 接口i可以装载任意其他类型 var i interface{} = 99 // type eface struct { // typ *_type ---\u003e 存储的是int类型的_type指针 // data uintptr ---\u003e 存储的地址指针内存是99 // } i = 44.09 // 接口存储的是float64类型 i = \"All\" // 接口存储的是string类型 非空接口示例 接口就是一组抽象方法的集合，它必须由其他非interface类型（具体类型）实现，而不能自我实现。 1 2 3 type Stringer interface{ String() string } 单方法接口由方法名称加上er后缀或类似修改来命名，以构造代理名词，如Reader、Writer、Formatter、CloseNotifer等。 还有一些不常用的方式（当后缀er不合适），比如Recoverable，此时接口名以able结尾，或者以I开头等 1 2 3 4 5 6 7 type Reader interface { Read(p []byte) (n int, err error) } type Writer interface { Write(p []byte) (n int, err error) } 在Go语言中，如果接口的所有方法在某个类型方法集中被实现，则认为该类型实现了这个接口。 类型不用显示声明实现接口，只需要实现接口所有方法，这样的隐式实现解耦了实现接口的包和定义接口的包。 同一个接口可被多个类型实现，一个类型也可以实现多个接口： 实现某个接口的类型，还可以有其他的方法，比如内嵌其他字段这些字段分别实现了部分方法从而实现接口。 有时甚至都不知道某个类型定义的方法集巧合地实现了另外一个接口。 类型需要实现接口方法集中的所有方法，类型实现了这个接口，那么接口类型的变量也就可以存放该类型的值。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 // B 接口中有非导出方法时，只能在本包中被实现，其他包中实现不了该接口 // 1. 这种情况常常被用于，某个导出的接口不想让外部包的其他类实现时。 // 在导出接口中定义非导出方法时 // 2. 在非导出接口中定义全部都是导出方法，外包能实现该接口，但是非导出接口却不可用。 type B interface { f() } type A struct { Books int } func (a A) f() { fmt.Println(\"A.f()：\", a.Books) } type I int func (i I) f() { fmt.Println(\"I.f()\", i) } func main() { var a A = A{Books: 9} a.f() // A.f(a) // Output: // A.f()：9 // 接口类型可接受结构体A的值，因为结构体A实现了接口 var b B = A{Books: 99} b.f() // B.f(b) // Output: // A.f()：99 // I是int类型引申出来的新类型 var i I = 199 i.f() // Output: // I.f()199 // 接口类型可接受新类型I的值，因为新类型I实现了接口 var b2 B = I(299) b2.f() // Output: // I.f()299 } 接口嵌入 一个接口可以包含一个或多个其他的接口：但在接口内不能嵌入结构体。不能嵌入接口自身，或者形成闭环，否则编译会出错误。 接口嵌入形成闭环 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 // 1. 编译错误 接口不能嵌入自身 会形成无限循环 // Bad \u003c---\u003e Bad 闭环 type Bad interface { Bad } // 2. 编译错误 接口之前互相嵌套形成闭环 形成无限循环 // Bad1 --\u003e Bad2 --\u003e Bad1 闭环 type Bad1 interface { Bad2 } type Bad2 interface { Bad1 } 嵌入接口 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 type ReadWrite interface { Read(b Buffer) bool Write(b Buffer) bool } type Lock interface { Lock() Unlock() } // 嵌入其他接口 type File interface { Lock // 嵌入的接口Lock Close() // 自带的Close()方法 } 类型断言 可以把实现了某个接口的类型值保存在接口变量中，但是反过来某个接口变量属于哪个类型呢? 如何检测接口变量的类型呢？这就是类型断言的作用（注意的是：接口断言时是接口特有的）。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 type I interface { f() } type T string func (t T) f() { fmt.Println(\"T Method\") } type Stringer interface { String() string } func main() { // 类型断言 var varI I = T(\"Tstring\") // 1. 非空接口.(具体类型) // 如果断言成功，v是varL转换到类型I的值，ok的值是true // 否则v是类型T的零值，ok的值是false，也没有运行时错误发生 if v, ok := varI.(T); ok { fmt.Println(\"varI类型断言结果为：\", v) v.f() } // Output: // varI类型断言结果为： Tstring // T Method // Type-Switch 做类型断言 var value interface{} // value.(type) 只能在switch中使用，会依次检查case的值进行断言，如value.(string)再试value.(Stringer)、value.(int) 等 // 这种形式下不允许使用 fallthrough 关键字 // 在处理未知类型的数据（例如解析JSON等编码的数据）更加方便 switch str := value.(type) { // str 是断言出来的值也就是 eface.data case string: fmt.Println(\"string：\", str) case Stringer: fmt.Println(\"Stringer：\", str) case int,uint,float32,float64: fmt.Println(\"我是上面类型其中一个\") case nil: fmt.Println(\"nil\") default: fmt.Println(\"value类型不在上面中\") } // Output: // nil // Comma-ok 断言 // 断言是否是某个具体的类型 其实上面的 value.(type) 就是这种形式的组合 value = \"类型断言检查\" if str, ok := value.(string); ok { fmt.Printf(\"value类型断言结果为：%T\\n\", str) // str已近转为string类型 } else { fmt.Printf(\"value 不是 string 类型 \\n\") } // Output: // value类型断言结果为：string } 类型实现不同的接口将拥有不同的行为方法结合，这就是多态的本质。 使用接口代码更具有普适性，例如函数的参数为接口变量。标准库所有包中遵循了这个原则。 在Go语言中，一个接口值其实由两部分组成：type:value。 所以在做类型断言时，变量只能是接口类型变量，断言得到的值其实就是接口值中对应的类型名。 接口与动态类型 接受一个（或多个）接口类型作为参数的函数，实参可以是任何实现了该接口的类型，实现了某个接口的类型可以被传给任何以此接口为参数的函数。 Go语言动态类型的实现通常需要编译器静态检查的支持： 当变量被赋值给一个接口类型的变量时，编译器会检查其是否实现了该接口的所有方法（在赋值时检查） 也可以通过类型断言来检查接口变量是否实现了相应类型。 接口的继承 当一个类型包含（内嵌）另外一个类型（实现了一个或多个接口）时，这个类型就可以使用（另一个类型）所有的接口方法。 类型可以通过继承多个接口来提供像多重继承一样的特性。 1 2 3 4 5 6 // 在结构体中内嵌接口，该结构体将具有接口的方法 // 关于这种在结构体中会详细介绍 type ReaderWriter struct { io.Reader // 接口 io.Writer // 接口 } 使用示例 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 // Sayer 单方法接口，待实现方法say type Sayer interface { say() } // dog 空结构体 type dog struct {} // say dog结构体定义say方法 func (d dog) say() { fmt.Println(\"wan ...\") } // cat 空结构体 type cat struct {} // say cat结构体定义say方法 func (c cat) say() { fmt.Println(\"miao ...\") } func main() { var x Sayer a := cat{} b := dog{} // 接口Sayer装载cat结构体 x = a x.say() // miao ... // 接口Sayer装载dog结构体 x = b x.say() // wan ... } 接口装载指针类型和值类型 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 // Sayer 单方法接口，待实现方法say type Sayer interface { say() } // dog 空结构体 type dog struct {} // say cat结构体定义say方法 func (d dog) say() { fmt.Println(\"wan ...\") } func main() { var x Sayer b := dog{} // 接口Sayer装载dog结构体 x = b x.say() // dog.say(x) // 接口Sayer装载*dog类型 c := \u0026dog{} x = c // x.say() -\u003e (*dog).say(x) -\u003e dog.say(*c) // (*dog).say(x) 是接口生成的包装方法，里面会调用 dog.say(*c) 方法 x.say() // (*c).say() -\u003e dog.say(*c) 这里并不是语法糖形式 // Output: // wan ... // wan ... } ",
   "wordCount" : "952",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-08-03T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2024-08-03T00:00:00Z",
   "dateModified": "2024-08-03T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/golang/interface/use/"
+    "@id": "https://helium-chain.github.io/posts/golang/interface/use/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/interface/">第11章 Interface</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/golang/interface/">第11章 Interface</a></div>
     <h1 class="post-title entry-hint-parent">
       接口(使用)
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://helium.github.io/tags/%E6%8E%A5%E5%8F%A3/" target="_blank" rel="noopener">接口</a>
+            <a href="https://helium-chain.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium-chain.github.io/tags/%E6%8E%A5%E5%8F%A3/" target="_blank" rel="noopener">接口</a>
         </ul>
       </span>
       
@@ -1109,16 +1109,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
-      <li><a href="https://helium.github.io/tags/%E6%8E%A5%E5%8F%A3/">接口</a></li>
+      <li><a href="https://helium-chain.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium-chain.github.io/tags/%E6%8E%A5%E5%8F%A3/">接口</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/golang/func/painc-theory/">
+  <a class="prev" href="https://helium-chain.github.io/posts/golang/func/painc-theory/">
     <span class="title">« 上一页</span>
     <br>
     <span>painc、recover(原理)</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/golang/goroutine/flow/">
+  <a class="next" href="https://helium-chain.github.io/posts/golang/goroutine/flow/">
     <span class="title">下一页 »</span>
     <br>
     <span>Go 执行流程</span>

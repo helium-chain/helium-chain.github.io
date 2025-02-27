@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, netpoll">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/golang/netpoll/linux/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/golang/netpoll/linux/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/netpoll/linux/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/golang/netpoll/linux/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="Linux epoll" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/golang/netpoll/linux/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/golang/netpoll/linux/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-07-20T21:28:31+08:00" />
 <meta property="article:modified_time" content="2024-07-20T21:28:31+08:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="Linux epoll"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://helium.github.io/posts/golang/"
+      "item": "https://helium-chain.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第16章 netpoll",
-      "item": "https://helium.github.io/posts/golang/netpoll/"
+      "item": "https://helium-chain.github.io/posts/golang/netpoll/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "Linux epoll",
-      "item": "https://helium.github.io/posts/golang/netpoll/linux/"
+      "item": "https://helium-chain.github.io/posts/golang/netpoll/linux/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": "epoll描述 适用范围：连接数量多，但活动连接较少的情况。 epoll高效的奥秘：epoll精巧的使用3个方法实现select方法要做的事： epoll_create()：创建一个epoll文件描述符。 执行一次epoll_create()函数就会创建一个epoll池，因此初始化执行一次即可。 epoll_create函数会返回一个epoll文件描述符。 epoll_ctrl()：添加/修改/删除需要侦听的文件描述符及其事件。 一个socket只需调用该函数一次注册当前文件描述符。 该函数注册时可以添加具体的侦听的事件和用户数据，当前事件触发时可以根据epoll_wait函数获取事件。 返回注册成功和失败结果。 epoll_wait()：接收发生在被侦听的描述符上的，用户感兴趣的IO事件，返回已就绪的事件集。 查询系统最大支持FD数目：cat /proc/sys/fs/file-max。 理解epoll的关键要素：红黑树、链表。 红黑树：存储epoll所监听的套接字。epoll在实现上采用红黑树去存储所有套接字，当添加或者删除一个套接字时（epoll_ctl），都在红黑树上去处理，红黑树本身插入和删除性能比较好，时间复杂度O(logN)。 通过epoll_ctl函数添加进来的事件都会被放在红黑树的某个节点内，所以重复添加是没有用的。当把事件添加进来的时候时候会完成关键的一步，那就是该事件都会与相应的设备（网卡）驱动程序建立回调关系，当相应的事件发生后，就会调用这个回调函数，该回调函数在内核中被称为：ep_poll_callback，这个回调函数其实就所把这个事件添加到rdllist这个双向链表中。一旦有事件发生，epoll就会将该事件添加到双向链表中。那么当我们调用epoll_wait时，epoll_wait只需要检查rdlist双向链表中是否有存在注册的事件，效率非常可观。这里也需要将发生了的事件复制到用户态内存中即可。中断程序还有一个重要作用是将阻塞的进程唤醒起来执行。 总结： 红黑树的作用：当有事件发生时，可以快速根据fd查找epitem（找到得epiterm会组成链表传递给用户空间做进一步处理），比遍历链表快多了！ 内核中链表适用的场景：用来做队列或栈，存储的每个节点都要处理（说白了就是需要遍历），不存在查找的需求场景！ epoll事件底层最终是中断触发的：当网卡收到数据后，通过中断通知操作系统来取数据，进而触发epoll事件！ epoll_create() 在epoll早期的实现中，对于监控文件描述符的组织并不是使用红黑树，而是hash表。所以在epoll_create的参数size没有什么意义。 epoll_create：该函数初始化时只执行一次。 1 2 3 4 5 6 7 // 创建一个epoll句柄 // 创建一个epoll的句柄，size用来告诉内核这个监听的数目一共有多大，在红黑树中该参数size无效 int epoll_create(int size);\t// 返回值： //\tEINVAL 大小不是正数。 // ENFILE 已达到系统对打开文件总数的限制。 // ENOMEM 没有足够的内存来创建内核对象。 epoll_ctl() 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 // 添加文件描述符到红黑树中 int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event); // epfd：为epoll_create创建的fd // op：指定操作类型 // EPOLL_CTL_ADD：\t将目标文件描述符fd添加到epoll描述符epfd中，并将事件event与fd链接的内部文件关联起来。 // EPOLL_CTL_MOD：\t更改与目标文件描述符fd关联的事件event。 // EPOLL_CTL_DEL：\t从epoll文件描述符epfd中删除目标文件描述符fd。该事件被忽略，可以为NULL。 // fd：要操作的文件描述符，也就是我们要加入的fd，可以是创建的socket或其他文件句柄。 // event：指定事件，它是epoll_event结构指针类型 // epoll_event 定义： // events：描述事件类型，和poll支持的事件类型基本相同（两个额外的事件：EPOLLET和EPOLLONESHOT，高效运作的关键） // events可以是以下几个宏的集合： // EPOLLIN ：表示对应的文件描述符可以读（包括对端SOCKET正常关闭）。关联文件描述符的read()操作 // EPOLLOUT：表示对应的文件描述 符可以写，关联文件描述符的write()操作。 // EPOLLPRI：表示对应的文件描述符有紧急的数据可读（这里应该表示有带外数据到来） // EPOLLERR：描述符产生错误时触发，默认检测事件 // EPOLLHUP：本端描述符产生一个挂断事件，默认监测事件 // EPOLLRDHUP：对端描述符产生一个挂断事件 // EPOLLET： 将EPOLL设为边缘触发(Edge Triggered)模式，这是相对于水平触发(Level Triggered)来说的 // EPOLLONESHOT：只监听一次事件，当监听完这次事件之后，如果还需要继续监听这个socket的话，需要再次把这个socket加入到EPOLL队列里 // data：存储用户数据，该字段是一个指针类型因此在wait函数中我们可以拿到该数据进行相关操作 // event是我们所关心的事件类型，注意只有我们注册的事件才会在epoll_wait被唤醒后传递到用户空间，否则虽然内核可以收到但不会传递 epoll_wait() 1 2 3 4 5 6 7 8 9 10 11 // 成功时返回就绪的文件描述符的个数，失败时返回-1并设置errno int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout); // timeout：指定epoll的超时时间，单位是毫秒 // 当timeout为-1时，epoll_wait调用将永久阻塞，直到某个事件发生 // 当timeout为0时，epoll_wait调用将立即返回 // 当timeout大于0时，epoll_wait阻塞timeout事件后返回 // maxevents：指定最多监听多少个事件，意思是一次返回最大的就绪事件数量 // events：检测到事件，将所有就绪的事件从内核事件表中复制到它的第二个参数events指向的数组中 // 该参数获取从内核得到的事件的集合，拿到前面函数注册的用户数据进行标记 // 返回值int，表示需要处理的事件数目，如果返回0表示已超时 select、poll、epoll 系统调用 select poll epoll 事件集合 通过传入3个参数可读、可写、异常事件内核通过对这些参数在线修改来反馈其中的就绪事件，这使得用户每次调用select都要重置这3个参数 统一处理所有事件类型，因此只需要一个事件集参数。用户通过pollfd.events传入感兴趣的事件，内核通过修改pollfd.revents反馈其中就绪的事件 内核通过一个事件表直接管理用户感兴趣的所有事件。因此每次调用epoll_wait时，无需反复传入用户感兴趣的事件。epoll_wait系统调用的参数events仅用来反馈就绪的事件 应用程序索引就绪文件描述符的时间复杂度 O(n) O(n) O(1) 最大支持文件描述符数 一般有最大值限制 65535 65535 工作模式 LT LT 支持ET高效模式 内核实现和工作效率 采用轮询方式检测就绪事件，时间复杂度：O(n) 采用轮询方式检测就绪事件，时间复杂度：O(n) 采用回调方式检测就绪事件，时间复杂度：O(1) socket() 创建一个socket，为一个socket数据结构分配存储空间。 两个网络程序之间的一个网络连接包括五种信息：【通信协议】、【本地协议地址】、【本地主机端口】、【远端主机地址】和【远端协议端口】。 该函数不会阻塞。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 int socket(int domain, int type, int protocol); // 1) domain 参数：互联网协议族，常用的有以下 // AF_INET： 表示通过IPv4,通信方式(通过IPv4网络连接起来的主机),应用程序间的通信(32位IPv4地址+16位端口号),地址结构(sockaddr_in) // AF_INET6：表示通过IPv6,通信方式(通过IPv6网络连接起来的主机),应用程序间的通信(128位Ipv6地址+16位端口号),地址结构(sockaddr_in6) // AF_UNIX： 内核中,同一主机间通信,地址格式(路径名),地址结构(sockaddr_un) // AF_ROUTE：路由套接字 // AF_KEY：密钥套接字 // AF_UNSPEC：未指定 // AF：是“Address Family”的简写，INET是“Inetnet”的简写 // 2) type 参数：表示 数据传输方式/套接字类型 // SOCK_STREAM：表示使用 \"流格式套接字/面向连接的套接字\"，有序的、面向连接的、可靠的双向通信的字节流通信 // SOCK_DGRAM： 表示使用 \"数据报套接字/无连接的套接字\"，不连接、不可靠、固定长度的数据报通信 // SOCK_NONBLOCK：将socket函数返回的文件描述符指定为非阻塞，可以和上面的宏使用’|’运算（如采用SOCK_STREAM | SOCK_NONBLOCK表示使用TCP协议且是非阻塞），默认是阻塞模式 // SOCK_RDM：表示想使用原始网络通信（如当domain参数设置为PF_INET时就表示直接使用TCP/IP协议族中的ip协议） // SOCK_CLOEXEC：一旦进程exec执行新程序时，自动关闭socket返回的套接字文件描述符，也就是fork的程序不能共用一个socket // 3) protocol 参数：表示传输协议，常用的有以下 // IPPROTO_TCP： 表示TCP传输协议 // IPPTOTO_UDP： 表示UDP传输协议 // IPPROTO_SCTP：表示SCTP传输协议 // IPPROTO_TIPC：表示TIPC传输协议 // 一般该参数默认传入0，socket程序根据前两个参数自动推断类型 // 返回值：成功时返回创建的socket的文件描述符;失败时返回-1，并设置errno错误信息 // 有了地址类型和数据传输方式，还不足以决定采用哪种协议吗？为什么还需要第三个参数呢？ // 1. 一般情况下有了前两个参数就可以创建socket，操作系统会自动推演出协议类型 // 2. 除非遇到这样的情况：有两种不同的协议支持同一种地址类型和数据传输类型 // 3. 如果我们不指明使用哪种协议，操作系统是没办法自动推演的 // int tcp_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); // 满足前面两个参数的只有TCP协议，因此可以写成如下 // int tcp_socket = socket(AF_INET, SOCK_STREAM, 0); // int udp_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP); // 满足前面两个参数的只有UDP协议，因此可以写成如下 // int udp_socket = socket(AF_INET, SOCK_DGRAM, 0); bind() Bind函数将socket与本机上的一个端口相关联，随后你就可以在该端口监听服务请求 给socket绑定一个地址，这样client对这个地址的相应收发数据就能和socket相关联 服务端: 必须要调用bind进行绑定，bind 是绑定本地地址，它不负责对端地址，一般用于服务器端，客户端是系统指定的。 客户端: 非必须调用，如不调用，则系统自动分配一个端口和本地地址来进行和socket绑定 socket函数并没有为套接字绑定本地地址和端口号，对于服务器端则必须显性绑定地址和端口号，bind函数主要是服务器端使用，把一个本地协议地址赋予套接字 该函数不会阻塞。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen); // sockfd：参数是调用socket函数返回的socket描述符 // addr：参数是一个指向包含有本机IP地址及端口号等信息的sockaddr类型的指针 // 早期的sockaddr // struct sockaddr { // sa_family_t sa_faily;\t// 地址族,AF_XXX // char sa_data[14];\t// 字符数组，存放ip和端口 // } // 后面出现了IPv4和IPv6，因此把sockaddr结构更详细细分,下面结构都能与sockaddr进行转换 // ipv4 // struct sockaddr_in { // __kernel_sa_family_t sin_family; // 地址族 // __be16 sin_port; // 端口 // struct in_addr sin_addr; // Internet地址 // // 占位,以满足sockaddr_in所占大小与sockaddr相同 // unsigned char __pad[__SOCK_SIZE__ - sizeof(short int) - sizeof(unsigned short int) - sizeof(struct in_addr)]; // } // // Internet地址 // struct in_addr { // __be32 s_addr; // 32为无符号整型数据，正好存储IP地址 // }; // ipv6 // struct sockaddr_in6 { // unsigned short int sin6_family; // AF_INET6 // __be16 sin6_port; // 传输层端口 // __be32 sin6_flowinfo; // IPv6 流信息 // struct in6_addr sin6_addr; // IPv6 地址 // __u32 sin6_scope_id; // scope id (new in RFC2553) // }; // unix addr // #define UNIX_PATH_MAX 108 // struct sockaddr_un { // __kernel_sa_family_t sun_family; // AF_UNIX // char sun_path[UNIX_PATH_MAX]; // }; // addrlen：参数是地址参数的长度sizeof(addr) // 返回值：成功返回0，失败返回-1, 并且设置errno // 比如绑定一个ipv4地址 struct sockaddr_in addr; // 定义结构体变量 addr.sin_family = AF_INET; // 指定协议族为IPv4 addr.sin_port = htons(5006);// 指定端口号 addr.sin_addr.s_addr = inet_addr(\"192.168.1.10\"); // 指定IP // 进行套接字文件 ip/端口的绑定 ret = bind(sockfd, (struct sockaddr*)\u0026addr, sizeof(addr)); // 其他相关函数 // htonl() 把32位值从主机字节序转换成网络字节序 // htons() 把16位值从主机字节序转换成网络字节序 // ntohl() 把32位值从网络字节序转换成主机字节序 // ntohs() 把16位值从网络字节序转换成主机字节序 // inet_addr() 字符串形式的ip,用于将点分十进制IP转换为IPV4的32位无符号整型IP listen() 仅供服务器端调用，把一个未连接的套接字转换为一个被动套接字，指示内核应该接受指向该套接字的连接请求。 其内部实现归根结底就是设置sock结构的状态，设置其为TCP_LISTEN。 该函数不会阻塞。 listen函数把一个未连接的套接字转换为一个被动套接字，指示内核应接受指向该套接字的连接请求，其内部实现归根到底就是设置sock结构的状态，设置其为TCP_LISTEN。 这个函数也是服务器端调用，其套接字的地址信息状态和bind函数执行之后是一样的，只绑定了本地地址信息，不知道对端的地址信息。 1 2 3 4 5 6 int listen(int sockfd, int backlog); // sockfd：socket()所创建的fd // backlog：在tcp三次握手的时候，第一次握手发送SYN=1，server端接收到之后，在回复了Ack=1之后， // 会把这个还未完成3次握手的连接放入到一个队列中，这个队列需要指定一个长度，该参数就是用来指定这个半连接队列长度的 // 在linux中该参数默认值由cat /proc/sys/net/ipv4/tcp_max_syn_backlog决定，默认1024 accept() 该函数返回一个已建立链接的可用 数据通信 的套接字 当socket模式设置为阻塞，accept函数的功能是阻塞等待client发起三次握手，当3次握手完成的时候，accept解除阻塞，并从全连接队列中取出一个socket，就可以对这个socket连接进行读写操作 该函数会阻塞等待链接。 1 2 3 4 5 int accept(int sockfd, struct sockaddr *cliaddr, socklen_t *addrlen); // 返回值：非负数成功，返回一个新的fd，这个fd用来和对端进行通信，-1 出错 // sockfd：监听后的套接字，也就是listen函数返回的fd // cliaddr：用来接收对端的连接地址信息，如果对客户端信息不感兴趣可以把该值设置成空NULL // addrlen：cliaddr的长度 accept4() accept4()有第四个参数flags，这个参数如果为0，就跟accept()一样。 额外添加的flags参数可以为新连接描述符设置 O_NONBLOCK | O_CLOEXEC (执行exec后关闭)这两个标记。 SOCK_NONBLOCK: 为新打开的文件描述符设置O_NONBLOCK标志位，这跟用fcntl()设置的效果是一样的，区别就是用fcntl()的话需要多调用个函数。 SOCK_CLOEXEC: 为新打开的文件描述符设置FD_CLOEXEC标志位，该标志位的作用是在进程使用fork()加上execve()的时候自动关闭打开的文件描述符。 1 int accept4(int sockfd, struct sockaddr *addr,socklen_t *addrlen, int flags); connect() TCP客户用connect函数来建立与TCP服务器的连接，其实是客户利用connect函数向服务器发出连接请求用户客户端。 1 2 3 int connect(int sockfd, const struct sockaddr *servaddr, socklen_t addrlen); // sockfd：由socket函数返回的套接字描述符 // 第二、三个参数分别是指向套接口地址结构的指针和该结构的大小，套接口地址结构必须含有服务器的IP地址和端口号 read() 从打开文件中读取数据。 1 2 3 4 5 ssize_t read(int fd, void *buf, size_t count); // fd：socket的文件描述符 // buf：读取到的容器 // count：buf的大小 // 返回值：为实际读取到的字节数，如果返回0，表示已达到文件尾或是无可读的数据 ",
   "wordCount" : "729",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-07-20T21:28:31+08:00",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2024-07-20T21:28:31+08:00",
   "dateModified": "2024-07-20T21:28:31+08:00",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/golang/netpoll/linux/"
+    "@id": "https://helium-chain.github.io/posts/golang/netpoll/linux/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/netpoll/">第16章 netpoll</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/golang/netpoll/">第16章 netpoll</a></div>
     <h1 class="post-title entry-hint-parent">
       Linux epoll
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://helium.github.io/tags/netpoll/" target="_blank" rel="noopener">Netpoll</a>
+            <a href="https://helium-chain.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium-chain.github.io/tags/netpoll/" target="_blank" rel="noopener">Netpoll</a>
         </ul>
       </span>
       
@@ -883,16 +883,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
-      <li><a href="https://helium.github.io/tags/netpoll/">Netpoll</a></li>
+      <li><a href="https://helium-chain.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium-chain.github.io/tags/netpoll/">Netpoll</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/golang/channel/select/">
+  <a class="prev" href="https://helium-chain.github.io/posts/golang/channel/select/">
     <span class="title">« 上一页</span>
     <br>
     <span>select(原理)</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/golang/netpoll/epoll/">
+  <a class="next" href="https://helium-chain.github.io/posts/golang/netpoll/epoll/">
     <span class="title">下一页 »</span>
     <br>
     <span>Golang epoll</span>

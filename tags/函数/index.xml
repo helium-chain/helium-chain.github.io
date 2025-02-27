@@ -2,58 +2,58 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>函数 on Helium</title>
-    <link>https://helium.github.io/tags/%E5%87%BD%E6%95%B0/</link>
+    <link>https://helium-chain.github.io/tags/%E5%87%BD%E6%95%B0/</link>
     <description>Recent content in 函数 on Helium</description>
     <image>
       <title>Helium</title>
-      <url>https://helium.github.io/favicon-32x32.png</url>
-      <link>https://helium.github.io/favicon-32x32.png</link>
+      <url>https://helium-chain.github.io/favicon-32x32.png</url>
+      <link>https://helium-chain.github.io/favicon-32x32.png</link>
     </image>
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
     <lastBuildDate>Tue, 06 Aug 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://helium.github.io/tags/%E5%87%BD%E6%95%B0/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://helium-chain.github.io/tags/%E5%87%BD%E6%95%B0/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>函数使用</title>
-      <link>https://helium.github.io/posts/golang/func/use/</link>
+      <link>https://helium-chain.github.io/posts/golang/func/use/</link>
       <pubDate>Fri, 12 Mar 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/func/use/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/func/use/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>函数调用栈</title>
-      <link>https://helium.github.io/posts/golang/func/stack/</link>
+      <link>https://helium-chain.github.io/posts/golang/func/stack/</link>
       <pubDate>Mon, 05 Aug 2024 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/func/stack/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/func/stack/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>内存对齐和逃逸分析</title>
-      <link>https://helium.github.io/posts/golang/func/align/</link>
+      <link>https://helium-chain.github.io/posts/golang/func/align/</link>
       <pubDate>Mon, 05 Aug 2024 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/func/align/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/func/align/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>Function Value</title>
-      <link>https://helium.github.io/posts/golang/func/value/</link>
+      <link>https://helium-chain.github.io/posts/golang/func/value/</link>
       <pubDate>Sat, 03 Aug 2024 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/func/value/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/func/value/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>defer(使用)</title>
-      <link>https://helium.github.io/posts/golang/func/defer-use/</link>
+      <link>https://helium-chain.github.io/posts/golang/func/defer-use/</link>
       <pubDate>Mon, 05 Aug 2024 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/func/defer-use/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/func/defer-use/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>painc、recover(原理)</title>
-      <link>https://helium.github.io/posts/golang/func/painc-theory/</link>
+      <link>https://helium-chain.github.io/posts/golang/func/painc-theory/</link>
       <pubDate>Tue, 06 Aug 2024 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/func/painc-theory/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/func/painc-theory/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
   </channel>

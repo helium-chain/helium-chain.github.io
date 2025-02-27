@@ -9,18 +9,18 @@
 <meta name="keywords" content="elasticsearch">
 <meta name="description" content="设置当前索引的分片数，副本数等信息。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/elasticsearch/settings/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/elasticsearch/settings/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/elasticsearch/settings/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/elasticsearch/settings/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="Settings" />
 <meta property="og:description" content="设置当前索引的分片数，副本数等信息。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/elasticsearch/settings/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/elasticsearch/settings/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2021-08-06T00:00:00+00:00" />
 <meta property="article:modified_time" content="2021-08-06T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="Settings"/>
 <meta name="twitter:description" content="设置当前索引的分片数，副本数等信息。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "ElasticSearch",
-      "item": "https://helium.github.io/posts/elasticsearch/"
+      "item": "https://helium-chain.github.io/posts/elasticsearch/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "Settings",
-      "item": "https://helium.github.io/posts/elasticsearch/settings/"
+      "item": "https://helium-chain.github.io/posts/elasticsearch/settings/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " setting属性用于设置当前索引的分片数，副本数等信息,常用的主要有： index.number_of_shards：索引分片数。 index.number_of_replicas：索引副本数。 index.refresh_interval：refresh频率，默认1s。当数据对实时刷新要求不那么高时，可以适当调大改值。当值=-1时，代表不会进行refresh操作，但是请保证es的虚拟机内存足够大，不然会造成内存溢出 使用示例： 1 2 3 4 5 6 7 8 9 10 PUT class_1 { \"settings\": { \"index\": { \"number_of_shards\": 3, \"number_of_replicas\": 1, \"refresh_interval\": \"3s\" } } } ES的settings分为静态设置和动态设置两种。 常用设置标记成🎈。 静态设置 只能在索引创建时设置，或者在已关闭的索引上设置。静态设置在创建索引时指定。 number_of_shards🎈 索引应具有的主分片数，默认值为1。ES支持的最大分片数默认为1024，可以通过修改index.max_number_of_shards属性修改。 该值用于指定分片数量，也就是当前索引创建几个主分片索引。number_of_shards值不推荐过大，推荐5~10。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.number_of_shards\": 1 } } shard.check_on_startup 分片在打开之前是否检查该分片是否损坏。当检测到分片损坏时，将阻止打开。 可选值： false：不检测，默认值。 checksum：只检查物理结构。 true：检查物理结构和路基损坏，相对比较消耗CPU。 fix：类同false，7.0版本后将废弃。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.shard.check_on_startup\": false } } number_of_routing_shards routing_partition_size 路由分区数，如果设置了该参数，其路由算法为： (hash(_routing) + hash(_id) % index.routing_parttion_size ) % number_of_shards 如果没有设置，路由算法为：_routing默认值为_id。 hash(_routing) % number_of_shardings codec 数据存储的压缩算法，默认值LZ4，可选值best_compression，比LZ4可以获得更好的压缩比例(占用较小的磁盘空间，但是存储性能比LZ4低)。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.codec\": \"LZ4\" } } 动态设置 number_of_replicas🎈 每个主分片的副本数，默认为 1，该值必须大于等于0，创建索引后该值可以变更。 副本的数量值不宜过大。 1 2 3 4 5 6 7 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2 } } auto_expand_replicas 基于可用节点的数量自动分配副本数量,默认为 false（即禁用此功能）,可设置为：0-all。 1 2 3 4 5 6 7 8 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.auto_expand_replicas\": false } } refresh_interval🎈 执行刷新操作的频率，这使得索引的最近更改可以被搜索。默认为 1s。可以设置为 -1 以禁用刷新。 1 2 3 4 5 6 7 8 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\" } } max_result_window🎈 用于索引搜索的 from+size 的最大值。默认为 10000。 1 2 3 4 5 6 7 8 9 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_result_window\": 1000 } } max_inner_result_window 用于控制top aggregations，默认100。内部命中和顶部命中聚合占用堆内存，并且时间与from+size成正比，这限制了内存。 1 2 3 4 5 6 7 8 9 10 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_result_window\": 1000, \"index.max_inner_result_window\": 100 } } max_rescore_window 在搜索此索引中 rescore 的 window_size 的最大值。 1 2 3 4 5 6 7 8 9 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_rescore_window\": 100 } } max_docvalue_fields_search 一次查询最多包含开启doc_values字段的个数，默认为100。 1 2 3 4 5 6 7 8 9 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_docvalue_fields_search\": 100 } } max_script_fields 查询中允许的最大script_fields数量。默认为32。 1 2 3 4 5 6 7 8 9 PUT /test { \"settings\": { \"index.number_of_shards\": 5, \"index.number_of_replicas\": 2, \"index.refresh_interval\": \"1s\", \"index.max_script_fields\": 32 } } max_ngram_diff NGramTokenizer和NGramTokenFilter的min_gram和max_gram之间允许的最大差异。默认为1。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_ngram_diff\": 1 } } max_shingle_diff 对于ShingleTokenFilter, max_shingle_size和min_shingle_size之间允许的最大差异。默认为3。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_shingle_diff\": 3 } } blocks.read_only 索引数据、索引元数据是否只读，如果设置为true，则不能修改索引数据，也不能修改索引元数据。，false 为允许写入和元数据更改。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.blocks.read_only\": false } } blocks.read_only_allow_delete 与index.blocks.read_only基本类似，唯一的区别是允许删除动作。 1 2 3 4 5 6 7 PUT /test { \"settings\": { \"index.blocks.read_only\": false, \"index.blocks.read_only_allow_delete\": false } } blocks.read 设置为 true 可禁用对索引的读取操作。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.blocks.read\": false } } blocks.write 设设置为true以禁用对索引数据的写操作。（针对索引数据，而不是索引元数据） 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.blocks.write\": false } } blocks.metadata 设置为true，表示不允许对索引元数据进行读与写。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.blocks.metadata\": false } } max_refresh_listeners 索引的每个分片上当刷新索引时最大的可用监听器数量。这些侦听器用于实现refresh=wait_for。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_refresh_listeners\": 1 } } highlight.max_analyzed_offset 高亮显示的最大字符数。此设置仅在对没有偏移或词向量的索引的文本上适用。默认情况下，此设置在6.x中未设置，默认为-1。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_refresh_listeners\": -1 } } max_terms_count Term查询中可以使用的最大Term数。默认为65536。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_terms_count\": 65536 } } routing.allocation.enable 控制此索引的分片分配，可选值： all：默认，允许分片所有的分片 primaries：只允许分配主分片 new_primaries：仅允许分配新创建的主分片 none：不允许分配 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.routing.allocation.enable\": \"all\" } } routing.rebalance.enable 为此索引启用分片重新平衡，可选值： all：默认，允许分片重新平衡 primaries：只允许主分片重新平衡 replicas：只允许副本分片重新平衡 none：不允许分片重新平衡 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.routing.rebalance.enable\": \"all\" } } gc_deletes 允许已删除文档的版本号，扔可用于进一步版本化操作的时间长度。默认60s。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.gc_deletes\": \"60s\" } } max_regex_length Regexp Query中可以使用的正则表达式的最大长度，默认为1000。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.max_regex_length\": 1000 } } mapping.coerce true：默认值，强制类型转换，把json中的值转为ES中字段的数据类型，譬如，把字符串\"5\"转为integer的5。 false：当json的值与ES字段类型不匹配将会拒绝。 1 2 3 4 5 6 PUT /test { \"settings\": { \"mapping.coerce\": true } } Merging max_thread_count 当个分片节点合并的最大线程数，默认值**Math.max(1, Math.min(4, Runtime.getRuntime().availableProcessors() / 2))**如果是非SSD盘，建议设置为1。。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.merge.scheduler.max_thread_count\": 1 } } max_merged_segment 指定单个segment的最大容量，默认值5GB，可以考虑适当降低此值。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.merge.policy.max_merged_segment\": \"5GB\" } } segments_per_tier 该属性指定了每层分段的数量，取值越小则segment越少，因此需要merge的操作更多，可以考虑适当增加此值。默认为10，其应该大于等于index.merge.poliycy.max_merge_at_once。 1 2 3 4 5 6 PUT /test { \"settings\": { \"index.merge.policy.segments_per_tier\": 10 } } Show Log Search Show Log ES提供在查询阶段(Query)和数据获取阶段(Fetch)设置阈值，超过改阈值则记录日志。 查询阶段支持参数，以下值定义查询阶段(Query)阈值，分别表示执行超过10s，打印警告日志。超过5s打印info日志。 1 2 3 4 index.search.slowlog.threshold.query.warn: 10s index.search.slowlog.threshold.query.info: 5s index.search.slowlog.threshold.query.debug: 2s index.search.slowlog.threshold.query.trace: 500ms 数据获取阶段支持参数，以下定义数据获取阶段(Fetch)阈值，分别表示执行超过1s，打印警告日志。超过800ms打印info日志。 1 2 3 4 index.search.slowlog.threshold.fetch.warn: 1s index.search.slowlog.threshold.fetch.info: 800ms index.search.slowlog.threshold.fetch.debug: 500ms index.search.slowlog.threshold.fetch.trace: 200ms 日志输出级别，定义日志输出级别为info，不输出debug、trace级别的日志。注意：上述日志级别为分片日志。 1 index.search.slowlog.level: info log4j配置。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 appender.index_search_slowlog_rolling.type = RollingFile appender.index_search_slowlog_rolling.name = index_search_slowlog_rolling appender.index_search_slowlog_rolling.fileName = ${sys:es.logs}_index_search_slowlog.log appender.index_search_slowlog_rolling.layout.type = PatternLayout appender.index_search_slowlog_rolling.layout.pattern = [%d{ISO8601}][%-5p][%-25c] [%node_name]%marker %.10000m%n appender.index_search_slowlog_rolling.filePattern = ${sys:es.logs}_index_search_slowlog-%d{yyyy-MM-dd}.log #文件切割方案，属于log4j的语法 appender.index_search_slowlog_rolling.policies.type = Policies #基于时间切割，log4j还支持按大小切割，其类为SizeBasedTriggeringPolicy。 appender.index_search_slowlog_rolling.policies.time.type = TimeBasedTriggeringPolicy #1小时切割成一个文件 appender.index_search_slowlog_rolling.policies.time.interval = 1 #是否修正时间范围, 如果设置为true，则从0时开始计数 appender.index_search_slowlog_rolling.policies.time.modulate = true logger.index_search_slowlog_rolling.name = index.search.slowlog logger.index_search_slowlog_rolling.level = trace logger.index_search_slowlog_rolling.appenderRef.index_search_slowlog_rolling.ref = index_search_slowlog_rolling logger.index_search_slowlog_rolling.additivity = false Index Show Log 索引慢日志配置。 index.indexing.slowlog.source参数用来记录文档 _source字段字符的个数，默认1000，表示只记录_source的前1000个字符，可以设置为true，表示输出_source字段全部内容，设置为false，表示不记录_source字段的内容。 默认情况下，会对_source字段的输出进行格式化，通常使用一行输出，如果想阻止格式化，可以通过index.indexing.slowlog.reformat设置为false来避免。 1 2 3 4 5 6 index.indexing.slowlog.threshold.index.warn: 10s index.indexing.slowlog.threshold.index.info: 5s index.indexing.slowlog.threshold.index.debug: 2s index.indexing.slowlog.threshold.index.trace: 500ms index.indexing.slowlog.level: info index.indexing.slowlog.source: 1000 在logg4j配置文件中定义日志的输出。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 appender.index_indexing_slowlog_rolling.type = RollingFile appender.index_indexing_slowlog_rolling.name = index_indexing_slowlog_rolling appender.index_indexing_slowlog_rolling.fileName = ${sys:es.logs}_index_indexing_slowlog.log appender.index_indexing_slowlog_rolling.layout.type = PatternLayout appender.index_indexing_slowlog_rolling.layout.pattern = [%d{ISO8601}][%-5p][%-25c] [%node_name]%marker %.-10000m%n appender.index_indexing_slowlog_rolling.filePattern = ${sys:es.logs}_index_indexing_slowlog-%d{yyyy-MM-dd}.log appender.index_indexing_slowlog_rolling.policies.type = Policies appender.index_indexing_slowlog_rolling.policies.time.type = TimeBasedTriggeringPolicy appender.index_indexing_slowlog_rolling.policies.time.interval = 1 appender.index_indexing_slowlog_rolling.policies.time.modulate = true logger.index_indexing_slowlog.name = index.indexing.slowlog.index logger.index_indexing_slowlog.level = trace logger.index_indexing_slowlog.appenderRef.index_indexing_slowlog_rolling.ref = index_indexing_slowlog_rolling logger.index_indexing_slowlog.additivity = false Store index.store.type 表示存储类型，该值为静态参数，在索引创建时指定，无法更改。可选值： fs：默认文件系统实现，根据当前操作系统选择最佳存储方式 simplefs：简单的FS类型，使用随机访问文件实现文件系统存储(映射到Lucene SimpleFsDirectory)。并发性能很差(多线程会出现瓶颈)。当需要索引持久性时，通常最好使用niofs。 niofs：基于NIO实现的文件系统，该类型使用NIO在文件系统上存储碎片索引(映射到Lucene NIOFSDirectory)。它允许多个线程同时从同一个文件中读取数据。 mmapfs：基于文件内存映射机制实现的文件系统实现，该方法将文件映射到内存(MMap)来存储文件系统上的碎片索引(映射到Lucene MMapDirectory)。内存映射使用进程中与被映射文件大小相同的部分虚拟内存地址空间。可通过node.store.allow_mmapfs属性来禁用基于内存映射机制，如果节点所在的操作系统没有大量虚拟内存，则可以使用该属性明确禁止使用该文件实现。 index.store.preload 预加载数据到文件系统缓存，如果ES主机重启，则文件系统缓存将清空，此时搜索会比较慢，可以使用index.store.preload设置，通过指定文件扩展名，显示的告诉操作系统应该将哪些文件加载到内存中。 例如，配置到elasticsearch.yml文件中： 1 index.store.preload: [\"nvd\",\"dvd\"] 或者在创建索引的时候设置： 1 2 3 4 5 { \"settings\":{ \"index.store.preload\":[\"nvd\",\"dvd\"] } } Translog 由于Lucene提交的开销很大，不能每个变更就提交一次(刷写磁盘)，所以每个分片复制都有一个事务日志，称为translog。所有索引和删除操作都是在被内部Lucene索引处理只会写入translog的。在发生崩溃的情况下，当索引恢复的时候，可以通过回放translog中的数据进行恢复。 index.translog.durability translog刷盘方式，可选值：request、async。 request：即每请求一次刷盘，也就是客户端发起一个增删改操作时，会在主分片和副本分片全部刷盘成功后，才会返回成功，是ES的默认模式。 async：异步刷盘模式，此模式频率由index.translog.sync_interval设置，其默认值为5s，该模式会存在数据丢失的可能。 index.translog.sync_interval 如果index.translog.durability设置为async，用该值来设置刷盘的频率，默认为5s。 index.translog.flush_threshold_size ES强制刷新的另外一个维度，如果translog的大小达到该值，则强制将为刷盘的数据强制刷新到Lucene中，默认512M。 index.translog.retention.size 保存跨日志文件的总大小。也就是translog日志文件flush后，并不马上删除，而是保留一段时间，但最新的translog文件已经存储的内容与待删除的文件的间隔不超过改参数设置的值，默认为512M。 index.translog.retention.age 保存translog文件的最大持续时间，默认12h。 参考 https://blog.csdn.net/dwjf321/article/details/103871981 ",
   "wordCount" : "882",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2021-08-06T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2021-08-06T00:00:00Z",
   "dateModified": "2021-08-06T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/elasticsearch/settings/"
+    "@id": "https://helium-chain.github.io/posts/elasticsearch/settings/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/elasticsearch/">ElasticSearch</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/elasticsearch/">ElasticSearch</a></div>
     <h1 class="post-title entry-hint-parent">
       Settings
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/elasticsearch/" target="_blank" rel="noopener">Elasticsearch</a>
+            <a href="https://helium-chain.github.io/tags/elasticsearch/" target="_blank" rel="noopener">Elasticsearch</a>
         </ul>
       </span>
       
@@ -1462,15 +1462,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/elasticsearch/">Elasticsearch</a></li>
+      <li><a href="https://helium-chain.github.io/tags/elasticsearch/">Elasticsearch</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/elasticsearch/mapping/">
+  <a class="prev" href="https://helium-chain.github.io/posts/elasticsearch/mapping/">
     <span class="title">« 上一页</span>
     <br>
     <span>Mappings</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/elasticsearch/aliases/">
+  <a class="next" href="https://helium-chain.github.io/posts/elasticsearch/aliases/">
     <span class="title">下一页 »</span>
     <br>
     <span>Aliases</span>

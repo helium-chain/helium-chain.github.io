@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, Goroutine">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/golang/goroutine/user/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/golang/goroutine/user/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/goroutine/user/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/golang/goroutine/user/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="user goroutine" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/golang/goroutine/user/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/golang/goroutine/user/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-07-29T00:00:00+00:00" />
 <meta property="article:modified_time" content="2024-07-29T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="user goroutine"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://helium.github.io/posts/golang/"
+      "item": "https://helium-chain.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第12章 Goroutine",
-      "item": "https://helium.github.io/posts/golang/goroutine/"
+      "item": "https://helium-chain.github.io/posts/golang/goroutine/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "user goroutine",
-      "item": "https://helium.github.io/posts/golang/goroutine/user/"
+      "item": "https://helium-chain.github.io/posts/golang/goroutine/user/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": " 本篇是接着上一篇《go关键字》的后续，goroutine运行完后的回收阶段。 goexit() goroutine运行结束后返回到goexit+PCQuantum处。const PCQuantum = 1。 也就是接着执行CALL runtime·goexit1(SB)这条指令。 文件位置：go1.19.3/src/runtime/asm_amd64.s。 1591 1592 1593 1594 1595 1596 1597 1598 // The top-most function running on a goroutine // returns to goexit+PCQuantum. TEXT runtime·goexit(SB),NOSPLIT|TOPFRAME,$0-0 BYTE $0x90 // NOP 从下一条指令开始执行 CALL runtime·goexit1(SB) // 这条指令调用函数将永不返回 // traceback from goexit1 must hit code range of goexit // 从goexit1回溯必须达到goexit的代码范围 BYTE $0x90 // NOP goexit1() goexit1()函数通过调用mcall从当前运行的g2 goroutine切换到g0，然后在g0栈上调用和执行goexit0()这个函数。 文件位置：go1.19.3/src/runtime/proc.go。 3468 3469 3470 3471 3472 3473 3474 3475 3476 3477 3478 3479 3480 3481 3482 3483 // Finishes execution of the current goroutine. func goexit1() { if raceenabled { //与竞态检查有关，不关注 racegoend() } if trace.enabled { //与backtrace有关，不关注 traceGoEnd() } // 注意，mcall函数的参数是一个函数goexit0 // Function Value 结构 // type funcval struct { // fn uintptr // // 闭包捕获的参数在这 // } mcall(goexit0) } mcall() 函数原型：func mcall(fn func(*g))。 runtime.mcall()函数和systemstack()函数很像，也是切换到系统栈去执行某个Function Value。 但是也有些不同，mcall()函数不能在g0栈上调用，而且也不会再切换回来。 切换到m.g0栈，调用fn(g)。 Fn必须永不返回。它应该调用gogo(\u0026g-\u003esched)来保持g的运行。这里的g应该是g0。 从当前运行的g切换到g0，这一步包括保存当前g的调度信息，把g0设置到tls中，修改CPU的rsp寄存器使其指向g0的栈。 以当前运行的g为参数调用fn函数(此处为goexit0)。 mcall函数不能在g0栈上调用，而且也不会再切换回来。 文件位置：go1.19.3/src/runtime/asm_amd64.s。 420 421 422 423 424 425 426 427 428 429 430 431 432 433 434 435 436 437 438 439 440 441 442 443 444 445 446 447 448 449 450 451 452 453 454 455 456 457 458 459 460 461 462 463 464 465 466 467 468 469 470 471 472 473 474 475 476 477 # func mcall(fn func(*g)) # Switch to m-\u003eg0's stack, call fn(g). # Fn must never return. It should gogo(\u0026g-\u003esched) # to keep running g. TEXT runtime·mcall\u003cABIInternal\u003e(SB), NOSPLIT, $0-8 # 1) 从AX中获取参数，注意这里还是再普通goroutine中不是g0 # 在go1.17后版本中采用寄存器传参，因此AX作为第一个参数存储的是macll的参数 # 传参顺序 AX、BX、CX、DI、SI、R8、R9、R10、R11 MOVQ AX, DX # DX = \u0026funcval; \u0026funcval -\u003e goexit0 # 2) 保存状态到 g-\u003esched。这里的g是当前正在运行的goroutine。 # save state in g-\u003esched # 以下保存当前状态到g-\u003esched中，在go 1.17版本后R14寄存器存储的是当前工作线程运行的goroutine # 0(SP)：存储的是goexit1函数调用mall函数的下一条指令地址。也就是goexit1()函数的返回地址 MOVQ 0(SP), BX # caller's PC\tmcall返回地址放入BX # g.sched.pc = BX MOVQ BX, (g_sched+gobuf_pc)(R14) # g.sched.pc = BX，保存g的rip # fn+0(FP)表当前参数所在栈位置，也就是goexit1函数的SP位置处。因为参数在调用者栈上。 LEAQ fn+0(FP), BX # caller's SP MOVQ BX, (g_sched+gobuf_sp)(R14) # g.sched.sp = BX，保存g的rsp # g.sched.bp = BP MOVQ BP, (g_sched+gobuf_bp)(R14) # g.sched.bp = BP，保存g的rbp # 3) 切换到 m-\u003eg0 及其堆栈，调用fn函数。 # switch to m-\u003eg0 \u0026 its stack, call fn # # BX = m MOVQ g_m(R14), BX # BX = g.m，拿到当前工作线程M # SI = g0 MOVQ m_g0(BX), SI # SI = g.m.g0，那当当前工作线程M的g0栈 # 此刻，SI = g0， R14 = g，所以这里在判断g是否是g0，如果g == g0则一定是哪里代码写错了 CMPQ SI, R14 # if g == m-\u003eg0 call badmcall JNE goodm # SI和R14不相等则跳转 JMP runtime·badmcall(SB) goodm: # 正常流程跳转到这里 # AX = g MOVQ R14, AX # AX (and arg 0) = g，AX = g2，当前g不是g0，AX也是goexit0函数需要的参数 # R14 = g0 MOVQ SI, R14 # g = g.m.g0，R14 = g0，设置当前正在运行的是g0 # CX = \u0026m.tls[1] get_tls(CX) # Set G in TLS # TLS = g0 MOVQ R14, g(CX) # sp = g0.sched.sp MOVQ (g_sched+gobuf_sp)(R14), SP # AX = g 入栈，此时已经在g0的栈上了 # AX存储的时普通的goroutine，这里入栈也是goexit0()函数的参数 PUSHQ AX # open up space for fn's arg spill slot # R12 = funcval.fn; DX = \u0026funcval MOVQ 0(DX), R12 # fn的第一个成员是goexit0函数代码地址处，R12 = fn.fn # 调用goexit0()函数，参数再AX寄存器中，上下文在DX寄存器中。 CALL R12 # 调用 goexit0(g)，这里【永不会返回】 POPQ AX JMP\truntime·badmcall2(SB) RET goexit0() 在g0上继续执行goexit0()。参数：gp *g，当前运行完的普通的goroutine。 从g2栈切换到g0栈之后，下面开始在g0栈执行goexit0()函数，该函数完成最后的清理工作： 把g的状态从_Grunning变更为_Gdead。 然后把g的一些字段清空成零值。 调用dropg函数解除g和m之间的关系，其实就是设置 g-\u003em = nil,m-\u003ecurrg = nil。 把g放入p的freeg队列缓存起来供下次创建g时快速获取而不用从内存分配。freeg就是g的一个对象池。 调用schedule()函数再次进行调度。 文件位置：go1.19.3/src/runtime/runtime/proc.go。 3479 3480 3481 3482 3483 3484 3485 3486 3487 3488 3489 3490 3491 3492 3493 3494 3495 3496 3497 3498 3499 3500 3501 3502 3503 3504 3505 3506 3507 3508 3509 3510 3511 3512 3513 3514 3515 3516 3517 3518 3519 3520 3521 3522 3523 3524 3525 3526 3527 3528 3529 3530 3531 3532 3533 3534 3535 3536 3537 3538 3539 3540 3541 3542 3543 3544 3545 3546 3547 3548 3549 3550 3551 3552 3553 3554 3555 3556 3557 3558 3559 3560 3561 3562 3563 3564 3565 // goexit continuation on g0. func goexit0(gp *g) { _g_ := getg() // _g_ = g0 _p_ := _g_.m.p.ptr() // _p_ = g0.m.p // _Grunning：2 表示这个 goroutine 可以执行用户代码。 堆栈由这个 goroutine 拥有。 // 它不在运行队列中。它被分配了一个 M 和一个 P（g.m 和 g.m.p 是有效的） // _Gdead：6 表示这个 goroutine 当前未被使用，它可能刚刚退出，在空闲列表中，或者刚刚被初始化 casgstatus(gp, _Grunning, _Gdead) // g马上退出，所以设置其状态为_Gdead gcController.addScannableStack(_p_, -int64(gp.stack.hi-gp.stack.lo)) // 已分配栈总量 // sSystemGoroutine 报告在堆栈转储和死锁检测器中是否必须省略 goroutine g // 这是在 runtime.* 入口点启动的任何 goroutine，除了 runtime.main、runtime.handleAsyncEvent // （仅限 wasm）和有时 runtime.runfinq // 如果 fixed 为真，任何可以在用户和系统之间变化的 goroutine（即终结器 goroutine）都被认为是用户 goroutine if isSystemGoroutine(gp, false) { atomic.Xadd(\u0026sched.ngsys, -1) // sched.ngsys 记录系统goroutine的数量 } // 清空g保存的一些信息 gp.m = nil // lockedm 关联到与当前G绑定的M，可以参考下 LockOSThread。 locked := gp.lockedm != 0 gp.lockedm = 0 _g_.m.lockedg = 0 gp.preemptStop = false gp.paniconfault = false gp._defer = nil // should be true already but just in case. gp._panic = nil // non-nil for Goexit during panic. points at stack-allocated data. gp.writebuf = nil gp.waitreason = 0 gp.param = nil gp.labels = nil gp.timer = nil // gcBlackenEnabled：表示辅助助手和后台标记线程允许将对象置为黑色; // gcAssistBytes：表示当前goroutine还有信用值。（GC相关） if gcBlackenEnabled != 0 \u0026\u0026 gp.gcAssistBytes \u003e 0 { // Flush assist credit to the global pool. This gives // better information to pacing if the application is // rapidly creating an exiting goroutines. assistWorkPerByte := gcController.assistWorkPerByte.Load() scanCredit := int64(assistWorkPerByte * float64(gp.gcAssistBytes)) atomic.Xaddint64(\u0026gcController.bgScanCredit, scanCredit) gp.gcAssistBytes = 0 } // g2-\u003em = nil, m-\u003ecurrg = nil 解绑g和m之关系 // m-\u003ecurrg记录着前一个g信息 // func dropg() { // _g_ := getg() // _g_ = g0 // setMNoWB(\u0026_g_.m.curg.m, nil) // g2-\u003em = nil // setGNoWB(\u0026_g_.m.curg, nil) // m-\u003ecurrg = nil // } // // func setMNoWB(mp **m, new *m) { // (*muintptr)(unsafe.Pointer(mp)).set(new) // } dropg() // 解绑gp的m和当前m.currg值 if GOARCH == \"wasm\" { // no threads yet on wasm gfput(_p_, gp) schedule() // never returns } // lockedInt 内部lockOSThread的跟踪 if _g_.m.lockedInt != 0 { print(\"invalid m-\u003elockedInt = \", _g_.m.lockedInt, \"\\n\") throw(\"internal lockOSThread error\") } // go keyword 文档关于 gfput 和 gfget 函数注解。 gfput(_p_, gp) // g2放入p的freeg队列，方便下次重用，免得再去申请内存，提高效率 if locked { // The goroutine may have locked this thread because // it put it in an unusual kernel state. Kill it // rather than returning it to the thread pool. // Return to mstart, which will release the P and exit // the thread. if GOOS != \"plan9\" { // See golang.org/issue/22227. gogo(\u0026_g_.m.g0.sched) } else { // Clear lockedExt on plan9 since we may end up re-using // this thread. _g_.m.lockedExt = 0 } } schedule() // 下面再次调用schedule } ",
   "wordCount" : "943",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-07-29T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2024-07-29T00:00:00Z",
   "dateModified": "2024-07-29T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/golang/goroutine/user/"
+    "@id": "https://helium-chain.github.io/posts/golang/goroutine/user/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/goroutine/">第12章 Goroutine</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/golang/goroutine/">第12章 Goroutine</a></div>
     <h1 class="post-title entry-hint-parent">
       user goroutine
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://helium.github.io/tags/goroutine/" target="_blank" rel="noopener">Goroutine</a>
+            <a href="https://helium-chain.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium-chain.github.io/tags/goroutine/" target="_blank" rel="noopener">Goroutine</a>
         </ul>
       </span>
       
@@ -775,16 +775,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
-      <li><a href="https://helium.github.io/tags/goroutine/">Goroutine</a></li>
+      <li><a href="https://helium-chain.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium-chain.github.io/tags/goroutine/">Goroutine</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/golang/goroutine/newproc/">
+  <a class="prev" href="https://helium-chain.github.io/posts/golang/goroutine/newproc/">
     <span class="title">« 上一页</span>
     <br>
     <span>go 关键字</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/golang/goroutine/main/">
+  <a class="next" href="https://helium-chain.github.io/posts/golang/goroutine/main/">
     <span class="title">下一页 »</span>
     <br>
     <span>main goroutine</span>

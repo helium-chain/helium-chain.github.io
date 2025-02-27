@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, sync, WaitGroup">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/golang/sync/waitgroup/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/golang/sync/waitgroup/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/sync/waitgroup/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/golang/sync/waitgroup/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,13 +77,13 @@
 <meta property="og:title" content="sync.WaitGroup" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/golang/sync/waitgroup/" />
-<meta property="og:image" content="https://helium.github.io/images/WaitGroup-cover.png" /><meta property="article:section" content="posts" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/golang/sync/waitgroup/" />
+<meta property="og:image" content="https://helium-chain.github.io/images/WaitGroup-cover.png" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2020-07-13T22:00:10+08:00" />
 <meta property="article:modified_time" content="2023-07-13T22:00:10+08:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/images/WaitGroup-cover.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/images/WaitGroup-cover.png" />
 <meta name="twitter:title" content="sync.WaitGroup"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18版本"/>
 
@@ -97,25 +97,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://helium.github.io/posts/golang/"
+      "item": "https://helium-chain.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "sync",
-      "item": "https://helium.github.io/posts/golang/sync/"
+      "item": "https://helium-chain.github.io/posts/golang/sync/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "sync.WaitGroup",
-      "item": "https://helium.github.io/posts/golang/sync/waitgroup/"
+      "item": "https://helium-chain.github.io/posts/golang/sync/waitgroup/"
     }
   ]
 }
@@ -133,7 +133,7 @@
   "articleBody": "type WaitGroup struct 🚀 WaitGroup 等待 goroutine 集合完成。 main goroutine 调用 Add 来设置要等待的 goroutine 的数量。然后每个 goroutine 运行并在完成时调用 Done。 同时，可以使用 Wait 来阻塞，直到所有 goroutine 完成。 WaitGroup 在第一次使用后不能被复制。 WaitGroup：用于等待一组线程的结束，父线程调用Add方法来设定应等待的线程的数量。 每个被等待的线程在结束时应调用Done方法，同时，主线程里可以调用Wait方法阻塞至所有线程结束。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 // A WaitGroup waits for a collection of goroutines to finish. // The main goroutine calls Add to set the number of // goroutines to wait for. Then each of the goroutines // runs and calls Done when finished. At the same time, // Wait can be used to block until all goroutines have finished. // // A WaitGroup must not be copied after first use. type WaitGroup struct { // WaitGroup 首次使用后不能被拷贝的原因【是 \u0026state2 地址会发生变化】 // semaPhore 要求 \u0026state2 地址是一个，不然从其中唤醒 goroutine 会找不到 noCopy noCopy\t// 编译器检查WaitGroup对象是否被拷贝过 // 64-bit value: high 32 bits are counter, low 32 bits are waiter count. // 64-bit atomic operations require 64-bit alignment, but 32-bit // compilers only guarantee that 64-bit fields are 32-bit aligned. // For this reason on 32 bit architectures we need to check in state() // if state1 is aligned or not, and dynamically \"swap\" the field order if // needed. // // 64位值: 高32位是 counter 计数，低32位是 waiter 计数。 // 64-bit = ( uint64(counter) \u003c\u003c 32 ) | uint32( waiter ) // 【64位原子操作需要64位对齐】，但是32位编译器只保证64位字段是32位对齐的。 // 因此，在32位架构上，我们需要检查在state()是否将state1对齐，并在需要时动态 “交换” 字段顺序。 // 意思是：在32位操作系统下使用64位原子操作时，被操作地址必须是64位对齐的，不然会宕机。 state1 uint64\t// (uint64(counter) \u003c\u003c 32) | uint32(waiter) state2 uint32 } type noCopy struct noCopy 可以嵌入到第一次使用后不得复制的结构中. sync/cond.go文件。 1 2 3 4 5 6 7 8 9 10 11 12 // noCopy may be embedded into structs which must not be copied // after the first use. // // See https://golang.org/issues/8005#issuecomment-190753527 // for details. type noCopy struct{} // Lock is a no-op used by -copylocks checker from `go vet`. // // Lock 是 `go vet` 的 -copylocks 检查器使用的无操作 func (*noCopy) Lock() {} func (*noCopy) Unlock() {} WaitGroup 结构布局 Semaphore：信号量用于挂起 Wait 函数的调用者的 goroutine。（需要一个 uint32 类型） Counter：等待的运行的 goroutine 数量，该值在 Add 和 Done 函数中被操作。 Waiter：等待在 Semaphore 中的 goroutine 数量。 为什么需要这么设计呢？因为 Waiter + Counter 是一个整体作为64位，被原子操作，而64位原子操作又要求必须是64位对齐的。（具体参看state()源码） 在1.22版本中，state1也就是Waiter和Counter使用atomic.Uint64替代了。以下图是1.18前版本的。 Sema、Counter、Waiter WaitGroup 结构设计目的是等待集合中的goroutine完成，因此 main goroutine 就是产生这个等待集合的，它等待集合中的所有goroutine完成再继续后续。 Counter 则是计数当前等待集合中的goroutine的数量，一个goroutine被创建放入集合时就应该计数Counter值，一个goroutine完成时也应该计数Counter。 因此goroutine被加入到等待集合中都是在main goroutine中操作包括Counter的计数，一个goroutine完成计数Counter应该在这goroutine完成时操作。 Semaphore 则是 main goroutine 在调用Wait()函数时，main goroutine需要等待等待集合goroutine完成而挂起在Semaphore池子里。 Waiter 则是记录Semaphore中等待的goroutine的数量。 Add() 和 Done() 函数是计数Counter的相关方法，在等待集合goroutine中最后一个goroutine完成时，如果有等待在Semaphore的goroutine应该全部唤醒。 Wait() 函数是等待等待集合goroutine完成，main goroutine主动挂起自己的相关逻辑。 state() State 返回指向存储在 wg.state* 中的 State 和 sema 字段的指针。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 // state returns pointers to the state and sema fields stored within wg.state*. func (wg *WaitGroup) state() (statep *uint64, semap *uint32) { // unsafe.Alignof(wg.state1) == 8：说明state1字段对齐为8字节，这种情况是64位平台 // uintptr(unsafe.Pointer(\u0026wg.state1))%8 == 0：说明wg.state1的地址按照8字节对齐的，可能是64或32平台 if unsafe.Alignof(wg.state1) == 8 || uintptr(unsafe.Pointer(\u0026wg.state1))%8 == 0 { // state1 is 64-bit aligned: nothing to do. // state1 是 64 位对齐的：无事可做 return \u0026wg.state1, \u0026wg.state2\t// state1是64位对齐，state1就是state，state2就是sema } else { // state1 is 32-bit aligned but not 64-bit aligned: this means that // (\u0026state1)+4 is 64-bit aligned. // // State1是32位对齐，而不是64位对齐:这意味着 (\u0026state1)+4 是64位对齐。 // 这种情况处理就是为了满足后续：64位原子操作需要64位对齐 state := (*[3]uint32)(unsafe.Pointer(\u0026wg.state1))\treturn (*uint64)(unsafe.Pointer(\u0026state[1])), \u0026state[0] } } Add() Add 将 delta (可能是负数)添加到 WaitGroup counter。 如果 counter 变为0，所有在等待时被阻塞的 goroutine 都会被释放。如果 counter 变为负数，则会 painc。 请注意，当 counter 为0时，delta为正的调用必须发生在等待之前。 使用负的delta调用，或者从 counter 大于零开始使用正的delta调用，都可能在任何时候发生。 通常，这意味着对Add的调用应该在创建goroutine语句或其他要等待的事件之前执行。 如果重用一个 WaitGroup 来等待几个独立的事件集，那么新的Add调用必须在所有先前的wait调用都返回之后发生。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 // Add adds delta, which may be negative, to the WaitGroup counter. // If the counter becomes zero, all goroutines blocked on Wait are released. // If the counter goes negative, Add panics. // // Note that calls with a positive delta that occur when the counter is zero // must happen before a Wait. Calls with a negative delta, or calls with a // positive delta that start when the counter is greater than zero, may happen // at any time. // Typically this means the calls to Add should execute before the statement // creating the goroutine or other event to be waited for. // If a WaitGroup is reused to wait for several independent sets of events, // new Add calls must happen after all previous Wait calls have returned. // See the WaitGroup example. func (wg *WaitGroup) Add(delta int) { // 1) 原子操作 statep += delta // statep *uint64：【Waiter + Counter】 // semap *uint32：【semaphore】 // *statep = (uint64(counter) \u003c\u003c 32) | uint32(waiter) statep, semap := wg.state() if race.Enabled { _ = *statep // trigger nil deref early if delta \u003c 0 { // Synchronize decrements with Wait. race.ReleaseMerge(unsafe.Pointer(wg)) } race.Disable() defer race.Enable() } // 原子操作 {counter += delta; state = counter;} delta 可能为负数 // 这里的64位原子操作也就是为什么需要 state 函数的原因 state := atomic.AddUint64(statep, uint64(delta)\u003c\u003c32) // counter += delta // 注意这里是 int32 类型，原因是 delta 是来自用户传入，可能最后导致 v \u003c 0 情况发生 v := int32(state \u003e\u003e 32)\t// counter 高32位 w := uint32(state)\t// waiter 低32位 if race.Enabled \u0026\u0026 delta \u003e 0 \u0026\u0026 v == int32(delta) { // The first increment must be synchronized with Wait. // Need to model this as a read, because there can be // several concurrent wg.counter transitions from 0. race.Read(unsafe.Pointer(semap)) } // 2) counter 不能为负数 // counter 不应该出现为负数情况 if v \u003c 0 { panic(\"sync: negative WaitGroup counter\") } // 3) Add(\u003e0) 和 Wait 函数不能并发调用 // Add(\u003e0) 和 Wait() 函数并发被调用 // 1. w != 0 存在等待的waiter // 2. delta \u003e 0 本次调用是添加不是减少 // 3. v == int32(delta) 当前添加的数量就是总数量，之前为0 if w != 0 \u0026\u0026 delta \u003e 0 \u0026\u0026 v == int32(delta) { panic(\"sync: WaitGroup misuse: Add called concurrently with Wait\") } // 4) if ( v \u003e 0 || (v == 0 \u0026\u0026 w == 0) ) return // Counter计数数量大于零 或 没有等待的waiter直接返回 // 1. v \u003e 0：代表不是最后一个，因此直接返回 // 2. v == 0 \u0026\u0026 w == 0：也是直接返回 if v \u003e 0 || w == 0 {\t// 这里的条件比较关键 return } // 5) v == 0 \u0026\u0026 w \u003e 0 // 这种情况需要去把 semap 上面挂起的 goroutine 全部唤醒 // This goroutine has set counter to 0 when waiters \u003e 0. // Now there can't be concurrent mutations of state: // - Adds must not happen concurrently with Wait, // - Wait does not increment waiters if it sees counter == 0. // Still do a cheap sanity check to detect WaitGroup misuse. // // 当 waiters \u003e 0 时，此 goroutine 将 counter 设置为 0 // 现在不能有并发的 state 突变： // - Add 不能与 Wait 同时发生 // - 如果看到 counter == 0，Wait 不会增加 waiter // 仍然要做一个廉价的健全检查来检测WaitGroup的滥用。 // // WaitGroup误用:Add与Wait并发调用 // 这种情况发生在：最后一个goroutine运行完需要唤醒等待的waiter此时Add方法有被调用 if *statep != state { panic(\"sync: WaitGroup misuse: Add called concurrently with Wait\") } // Reset waiters count to 0. *statep = 0\t// 重置 Counter = 0，Waiter = 0 for ; w != 0; w-- { // false正常模式 // 将等待在 semaphore 中的goroutine取出等待调度 runtime_Semrelease(semap, false, 0) } } Done() Done 将 WaitGroup counter 减1。 1 2 3 4 // Done decrements the WaitGroup counter by one. func (wg *WaitGroup) Done() { wg.Add(-1) } Wait() Wait 阻塞，直到 WaitGroup counter 为0。 Wait 函数的调用期间，可能处于多个goroutine在调用 Done 函数。 Wait() 函数允许被多个线程同时调用。Wait() 函数一定要所有的Counter都标记完毕后才调用该方法。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 // Wait blocks until the WaitGroup counter is zero. func (wg *WaitGroup) Wait() { // statep *uint64：【Waiter + Counter】 // semap *uint32：【semaphore】 // *statep = (uint64(counter) \u003c\u003c 32) | uint32(waiter) statep, semap := wg.state() if race.Enabled { _ = *statep // trigger nil deref early race.Disable() } for { state := atomic.LoadUint64(statep)\t// 原子读取 statep v := int32(state \u003e\u003e 32)\t// counter w := uint32(state)\t// waiter // 这种情况，比如在调用Wait函数时先调用sleep睡眠很长一段时间 // 也就是 Wait 函数还没开始执行 其他goroutine 已经执行完了，因此直接返回即可 if v == 0 {\t// Counter is 0, no need to wait. // // 计数器为 0，无需等待 if race.Enabled { race.Enable() race.Acquire(unsafe.Pointer(wg)) } return } // Increment waiters count. // // 增加waiter数量，正常逻辑下在这里等待的只有main goroutine一个 // 这里可能会失败，可能有很多goroutine正在调用Add或Done方法修改Counter导致这里原子操作失败 if atomic.CompareAndSwapUint64(statep, state, state+1) { if race.Enabled \u0026\u0026 w == 0 { // Wait must be synchronized with the first Add. // Need to model this is as a write to race with the read in Add. // As a consequence, can do the write only for the first waiter, // otherwise concurrent Waits will race with each other. race.Write(unsafe.Pointer(semap)) } // 该方法最后会调用semacquire1，我们在sync.Mutex中已经讨论过 // 这里会把当前goroutine入队，注意这里入队的是main goroutine // runtime_Semacquire 将当前 goroutine 加入到 semaphore 的尾部 runtime_Semacquire(semap)\t// 主线程在这里被调离工作线程，下次恢复时从这里接到执行 // 当前goroutine被Done函数唤醒时，一定是 *statep == 0，不然流程有问题 if *statep != 0 { panic(\"sync: WaitGroup is reused before previous Wait has returned\") } if race.Enabled { race.Enable() race.Acquire(unsafe.Pointer(wg)) } return\t// 直接返回到调用Wait方法位置处 } } } 使用示例 WaitGroup：用于线程总同步，它等待一组线程集合完成，才会继续向下执行。 主线程调用 Add() 方法来设置等待的协程数量： 然后每个协程运行，并在完成后调用 Done() 方法，Add(-1) 和 Done() 效果一致，都表示等到的协程数量减少一个。 同时，Wait() 方法用来阻塞主线程，直到所有协程完成才会向下执行。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 package main import ( \"fmt\" \"sync\" ) func main() { var wg sync.WaitGroup wg.Add(10)\t// (\u0026wg).Add(10) -\u003e (*WaitGroup).Add(\u0026wg, 10) for i := 0; i \u003c 10; i++ { //wg.Add(1)\t// (\u0026wg).Add(1)\t-\u003e (*WaitGroup).Add(\u0026wg, 1) go func(i int) { defer wg.Done()\t// (\u0026wg).Done() -\u003e (*WaitGroup).Done(\u0026wg) fmt.Println(i) }(i) } fmt.Println(\"我在循环外\") // 阻塞主线程，等所有协程完成 wg.Wait()\t// (\u0026wg).Wait() -\u003e (*WaitGroup).Wait(\u0026wg) // Output: // 1 // 9 // 3 // 4 // 我在循环外 // 5 // 6 // 7 // 8 // 2 // 0 } 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 package main import ( \"fmt\" \"net/http\" \"sync\" ) func main() { var wg sync.WaitGroup var urls []string = []string{ \"http://baidu.com/\", \"https://wzapi.myzx.cn/\", } wg.Add(len(urls)) for _, url := range urls { // wg.Add(1) go func(url string) { defer wg.Done() response, err := http.Get(url) fmt.Println(response, err, url) }(url) } wg.Wait() fmt.Println(\"over\") // Output: // \u0026{200 OK 200 HTTP/1.1 1 1 map[Accept-Ranges:[bytes] Cache-Control:[max-age=86400] Connection:[Keep-Alive] Content-Length:[81] Content-Type:[text/html] Date:[Thu, 22 Apr 2021 03:19:50 GMT] Etag:[\"51-47cf7e6ee8400\"] Expires:[Fri, 23 A // pr 2021 03:19:50 GMT] Last-Modified:[Tue, 12 Jan 2010 13:48:00 GMT] Server:[Apache]] 0xc00003a140 81 [] false false map[] 0xc000044000 } http://baidu.com/ // \u0026{200 OK 200 HTTP/1.1 1 1 map[Access-Control-Allow-Headers:[Origin, X-Requested-With, Content-Type, Acceptfecshop-uuid, fecshop-lang, fecshop-currency, access-token, x-token, authorization] Access-Control-Allow-Methods:[*] Access-Co // ntrol-Allow-Origin:[*] Cache-Control:[no-cache, private] Connection:[keep-alive] Content-Type:[text/html; charset=UTF-8] Date:[Thu, 22 Apr 2021 03:19:50 GMT] Etag:[W/\"be34c7da7adc79dfee6c76195ba1dbdad7b5bc9b\"] Server:[MYBWS/1.1] Set // -Cookie:[acw_tc=2760829816190615907855703e97def055d99950b742716bbf6b2d8e6e2288;path=/;HttpOnly;Max-Age=1800 XSRF-TOKEN=eyJpdiI6IjFPZm9TcTYzblc5c0JJMFdSSW5EZ0E9PSIsInZhbHVlIjoiTXhEbHNlbVRXelMwTnR4UE5nY1JsNTRDTEJ4SmUzaFFsQkZTak9nTEtib // m5rczF3VlF6bVE1YitjNU5EbzlXMms4bTZLV0RiRTk4WXZMSFBBMFoxQ0V0OUpuYWxwN1ppYmpydjFFUzRQWXVBbktaNW82dFNVXC9BXC9FOG9Qb094VSIsIm1hYyI6IjNmYTMyZDUyYzk0ZWY0ZjJkNzJjOGY3M2FiYWYzZDYwNTA4YjFmZTBiZTljMzI1ZTI1MzY1MGQyZDAxYjQwN2QifQ%3D%3D; expires // =Thu, 22-Apr-2021 05:19:50 GMT; Max-Age=7200; path=/ laravel_session=eyJpdiI6IlA2cXcxRHVWYVgxa3VZRnNFY09LbkE9PSIsInZhbHVlIjoiK1ptMGIwOTdZbGp5dlwvRlNMK2pWb3hLVVErV0wxOFBQSmp1dVRkWExcL1VZbm1zVFwvUmRGT0dZcXJlcTZSRmhoWk1hdkJxYU9kUUFrNjB // RK3o4cW5TanZVZXZSYjVEN29CNUU2bEVHdHVoUVVESkhJcG1ETDVCS3FSTmtwYkJTcDciLCJtYWMiOiIwMTM3NDg2NTJlNDJkMGFhN2Y0NDA2YzJhYzcyMTQ4MzY1NDU1YzlmMjYwOTUxNjM0ZDJkYjUzYWJmMmMxZTE1In0%3D; expires=Thu, 22-Apr-2021 05:19:50 GMT; Max-Age=7200; path=/ // ; httponly]] 0xc0001220a0 -1 [chunked] false true map[] 0xc00010a000 0xc00004e0b0} https://wzapi.myzx.cn/ // over } 总结 sync.WaitGroup 更多是 多个goroutine通知一个goroutine,更像是main goroutine等待集合的所有goroutine完成一项任务，多对一 sync.Cond 则更像多个goroutine等待main goroutine的工作完成，一对多，更像是广播形式 使用注意 以下使用方式是不正确的。 package main import ( \"fmt\" \"sync\" ) func main() { var wg sync.WaitGroup // 【不能另外启动协程去执行Add()和Done()，因为main的Wait()不会阻塞等待】 go func() { for i := 0; i \u003c 10; i++ { wg.Add(1)\t// (\u0026wg).Add(1)\t-\u003e (*WaitGroup).Add(\u0026wg, 1) go func(i int) { defer wg.Done()\t// (\u0026wg).Done() -\u003e (*WaitGroup).Done(\u0026wg) fmt.Println(i) }(i) } }() // 这里并不会阻塞等待，因为计数器为0 wg.Wait() // Output: } ",
   "wordCount" : "1883",
   "inLanguage": "zh",
-  "image":"https://helium.github.io/images/WaitGroup-cover.png","datePublished": "2020-07-13T22:00:10+08:00",
+  "image":"https://helium-chain.github.io/images/WaitGroup-cover.png","datePublished": "2020-07-13T22:00:10+08:00",
   "dateModified": "2023-07-13T22:00:10+08:00",
   "author":[{
     "@type": "Person",
@@ -141,14 +141,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/golang/sync/waitgroup/"
+    "@id": "https://helium-chain.github.io/posts/golang/sync/waitgroup/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -170,8 +170,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -198,32 +198,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -235,7 +235,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/sync/">sync</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/golang/sync/">sync</a></div>
     <h1 class="post-title entry-hint-parent">
       sync.WaitGroup
     </h1>
@@ -274,9 +274,9 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://helium.github.io/tags/sync/" target="_blank" rel="noopener">Sync</a>
-            <a href="https://helium.github.io/tags/waitgroup/" target="_blank" rel="noopener">WaitGroup</a>
+            <a href="https://helium-chain.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium-chain.github.io/tags/sync/" target="_blank" rel="noopener">Sync</a>
+            <a href="https://helium-chain.github.io/tags/waitgroup/" target="_blank" rel="noopener">WaitGroup</a>
         </ul>
       </span>
       
@@ -288,8 +288,8 @@
 </div>
   </header> 
 <figure class="entry-cover1">
-        <img loading="eager" srcset="https://helium.github.io/posts/golang/sync/waitgroup/images/WaitGroup-cover_hu873c44d47985e055a792362bbc8ff5ff_59165_360x0_resize_box_3.png 360w ,https://helium.github.io/posts/golang/sync/waitgroup/images/WaitGroup-cover_hu873c44d47985e055a792362bbc8ff5ff_59165_480x0_resize_box_3.png 480w ,https://helium.github.io/posts/golang/sync/waitgroup/images/WaitGroup-cover_hu873c44d47985e055a792362bbc8ff5ff_59165_720x0_resize_box_3.png 720w ,https://helium.github.io/posts/golang/sync/waitgroup/images/WaitGroup-cover.png 800w" 
-            sizes="(min-width: 768px) 720px, 100vw" src="https://helium.github.io/posts/golang/sync/waitgroup/images/WaitGroup-cover.png" alt="" 
+        <img loading="eager" srcset="https://helium-chain.github.io/posts/golang/sync/waitgroup/images/WaitGroup-cover_hu873c44d47985e055a792362bbc8ff5ff_59165_360x0_resize_box_3.png 360w ,https://helium-chain.github.io/posts/golang/sync/waitgroup/images/WaitGroup-cover_hu873c44d47985e055a792362bbc8ff5ff_59165_480x0_resize_box_3.png 480w ,https://helium-chain.github.io/posts/golang/sync/waitgroup/images/WaitGroup-cover_hu873c44d47985e055a792362bbc8ff5ff_59165_720x0_resize_box_3.png 720w ,https://helium-chain.github.io/posts/golang/sync/waitgroup/images/WaitGroup-cover.png 800w" 
+            sizes="(min-width: 768px) 720px, 100vw" src="https://helium-chain.github.io/posts/golang/sync/waitgroup/images/WaitGroup-cover.png" alt="" 
             width="800" height="600">
         
 </figure><aside id="toc-container" class="toc-container wide">
@@ -1147,17 +1147,17 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
-      <li><a href="https://helium.github.io/tags/sync/">Sync</a></li>
-      <li><a href="https://helium.github.io/tags/waitgroup/">WaitGroup</a></li>
+      <li><a href="https://helium-chain.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium-chain.github.io/tags/sync/">Sync</a></li>
+      <li><a href="https://helium-chain.github.io/tags/waitgroup/">WaitGroup</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/golang/install/install/">
+  <a class="prev" href="https://helium-chain.github.io/posts/golang/install/install/">
     <span class="title">« 上一页</span>
     <br>
     <span>Install Golang</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/golang/basic/type/">
+  <a class="next" href="https://helium-chain.github.io/posts/golang/basic/type/">
     <span class="title">下一页 »</span>
     <br>
     <span>内置类型</span>

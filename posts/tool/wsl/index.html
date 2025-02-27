@@ -9,18 +9,18 @@
 <meta name="keywords" content="wsl">
 <meta name="description" content="win 安装 linux 子系统。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/tool/wsl/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/tool/wsl/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/tool/wsl/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/tool/wsl/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="win 安装 wsl2" />
 <meta property="og:description" content="win 安装 linux 子系统。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/tool/wsl/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/tool/wsl/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2021-03-28T00:00:00+00:00" />
 <meta property="article:modified_time" content="2021-03-28T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="win 安装 wsl2"/>
 <meta name="twitter:description" content="win 安装 linux 子系统。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "工具箱",
-      "item": "https://helium.github.io/posts/tool/"
+      "item": "https://helium-chain.github.io/posts/tool/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "win 安装 wsl2",
-      "item": "https://helium.github.io/posts/tool/wsl/"
+      "item": "https://helium-chain.github.io/posts/tool/wsl/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": "安装 WSL2 PowerShell 开启 wsl2 使用Windows + R快捷键打开「运行」对话框，输入powershell，然后按Ctrl + Shift + Enter，以管理员权限打开 PowerShell。 执行以下命令启用 WSL 和虚拟机平台功能： Enable-WindowsOptionalFeature -Online -FeatureName $(\"Microsoft-Windows-Subsystem-Linux\",\"VirtualMachinePlatform\") 安装完成后，键入Y重启计算机。 完成以上步骤后，需要通过 Microsoft Store 获取要使用的 Linux 发行版。 如果在安装 WSL 时没有选择安装 Virtual Machine Platform，那么将使用 WSL 1。 Windows 功能开启 wsl2 使用Windows + R快捷键打开「运行」对话框，执行OptionalFeatures打开「Windows 功能」。 勾选「适用于 Linux 的 Windows 子系统」和「虚拟机平台」，然后点击「确定」。 安装完成后，点击「立即重新启动」。 系统重启完成后，请通过 Microsoft Store 来获取要使用的 Linux 发行版。 如果在安装 WSL 时没有勾选「虚拟机平台」，那么将使用 WSL 1。 更新 WSL 右键点击「开始」菜单，选择「终端管理员」，以管理员权限打开「Windows 终端」。 在 Windows PowerShell 或「命令提示符」窗口中，执行以下命令： 查看当前 WSL 版本：wsl –version 手动更新 WSL 版本：wsl –update 安装最新的预发行版（可选）：wsl –update –pre-release 如果更新之后遇到问题或出现故障，可以回滚到上一版本：wsl –update –rollback 切换 WSL 默认版本 要切换 WSL 默认版本也非常容易，在命令行中执行以下命令即可： 切换为 WSL 2：wsl –set-default-version 2 切换为 WSL 1：wsl –set-default-version 1 如无特殊需求，推荐始终使用 WSL 2，以获得最佳功能和性能。 WSL 安装 Debian # 查看可用 Linux 发行版，可能需要外网 wsl --list --online # 安装指定 Linux 发行版 (Debian) wsl --install --distribution 设置默认 如果你在 Windows 11 上为 WSL 安装了多个 Linux 发行版，可以通过以下步骤来指定默认发行版： 右键点击「开始」菜单，选择「终端管理员」，以管理员权限打开「Windows 终端」。 在 Windows PowerShell 或「命令提示符」窗口中，执行以下命令： # 查看已安装的发行版、WSL 版本信息和当前状态 wsl --list --verbose # 重新指定默认发行版 wsl --set-default 版存储位置 以下方法仅适用于 WSL 2.3.11 及更高版本。 默认情况下，WSL 会将 Linux 发行版存放在 C 盘的以下路径，其中包含了发行版的根文件系统和相关配置文件： %USERPROFILE%\\AppData\\Local\\\\Packages\\\u003c发行版的包名\u003e\\ 以前，移动发行版需要手动导出 → 将其作为新发行版导入 WSL → 然后删除原来的发行版，这 3 个步骤。但从 WSL 2.3.11 开始，微软引入了更简单的–move参数来移动发行版的底层存储。 例如，要将 Ubuntu 22.04 实例移动到 D 盘的一个专用 WSL 文件夹，可以使用以下命令： 列出已安装的发行版：wsl –list 将特定发行版移动到指定路径：wsl –manage Ubuntu-22.04 –move 参考 https://www.sysgeek.cn/install-wsl-2-windows/。 ",
   "wordCount" : "184",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2021-03-28T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2021-03-28T00:00:00Z",
   "dateModified": "2021-03-28T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/tool/wsl/"
+    "@id": "https://helium-chain.github.io/posts/tool/wsl/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/tool/">工具箱</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/tool/">工具箱</a></div>
     <h1 class="post-title entry-hint-parent">
       win 安装 wsl2
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/wsl/" target="_blank" rel="noopener">Wsl</a>
+            <a href="https://helium-chain.github.io/tags/wsl/" target="_blank" rel="noopener">Wsl</a>
         </ul>
       </span>
       
@@ -458,15 +458,15 @@ wsl --install --distribution &lt;DistroName&gt;
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/wsl/">Wsl</a></li>
+      <li><a href="https://helium-chain.github.io/tags/wsl/">Wsl</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/tool/git/">
+  <a class="prev" href="https://helium-chain.github.io/posts/tool/git/">
     <span class="title">« 上一页</span>
     <br>
     <span>git 命令</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/tool/goland/">
+  <a class="next" href="https://helium-chain.github.io/posts/tool/goland/">
     <span class="title">下一页 »</span>
     <br>
     <span>WSL2 &#43; Goland</span>

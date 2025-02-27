@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, 流程控制">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/golang/process/switch/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/golang/process/switch/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/process/switch/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/golang/process/switch/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="流程控制(switch)" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/golang/process/switch/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/golang/process/switch/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2019-10-27T00:00:00+00:00" />
 <meta property="article:modified_time" content="2020-08-02T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="流程控制(switch)"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://helium.github.io/posts/golang/"
+      "item": "https://helium-chain.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第3章 流程控制",
-      "item": "https://helium.github.io/posts/golang/process/"
+      "item": "https://helium-chain.github.io/posts/golang/process/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "流程控制(switch)",
-      "item": "https://helium.github.io/posts/golang/process/switch/"
+      "item": "https://helium-chain.github.io/posts/golang/process/switch/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": " 表达式型switch：包含与switch表达式的值进行比较的表达式。 类型型switch：包含与switch表达式的类型进行比较的类型。 switch 使用方式 switch var{} switch 表达式可以执行一个简单语句完成运算从而得到表达式的值。 1 2 3 4 5 6 7 8 switch var { // switch 会判断var的类型 case val1: // case 会判断val1的类型以便和var能比较 // ... case val2: // ... default: // ... } 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 package main import ( \"fmt\" ) const B1 = false func main() { switch B1 { case false: fmt.Println(\"fallthrough 语句 接到执行下一个语句\") fallthrough case true: fmt.Println(\"true\") fallthrough case false: fmt.Println(123) fallthrough case true: fmt.Println(456789) default: fmt.Println(\"default\") } fmt.Println(\"default 1234\") // \u003e ---------------------------------------------------- var i1 = 2 switch i1 { default: fmt.Println(\"default\") case 0,1,2,3: fmt.Println(\"123456789\") case 4,5,6,7: fmt.Println(\"987654321\") } // \u003e ---------------------------------------------------- switch i1 { default: fmt.Println(\"default\") case 0: case 1: case 2: case 3: fmt.Println(\"123456789\") case 4,5,6,7: fmt.Println(\"987654321\") } // 注意 case 0,1,2,3: 形式和 case 0: case 1: case 2: 这种形式的区别 // Output: // fallthrough 语句 接到执行下一个语句 // true // 123 // 456789 // default 1234 // 123456789 } switch{} 不提供任何被判断的值（实际上默认为判断是否为true）然后在每个case分支中检测不同的条件，当任一分支的测试结果为true时，该分支的代码会被执行，此时语句相当于switch true。 1 2 3 4 5 6 7 8 switch { // 默认推导为布尔类型 true case condition1: // condition1比较条件 // ... case condition2: // ... default: // ... } 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 package main import ( \"fmt\" ) func main() { var x, y, z = 2, 1, 3 // switch {} 等价于 switch true {} switch { case x \u003c y: fmt.Printf(\"x:%d,y:%d\\n\", x, y) case x \u003c z: fmt.Printf(\"x:%d,z:%d\\n\", x, z) case z == 3: fmt.Println(\"z==4\\n\") } // Output: // x:2,z:3 } switch Init; var{} switch语句第三种形式，包含一个初始化语句。 1 2 3 4 5 6 7 8 switch Init; var { case val1: // ... case val2: // ... default: // ... } 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 package main import ( \"fmt\" ) func main() { // switch x, y, z := 2, 1, 3; {} 等价于 switch x, y, z := 2, 1, 3; true {} // 等价于 // { // x, y, z := 2, 1, 3; // switch true { // // ... ... // } // } switch x, y, z := 2, 1, 3; { case x \u003c y: fmt.Printf(\"x:%d,y:%d\\n\", x, y) case x \u003c z: fmt.Printf(\"x:%d,z:%d\\n\", x, z) case z == 3: fmt.Println(\"z==4\\n\") } switch x, y, z := 2, 1, 3; false { case x \u003c y: fmt.Printf(\"x:%d,y:%d\\n\", x, y) case x \u003c z: fmt.Printf(\"x:%d,z:%d\\n\", x, z) case z == 3: fmt.Println(\"z==4\\n\") } // Output: // x:2,z:3 // x:2,y:1 } 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 package main import \"fmt\" func main() { var j = 0 switch j { case 0: // 注意这种和case 0, 1:形式的区别 case 1: fmt.Println(\"11\") case 2: fmt.Println(\"22\") default: fmt.Println(\"def def\") } var k = 0 switch k { case 0: fmt.Println(\"fallthrough\") fallthrough case 1: fmt.Println(\"111\") case 2: fmt.Println(\"211\") default: fmt.Println(\"def def def\") } var m = 0 switch m { case 0, 1: fmt.Println(\"1111\") case 2: fmt.Println(\"2111\") default: fmt.Println(\"def def def def\") } var n = 0 switch { case n \u003e 0 \u0026\u0026 n \u003c 10: fmt.Println(\"i \u003e 0 and i \u003c 10\") case n \u003e 10 \u0026\u0026 n \u003c 20: fmt.Println(\"i \u003e 10 and i \u003c 20\") default: fmt.Println(\"def def def def def\") } // Output: // fallthrough // 111 // 1111 // def def def def def } 表达式型switch 如果switch表达式求值为无类型常量，则首先将其转换为默认类型（整型默认int，浮点数默认float64，字符串默认string，复数默认complex128）。 如果是无类型的布尔值，则首先将其转换为bool类型。 预先声明的无类型值nil不能用作开关表达式（由于switch转换nil为默认类型报错）。 如果switch表达式是无类型的，则首先将其转换为switch表达式的类型。 对于每个（可能已转换的）switch表达式x和switch表达式的值t，x和t必须可以进行有效的比较。 在switch或default字句中，最后一个非空语句可以是fallthrough语句。 以指示应该从该字句的末尾流向下一个字句的第一个语句，无论下一个字句的条件是否满足。 出现fallthrough语句后，它后面只能接下一个字句。 1 2 3 4 5 6 7 8 switch expr { case v1: // pass case v2: // pass default: // pass } nil不能作为switch表达式 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 package main import \"fmt\" func main() { // 这里switch将nil转换成默认类型进行以下比较时报错 // 和之前的 a := nil 或 var a = nil 一样报错不能判断出a的具体类型 // 由此可见swicth需要确定变量的唯一类型 switch nil { // 报错 case nil: fmt.Println(\"nil\") default: fmt.Println(\"default\") } // .\\os.go:8:2: use of untyped nil // 下面这种却是可以 var m map[string]string switch m { // 这里能确认m是map类型 case nil: fmt.Println(\"nil\") default: fmt.Println(\"default\") } // Output: // nil } 无类型常量用作switch 1 2 3 4 5 6 7 8 9 10 11 12 13 14 package main import \"fmt\" const Sw = 12 func main() { switch Sw { // Sw被默认推导为int类型 // (untyped float constant) truncated to int // 报错，1.1被默认推导为float64类型无法与int类型比较 case 1.1:\tfmt.Println() } } switch常用示例 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 package main import \"fmt\" func main() { // 定义局部变量 var grade string = \"B\" var marks int = 90 switch marks { case 90: grade = \"A\" case 80: grade = \"B\" // 这里与其他语言写法的根本原因是go默认会添加break语句，而其他语言没有这一特性的原因 case 50, 60, 70: // 这里区分其他语言 case 50: case 60: case 70: grade = \"C\" default: grade = \"D\" } // switch 省略条件 默认为 switch true {} // 和for {} 一样省略条件默认为 for true {} switch { case grade == \"A\": fmt.Printf(\"优秀\\n\") case grade == \"B\", grade == \"C\": fmt.Printf(\"良好\\n\") case grade == \"D\": fmt.Printf(\"及格\\n\") case grade == \"F\": fmt.Printf(\"不及格\\n\") default: fmt.Printf(\"差\\n\") } fmt.Printf(\"你的等级是 %s\\n\", grade) // Output: // 优秀 // 你的等级是 A } fallthrough关键字 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 package main import ( \"fmt\" ) func main() { // fallthrough 关键字 继续执行下一个case不判断case值 switch { case false: fmt.Println(\"fallthrough 语句 接到执行下一个语句\") fallthrough case true: fmt.Println(\"true\") fallthrough case false: fmt.Println(123) fallthrough case true: fmt.Println(456789) // fallthrough强制执行【紧挨着相邻】的case或default块， // 如果后面没有紧挨着的则报错 fallthrough default: fmt.Println(\"default\") } // Output: // true // 123 // 456789 // default } 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 package main import \"fmt\" func main() { var k = 2 switch k { case 0: fmt.Println(\"fallthrough\") case 2: fmt.Println(\"211\") fallthrough // 可见，fallthrough 后紧挨着 default 也会执行它。 default: fmt.Println(\"def def def\") case 1: fmt.Println(\"111\") } // Output: // 211 // def def def } fallthrough和default一起使用。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 switch { default: // 比如这里当匹配条件都不通过，则到default这里 fmt.Println(\"1\") fallthrough // fallthrough后继续执行后面的case case true: fmt.Println(\"2\") } // Output: // 2 switch { default: // 比如这里当匹配条件都不通过，则到default这里 fmt.Println(\"1\") fallthrough // fallthrough后继续执行后面的case case false: fmt.Println(\"2\") } // Output: // 1 // 2 类型型switch 比较的类型而不是值，它在其他方面类似表达式型switch，只不过分支选择的是类型而不是值。 它由一个特殊的switch表达式标记，该表达式使用类型断言的形式来进行动态类型判断。 x.(type) switch 语句还可以被用于 type-switch 来判断某个 interface 变量中实际存储的变量类型。 type switch 语句格式如下： 1 2 3 4 5 6 7 8 switch x.(type) { case type: statement(s) case type: statement(s) default: statement(s) } 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 package main import ( \"fmt\" ) func main() { // 定义变量t 接口类型 interface{} 可以是任何其他类型 var t interface{} t = functionOfSomeType() // switch t.(type) { ... } // t.(type) 断言t的类型 .(type)形式必须配合switch使用 switch t1 := t.(type) { default: fmt.Printf(\"default Type %T\\n\", t1) case bool: fmt.Printf(\"bool %t\\n\", t1) case int: fmt.Printf(\"integer %d\\n\", t1) case *bool: fmt.Printf(\"pointer bool %t\\n\", *t1) case *int: fmt.Printf(\"pointer integer %d\\n\", *t1) } } //func functionOfSomeType () bool { // return false //} // bool false //func functionOfSomeType () uint { // return 123 //} // default Type uint //func functionOfSomeType () int { // return 123 //} // integer 123 //func functionOfSomeType () *int { // a := 123 // return \u0026a //} // pointer integer 123 func functionOfSomeType () *bool { a := true return \u0026a } // pointer bool true 注意 val1和val2可以是同类型的任意值，类型不局限于常数或整数，但必须是相同的类型，或最终结果为相同类型的表达式。 前花括号{必须和switch关键字在同一行。 可以同时测试多个可能符合条件的值，使用逗号分割它们。 如case val1, val2, val3而在其他语言中则是case val1: case val2: case val3:这种形式。 一旦成功地匹配到某个分支，在执行完相应代码后就会退出整个switch代码块。 也就是说，不需要特别使用break语句来表示结束，如果使用了仍然是在switch块中。 如果在执行完每个分支的代码后，还是希望继续执行后续分支的代码。 可以使用fallthrough关键字来达到目的，fallthrough强制执行后面的(紧挨着的)下一条分支代码，不管是case或default分支都会执行。 fallthrough不会判断下一条分支的表达式结果是否为真。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 package main import ( \"fmt\" ) func main() { switch a := 1; { case a == 1: fmt.Printf(\"a == %d\\n\", a) fallthrough case a == 2: fmt.Println(\"a == 2\") case a == 3: fmt.Println(\"a == 3\") fallthrough case a == 5: fmt.Println(\"a == 5\") fallthrough default: fmt.Println(\"default\") case a == 4: fmt.Println(\"a == 4\") } // Output: // a == 1 // a == 2 } ",
   "wordCount" : "1538",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2019-10-27T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2019-10-27T00:00:00Z",
   "dateModified": "2020-08-02T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/golang/process/switch/"
+    "@id": "https://helium-chain.github.io/posts/golang/process/switch/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/process/">第3章 流程控制</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/golang/process/">第3章 流程控制</a></div>
     <h1 class="post-title entry-hint-parent">
       流程控制(switch)
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://helium.github.io/tags/%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6/" target="_blank" rel="noopener">流程控制</a>
+            <a href="https://helium-chain.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium-chain.github.io/tags/%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6/" target="_blank" rel="noopener">流程控制</a>
         </ul>
       </span>
       
@@ -1487,16 +1487,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
-      <li><a href="https://helium.github.io/tags/%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6/">流程控制</a></li>
+      <li><a href="https://helium-chain.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium-chain.github.io/tags/%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6/">流程控制</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/golang/process/range/">
+  <a class="prev" href="https://helium-chain.github.io/posts/golang/process/range/">
     <span class="title">« 上一页</span>
     <br>
     <span>流程控制(range迭代)</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/golang/process/select/">
+  <a class="next" href="https://helium-chain.github.io/posts/golang/process/select/">
     <span class="title">下一页 »</span>
     <br>
     <span>流程控制(select)</span>

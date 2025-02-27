@@ -9,18 +9,18 @@
 <meta name="keywords" content="redis">
 <meta name="description" content="redis transactions命令介绍。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/redis/transactions/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/redis/transactions/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/redis/transactions/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/redis/transactions/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="redis transactions" />
 <meta property="og:description" content="redis transactions命令介绍。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/redis/transactions/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/redis/transactions/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2023-12-21T00:00:00+00:00" />
 <meta property="article:modified_time" content="2023-12-21T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="redis transactions"/>
 <meta name="twitter:description" content="redis transactions命令介绍。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Redis",
-      "item": "https://helium.github.io/posts/redis/"
+      "item": "https://helium-chain.github.io/posts/redis/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "redis transactions",
-      "item": "https://helium.github.io/posts/redis/transactions/"
+      "item": "https://helium-chain.github.io/posts/redis/transactions/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " 官网地址：https://redis.io/docs/latest/commands/?group=transactions Redis 事务可以一次执行多个命令， 并且带有以下三个重要的保证： 批量操作在发送 EXEC 命令前被放入队列缓存。 收到 EXEC 命令后进入事务执行，事务中任意命令执行失败，其余的命令依然被执行。 在事务执行过程，其他客户端提交的命令请求不会插入到事务执行命令序列中。 一个事务从开始到执行会经历以下三个阶段： 开始事务、命令入队、执行事务。 在分片集群中，事务要注意什么： 所有事务命令必须作用在同一个分片上：由于Redis Cluster的设计，一个事务中的所有命令必须指向同一个分片上的键，这是因为事务需要保持操作的原子性，而跨越多个分片的事务无法保证这一点。 错误处理：如果在事务中的某个命令执行时出现了转向（redirection），比如因为命令中的键不在当前分片上，那么整个事务会失败，并且已经执行的部分命令不会被回滚。这与单机Redis事务中如果命令执行出错可以回滚不同。 因此，如果你的事务涉及到多个分片上的键，那么你不能在一个事务中执行这样的操作。你需要手动确保事务中的所有命令都只针对单个分片上的键，或者将涉及多个分片的事务拆分为多个小的事务，每个事务操作一个分片，并且需要应用层逻辑来处理可能的一致性问题。 简而言之，Redis Cluster中的事务不支持跨分片操作，每条语句在一个事务中应当选择相同的分片。 单个 Redis 命令的执行是原子性的，但 Redis 没有在事务上增加任何维持原子性的机制，所以 Redis 事务的执行并不是原子性的。 事务可以理解为一个打包的批量执行脚本，但批量指令并非原子化的操作，中间某条指令的失败不会导致前面已做指令的回滚，也不会造成后续的指令不做。 MULTI 标记事务块的开始。后续命令将排队等待使用EXEC进行原子执行。 语法： MULTI EXEC 执行所有事务块内的命令。 语法： EXEC DISCARD 取消事务，放弃执行事务块内的所有命令。 语法： DISCARD WATCH 监视一个(或多个) key ，如果在事务执行之前这个(或这些) key 被其他命令所改动，那么事务将被打断。 语法： WATCH key [key ...] UNWATCH 取消 WATCH 命令对所有 key 的监视。 语法： UNWATCH 示例 如果在 set b bbb 处失败，set a 已成功不会回滚，set c 还会继续执行。 $ multi OK $ set a aaa QUEUED $ set b bbb QUEUED $ set c ccc QUEUED $ exec ",
   "wordCount" : "89",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2023-12-21T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2023-12-21T00:00:00Z",
   "dateModified": "2023-12-21T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/redis/transactions/"
+    "@id": "https://helium-chain.github.io/posts/redis/transactions/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/redis/">Redis</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/redis/">Redis</a></div>
     <h1 class="post-title entry-hint-parent">
       redis transactions
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/redis/" target="_blank" rel="noopener">Redis</a>
+            <a href="https://helium-chain.github.io/tags/redis/" target="_blank" rel="noopener">Redis</a>
         </ul>
       </span>
       
@@ -439,15 +439,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/redis/">Redis</a></li>
+      <li><a href="https://helium-chain.github.io/tags/redis/">Redis</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/redis/hyperloglog/">
+  <a class="prev" href="https://helium-chain.github.io/posts/redis/hyperloglog/">
     <span class="title">« 上一页</span>
     <br>
     <span>redis hyperLogLog</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/redis/scripting/">
+  <a class="next" href="https://helium-chain.github.io/posts/redis/scripting/">
     <span class="title">下一页 »</span>
     <br>
     <span>redis scripting</span>

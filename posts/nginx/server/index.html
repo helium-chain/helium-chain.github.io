@@ -9,18 +9,18 @@
 <meta name="keywords" content="nginx">
 <meta name="description" content="nginx server块介绍。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/nginx/server/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/nginx/server/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/nginx/server/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/nginx/server/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="nginx server块" />
 <meta property="og:description" content="nginx server块介绍。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/nginx/server/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/nginx/server/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2021-05-11T00:00:00+00:00" />
 <meta property="article:modified_time" content="2021-05-11T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="nginx server块"/>
 <meta name="twitter:description" content="nginx server块介绍。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Nginx",
-      "item": "https://helium.github.io/posts/nginx/"
+      "item": "https://helium-chain.github.io/posts/nginx/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "nginx server块",
-      "item": "https://helium.github.io/posts/nginx/server/"
+      "item": "https://helium-chain.github.io/posts/nginx/server/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": "server块 listen指令 用来配置监听端口。 语法：默认 listen *:80 | *:8000 listen address[:port] [default_server]...; listen port [default_server]...; 示例： # listen localhost:8000 监听指定的IP和端口 listen 127.0.0.1:8000; # 监听指定IP的所有端口 listen 127.0.0.1; # 监听指定端口上的连接(常用) listen 8000 # 监听指定端口上的连接 listen *:8000; default_server属性是标识符，用来将此虚拟主机设置成默认主机。 所谓的默认主机指的是如果没有匹配到对应的address:port，则会默认执行的。如果不指定默认使用的是第一个server。 server{ listen 8080; server_name 127.0.0.1; location /{ root html; index index.html; } } server{ # default_server 设置默认主机 listen 8080 default_server; server_name localhost; default_type text/plain; return 444 'This is a error request'; } server_name指令 设置虚拟主机服务名称。常用 127.0.0.1、localhost、www.heliu.site、heliu.site。 语法：server_name name …;，name可以提供多个中间用空格分隔。 server_name的配置方式有三种，分别是：精确匹配、通配符匹配、正则表达式匹配。 匹配顺序： 首先匹配，精确匹配server_name。 其次匹配，通配符在开始时匹配server_name。 然后匹配，通配符在结束时匹配server_name。 接着匹配，正则表达式匹配server_name。 最后匹配，默认的default_server处理，如果没有指定默认找第一个server。 精确匹配 server { listen 80; server_name heliu.site www.heliu.site; } 通配符配置 server_name中支持通配符\"*\",但需要注意的是通配符不能出现在域名的中间，只能出现在首段或尾段。 server { listen 80; server_name *.heliu.site www.heliu.*; } 正则表达式匹配 server_name中可以使用正则表达式，并且使用~作为正则表达式字符串的开始标记。 常见正则表达式： 代码 说明 ^ 匹配搜索字符串开始位置 $ 匹配搜索字符串结束位置 . 匹配除换行符\\n之外的任何单个字符 \\ 转义字符，将下一个字符标记为特殊字符 [xyz] 字符集，与任意一个指定字符匹配 [a-z] 字符范围，匹配指定范围内的任何字符 \\w 与以下任意字符匹配 A-Z a-z 0-9 和下划线,等效于[A-Za-z0-9_] \\d 数字字符匹配，等效于[0-9] {n} 正好匹配n次 {n,} 至少匹配n次 {n,m} 匹配至少n次至多m次 * 零次或多次，等效于{0,} + 一次或多次，等效于{1,} ? 零次或一次，等效于{0,1} server{ listen 80; # ~后面不能加空格，括号可以取值 server_name ~^www\\.(\\w+)\\.com$; default_type text/plain; return 200 $1 $2 ..; } location指令 设置请求的URI。 语法：location [ = | ~ | ~* | ^~ | @ ] uri{...} uri变量是待匹配的请求字符串，可以不包含正则表达式，也可以包含正则表达式，那么nginx服务器在搜索匹配location的时候，是先使用不包含正则表达式进行匹配，找到一个匹配度最高的一个，然后在通过包含正则表达式的进行匹配，如果能匹配到直接访问，匹配不到，就使用刚才匹配度最高的那个location来处理请求。 location 匹配 不带符号 要求必须以指定模式开始。 server { listen 80; server_name 127.0.0.1; location /abc{ default_type text/plain; return 200 \"access success\"; } } # 以下都能匹配到 # http://192.168.200.133/abc # http://192.168.200.133/abc?p1=TOM # http://192.168.200.133/abc/ # http://192.168.200.133/abcdef = 前缀 用于不包含正则表达式的uri前，必须与指定的模式精确匹配。 server { listen 80; server_name 127.0.0.1; location =/abc{ default_type text/plain; return 200 \"access success\"; } } # 可以匹配到 # http://192.168.200.133/abc # http://192.168.200.133/abc?p1=TOM # 匹配不到 # http://192.168.200.133/abc/ # http://192.168.200.133/abcdef ~ 和 ~* 前缀 ~ ： 用于表示当前uri中包含了正则表达式，并且区分大小写。 ~*：用于表示当前uri中包含了正则表达式，并且不区分大小写。 如果uri包含了正则表达式，需要用上述两个符合来标识。 server { listen 80; server_name 127.0.0.1; location ~^/abc\\w${ default_type text/plain; return 200 \"access success\"; } } server { listen 80; server_name 127.0.0.1; location ~*^/abc\\w${ default_type text/plain; return 200 \"access success\"; } } ^~ 前缀 用于不包含正则表达式的uri前，功能和不加符号的一致，唯一不同的是，如果模式匹配，那么就停止搜索其他模式了。 server { listen 80; server_name 127.0.0.1; location ^~/abc{ default_type text/plain; return 200 \"access success\"; } } @ 前缀 使用location的@符合完成错误信息展示。 server{ error_page 404 @jump_to_error; location @jump_to_error { default_type text/plain; return 404 'Not Found Page...'; } } root指令 设置请求的根目录。 可以在 http、server、location 中。 —————–语法—————– 默认值 示例 root path html root html path 为Nginx服务器接收到请求以后查找资源的根目录路径。 alias指令 更改location的URI。 —————–语法—————– 默认值 示例 alias path alias /usr/local/nginx/htm path为修改后的根路径。 root和alias指令的区别 在/usr/local/nginx/html目录下创建一个 images目录,并在目录下放入一张图片mv.png图片。 location /images { root /usr/local/nginx/html; } # 访问图片的路径为: http://127.0.0.1/images/mv.png 能成功 如果把root改为alias。 location /images { alias /usr/local/nginx/html; } # 再次访问上述地址，页面会出现404的错误，因为地址不对 oot的处理结果是: root路径+location路径，/usr/local/nginx/html/images/mv.png。 alias的处理结果是:使用alias路径替换location路径，/usr/local/nginx/html/mv.png。 修改成这样，alias /usr/local/nginx/html/images;就能访问到。 如果location路径是以/结尾,则alias也必须是以/结尾，root没有要求。 location /images/ { alias /usr/local/nginx/html/images; } # 访问就会出问题，查看错误日志还是路径不对，所以需要把alias后面加上 / index指令 设置网站的默认首页。 可以在 http、server、location 中。 —————–语法—————– 默认值 示例 index file … index.html index index.html index后面可以跟多个设置，如果访问的时候没有指定具体访问的资源，则会依次进行查找，找到第一个为止。 location / { root /usr/local/nginx/html; index index.html index.htm; } # 访问该location的时候，可以通过 http://ip:port/， # 地址后面如果不添加任何内容，则默认依次访问index.html和index.htm， # 找到第一个来进行返回 error_page指令 设置网站的错误页面。可以在 http、server、location 中。 语法：error_page code … [=[response]] uri。 可以指定具体跳转的地址。 server { error_page 404 http://www.baidu.cn; } 指定重定向地址。 server{ error_page 404 /50x.html; error_page 500 502 503 504 /50x.html; location =/50x.html{ root html; } } 使用location的@符合完成错误信息展示。 server{ error_page 404 @jump_to_error; location @jump_to_error { default_type text/plain; return 404 'Not Found Page...'; } } =[response]的作用是用来将相应代码更改为另外一个。 server{ error_page 404 =200 /50x.html; location =/50x.html{ root html; } } ",
   "wordCount" : "462",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2021-05-11T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2021-05-11T00:00:00Z",
   "dateModified": "2021-05-11T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/nginx/server/"
+    "@id": "https://helium-chain.github.io/posts/nginx/server/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/nginx/">Nginx</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/nginx/">Nginx</a></div>
     <h1 class="post-title entry-hint-parent">
       nginx server块
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/nginx/" target="_blank" rel="noopener">Nginx</a>
+            <a href="https://helium-chain.github.io/tags/nginx/" target="_blank" rel="noopener">Nginx</a>
         </ul>
       </span>
       
@@ -791,15 +791,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/nginx/">Nginx</a></li>
+      <li><a href="https://helium-chain.github.io/tags/nginx/">Nginx</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/nginx/conf/">
+  <a class="prev" href="https://helium-chain.github.io/posts/nginx/conf/">
     <span class="title">« 上一页</span>
     <br>
     <span>nginx nginx.cnf</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/nginx/static/">
+  <a class="next" href="https://helium-chain.github.io/posts/nginx/static/">
     <span class="title">下一页 »</span>
     <br>
     <span>nginx 静态资源优化</span>

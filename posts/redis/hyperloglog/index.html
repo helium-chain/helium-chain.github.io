@@ -9,18 +9,18 @@
 <meta name="keywords" content="redis">
 <meta name="description" content="redis HyperLogLog命令介绍。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/redis/hyperloglog/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/redis/hyperloglog/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/redis/hyperloglog/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/redis/hyperloglog/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="redis hyperLogLog" />
 <meta property="og:description" content="redis HyperLogLog命令介绍。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/redis/hyperloglog/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/redis/hyperloglog/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-02-21T00:00:00+00:00" />
 <meta property="article:modified_time" content="2024-02-21T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="redis hyperLogLog"/>
 <meta name="twitter:description" content="redis HyperLogLog命令介绍。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Redis",
-      "item": "https://helium.github.io/posts/redis/"
+      "item": "https://helium-chain.github.io/posts/redis/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "redis hyperLogLog",
-      "item": "https://helium.github.io/posts/redis/hyperloglog/"
+      "item": "https://helium-chain.github.io/posts/redis/hyperloglog/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " HyperLogLog 是一种概率数据结构，用于估计集合的基数。 每个 HyperLogLog 最多只需要花费 12KB 内存，在标准误差 0.81%的前提下，就可以计算 2 的 64 次方个元素的基数。 HyperLogLog 的优点在于它所需的内存并不会因为集合的大小而改变，无论集合包含的元素有多少个，HyperLogLog 进行计算所需的内存总是固定的，并且是非常少的。 使用场景： 统计一个 APP 的日活、月活数。 统计一个页面的每天被多少个不同账户访问量（Unique Visitor，UV）。 统计用户每天搜索不同词条的个数。 统计注册 IP 数。 PFADD 向 HyperLogLog 的Key添加元素。如果key不存在则创建key。 如果 HyperLogLog 估计的近似基数在执行命令后发生变化，则返回 1，否则返回 0。 语法： PFADD key [element [element ...]] 使用示例： # 向 hll 的 key 中添加元素 a b c d e f g $ PFADD hll a b c d e f g (integer) 1 # 查询 hll 的 key 中不同元素的数量 $ PFCOUNT hll (integer) 7 $ PFADD hll xxx (integer) 1 $ PFCOUNT hll (integer) 8 $ PFADD hll xxx (integer) 0 $ PFCOUNT hll (integer) 8 PFCOUNT 语法： PFCOUNT key [key ...] 当使用单个key调用时，返回由存储在指定变量处的 HyperLogLog 数据结构计算的近似基数，如果变量不存在，则为 0。 当使用多个键调用时，通过在内部合并存储在提供的键上的 HyperLogLogs 到临时 HyperLogLog 中，返回传递的 HyperLogLogs 并集的近似基数。 观测集返回的基数并不精确，而是近似于标准误差为 0.81%。 使用示例： $ PFADD hll foo bar zap (integer) 1 $ PFADD hll zap zap zap (integer) 0 $ PFADD hll foo bar (integer) 0 $ PFCOUNT hll (integer) 3 $ PFADD some-other-hll 1 2 3 (integer) 1 $ PFCOUNT hll some-other-hll (integer) 6 $ PFADD some-other-hll foo 4 (integer) 1 $ PFCOUNT hll some-other-hll (integer) 7 PFDEBUG 该命令是内部命令。它旨在用于开发和测试 Redis。 语法： $ PFDEBUG subcommand key PFMERGE 将多个 HyperLogLog 合并（merge）为一个 HyperLogLog，合并后的 HyperLogLog 的基数接近于所有输入 HyperLogLog 的可见集合（observed set）的并集。 计算合并的 HyperLogLog 设置为目标变量，即 如果不存在，则创建（默认为空的 HyperLogLog）。 如果目标变量存在，则将其视为源集之一其基数将包含在计算的基数中 HyperLogLog。 语法： PFMERGE destkey [sourcekey [sourcekey ...]] 使用示例： $ PFADD hll1 foo bar zap a (integer) 1 $ PFADD hll2 a b c foo (integer) 1 $ PFMERGE hll3 hll1 hll2 \"OK\" $ PFCOUNT hll3 (integer) 6 PFSELFTEST PFSELFTEST命令是一个内部命令。它是用来开发和测试Redis的。 PFSELFTEST ",
   "wordCount" : "238",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-02-21T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2024-02-21T00:00:00Z",
   "dateModified": "2024-02-21T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/redis/hyperloglog/"
+    "@id": "https://helium-chain.github.io/posts/redis/hyperloglog/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/redis/">Redis</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/redis/">Redis</a></div>
     <h1 class="post-title entry-hint-parent">
       redis hyperLogLog
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/redis/" target="_blank" rel="noopener">Redis</a>
+            <a href="https://helium-chain.github.io/tags/redis/" target="_blank" rel="noopener">Redis</a>
         </ul>
       </span>
       
@@ -474,15 +474,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/redis/">Redis</a></li>
+      <li><a href="https://helium-chain.github.io/tags/redis/">Redis</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/redis/use/">
+  <a class="prev" href="https://helium-chain.github.io/posts/redis/use/">
     <span class="title">« 上一页</span>
     <br>
     <span>redis 场景</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/redis/transactions/">
+  <a class="next" href="https://helium-chain.github.io/posts/redis/transactions/">
     <span class="title">下一页 »</span>
     <br>
     <span>redis transactions</span>

@@ -2,100 +2,100 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>ElasticSearch on Helium</title>
-    <link>https://helium.github.io/posts/elasticsearch/</link>
+    <link>https://helium-chain.github.io/posts/elasticsearch/</link>
     <description>Recent content in ElasticSearch on Helium</description>
     <image>
       <title>Helium</title>
-      <url>https://helium.github.io/favicon-32x32.png</url>
-      <link>https://helium.github.io/favicon-32x32.png</link>
+      <url>https://helium-chain.github.io/favicon-32x32.png</url>
+      <link>https://helium-chain.github.io/favicon-32x32.png</link>
     </image>
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
     <lastBuildDate>Sat, 20 Nov 2021 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://helium.github.io/posts/elasticsearch/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://helium-chain.github.io/posts/elasticsearch/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>正向索引和倒排索引</title>
-      <link>https://helium.github.io/posts/elasticsearch/desc/</link>
+      <link>https://helium-chain.github.io/posts/elasticsearch/desc/</link>
       <pubDate>Fri, 16 Jul 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/elasticsearch/desc/</guid>
+      <guid>https://helium-chain.github.io/posts/elasticsearch/desc/</guid>
       <description>es 正向索引和倒排索引简介。</description>
     </item>
     <item>
       <title>文档和索引</title>
-      <link>https://helium.github.io/posts/elasticsearch/intro/</link>
+      <link>https://helium-chain.github.io/posts/elasticsearch/intro/</link>
       <pubDate>Sat, 17 Jul 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/elasticsearch/intro/</guid>
+      <guid>https://helium-chain.github.io/posts/elasticsearch/intro/</guid>
       <description>es 文档和索引简介。</description>
     </item>
     <item>
       <title>安装</title>
-      <link>https://helium.github.io/posts/elasticsearch/install/</link>
+      <link>https://helium-chain.github.io/posts/elasticsearch/install/</link>
       <pubDate>Wed, 21 Jul 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/elasticsearch/install/</guid>
+      <guid>https://helium-chain.github.io/posts/elasticsearch/install/</guid>
       <description>elasticsearch、kibana安装简介。</description>
     </item>
     <item>
       <title>Mappings</title>
-      <link>https://helium.github.io/posts/elasticsearch/mapping/</link>
+      <link>https://helium-chain.github.io/posts/elasticsearch/mapping/</link>
       <pubDate>Tue, 27 Jul 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/elasticsearch/mapping/</guid>
+      <guid>https://helium-chain.github.io/posts/elasticsearch/mapping/</guid>
       <description>索引的创建、修改、删除。</description>
     </item>
     <item>
       <title>Settings</title>
-      <link>https://helium.github.io/posts/elasticsearch/settings/</link>
+      <link>https://helium-chain.github.io/posts/elasticsearch/settings/</link>
       <pubDate>Fri, 06 Aug 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/elasticsearch/settings/</guid>
+      <guid>https://helium-chain.github.io/posts/elasticsearch/settings/</guid>
       <description>设置当前索引的分片数，副本数等信息。</description>
     </item>
     <item>
       <title>Aliases</title>
-      <link>https://helium.github.io/posts/elasticsearch/aliases/</link>
+      <link>https://helium-chain.github.io/posts/elasticsearch/aliases/</link>
       <pubDate>Fri, 27 Aug 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/elasticsearch/aliases/</guid>
+      <guid>https://helium-chain.github.io/posts/elasticsearch/aliases/</guid>
       <description>ElasticSearch 索引别名设置。</description>
     </item>
     <item>
       <title>Routing</title>
-      <link>https://helium.github.io/posts/elasticsearch/routing/</link>
+      <link>https://helium-chain.github.io/posts/elasticsearch/routing/</link>
       <pubDate>Mon, 13 Sep 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/elasticsearch/routing/</guid>
+      <guid>https://helium-chain.github.io/posts/elasticsearch/routing/</guid>
       <description>ElasticSearch 路由规则。</description>
     </item>
     <item>
       <title>索引CURD</title>
-      <link>https://helium.github.io/posts/elasticsearch/indexes/</link>
+      <link>https://helium-chain.github.io/posts/elasticsearch/indexes/</link>
       <pubDate>Wed, 06 Oct 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/elasticsearch/indexes/</guid>
+      <guid>https://helium-chain.github.io/posts/elasticsearch/indexes/</guid>
       <description>索引的增删改查。</description>
     </item>
     <item>
       <title>文档CURD</title>
-      <link>https://helium.github.io/posts/elasticsearch/document/</link>
+      <link>https://helium-chain.github.io/posts/elasticsearch/document/</link>
       <pubDate>Mon, 18 Oct 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/elasticsearch/document/</guid>
+      <guid>https://helium-chain.github.io/posts/elasticsearch/document/</guid>
       <description>文档增删改查。</description>
     </item>
     <item>
       <title>Query</title>
-      <link>https://helium.github.io/posts/elasticsearch/query/</link>
+      <link>https://helium-chain.github.io/posts/elasticsearch/query/</link>
       <pubDate>Thu, 11 Nov 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/elasticsearch/query/</guid>
+      <guid>https://helium-chain.github.io/posts/elasticsearch/query/</guid>
       <description>查询文档。</description>
     </item>
     <item>
       <title>聚合</title>
-      <link>https://helium.github.io/posts/elasticsearch/aggregate/</link>
+      <link>https://helium-chain.github.io/posts/elasticsearch/aggregate/</link>
       <pubDate>Sat, 20 Nov 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/elasticsearch/aggregate/</guid>
+      <guid>https://helium-chain.github.io/posts/elasticsearch/aggregate/</guid>
       <description>桶聚合、度量聚合、管道聚合等。</description>
     </item>
     <item>
       <title>数据同步</title>
-      <link>https://helium.github.io/posts/elasticsearch/sync/</link>
+      <link>https://helium-chain.github.io/posts/elasticsearch/sync/</link>
       <pubDate>Sat, 30 Oct 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/elasticsearch/sync/</guid>
+      <guid>https://helium-chain.github.io/posts/elasticsearch/sync/</guid>
       <description>Mysql数据同步ElasticSearch。</description>
     </item>
   </channel>

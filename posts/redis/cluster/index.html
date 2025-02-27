@@ -9,18 +9,18 @@
 <meta name="keywords" content="redis">
 <meta name="description" content="redis 分片集群原理和搭建。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/redis/cluster/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/redis/cluster/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/redis/cluster/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/redis/cluster/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="redis 分片集群" />
 <meta property="og:description" content="redis 分片集群原理和搭建。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/redis/cluster/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/redis/cluster/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2023-06-21T00:00:00+00:00" />
 <meta property="article:modified_time" content="2023-06-21T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="redis 分片集群"/>
 <meta name="twitter:description" content="redis 分片集群原理和搭建。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Redis",
-      "item": "https://helium.github.io/posts/redis/"
+      "item": "https://helium-chain.github.io/posts/redis/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "redis 分片集群",
-      "item": "https://helium.github.io/posts/redis/cluster/"
+      "item": "https://helium-chain.github.io/posts/redis/cluster/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": "简介 主从和哨兵可以解决高可用、高并发读的问题。但是依然有两个问题没有解决： 海量数据存储问题、高并发写的问题。 使用分片集群可以解决上述问题，如图: 分片集群特征： 集群中有多个master，每个master保存不同数据。 每个master都可以有多个slave节点。 master之间通过ping监测彼此健康状态。 客户端请求可以访问集群任意节点，最终都会被转发到正确节点。 散列插槽 插槽原理 Redis会把每一个master节点映射到0~16383共16384个插槽（hash slot）上，查看集群信息时就能看到。 M: xxxxxxxxxxxxxxxxxxxxxxxx 172.30.1.2:7001 slots:[0-5460] (5461 slots) master M: xxxxxxxxxxxxxxxxxxxxxxxx 172.30.1.2:7002 slots:[5461-10922] (5462 slots) master M: xxxxxxxxxxxxxxxxxxxxxxxx 172.30.1.2:7003 slots:[10923-16383] (5461 slots) master 数据key不是与节点绑定，而是与插槽绑定。redis会根据key的有效部分计算插槽值，分两种情况： key中包含 \"{}\"，且 \"{}\" 中至少包含1个字符，\"{}\" 中的部分是有效部分。 key中不包含 \"{}\"，整个key都是有效部分。 例如：key是num，那么就根据num计算，如果是{itcast}num，则根据itcast计算。计算方式是利用CRC16算法得到一个hash值，然后对16384取余，得到的结果就是slot值。 在7001这个节点执行set a 1时，对a做hash运算，对16384取余，得到的结果是15495，因此要存储到7003节点。 到了7003后，执行get num时，对num做hash运算，对16384取余，得到的结果是2765，因此需要切换到7001节点。 $ set a 1 -\u003e Redirected to slot [15495] located at 172.30.1.2:7003 OK $ get num -\u003e Redirected to slot [2765] located at 172.30.1.2:7001 Redis如何判断某个key应该在哪个实例： 将16384个插槽分配到不同的实例。 根据key的有效部分计算哈希值，对16384取余。 余数作为插槽，寻找插槽所在实例即可。 如何将同一类数据固定的保存在同一个Redis实例：这一类数据使用相同的有效部分，例如key都以{typeId}为前缀。 集群伸缩 redis-cli –cluster 提供了很多操作集群的命令，可以通过下面方式查看： $ redis-cli --cluster help 添加新节点到集群 $ redis-cli --cluster add-node 192.168.150.101:7004 192.168.150.101:7001 查看集群状态。 $ redis-cli -p 7001 cluster nodes 转移插槽 转移插槽命令：redis-cli –cluster reshard host:port。 host:port 从这个位置转移到其他位置。 故障转移 自动故障转移 redis 集群会自动故障转移。 手动故障转移 利用cluster failover命令可以手动让集群中的某个master宕机，切换到执行cluster failover命令的这个slave节点，实现无感知的数据迁移。 failover命令可以指定三种模式： “\"：默认的流程，如图1~6歩。 force：省略了对offset的一致性校验。 takeover：直接执行第5歩，忽略数据一致性、忽略master状态和其它master的意见。 在从节点执行： $ CLUSTER FAILOVER 搭建集群 分片集群需要的节点数量较多，这里我们搭建一个最小的分片集群，包含3个master节点，每个master包含一个slave节点。 IP PORT 角色 172.30.2.11 7001 master 172.30.2.12 7002 master 172.30.2.13 7003 master 172.30.2.21 8001 slave 172.30.2.22 8002 slave 172.30.2.23 8003 slave redis.conf redis.conf 文件准备。github 官网下载 redis 相应版本的配置文件。 对每个redis.conf都做以下修改。分片集群的redis主从的redis.conf目前都是一样的。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 port 6379 # 开启集群功能 cluster-enabled yes # 集群的配置文件名称，不需要我们创建，由redis自己维护 cluster-config-file /data/nodes.conf # 节点心跳失败的超时时间 cluster-node-timeout 5000 # 持久化文件存放目录 dir /data # 绑定地址 bind 0.0.0.0 # no 非后台守护运行 daemonize no # 保护模式 protected-mode no # 数据库数量 databases 1 # 日志 logfile /data/run.log docker-compose.yml 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 version: '3.8' networks: redis-sharding: driver: bridge ipam: driver: default config: - subnet: 172.30.2.0/24 services: master1: container_name: master1 image: redis:6.2.3 volumes: - ./master1/conf:/usr/local/etc/redis ports: - \"7001:6379\" command: [\"redis-server\", \"/usr/local/etc/redis/redis.conf\"] networks: redis-sharding: ipv4_address: 172.30.2.11 master2: container_name: master2 image: redis:6.2.3 volumes: - ./master2/conf:/usr/local/etc/redis ports: - \"7002:6379\" command: [ \"redis-server\", \"/usr/local/etc/redis/redis.conf\" ] networks: redis-sharding: ipv4_address: 172.30.2.12 master3: container_name: master3 image: redis:6.2.3 volumes: - ./master3/conf:/usr/local/etc/redis ports: - \"7003:6379\" command: [ \"redis-server\", \"/usr/local/etc/redis/redis.conf\" ] networks: redis-sharding: ipv4_address: 172.30.2.13 replica1: container_name: replica1 image: redis:6.2.3 volumes: - ./replica1/conf:/usr/local/etc/redis ports: - \"8001:6379\" command: [ \"redis-server\", \"/usr/local/etc/redis/redis.conf\" ] networks: redis-sharding: ipv4_address: 172.30.2.21 replica2: container_name: replica2 image: redis:6.2.3 volumes: - ./replica2/conf:/usr/local/etc/redis ports: - \"8002:6379\" command: [ \"redis-server\", \"/usr/local/etc/redis/redis.conf\" ] networks: redis-sharding: ipv4_address: 172.30.2.22 replica3: container_name: replica3 image: redis:6.2.3 volumes: - ./replica3/conf:/usr/local/etc/redis ports: - \"8003:6379\" command: [ \"redis-server\", \"/usr/local/etc/redis/redis.conf\" ] networks: redis-sharding: ipv4_address: 172.30.2.23 $ docker-compose -p redis-sharding up -d 构建集群 下面的命令都在 master1 容器里执行。\n自动分配主从关系 创建了一个集群，包括三个主节点和三个从节点，每个主节点分配一个从节点作为副本，前3个ip为主节点，后3个为从节点，主节点的从节点随机分配。 $ redis-cli --cluster create 172.30.2.11:6379 172.30.2.12:6379 172.30.2.13:6379 172.30.2.21:6379 172.30.2.22:6379 172.30.2.23:6379 --cluster-replicas 1 手动分配主从关系 分配 master 集群。 $ redis-cli --cluster create 172.30.2.11:6379 172.30.2.12:6379 172.30.2.13:6379 --cluster-replicas 0 查看3个主节点的ID。 $ redis-cli -h 172.30.2.11 -p 6379 cluster nodes 将3个从节点加入集群中，其中172.30.2.11可以是三个主节点的任意一个。 $ redis-cli -h 172.30.2.21 -p 6379 cluster meet 172.30.2.11 6379 $ redis-cli -h 172.30.2.22 -p 6379 cluster meet 172.30.2.11 6379 $ redis-cli -h 172.30.2.23 -p 6379 cluster meet 172.30.2.11 6379 为每个从节点指定主节点。 $ redis-cli -h 172.30.2.21 -p 6379 cluster replicate $ redis-cli -h 172.30.2.22 -p 6379 cluster replicate $ redis-cli -h 172.30.2.23 -p 6379 cluster replicate 验证 通过以下命令查看集群中每个节点的id、角色、ip、port、插槽范围等信息。 $ redis-cli -h 172.30.2.11 -p 6379 cluster nodes 往集群存入4个键值。 $ redis-cli -c -h 172.30.2.11 -p 6379 set key1 value1 $ redis-cli -c -h 172.30.2.11 -p 6379 set key2 value2 $ redis-cli -c -h 172.30.2.11 -p 6379 set key3 value3 $ redis-cli -c -h 172.30.2.11 -p 6379 set key4 value4 查看每个主节点现有的键值，会发现每个节点只有一部分键值。 $ redis-cli -h 172.30.2.11 -p 6379 --scan $ redis-cli -h 172.30.2.12 -p 6379 --scan $ redis-cli -h 172.30.2.13 -p 6379 --scan ",
   "wordCount" : "612",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2023-06-21T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2023-06-21T00:00:00Z",
   "dateModified": "2023-06-21T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/redis/cluster/"
+    "@id": "https://helium-chain.github.io/posts/redis/cluster/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/redis/">Redis</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/redis/">Redis</a></div>
     <h1 class="post-title entry-hint-parent">
       redis 分片集群
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/redis/" target="_blank" rel="noopener">Redis</a>
+            <a href="https://helium-chain.github.io/tags/redis/" target="_blank" rel="noopener">Redis</a>
         </ul>
       </span>
       
@@ -830,15 +830,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/redis/">Redis</a></li>
+      <li><a href="https://helium-chain.github.io/tags/redis/">Redis</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/redis/sentinel/">
+  <a class="prev" href="https://helium-chain.github.io/posts/redis/sentinel/">
     <span class="title">« 上一页</span>
     <br>
     <span>redis 哨兵</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/redis/command/">
+  <a class="next" href="https://helium-chain.github.io/posts/redis/command/">
     <span class="title">下一页 »</span>
     <br>
     <span>redis 通用命令</span>

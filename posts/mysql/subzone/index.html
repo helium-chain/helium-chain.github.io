@@ -9,18 +9,18 @@
 <meta name="keywords" content="mysql">
 <meta name="description" content="mysql 分区表介绍。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/mysql/subzone/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/mysql/subzone/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/mysql/subzone/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/mysql/subzone/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="分区表" />
 <meta property="og:description" content="mysql 分区表介绍。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/mysql/subzone/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/mysql/subzone/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2022-11-12T00:00:00+00:00" />
 <meta property="article:modified_time" content="2022-11-12T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="分区表"/>
 <meta name="twitter:description" content="mysql 分区表介绍。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Mysql",
-      "item": "https://helium.github.io/posts/mysql/"
+      "item": "https://helium-chain.github.io/posts/mysql/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "分区表",
-      "item": "https://helium.github.io/posts/mysql/subzone/"
+      "item": "https://helium-chain.github.io/posts/mysql/subzone/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " MySQL分区 是一种数据库优化的技术，它允许将一个大的表、索引或其子集分割成多个较小的、更易于管理的片段，这些片段称为“分区”。 每个分区都可以独立于其他分区进行存储、备份、索引和其他操作。这种技术主要是为了改善大型数据库表的查询性能、维护的方便性以及数据管理效率。 基本概念 物理存储与逻辑分割 物理上，每个分区可以存储在不同的文件或目录中，这取决于分区类型和配置。 逻辑上，表数据根据分区键的值被分割到不同的分区里。 查询性能提升 当执行查询时，MySQL能够确定哪些分区包含相关数据，并只在这些分区上进行搜索。这减少了需要搜索的数据量，从而提高了查询性能。 对于范围查询或特定值的查询，分区可以显著减少扫描的数据量。 数据管理与维护 分区可以使得数据管理更加灵活。例如，可以独立地备份、恢复或优化某个分区，而无需对整个表进行操作。 对于具有时效性的数据，可以通过删除或归档某个分区来快速释放存储空间。 扩展性与并行处理 分区技术使得数据库表更容易扩展到更大的数据集。当表的大小超过单个存储设备的容量时，可以使用分区将数据分布到多个存储设备上。 由于每个分区可以独立处理，因此可以并行执行查询和其他数据库操作，从而进一步提高性能。 分区的原理和类型 分区的原理 分区技术是将表中的记录分散到不同的物理文件中，即每个分区对应一个.idb文件。这是MySQL 5.1及以后版本支持的一项高级功能，旨在提高大数据表的管理效率和查询性能。 分区类型：MySQL支持水平分区，即根据某些条件将表中的行分配到不同的分区中。这些分区在物理上是独立的，可以单独处理，也可以作为整体处理。 性能和影响：虽然分区可以提高查询性能和管理效率，但如果不恰当使用，也可能对性能产生负面影响。因此，在使用分区时应谨慎评估其影响。 索引与分区：在MySQL中，分区是局部的，意味着数据和索引都存储在各自的分区内。目前，MySQL尚不支持全局分区索引。 分区键与唯一索引：当表存在主键或唯一索引时，分区列必须是这些索引的一部分。这是为了确保分区的唯一性和查询效率。 分区类型 MySQL支持几种不同类型的分区方式，包括RANGE、LIST、HASH和KEY。下面简要介绍这些分区方式的工作原理： RANGE分区：基于列的值范围将数据分配到不同的分区。例如，可以根据日期范围将数据分配到不同的月份或年份的分区中。 LIST分区：类似于RANGE分区，但LIST分区是基于列的离散值集合来分配数据的。可以指定一个枚举列表来定义每个分区的值。 HASH分区：基于用户定义的表达式的哈希值来分配数据到不同的分区。这种分区方式适用于确保数据在各个分区之间均匀分布。 KEY分区：类似于HASH分区，但KEY分区支持计算一列或多列的哈希值来分配数据。它支持多列作为分区键，并且提供了更好的数据分布和查询性能。 使用场景 性能提升：通过将数据分散到多个分区中，可以并行处理查询，从而提高查询性能。同时，对于涉及大量数据的维护操作（如备份和恢复），可以单独处理每个分区，减少了操作的复杂性和时间成本。 管理简化：分区可以使得数据管理更加灵活。例如，可以独立地备份、恢复或优化某个分区，而无需对整个表进行操作。这对于大型数据库表来说尤为重要，因为它可以显著减少维护时间和资源消耗。 数据归档和清理：对于具有时间属性的数据（如日志、交易记录等），可以使用分区来轻松归档旧数据或删除不再需要的数据。通过简单地删除或归档某个分区，可以快速释放存储空间并提高性能。 可扩展性：分区技术使得数据库表更容易扩展到更大的数据集。当表的大小超过单个存储设备的容量时，可以使用分区将数据分布到多个存储设备上，从而实现水平扩展。 确认MySQL支持分区 从MySQL5.1开始引入分区功能，可以如下方式查看是否支持： “老\"版本方式：SHOW VARIABLES LIKE ‘%partition%’。 “新\"版本方式：show plugins。 # 信息中查看到这一条数据就表示支持分区 | partition | ACTIVE | STORAGE ENGINE | NULL | GPL | 注意事项 如果表中存在primary key或者unique key时，分区的列必须是primary key或者unique key的一个组成部分，也就是说，分区函数的列只能从primary key或者unique key这些key中取子集。 如果表中不存在任何的primary key或者unique key时，则可以指定任何一个列作为分区列。 MySQL5.5版本之前的Range、List、Hash分区要求分区键必须是int；MySQL5.5及以上，支持非整型的Range和List分区，即：range columns 和 list columns。 分区命名 ​分区的名字基本遵循其他MySQL标识符应当遵循的原则，例如用于表和数据库名字的标识符，但是注意，分区的名字是不区分大小写的。 无论使用何种类型的分区，分区总是在创建时就自动的顺序编号，且从0开始记录。 创建分区 RANGE分区 --创建数据库 CREATE DATABASE kubiao DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci; --创建分区表，主键：int类型 CREATE TABLE tbl_users ( `uuid` INT NOT NULL, `customerId` VARCHAR(200), `pwd` VARCHAR(20), `showName` VARCHAR(100), `trueName` VARCHAR(100), `registerTime` VARCHAR(100) ) PARTITION BY RANGE (uuid) ( PARTITION p0 VALUES LESS THAN (5), PARTITION p1 VALUES LESS THAN (10), PARTITION p2 VALUES LESS THAN (15), PARTITION p3 VALUES LESS THAN MAXVALUE ); --插入数据 INSERT INTO tbl_users VALUES(1,\"只为你\",\"123456\",\"qzp\",\"quezhipeng\",\"20200808\"),(6,\"人生\",\"123456\",\"人生\",\"无名\",\"20200808\"),(12,\"无须终有\",\"123456\",\"无须终有\",\"无声\",\"20200808\"),(100,\"坚持\",\"123456\",\"胜利\",\"坚持\",\"20200808\"); 通过命令查看分区。 mysql\u003e SELECT * FROM information_schema.`PARTITIONS` WHERE table_schema='kubiao' AND table_name='tbl_users'; 查看分区上的数据。 SELECT * FROM tbl_users PARTITION(p0); 查看MySQL操作的分区。 EXPLAIN PARTITIONS SELECT * FROM tbl_users WHERE uuid = 2; List分区 注意：如果试图操作的列值不在分区值列表中时，那么会失败并报错，要注意的是，LIST分区没有类似如：“VALUES LESS THAN”这样的包含其他值在内的定义，将要匹配的任何值都必须在值列表中找到。 LIST分区除了能和RANGE分区结合起来生成一个复合的子分区，与Hash和KEY分区结合起来成复合的子分区也是可以的。 CREATE TABLE tbl_users2 ( `uuid` INT NOT NULL, `customerId` VARCHAR(200), `pwd` VARCHAR(20), `showName` VARCHAR(100), `trueName` VARCHAR(100), `registerTime` VARCHAR(100) ) PARTITION BY List(uuid) ( PARTITION p0 VALUES in(1,2,3,5), PARTITION p1 VALUES in(7,9,10), PARTITION p2 VALUES in(11,15) ); --插入数据，注意：加入数据需要根据主键来，不可以时主键分区中没有的，否则报错 INSERT INTO tbl_users2 VALUES(1,\"只为你\",\"123456\",\"qzp\",\"quezhipeng\",\"20200808\"),(7,\"人生\",\"123456\",\"人生\",\"无名\",\"20200808\"),(10,\"无须终有\",\"123456\",\"无须终有\",\"无声\",\"20200808\"),(15,\"坚持\",\"123456\",\"胜利\",\"坚持\",\"20200808\"); 查看数据，与 RANGE 分区一样。 HASH分区 HASH分区：主要用来确保数据在预先确定数目的分区中平均分布，在RANGE和LIST分区中，必须明确指定一个给定的列值或者列值集合以指定应该保存在哪个分区中；而在HASH分区中，MySQL自动完成这些工作，要做的只是基于将要被哈希的列值指定的一个表达式，以及指定被分区的表将要被分割成的分区数量，如： --创建一张hash分区表 CREATE TABLE tbl_users4 ( `uuid` INT NOT NULL, `customerId` VARCHAR(200), `pwd` VARCHAR(20), `showName` VARCHAR(100), `trueName` VARCHAR(100), `registerTime` VARCHAR(100) ) PARTITION BY hash(uuid) PARTITIONS 3; --插入数据，注意：分区是有uuid/3求余数决定,余数为0，在p0;余数为1，在p1;余数为2，在p2,以此类推.... INSERT INTO tbl_users2 VALUES(1,\"只为你\",\"123456\",\"qzp\",\"quezhipeng\",\"20200808\"),(7,\"人生\",\"123456\",\"人生\",\"无名\",\"20200808\"),(10,\"无须终有\",\"123456\",\"无须终有\",\"无声\",\"20200808\"),(15,\"坚持\",\"123456\",\"胜利\",\"坚持\",\"20200808\"); KEY分区 类似于按照HASH分区，HASH分区允许用户自定义表达式，而KEY分区不允许使用用户自定义的表达式：HASH分区只支持整数分区，KEY分区支持除了blob或者text类型之外的其他数据类型分区。 与HASH分区不同，创建KEY分区表的时候，可以不指定分区键，默认会选择使用主键或者唯一键作为分区键，没有主键或唯一键，就必须指定分区键。 --创建一张key分区表 CREATE TABLE tbl_users5 ( `uuid` INT NOT NULL, `customerId` VARCHAR(200), `pwd` VARCHAR(20), `showName` VARCHAR(100), `trueName` VARCHAR(100), `registerTime` VARCHAR(100) ) PARTITION BY LINEAR key(uuid) PARTITIONS 3; --插入数据，注意：分区是有uuid/3求余数决定,余数为0，在p0;余数为1，在p1;余数为2，在p2,以此类推.... INSERT INTO tbl_users5 VALUES(1,\"只为你\",\"123456\",\"qzp\",\"quezhipeng\",\"20200808\"),(7,\"人生\",\"123456\",\"人生\",\"无名\",\"20200808\"),(10,\"无须终有\",\"123456\",\"无须终有\",\"无声\",\"20200808\"),(15,\"坚持\",\"123456\",\"胜利\",\"坚持\",\"20200808\"); 参考 MySQL分区知识及操作详解(完整版) MySQL分区表：万字详解与实践指南 ",
   "wordCount" : "288",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2022-11-12T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2022-11-12T00:00:00Z",
   "dateModified": "2022-11-12T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/mysql/subzone/"
+    "@id": "https://helium-chain.github.io/posts/mysql/subzone/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/mysql/">Mysql</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/mysql/">Mysql</a></div>
     <h1 class="post-title entry-hint-parent">
       分区表
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/mysql/" target="_blank" rel="noopener">Mysql</a>
+            <a href="https://helium-chain.github.io/tags/mysql/" target="_blank" rel="noopener">Mysql</a>
         </ul>
       </span>
       
@@ -567,15 +567,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/mysql/">Mysql</a></li>
+      <li><a href="https://helium-chain.github.io/tags/mysql/">Mysql</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/mysql/trigger/">
+  <a class="prev" href="https://helium-chain.github.io/posts/mysql/trigger/">
     <span class="title">« 上一页</span>
     <br>
     <span>触发器</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/nginx/install/">
+  <a class="next" href="https://helium-chain.github.io/posts/nginx/install/">
     <span class="title">下一页 »</span>
     <br>
     <span>nginx 安装部署</span>

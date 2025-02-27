@@ -2,58 +2,58 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Nginx on Helium</title>
-    <link>https://helium.github.io/tags/nginx/</link>
+    <link>https://helium-chain.github.io/tags/nginx/</link>
     <description>Recent content in Nginx on Helium</description>
     <image>
       <title>Helium</title>
-      <url>https://helium.github.io/favicon-32x32.png</url>
-      <link>https://helium.github.io/favicon-32x32.png</link>
+      <url>https://helium-chain.github.io/favicon-32x32.png</url>
+      <link>https://helium-chain.github.io/favicon-32x32.png</link>
     </image>
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
     <lastBuildDate>Fri, 16 Aug 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://helium.github.io/tags/nginx/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://helium-chain.github.io/tags/nginx/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>nginx 安装部署</title>
-      <link>https://helium.github.io/posts/nginx/install/</link>
+      <link>https://helium-chain.github.io/posts/nginx/install/</link>
       <pubDate>Thu, 15 Apr 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/nginx/install/</guid>
+      <guid>https://helium-chain.github.io/posts/nginx/install/</guid>
       <description>nginx 架构、目录结构、相关命令。</description>
     </item>
     <item>
       <title>nginx nginx.cnf</title>
-      <link>https://helium.github.io/posts/nginx/conf/</link>
+      <link>https://helium-chain.github.io/posts/nginx/conf/</link>
       <pubDate>Fri, 16 Apr 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/nginx/conf/</guid>
+      <guid>https://helium-chain.github.io/posts/nginx/conf/</guid>
       <description>nginx 全局块、events块、http块指令介绍。</description>
     </item>
     <item>
       <title>nginx server块</title>
-      <link>https://helium.github.io/posts/nginx/server/</link>
+      <link>https://helium-chain.github.io/posts/nginx/server/</link>
       <pubDate>Tue, 11 May 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/nginx/server/</guid>
+      <guid>https://helium-chain.github.io/posts/nginx/server/</guid>
       <description>nginx server块介绍。</description>
     </item>
     <item>
       <title>nginx 静态资源优化</title>
-      <link>https://helium.github.io/posts/nginx/static/</link>
+      <link>https://helium-chain.github.io/posts/nginx/static/</link>
       <pubDate>Mon, 17 May 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/nginx/static/</guid>
+      <guid>https://helium-chain.github.io/posts/nginx/static/</guid>
       <description>nginx 静态资源缓存、压缩、防盗链。</description>
     </item>
     <item>
       <title>nginx Rewrite</title>
-      <link>https://helium.github.io/posts/nginx/rewrite/</link>
+      <link>https://helium-chain.github.io/posts/nginx/rewrite/</link>
       <pubDate>Sat, 29 May 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/nginx/rewrite/</guid>
+      <guid>https://helium-chain.github.io/posts/nginx/rewrite/</guid>
       <description>nginx 重写地址。</description>
     </item>
     <item>
       <title>nginx 反向代理</title>
-      <link>https://helium.github.io/posts/nginx/proxy/</link>
+      <link>https://helium-chain.github.io/posts/nginx/proxy/</link>
       <pubDate>Fri, 16 Aug 2024 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/nginx/proxy/</guid>
+      <guid>https://helium-chain.github.io/posts/nginx/proxy/</guid>
       <description>nginx 反向代理及SSL。</description>
     </item>
   </channel>

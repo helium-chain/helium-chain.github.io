@@ -2,107 +2,107 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Mysql on Helium</title>
-    <link>https://helium.github.io/tags/mysql/</link>
+    <link>https://helium-chain.github.io/tags/mysql/</link>
     <description>Recent content in Mysql on Helium</description>
     <image>
       <title>Helium</title>
-      <url>https://helium.github.io/favicon-32x32.png</url>
-      <link>https://helium.github.io/favicon-32x32.png</link>
+      <url>https://helium-chain.github.io/favicon-32x32.png</url>
+      <link>https://helium-chain.github.io/favicon-32x32.png</link>
     </image>
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
     <lastBuildDate>Wed, 12 Jun 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://helium.github.io/tags/mysql/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://helium-chain.github.io/tags/mysql/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>mysql 语法</title>
-      <link>https://helium.github.io/posts/mysql/use/</link>
+      <link>https://helium-chain.github.io/posts/mysql/use/</link>
       <pubDate>Fri, 11 Mar 2022 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/mysql/use/</guid>
+      <guid>https://helium-chain.github.io/posts/mysql/use/</guid>
       <description>DDL、DCL、DQL、DML</description>
     </item>
     <item>
       <title>mysql 多表查询</title>
-      <link>https://helium.github.io/posts/mysql/join/</link>
+      <link>https://helium-chain.github.io/posts/mysql/join/</link>
       <pubDate>Sun, 27 Mar 2022 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/mysql/join/</guid>
+      <guid>https://helium-chain.github.io/posts/mysql/join/</guid>
       <description>mysql Join 语法。</description>
     </item>
     <item>
       <title>mysql 事务</title>
-      <link>https://helium.github.io/posts/mysql/transaction/</link>
+      <link>https://helium-chain.github.io/posts/mysql/transaction/</link>
       <pubDate>Sun, 17 Apr 2022 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/mysql/transaction/</guid>
+      <guid>https://helium-chain.github.io/posts/mysql/transaction/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>mysql 索引</title>
-      <link>https://helium.github.io/posts/mysql/tree/</link>
+      <link>https://helium-chain.github.io/posts/mysql/tree/</link>
       <pubDate>Fri, 29 Apr 2022 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/mysql/tree/</guid>
+      <guid>https://helium-chain.github.io/posts/mysql/tree/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>mysql sql 优化</title>
-      <link>https://helium.github.io/posts/mysql/sql/</link>
+      <link>https://helium-chain.github.io/posts/mysql/sql/</link>
       <pubDate>Sun, 12 Jun 2022 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/mysql/sql/</guid>
+      <guid>https://helium-chain.github.io/posts/mysql/sql/</guid>
       <description>mysql sql优化。</description>
     </item>
     <item>
       <title>mysql 锁</title>
-      <link>https://helium.github.io/posts/mysql/lock/</link>
+      <link>https://helium-chain.github.io/posts/mysql/lock/</link>
       <pubDate>Thu, 30 Jun 2022 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/mysql/lock/</guid>
+      <guid>https://helium-chain.github.io/posts/mysql/lock/</guid>
       <description>mysql 全局锁、表锁、行锁。</description>
     </item>
     <item>
       <title>mysql innodb</title>
-      <link>https://helium.github.io/posts/mysql/innodb/</link>
+      <link>https://helium-chain.github.io/posts/mysql/innodb/</link>
       <pubDate>Fri, 23 Sep 2022 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/mysql/innodb/</guid>
+      <guid>https://helium-chain.github.io/posts/mysql/innodb/</guid>
       <description>mysql innodb、MVCC。</description>
     </item>
     <item>
       <title>mysql 工具</title>
-      <link>https://helium.github.io/posts/mysql/tool/</link>
+      <link>https://helium-chain.github.io/posts/mysql/tool/</link>
       <pubDate>Wed, 13 Jul 2022 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/mysql/tool/</guid>
+      <guid>https://helium-chain.github.io/posts/mysql/tool/</guid>
       <description>mysql 常用工具。</description>
     </item>
     <item>
       <title>mysql 主从复制</title>
-      <link>https://helium.github.io/posts/mysql/master/</link>
+      <link>https://helium-chain.github.io/posts/mysql/master/</link>
       <pubDate>Sat, 13 Aug 2022 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/mysql/master/</guid>
+      <guid>https://helium-chain.github.io/posts/mysql/master/</guid>
       <description>mysql 主从复制。</description>
     </item>
     <item>
       <title>mysql 分库分表</title>
-      <link>https://helium.github.io/posts/mysql/table/</link>
+      <link>https://helium-chain.github.io/posts/mysql/table/</link>
       <pubDate>Mon, 05 Sep 2022 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/mysql/table/</guid>
+      <guid>https://helium-chain.github.io/posts/mysql/table/</guid>
       <description>mysql 分库分表策略。</description>
     </item>
     <item>
       <title>mycat 分库分表中间件</title>
-      <link>https://helium.github.io/posts/mysql/mycat/</link>
+      <link>https://helium-chain.github.io/posts/mysql/mycat/</link>
       <pubDate>Mon, 03 Oct 2022 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/mysql/mycat/</guid>
+      <guid>https://helium-chain.github.io/posts/mysql/mycat/</guid>
       <description>mysql mycat 分库分表中间件。</description>
     </item>
     <item>
       <title>触发器</title>
-      <link>https://helium.github.io/posts/mysql/trigger/</link>
+      <link>https://helium-chain.github.io/posts/mysql/trigger/</link>
       <pubDate>Thu, 03 Nov 2022 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/mysql/trigger/</guid>
+      <guid>https://helium-chain.github.io/posts/mysql/trigger/</guid>
       <description>mysql 触发器介绍。</description>
     </item>
     <item>
       <title>分区表</title>
-      <link>https://helium.github.io/posts/mysql/subzone/</link>
+      <link>https://helium-chain.github.io/posts/mysql/subzone/</link>
       <pubDate>Sat, 12 Nov 2022 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/mysql/subzone/</guid>
+      <guid>https://helium-chain.github.io/posts/mysql/subzone/</guid>
       <description>mysql 分区表介绍。</description>
     </item>
   </channel>

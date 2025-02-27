@@ -2,37 +2,37 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>第6章 Array on Helium</title>
-    <link>https://helium.github.io/posts/golang/array/</link>
+    <link>https://helium-chain.github.io/posts/golang/array/</link>
     <description>Recent content in 第6章 Array on Helium</description>
     <image>
       <title>Helium</title>
-      <url>https://helium.github.io/favicon-32x32.png</url>
-      <link>https://helium.github.io/favicon-32x32.png</link>
+      <url>https://helium-chain.github.io/favicon-32x32.png</url>
+      <link>https://helium-chain.github.io/favicon-32x32.png</link>
     </image>
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
     <lastBuildDate>Fri, 03 May 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://helium.github.io/posts/golang/array/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://helium-chain.github.io/posts/golang/array/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>数组使用</title>
-      <link>https://helium.github.io/posts/golang/array/use/</link>
+      <link>https://helium-chain.github.io/posts/golang/array/use/</link>
       <pubDate>Mon, 09 Mar 2020 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/array/use/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/array/use/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>数组的内存布局</title>
-      <link>https://helium.github.io/posts/golang/array/memory/</link>
+      <link>https://helium-chain.github.io/posts/golang/array/memory/</link>
       <pubDate>Sat, 25 Jul 2020 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/array/memory/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/array/memory/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>数组的元类型</title>
-      <link>https://helium.github.io/posts/golang/array/meta/</link>
+      <link>https://helium-chain.github.io/posts/golang/array/meta/</link>
       <pubDate>Tue, 25 May 2021 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/array/meta/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/array/meta/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
   </channel>

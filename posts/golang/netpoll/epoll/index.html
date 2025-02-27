@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, netpoll">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/golang/netpoll/epoll/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/golang/netpoll/epoll/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/netpoll/epoll/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/golang/netpoll/epoll/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="Golang epoll" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/golang/netpoll/epoll/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/golang/netpoll/epoll/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-07-20T21:59:40+08:00" />
 <meta property="article:modified_time" content="2024-07-20T21:59:40+08:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="Golang epoll"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18&#43;版本"/>
 
@@ -98,25 +98,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://helium.github.io/posts/golang/"
+      "item": "https://helium-chain.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "第16章 netpoll",
-      "item": "https://helium.github.io/posts/golang/netpoll/"
+      "item": "https://helium-chain.github.io/posts/golang/netpoll/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "Golang epoll",
-      "item": "https://helium.github.io/posts/golang/netpoll/epoll/"
+      "item": "https://helium-chain.github.io/posts/golang/netpoll/epoll/"
     }
   ]
 }
@@ -134,7 +134,7 @@
   "articleBody": " 以下来自go1.19.3/src/runtime/netpoll_epoll.go文件。 本篇文章是针对netpoll_epoll.go文件的源码走读。 variables 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 var ( // epoll 描述符, epollcreate 函数创建返回的文件描述符 epfd int32 = -1 // epoll descriptor // 保存的是pipe2()或pip()函数创建的读写描述符，pip2()或pip()函数创建的read和write，只要任意一方操作另一方能获取到数据 // netpollBreakRd会被注册到epoll中，当写描述符向里写数据时会触发wait监听函数返回就绪的事件集 // 这对读写描述符的作用在于通信，当有其他协程在wait阻塞等待时，可以通过写描述符写入数据让等待的协程返回 // 主要针对 epoll_wait() 函数阻塞的线程，通过这里的事件使调用 epoll_wait() 函数的线程陷入内核返回。 // 对于 epoll_wait() 的 timeout 参数为0的情况，这里的事件会被忽略 netpollBreakRd, netpollBreakWr uintptr // for netpollBreak // 用于避免重复调用 netpollBreak() // 在向netpollBreakWr中写入数据时，该值会从0变成1，控制只写一次标志符号 // 该参数是原子性的 netpollWakeSig uint32 // used to avoid duplicate calls of netpollBreak ) netpollGenericInit() 初始化netpoll。go1.19.3/src/runtime/netpoll.go文件。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 func netpollGenericInit() { // var netpollInited uint32 // 是否已初始化epoll标志 0.未初始化 1.已初始化 if atomic.Load(\u0026netpollInited) == 0 { // var netpollInitLock mutex 初始化 lockInit(\u0026netpollInitLock, lockRankNetpollInit) lock(\u0026netpollInitLock) // 这里需要判断 netpollInited == 0；原因在于可能存在多个协程并发在等待初始化epoll // 当这些协程获取的锁权限时，这里的netpollInited已被设置成1了，已经被初始化了 if netpollInited == 0 { netpollinit() // 初始化netpoll atomic.Store(\u0026netpollInited, 1)\t// netpollInited } unlock(\u0026netpollInitLock) } } netpollinit() go1.19.3/src/runtime/netpoll_epoll.go。 调用epollcreate创建netpoller。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 func netpollinit() { // epollcreate 函数内会调用 epollcreate1 // _EPOLL_CLOEXEC：当前进程fork出来的任何子进程在执行前都会关闭epoll描述符，也因此，子进程不能够访问epoll实例 epfd = epollcreate1(_EPOLL_CLOEXEC) // 小于0表示创建出错，大于0表示返回的创建后的文件句柄ID if epfd \u003c 0 {\tepfd = epollcreate(1024) if epfd \u003c 0 { println(\"runtime: epollcreate failed with\", -epfd) throw(\"runtime: netpollinit failed\") } // 系统调用 fcntl 设置 FD_CLOEXEC，参看 epollcreate1 函数参数 // fcntl：fd, F_SETFD, FD_CLOEXEC closeonexec(epfd) } // 创建一个用于通信的管道,返回读写,主要用于那些等待在IO轮询中的线程通信 // 创建一个非阻塞式pipe，用来唤醒阻塞中的 netpoller。 // pipe2(_O_NONBLOCK | _O_CLOEXEC) r, w, errno := nonblockingPipe() // 主要用于Break相关的函数，主要用于网络轮询唤醒信号 if errno != 0 { println(\"runtime: pipe failed with\", -errno) throw(\"runtime: pipe failed\") } // epollevent 是事件类型 // type epollevent struct { //\tevents uint32 // 事件类型 //\tdata [8]byte // 存储用户数据，刚好是一个指针存储的大小，该数据用户是可以修改的 // } ev := epollevent{ // 注意：这里默认注册的是水平触发，因此会一直触发 events: _EPOLLIN, // EPOLLIN 表示对应的文件描述符可以读（包括对端SOCKET正常关闭） } // var netpollBreakRd uintptr *(**uintptr)(unsafe.Pointer(\u0026ev.data)) = \u0026netpollBreakRd // ev.data = \u0026netpollBreakRd // 将读取数据的文件描述符加入监听，当使用w写数据时，该r会被触发 // func epollctl(epfd, op, fd int32, ev *epollevent) int32 // _EPOLL_CTL_ADD 将目标文件描述符fd添加到epoll描述符epfd中，并将事件event与fd链接的内部文件关联起来。 errno = epollctl(epfd, _EPOLL_CTL_ADD, r, \u0026ev) // r 被添加到epoll中 if errno != 0 { println(\"runtime: epollctl failed with\", -errno) throw(\"runtime: epollctl failed\") } // netpollBreakRd、netpollBreakWr 是非阻塞管道两端的文件描述符，分别被用作读取端和写入端。 // 读取端 netpollBreakRd 被添加到 epoll 中监听 _EPOLLIN 事件，后续从写入端netpollBreakWr // 写入数据就能唤醒阻塞中的 poller。 netpollBreakRd = uintptr(r) // netpollBreakRd保存pip2的read netpollBreakWr = uintptr(w) // netpollBreakRd保存pip2的write } netpollopen() 把要监听的文件描述符fd和与之关联的pollDesc结构添加到poller实例中。 该方法对于一个socket只需调用一次即可，表示注册fd到epoll中。 参数： fd uintptr：文件描述符。 pd *pollDesc：用户数据。 返回值：int32：0-注册成功。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 func netpollopen(fd uintptr, pd *pollDesc) int32 { // type epollevent struct { // events uint32 // 事件类型 // data [8]byte // 存储用户数据，刚好是一个指针存储的大小，该数据用户是可以修改的 // } var ev epollevent // EPOLLIN：表示对应的文件描述符可以读（包括对端SOCKET正常关闭） // EPOLLOUT：表示对应的文件描述符可以写 // EPOLLRDHUP：对端描述符产生一个挂断事件，比如来自对端的socket挂断事件等 // EPOLLET：将EPOLL设为边缘触发(Edge Triggered)模式，这是相对于水平触发(Level Triggered)来说的 // pollDesc：类型的数据结构pd作为与fd关联的自定数据会被一同添加到epoll中。 ev.events = _EPOLLIN | _EPOLLOUT | _EPOLLRDHUP | _EPOLLET // epollevent 是由events和data组成，data来自用户空间传入的数据 *(**pollDesc)(unsafe.Pointer(\u0026ev.data)) = pd // ev.data = pd // _EPOLL_CTL_ADD 将目标文件描述符fd添加到epoll描述符epfd中，并将事件event与fd链接的内部文件关联起来。 return -epollctl(epfd, _EPOLL_CTL_ADD, int32(fd), \u0026ev) } 触发模式LT\\ ET： 水平触发：LT 对于读操作，只要缓冲内容不为空，LT模式返回读就绪。 对于写操作，只要缓冲区还不满，LT模式会返回写就绪。 水平触发描述： 当被监控的文件描述符上有可读写事件发生时，epoll_wait()会通知处理程序去读写。 如果这次没有把数据一次性全部读写完(如读写缓冲区太小)，那么下次调用 epoll_wait()时，它还会通知你在上没读写完的文件描述符上继续读写，当然如果你一直不去读写，它会一直通知你。 如果系统中有大量你不需要读写的就绪文件描述符，而它们每次都会返回，这样会大大降低处理程序检索自己关心的就绪文件描述符的效率。 边缘触发：ET 对于读操作： 当缓冲区由不可读变为可读的时候，即缓冲区由空变为不空的时候。 当有新数据到达时，即缓冲区中的待读数据变多的时候。 当缓冲区有数据可读，且应用进程对相应的描述符进行EPOLL_CTL_MOD修改EPOLLIN事件时。 对于写操作： 当缓冲区由不可写变为可写时。 当有旧数据被发送走，即缓冲区中的内容变少的时候。 当缓冲区有空间可写，且应用进程对相应的描述符进行EPOLL_CTL_MOD修改EPOLLOUT事件时。 边缘触发描述： 当被监控的文件描述符上有可读写事件发生时，epoll_wait()会通知处理程序去读写。 如果这次没有把数据全部读写完(如读写缓冲区太小)，那么下次调用 epoll_wait()时，它不会通知你，也就是它只会通知你一次，直到该文件描述符上出现第二次可读写事件才会通知你。 这种模式比水平触发效率高，系统不会充斥大量你不关心的就绪文件描述符。 在ET模式下，缓冲区从不可读变成可读，会唤醒应用进程，缓冲区数据变少的情况，则不会再唤醒应用进程。 举例： 举例1： 读缓冲区刚开始是空的 读缓冲区写入2KB数据 水平触发和边缘触发模式此时都会发出可读信号 收到信号通知后，读取了1KB的数据，读缓冲区还剩余1KB数据 水平触发会再次进行通知，而边缘触发不会再进行通知 举例2： 水平触发：0为无数据，1为有数据。缓冲区有数据则一直为1，则一直触发。 边缘触发：0为无数据，1为有数据，只要在0变到1的上升沿才触发。 netpollclose() 把文件描述符fd从poller实例中移除，也就是从epoll中删除。 1 2 3 4 5 6 func netpollclose(fd uintptr) int32 { var ev epollevent // _EPOLL_CTL_DEL 从epoll文件描述符epfd中删除目标文件描述符fd。 // 该事件被忽略，可以为NULL。 return -epollctl(epfd, _EPOLL_CTL_DEL, int32(fd), \u0026ev)\t} netpollIsPollDescriptor() 判断是否是顶层poll，以及是pip2创建的读和写文件描述符。 判断文件描述符是否被poller使用。epfd、netpollBreakRd、netpollBreakWr属于被poller使用的描述符。 1 2 3 func netpollIsPollDescriptor(fd uintptr) bool { return fd == uintptr(epfd) || fd == netpollBreakRd || fd == netpollBreakWr } netpollBreak() 用来唤醒阻塞中的netpoll，它实际上就是向netpollBreakWr描述符中写入数据，这样一来epoll就会监听到。 netpollBreakRd的EPOLLIN事件(EPOLLIN表示对应的文件描述符可以读（包括对端SOCKET正常关闭）)。netpollBreak中断epollwait。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 // netpollBreak interrupts an epollwait. func netpollBreak() { // netpollWakeSig信号主要用于本轮已经通知过IO轮询，但是还没处理有其他的调用此方法时 // 使用原子操作将netpollWakeSig由0变成1，表示正在唤醒epoll。 if atomic.Cas(\u0026netpollWakeSig, 0, 1) {\tfor { var b byte // 向netpollBreakWr中写入数据，会导致那些阻塞在netpoll函数中的线程直接返回去执行后面代码 // netpollBreakWr在pipe2函数中注册时已经设置了非阻塞。因此这里不会阻塞。 n := write(netpollBreakWr, unsafe.Pointer(\u0026b), 1) // 写入成功 if n == 1 { break } // 在写入任何数据之前，调用被信号中断。 if n == -_EINTR { continue // 重试。 } // 已使用 O_NONBLOCK 选择了非阻塞 I/O，并且写入将阻塞。 // _EAGAIN：表示目前没有可用的数据 if n == -_EAGAIN { return } println(\"runtime: netpollBreak write failed with\", -n) throw(\"runtime: netpollBreak write failed\") } } } netpoll() netpoll检查准备就绪的网络连接。返回可运行的goroutine列表。 参数： delay \u003c 0：无限期阻塞。 delay == 0：不阻塞，立即返回。 delay \u003e 0：阻塞长达delay纳秒。 返回值：gList：一组就绪的goroutine。 根据入参delay设置调用epoll_wait的timeout值，调用epoll_wait从epoll的eventpoll.rdllist双向列表中获取IO就绪的fd列表，遍历epoll_wait返回的fd列表， 根据调用epoll_ctl注册fd时封装的上下文信息组装可运行的goroutine并返回。 执行完netpoll之后，会返回一个就绪fd列表对应的goroutine列表，接下来将就绪的goroutine加入到调度队列中，等待调度运行。 netpoll的调用时机： 在调度器中执行runtime.schedule()，该方法中会执行runtime.findrunnable()函数中调用了runtime.netpoll获取待执行的goroutine。 Go runtime在程序启动的时候会创建一个独立的sysmon监控线程，sysmon每20us~10ms运行一次，每次运行会检查距离上一次执行netpoll是否超过10ms，如果是则会调用一次runtime.netpoll。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 // netpoll checks for ready network connections. // Returns list of goroutines that become runnable. // // delay \u003c 0: blocks indefinitely;\t// delay == 0: does not block, just polls; // delay \u003e 0: block for up to that many nanoseconds; func netpoll(delay int64) gList { // 1) epoll没有初始化 if epfd == -1 {\treturn gList{} } // 2) 下面把纳秒级的 delay 转换成毫秒级的 waitms。 var waitms int32 if delay \u003c 0 { waitms = -1 // 永久阻塞，直到事件就绪返回 } else if delay == 0 { waitms = 0 // 不阻塞，立即返回 } else if delay \u003c 1e6 { // 小于1毫秒，修改为阻塞1毫秒 waitms = 1 // 阻塞1毫秒 } else if delay \u003c 1e15 { // 小于 11.5 day // 1e6 表示 1毫秒 waitms = int32(delay / 1e6) // 阻塞指定毫秒 } else { // An arbitrary cap on how long to wait for a timer. // 1e9 ms == ~11.5 days. waitms = 1e9 // 最长 11.5天 } // 3) 通过epollwait函数等待IO事件，缓冲区大小为128个epollevent。 // 超时时间是 waitms 毫秒。如果 epollwait函数被中断打断，就通过goto来重试。 // waitms 大于0时不会重试，因为需要返回调用者中去重新计算超时时间。 // 下面传入epollwait的数量是128，表示一次最大就绪128个事件 // 这样可能存在此次大于128数量时，需要等到下一个IO轮询时间窗口 // type epollevent struct { // events uint32 // 事件类型 // data [8]byte // 存储用户数据，刚好是一个指针存储的大小，该数据用户是可以修改的 // } var events [128]epollevent // 用于存储已经准备好的描述符的事件数据 retry: // 调用epollwait等待文件描述符转换成可写或可读，如果没有epollwait会阻塞 n := epollwait(epfd, \u0026events[0], int32(len(events)), waitms) // 返回活跃的数量n if n \u003c 0 { // EBADF：epfd 不是有效的文件描述符。 // EFAULT：事件指向的内存区域无法用写权限访问。 // EINVAL：epfd 不是epoll文件描述符，或者maxevents(第三个参数)小于等于0。 if n != -_EINTR { // EINTR 被CPU中断 println(\"runtime: epollwait on fd\", epfd, \"failed with\", -n) throw(\"runtime: netpoll failed\") } // If a timed sleep was interrupted, just return to // recalculate how long we should sleep now. // // 如果定时睡眠被中断，只需返回重新计算我们现在应该睡多久。 // _EINTR: 在任何请求的事件发生或超时到期之前，该调用被信号处理程序中断。 if waitms \u003e 0 { return gList{} } // 被中断 AND waitms \u003c= 0 情况重试 goto retry } // type gList struct { head guintptr } var toRun gList // 意味着被监控的文件描述符出现了待处理的事件 for i := int32(0); i \u003c n; i++ { // 就绪的IO事件集 ev := \u0026events[i] // 当前就绪描述符没有事件类型，直接跳过 if ev.events == 0 { continue } // 事件来源是否是netpollBreakRd，该描述符来之pipe2函数创建 // 来自pipe2函数创建的通信，netpollBreakRd是LT水平触发如果不读取会一直触发 // 该事件来自 netpollBreak() 方法，该方法只会在创建timer时和findRunnable()函数中被调用。 if *(**uintptr)(unsafe.Pointer(\u0026ev.data)) == \u0026netpollBreakRd { // 对于文件描述符 netpollBreakRd 而言，只有 _EPOLLIN 事件是正常的，其他都会被视为异常。 if ev.events != _EPOLLIN { println(\"runtime: netpoll: break fd ready for\", ev.events) throw(\"runtime: netpoll: break fd ready for something unexpected\") } // 这种情况下只处理不是立即返回情况下，如果是立即返回情况时，数据并未被读取，下次还会触发该信号 // 这种情况下只在runtime.findrunnable()函数中存在，线程在寻找g无果时，最后只能在IO轮询处等待 // 只有在 delay 不为0，也就是阻塞式netpoll时，才读取netpollBreakRd中的数据。 if delay != 0 { // netpollBreakRd 的本意也是只唤醒delay != 0的netpoll，因为这些在阻塞需要返回 // netpollBreak could be picked up by a // nonblocking poll. Only read the byte // if blocking. // netpollBreak 可以通过非阻塞轮询来获取。 仅在阻塞时读取字节。 var tmp [16]byte // 把写入的数据读取让缓存区为空 read(int32(netpollBreakRd), noescape(unsafe.Pointer(\u0026tmp[0])), int32(len(tmp)))\t// 将netpollWakeSig由1变成0，表示当前事件已被读取 atomic.Store(\u0026netpollWakeSig, 0)\t} continue } // 根据epoll返回的IO事件标志位为mode赋值 // r 表示可读，w 表示可写，r+w 表示既可读又可写。 // 检测IO事件中的错误标志位，并相应的为pd.everr赋值。 // 判断发生的事件类型,读类型或者写类型 var mode int32\t// 存储当前类型 // EPOLLIN ：表示对应的文件描述符可以读（包括对端SOCKET正常关闭） // EPOLLRDHUP：对端描述符产生一个挂断事件 // EPOLLHUP：本端描述符产生一个挂断事件，默认监测事件 // EPOLLERR：表示对应的文件描述符发生错误 if ev.events\u0026(_EPOLLIN|_EPOLLRDHUP|_EPOLLHUP|_EPOLLERR) != 0 { mode += 'r' } // EPOLLOUT：表示对应的文件描述符可以写 // EPOLLHUP：本端描述符产生一个挂断事件，默认监测事件 // EPOLLERR：表示对应的文件描述符发生错误 if ev.events\u0026(_EPOLLOUT|_EPOLLHUP|_EPOLLERR) != 0 { mode += 'w' } // mode不为0，表示有IO事件，需要从ev.data字段得到与IO事件关联的pollDesc。 if mode != 0 { // 取出保存在 epollevent 里的pollDesc，因为要根据这个内容去恢复g如果g已被挂起时 pd := *(**pollDesc)(unsafe.Pointer(\u0026ev.data)) // *pollDesc // 对应的_EPOLLERR文件描述符出现错误时，标记错误 pd.setEventErr(ev.events == _EPOLLERR)\t// 设置pollDesc的EpollErr错误位，如果是这种状态 netpollready(\u0026toRun, pd, mode)\t// 处理就绪的描述符 } } return toRun } netpollready() go1.19.3/src/runtime/runtime/netpoll.go。 netpollready由特定于平台的netpoll函数调用。它声明与pd相关的fd已经为I/O做好了准备。 toRun参数用于构建一个从netpoll返回的goroutines列表。mode参数是'r'、'w'或'r'+'w'，表示fd是否准备好读、写或同时读和写。 这可能会在整个系统停止时运行，因此不允许设置写屏障。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 // netpollready is called by the platform-specific netpoll function. // It declares that the fd associated with pd is ready for I/O. // The toRun argument is used to build a list of goroutines to return // from netpoll. The mode argument is 'r', 'w', or 'r'+'w' to indicate // whether the fd is ready for reading or writing or both. // // This may run while the world is stopped, so write barriers are not allowed. //go:nowritebarrier func netpollready(toRun *gList, pd *pollDesc, mode int32) { var rg, wg *g if mode == 'r' || mode == 'r'+'w' { // netpollunblock 可能返回 goroutine 或 nil rg = netpollunblock(pd, 'r', true) } if mode == 'w' || mode == 'r'+'w' { wg = netpollunblock(pd, 'w', true) } if rg != nil { // 并入 toRun 中，这部分 goroutine 等待放入调度池中 toRun.push(rg) } if wg != nil { toRun.push(wg) } } netpollunblock() go1.19.3/src/runtime/runtime/netpoll.go。 netpollunblock解除阻塞。 参数： pd *pollDesc：pollDesc。 mode int32：读r或写w。 ioready bool：true-I/O读（用于从pollDesc中获取 goroutine），false-读写超时从pollDesc中获取goroutine。 返回值：*g返回就绪的goroutine，可能是nil。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 func netpollunblock(pd *pollDesc, mode int32, ioready bool) *g { // 根据 mode 从rg或wg取出 goroutine。 gpp := \u0026pd.rg if mode == 'w' { gpp = \u0026pd.wg } for { // 原子读取 old := gpp.Load() // pdReady：表示fd的数据已经就绪，可供读取或写。该值从g修改pdReady。 // 这种情况可能 goroutine 已经被返回给调用者了。什么都不做直接返回。 if old == pdReady { return nil } // nil：没有什么可做的 if old == 0 \u0026\u0026 !ioready { // Only set pdReady for ioready. runtime_pollWait // will check for timeout/cancel before waiting. // // 只在ioready中设置pdReady。runtime_pollWait将在等待之前检查 timeout/cancel。 return nil } // old是0、goroutine、pdWait这三种情况。 var new uintptr if ioready { // 修改为pdReady，表示数据已就绪或写 new = pdReady } // CAS 交换 if gpp.CompareAndSwap(old, new) { // pdWait：表示某个goroutine即将挂起并等待fd的可读可写事件。 if old == pdWait { old = 0 // nil } return (*g)(unsafe.Pointer(old)) // nil 或 *g } } } wakeNetPoller() 该函数在time源码中被调用，用于判断是否需要发起I/O网络轮询。 该方法是为了防止定时器触发时间到了没有线程能触发的情况，当只剩阻塞在netpoll的线程或所有的线程都处于等待中时，timer可能不能按时触发的情况。 wakeenetpoller唤醒在网络轮询器(network poller)中睡眠的线程，如果它不打算在when参数之前被唤醒; 或者唤醒一个空闲的P来服务计时器(timers)和网络轮询器(network poller)(如果还没有的话)。 when int64：表示最近的timer触发的时间点，因此为了避免当前最近的timer到时间能准时触发，需要调整netpoll的阻塞事件点。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 // wakeNetPoller wakes up the thread sleeping in the network poller if it isn't // going to wake up before the when argument; or it wakes an idle P to service // timers and the network poller if there isn't one already. func wakeNetPoller(when int64) { // sched.lastpoll：记录的是上次执行netpoll的时间，如果等于0，则表示某个线程正在阻塞式地执行netpoll。 // sched.lastpoll 被设置为0只会在 findrunnable 函数中。 if atomic.Load64(\u0026sched.lastpoll) == 0 { // In findrunnable we ensure that when polling the pollUntil // field is either zero or the time to which the current // poll is expected to run. This can have a spurious wakeup // but should never miss a wakeup. // // 在 findrunnable 中，我们要确保轮询时 pollUntil 字段要么是0，要么为当前poll预期运行的时间。 // 这里可能会是一个虚假的唤醒，但不应该错过唤醒。 // sched.pollUntil：表示阻塞式地netpoll将在何时被唤醒。该值在 findrunnable 函数中被设置。 // sched.pollUntil 值大于0时，表示最近的timer触发时间段。 pollerPollUntil := int64(atomic.Load64(\u0026sched.pollUntil)) // pollerPollUntil \u003e when：存在最新的计时器被加入when时间段后触发 if pollerPollUntil == 0 || pollerPollUntil \u003e when { netpollBreak() } } else { // There are no threads in the network poller, try to get // one there so it can handle new timers. if GOOS != \"plan9\" { // Temporary workaround - see issue #42303. wakep() // 尝试唤醒一个空闲的P起来服务timer和network poller。 } } } netpollarm() 该函数在linux上不会调用，充当一个占位作用。 1 2 3 func netpollarm(pd *pollDesc, mode int) { throw(\"runtime: unused\") // runtime: 未使用的 } 参考 详解Go语言I/O多路复用netpoller模型 epoll详解 epoll源码解析(1) epoll_create ",
   "wordCount" : "1886",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-07-20T21:59:40+08:00",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2024-07-20T21:59:40+08:00",
   "dateModified": "2024-07-20T21:59:40+08:00",
   "author":[{
     "@type": "Person",
@@ -142,14 +142,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/golang/netpoll/epoll/"
+    "@id": "https://helium-chain.github.io/posts/golang/netpoll/epoll/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -171,8 +171,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -199,32 +199,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -236,7 +236,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/netpoll/">第16章 netpoll</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/golang/netpoll/">第16章 netpoll</a></div>
     <h1 class="post-title entry-hint-parent">
       Golang epoll
     </h1>
@@ -275,8 +275,8 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://helium.github.io/tags/netpoll/" target="_blank" rel="noopener">Netpoll</a>
+            <a href="https://helium-chain.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium-chain.github.io/tags/netpoll/" target="_blank" rel="noopener">Netpoll</a>
         </ul>
       </span>
       
@@ -1358,16 +1358,16 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
-      <li><a href="https://helium.github.io/tags/netpoll/">Netpoll</a></li>
+      <li><a href="https://helium-chain.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium-chain.github.io/tags/netpoll/">Netpoll</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/golang/netpoll/linux/">
+  <a class="prev" href="https://helium-chain.github.io/posts/golang/netpoll/linux/">
     <span class="title">« 上一页</span>
     <br>
     <span>Linux epoll</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/vue/component/register/">
+  <a class="next" href="https://helium-chain.github.io/posts/vue/component/register/">
     <span class="title">下一页 »</span>
     <br>
     <span>注册</span>

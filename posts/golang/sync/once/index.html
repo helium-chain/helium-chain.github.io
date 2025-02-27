@@ -9,18 +9,18 @@
 <meta name="keywords" content="golang, sync, Once">
 <meta name="description" content="💥本文章所有相关go代码参考自go 1.18版本">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/golang/sync/once/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/golang/sync/once/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/golang/sync/once/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/golang/sync/once/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,13 +77,13 @@
 <meta property="og:title" content="sync.Once" />
 <meta property="og:description" content="💥本文章所有相关go代码参考自go 1.18版本" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/golang/sync/once/" />
-<meta property="og:image" content="https://helium.github.io/images/Once-cover.png" /><meta property="article:section" content="posts" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/golang/sync/once/" />
+<meta property="og:image" content="https://helium-chain.github.io/images/Once-cover.png" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-07-14T13:10:26+08:00" />
 <meta property="article:modified_time" content="2024-07-14T13:10:26+08:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/images/Once-cover.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/images/Once-cover.png" />
 <meta name="twitter:title" content="sync.Once"/>
 <meta name="twitter:description" content="💥本文章所有相关go代码参考自go 1.18版本"/>
 
@@ -97,25 +97,25 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Golang",
-      "item": "https://helium.github.io/posts/golang/"
+      "item": "https://helium-chain.github.io/posts/golang/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "sync",
-      "item": "https://helium.github.io/posts/golang/sync/"
+      "item": "https://helium-chain.github.io/posts/golang/sync/"
     }, 
     {
       "@type": "ListItem",
       "position":  4 ,
       "name": "sync.Once",
-      "item": "https://helium.github.io/posts/golang/sync/once/"
+      "item": "https://helium-chain.github.io/posts/golang/sync/once/"
     }
   ]
 }
@@ -133,7 +133,7 @@
   "articleBody": "type Once struct 🚀 Once是只执行一次动作的对象，应用场景，比如加载配置文件只需要加载一次。 首次使用Once后，不能复制Once。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 // Once is an object that will perform exactly one action. // // A Once must not be copied after first use. type Once struct { // done indicates whether the action has been performed. // It is first in the struct because it is used in the hot path. // The hot path is inlined at every call site. // Placing done first allows more compact instructions on some architectures (amd64/386), // and fewer instructions (to calculate offset) on other architectures. // // done 表示操作是否已经执行。 // 它在结构体中位于首位，因为它在 hot path 中使用。 // hot path 内联在每个调用点。 // 在某些体系结构上(amd64/386)，将done放在第一位可以让指令更紧凑，而在其他体系结构上可以让指令更少(用于计算偏移量)。 done uint32\t// 0.未被调用过 1.已被调用过 m Mutex\t// 互斥锁 } // 其中解释了为什么将 done 置为 Once 的第一个字段：done 在热路径中，done 放在第一个字段，能够减少 CPU 指令，也就是说，这样做能够提升性能。 // 1. 热路径(hot path)是程序非常频繁执行的一系列指令，sync.Once 绝大部分场景都会访问 o.done，在热路径上是比较好理解的， //\t如果 hot path 编译后的机器码指令更少，更直接，必然是能够提升性能的。 // 2. 为什么放在第一个字段就能够减少指令呢？因为结构体第一个字段的地址和结构体的指针是相同的，如果是第一个字段，直接对结构体的指针解引用即可。 // 如果是其他的字段，除了结构体指针外，还需要计算与第一个值的偏移(calculate offset)。在机器码中，偏移量是随指令传递的附加值， // CPU 需要做一次偏移值与指针的加法运算，才能获取要访问的值的地址。因为，访问第一个字段的机器代码更紧凑，速度更快。 Do() 当且仅当 Do 是第一次为 Once 实例调用函数 f 时，Do 才会调用函数 f。 换句话说，给定var once Once，如果 once.Do(f) 被多次调用，只有第一次调用会调用f，即使每次调用 f 的值不同。 每个函数执行时都需要一个 Once 的新实例。 Do 用于必须只运行一次的初始化。 由于 f 是 niladic，因此可能需要使用函数字面量来捕获Do调用的函数的参数:config.once.Do(func() { config.init(filename) }) niladic：被解释为不带参数的闭包函数。 因为只有在对 f 的调用返回之前，才会返回对 Do 的调用，如果 f 导致Do被调用，它就会死锁。（f函数内不能在调用外层的Do函数） 如果f发生panic，Do认为它回来了;Do的后续调用不需要调用f。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 // Do calls the function f if and only if Do is being called for the // first time for this instance of Once. In other words, given // var once Once // if once.Do(f) is called multiple times, only the first call will invoke f, // even if f has a different value in each invocation. A new instance of // Once is required for each function to execute. // // Do is intended for initialization that must be run exactly once. Since f // is niladic, it may be necessary to use a function literal to capture the // arguments to a function to be invoked by Do: // config.once.Do(func() { config.init(filename) }) // // Because no call to Do returns until the one call to f returns, if f causes // Do to be called, it will deadlock. // // If f panics, Do considers it to have returned; future calls of Do return // without calling f. func (o *Once) Do(f func()) { // Note: Here is an incorrect implementation of Do: // //\tif atomic.CompareAndSwapUint32(\u0026o.done, 0, 1) { //\tf() //\t} // // Do guarantees that when it returns, f has finished. // This implementation would not implement that guarantee: // given two simultaneous calls, the winner of the cas would // call f, and the second would return immediately, without // waiting for the first's call to f to complete. // This is why the slow path falls back to a mutex, and why // the atomic.StoreUint32 must be delayed until after f returns. // // 注意:下面是一个不正确的Do实现。 // 以下形式不能保证Do函数返回时f函数已执行完，因为我们是先标记后执行f的。 // if atomic.CompareAndSwapUint32(\u0026o.done, 0, 1) { // f() // } // // Do 保证当它返回时，f 已经完成 // 这种实现不会实现这种保证:给定两个同时调用，cas的赢家将调用f，而第二个将立即返回，而无需等待第一个调用完成。 // 这就是慢路径回退到互斥量的原因，也是原子性的原因。StoreUint32必须延迟到f返回之后。 // 后续大部分情况会从这里判断失败 if atomic.LoadUint32(\u0026o.done) == 0 { // Outlined slow-path to allow inlining of the fast-path. o.doSlow(f) } } doSlow() 1 2 3 4 5 6 7 8 9 10 11 12 func (o *Once) doSlow(f func()) { o.m.Lock() // 获取锁 defer o.m.Unlock() // 延迟释放锁 // 当出现并发时，这里会拦住等待着的协程 if o.done == 0 {\t// 在f()执行完后才会标记done为1。 defer atomic.StoreUint32(\u0026o.done, 1) // 需要保证f函数不会发生panic // 如果发生panic，则o.done会被标记为1，后续不会在调用f函数 f() } } 使用场景 sync.Once 是 Go 标准库提供的使函数只执行一次的实现。 常应用于【单例模式】，例如【初始化配置】、【保持数据库连接】等。作用与 init 函数类似，但有区别。 init 函数是当所在的 package 首次被加载时执行，若迟迟未被使用，则既浪费了内存，又延长了程序加载时间。 sync.Once 可以在代码的任意位置初始化和调用，因此可以延迟到使用时再执行，并发场景下是线程安全的。 在多数情况下，sync.Once 被用于控制变量的初始化，这个变量的读写满足如下三个条件： 当且仅当第一次访问某个变量时，进行初始化（写）。 变量初始化过程中，所有读都被阻塞，直到初始化完成。 变量仅初始化一次，初始化完成后驻留在内存里。 sync.Once 仅提供了一个方法 Do，参数 f 是对象初始化函数。 func (o *Once) Do(f func())。 使用示例 简单的示例 考虑一个简单的场景，函数 ReadConfig 需要读取环境变量，并转换为对应的配置。 环境变量在程序执行前已经确定，执行过程中不会发生改变。 ReadConfig 可能会被多个协程并发调用，为了提升性能（减少执行时间和内存占用），使用 sync.Once 是一个比较好的方式。 在这个例子中，声明了 2 个全局变量，once 和 config。 config 是需要在 ReadConfig 函数中初始化的(将环境变量转换为 Config 结构体)，ReadConfig 可能会被并发调用。 如果 ReadConfig 每次都构造出一个新的 Config 结构体，既浪费内存，又浪费初始化时间。 如果 ReadConfig 中不加锁，初始化全局变量 config 就可能出现并发冲突。 这种情况下，使用 sync.Once 既能够保证全局变量初始化时是线程安全的，又能节省内存和初始化时间。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 type Config struct { Server string Port int64 } var ( once sync.Once config *Config ) func ReadConfig() *Config { once.Do(func() { var err error config = \u0026Config{Server: os.Getenv(\"TT_SERVER_URL\")} config.Port, err = strconv.ParseInt(os.Getenv(\"TT_PORT\"), 10, 0) if err != nil { config.Port = 8080 // default port } log.Println(\"init config\") }) return config } func main() { for i := 0; i \u003c 10; i++ { go func() { _ = ReadConfig() }() } time.Sleep(time.Second) } 标准库中的使用 比如 package html 中，对象 entity 只被初始化一次。 字典 entity 包含 2005 个键值对，若使用 init 在包加载时初始化，若不被使用，将会浪费大量内存。 html.UnescapeString(s) 函数是线程安全的，可能会被用户程序在并发场景下调用，因此对 entity 的初始化需要加锁，使用 sync.Once 能保证这一点。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 var populateMapsOnce sync.Once var entity map[string]rune func populateMaps() { entity = map[string]rune{ \"AElig;\": '\\U000000C6', \"AMP;\": '\\U00000026', \"Aacute;\": '\\U000000C1', \"Abreve;\": '\\U00000102', \"Acirc;\": '\\U000000C2', // 省略 2000 项 } } func UnescapeString(s string) string { populateMapsOnce.Do(populateMaps) i := strings.IndexByte(s, '\u0026') if i \u003c 0 { return s } // 省略后续的实现 } 普通示例 对只需要运行一次的代码，如全局性的初始化操作，或者防止多次重复执行（比如重复提交等）都有很好的作用 无论 sync.Once.Do(f func()) 里面的f函数是否变化，只要 Once.Do() 运行一次就没有机会再次运行了 Once 是一个结构体，通过判断 done 值来确定是否执行下一步 当 done 为1时直接返回，否则锁定后执行f函数以及置done值为1 而对 done 的值得修改使用了 atomic.StoreUint32（原子级的操作） 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 package main import ( \"fmt\" \"sync\" \"time\" ) var once sync.Once func onces() { fmt.Println(\"once\") } func onced() { fmt.Println(\"onced\") } func main() { for i, v := range make([]string, 10){ once.Do(onces) fmt.Println(\"v:\", v, \"--i:\", i) } for i := 0; i \u003c 10; i++ { go func(i int) { once.Do(onced) fmt.Println(i) }(i) } time.Sleep(3 * time.Second) } once v: --i: 0 v: --i: 1 v: --i: 2 v: --i: 3 v: --i: 4 v: --i: 5 v: --i: 6 v: --i: 7 v: --i: 8 v: --i: 9 0 1 3 4 2 6 5 7 8 9 ",
   "wordCount" : "1015",
   "inLanguage": "zh",
-  "image":"https://helium.github.io/images/Once-cover.png","datePublished": "2024-07-14T13:10:26+08:00",
+  "image":"https://helium-chain.github.io/images/Once-cover.png","datePublished": "2024-07-14T13:10:26+08:00",
   "dateModified": "2024-07-14T13:10:26+08:00",
   "author":[{
     "@type": "Person",
@@ -141,14 +141,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/golang/sync/once/"
+    "@id": "https://helium-chain.github.io/posts/golang/sync/once/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -170,8 +170,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -198,32 +198,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -235,7 +235,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/golang/sync/">sync</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/golang/">Golang</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/golang/sync/">sync</a></div>
     <h1 class="post-title entry-hint-parent">
       sync.Once
     </h1>
@@ -274,9 +274,9 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
-            <a href="https://helium.github.io/tags/sync/" target="_blank" rel="noopener">Sync</a>
-            <a href="https://helium.github.io/tags/once/" target="_blank" rel="noopener">Once</a>
+            <a href="https://helium-chain.github.io/tags/golang/" target="_blank" rel="noopener">Golang</a>
+            <a href="https://helium-chain.github.io/tags/sync/" target="_blank" rel="noopener">Sync</a>
+            <a href="https://helium-chain.github.io/tags/once/" target="_blank" rel="noopener">Once</a>
         </ul>
       </span>
       
@@ -288,8 +288,8 @@
 </div>
   </header> 
 <figure class="entry-cover1">
-        <img loading="eager" srcset="https://helium.github.io/posts/golang/sync/once/images/Once-cover_hu345b664b832432c9df31c999b5f18aa0_47046_360x0_resize_box_3.png 360w ,https://helium.github.io/posts/golang/sync/once/images/Once-cover_hu345b664b832432c9df31c999b5f18aa0_47046_480x0_resize_box_3.png 480w ,https://helium.github.io/posts/golang/sync/once/images/Once-cover_hu345b664b832432c9df31c999b5f18aa0_47046_720x0_resize_box_3.png 720w ,https://helium.github.io/posts/golang/sync/once/images/Once-cover.png 800w" 
-            sizes="(min-width: 768px) 720px, 100vw" src="https://helium.github.io/posts/golang/sync/once/images/Once-cover.png" alt="" 
+        <img loading="eager" srcset="https://helium-chain.github.io/posts/golang/sync/once/images/Once-cover_hu345b664b832432c9df31c999b5f18aa0_47046_360x0_resize_box_3.png 360w ,https://helium-chain.github.io/posts/golang/sync/once/images/Once-cover_hu345b664b832432c9df31c999b5f18aa0_47046_480x0_resize_box_3.png 480w ,https://helium-chain.github.io/posts/golang/sync/once/images/Once-cover_hu345b664b832432c9df31c999b5f18aa0_47046_720x0_resize_box_3.png 720w ,https://helium-chain.github.io/posts/golang/sync/once/images/Once-cover.png 800w" 
+            sizes="(min-width: 768px) 720px, 100vw" src="https://helium-chain.github.io/posts/golang/sync/once/images/Once-cover.png" alt="" 
             width="800" height="600">
         
 </figure><aside id="toc-container" class="toc-container wide">
@@ -862,17 +862,17 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/golang/">Golang</a></li>
-      <li><a href="https://helium.github.io/tags/sync/">Sync</a></li>
-      <li><a href="https://helium.github.io/tags/once/">Once</a></li>
+      <li><a href="https://helium-chain.github.io/tags/golang/">Golang</a></li>
+      <li><a href="https://helium-chain.github.io/tags/sync/">Sync</a></li>
+      <li><a href="https://helium-chain.github.io/tags/once/">Once</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/golang/sync/rwmutex/">
+  <a class="prev" href="https://helium-chain.github.io/posts/golang/sync/rwmutex/">
     <span class="title">« 上一页</span>
     <br>
     <span>sync.RwMutex</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/golang/sync/mutex/">
+  <a class="next" href="https://helium-chain.github.io/posts/golang/sync/mutex/">
     <span class="title">下一页 »</span>
     <br>
     <span>sync.Mutex</span>

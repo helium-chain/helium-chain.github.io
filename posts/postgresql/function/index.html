@@ -9,18 +9,18 @@
 <meta name="keywords" content="pgsql">
 <meta name="description" content="pgSQL 常用函数简介。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/postgresql/function/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/postgresql/function/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/postgresql/function/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/postgresql/function/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="常用函数" />
 <meta property="og:description" content="pgSQL 常用函数简介。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/postgresql/function/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/postgresql/function/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-09-19T00:00:00+00:00" />
 <meta property="article:modified_time" content="2024-09-19T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="常用函数"/>
 <meta name="twitter:description" content="pgSQL 常用函数简介。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "PostgreSQL",
-      "item": "https://helium.github.io/posts/postgresql/"
+      "item": "https://helium-chain.github.io/posts/postgresql/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "常用函数",
-      "item": "https://helium.github.io/posts/postgresql/function/"
+      "item": "https://helium-chain.github.io/posts/postgresql/function/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": "数学函数 算数运算符 运算符 描述 示例 结果 + 加法 2 + 3 5 - 减法 2 - 3 -1 * 乘法 2 * 3 6 / 整除 5 / 2 2 % 模除（求余） 5 % 4 1 ^ 求幂（左边为底数，右边为指数） 2.0 ^ 3.0 8 |/ 平方根 |/ 25.0 5 ||/ 立方根 ||/ 27.0 3 ! 阶乘(测试失败) 5 ! 120 !! 阶乘（前置运算符）(测试失败) !! 5 120 @ 绝对值(注意空格) @ -5.0 5 \u0026 按位与 91 \u0026 15 11 | 按位或 32 | 3 35 # 按位异或 17 # 5 20 ~ 按位非 ~1 -2 « 按位左移 1 « 4 16 » 按位右移 8 » 2 2 绝对值 abs(x)函数用于计算 x 的绝对值。 SELECT abs(-17.4); -- | abs | -- |------| -- | 17.4 | 取整 ceil(dp)/ceiling(dp)函数用于计算大于或等于 dp 的最小整数。 floor(dp)函数用于计算小于或等于 dp 的最大整数。 round(dp)函数四舍五入为整数。 trunc(dp)函数向零取整。 SELECT ceil(-42.8), floor(-42.8), round(12.45), trunc(12.8); -- | ceil | floor | round | trunc | -- |------|-------|-------|-------| -- | -42 | -43 | 12 | 12 | 另外，round(dp, s)函数四舍五入到 s 位小数。 trunc(dp, s)函数截断到 s 位小数。 SELECT round(12.4565, 2), round(12.4564, 3); -- | round | round(1) | -- |-------|----------| -- | 12.46 | 12.456 | SELECT trunc(12.4565, 2), trunc(12.4564, 3); -- | trunc | trunc(1) | -- |-------|----------| -- | 12.45 | 12.456 | 乘方与开方 power(a, b)函数计算 a 的 b 次方。 sqrt(dp)函数计算 dp 的平方根。 cbrt(dp)函数计算 dp 的立方根。 SELECT power(2, 3), sqrt(4), cbrt(27); -- | power | sqrt | cbrt | -- |-------|------|--------------------| -- | 8 | 2 | 3.0000000000000004 | 指数与对数 exp(dp)函数计算以自然常数 e 为底的指数。 ln(dp)函数计算以自然常数 e 为底数的对数。 log(dp)/log10(dp)函数计算以 10 为底的对数。 log(b, x)函数计算以 b 为底的对数。 SELECT exp(1.0), ln(2.718281828459045), log(100), log(2.0, 16.0); -- | exp | ln | log | log(1) | -- |-------------------|--------------------|-----|--------------------| -- | 2.718281828459045 | 0.9999999999999999 | 2 | 4.0000000000000000 | 整数商和余数 div(y, x)函数计算 y 除以 x 的整数商。 mod(y, x)函数计算 y 除以 x 的余数。 SELECT div(9,4), mod(9,4); -- | div | mod | -- |-----|-----| -- | 2 | 1 | 弧度与角度 degrees(dp)函数用于将弧度转为角度。 radians(dp)函数用于将角度转弧度。 SELECT degrees(1.57), radians(90.0); -- | degrees | radians | -- |-------------------|--------------------| -- | 89.95437383553924 | 1.5707963267948966 | 常量 π pi()函数用于返回常量“π”的值。 SELECT pi(); -- | pi | -- |-------------------| -- | 3.141592653589793 | 符号函数 sign(dp)函数返回参数的正负号，可能的结果为-1、0、+1。 SELECT sign(-8.4); -- | sign | -- |------| -- | -1 | 生成随机数 PostgreSQL 提供了用于返回一个随机数的函数 random()。 SELECT random(); -- | random | -- |---------------------| -- | 0.895738968003343 | random()返回一个大于等于 0 小于 1 的随机数，类型为双精度浮点数。 setseed(dp)函数可以为随后一次运行的random()函数设置种子数，范围：-1.0 \u003c= dp \u003c= 1.0。 相同的种子可以得到相同的随机数，用于重现结果。 SELECT setseed(0); SELECT random(); -- | random | -- |-----------------------| -- | 3.907985046680551e-14 | 字符函数 字符串连接 concat(str, …)函数用于连接字符串，并且忽略其中的 NULL 参数。 concat_ws(sep, str, …)函数使用指定分隔符 sep 连接字符串。 SELECT concat(2, NULL, 22), concat_ws(' and ', 2, NULL, 22); -- | concat | concat_ws | -- |--------|-----------| -- | 222 | 2 and 22 | 两个竖杠（||）也可以用于连接字符串，但是 NULL 参数将会返回 NULL。 SELECT 'Post'||'greSQL', 'Post'||NULL||'greSQL'; -- | ?column? | ?column? | -- |------------|----------| -- | PostgreSQL | (null) | 字符与编码 ascii(string)函数返回第一个字符的 ASCII 码。对于 UTF8 返回 Unicode 码；对于其他多字节编码，参数必须是一个 ASCII 字符。 SELECT ascii('x'), ascii('好'); -- | ascii | ascii(1) | -- |-------|----------| -- | 120 | 22909 | chr(int)函数返回编码对应的字符。 对于 UTF8，参数指定的是 Unicode 码； 对于其他多字节编码，参数必须对应一个 ASCII 字符。 参数不允许为 0（空字符），因为 text 数据类型不能存储空字符。 SELECT chr(120), chr(22909); -- | chr | chr(1) | -- |-----|--------| -- | x | 好 | 字符串长度 bit_length(string)函数用于计算字符串包含的比特数。 length(string)、 char_length(string)、character_length(string)函数计算字符串包含的字符数。 octet_length(string) 函数计算字符串包含的字节数。 SELECT bit_length('jose'), bit_length('jo好se'), bit_length('jo1se'); -- | bit_length | bit_length(1) | bit_length(2) | -- |------------|---------------|---------------| -- | 32 | 56 | 40 | SELECT length('jose'), length('jo好se'), length('jo1se'); -- | length | length(1) | length(2) | -- |------------|---------------|---------------| -- | 4 | 5 | 5 | SELECT char_length('jose'), char_length('jo好se'), char_length('jo1se'); -- | char_length| char_length(1)| char_length(2)| -- |------------|---------------|---------------| -- | 4 | 5 | 5 | SELECT character_length('jose'), character_length('jo好se'), character_length('jo1se'); -- | character_length | character_length(1) | character_length(2) | -- |------------------|---------------------|---------------------| -- | 4 | 5 | 5 | SELECT octet_length('jose'), octet_length('jo好se'), octet_length('jo1se'); -- | octet_length | octet_length(1) | octet_length(2) | -- |--------------|-----------------|-----------------| -- | 4 | 7 | 5 | 大小写转换 lower(string)函数将字符串转换为小写形式。 upper(string)函数将字符串转换为大写形式。 initcap(string)函数将每个单词的首字母大写，其他字母小写。 SELECT lower('TOM'), upper('tom'), initcap('hi THOMAS'); -- | lower | upper | initcap | -- |-------|-------|-----------| -- | tom | TOM | Hi Thomas | 子串查找与替换 substring(string [FROM] [for])函数用于提取从位置 FROM 开始的 for 个字符子串，位置从 1 开始计算。 substr(string, FROM [, count])的作用相同。 SELECT substring('Thomas' FROM 2 for 3), substr('Thomas',2, 3); -- | substring | substr | -- |-----------|--------| -- | hom | hom | left(str, n)函数返回字符串左边的 n 个字符。如果 n 为负数，返回除了最后|n|个字符之外的所有字符。 right(str, n)函数返回字符串右边的 n 个字符。如果 n 为负数，返回除了左边|n|个字符之外的字符。 SELECT left('abcde', 2), left('abcde', -2); -- | left | left(1) | -- |------|---------| -- | ab | abc | SELECT right('abcde', 2), right('abcde', -2); -- | right | right(1) | -- |-------|----------| -- | de | cde | substring(string FROM pattern)函数提取匹配 POSIX 正则表达式的子串。 substring(string FROM pattern for escape)函数提取匹配 SQL 正则表达式的子串。 SELECT substring('Thomas' FROM '...$'), substring('Thomas' FROM '%#\"o_a#\"_' for '#'); -- | substring | substring | -- |-----------|-----------| -- | mas | oma | regexp_match(string, pattern [, flags])函数返回匹配 POSIX 正则表达式的第一个子串。 SELECT regexp_match('foobarbequebaz', '(bar)(beque)'); -- |regexp_match| -- |------------| -- |{bar,beque} | regexp_matches(string, pattern [, flags])函数返回匹配 POSIX 正则表达式的所有子串，结果是一个集合。 SELECT regexp_matches('foobarbequebaz', 'ba.', 'g'); -- | regexp_matches | -- |----------------| -- | {bar} | -- | {baz} | position(substring in string)返回子串的位置。 strpos(string, substring)函数的作用相同，但是参数顺序相反。 SELECT position('om' in 'Thomas'), strpos('Thomas', 'om'); -- | position | strpos | -- |----------|--------| -- | 3 | 3 | starts_with(string, prefix)函数判断 string 是否以 prefix 开头，如果是则返回 true；否则返回false。 SELECT starts_with('alphabet', 'alph'), starts_with('alphabet', 'alxh'); -- |starts_with|starts_with(1)| -- |-----------|--------------| -- | t | f | replace(string, FROM, to)函数将字符串 string 中的 FROM 子串替换为 to 子串。 regexp_replace(string, pattern, replacement [, flags])函数字符串 string 中匹配 POSIX 正则表达式pattern 的子串替换为 replacement。 SELECT replace('abcdefabcdef', 'cd', 'XX'), regexp_replace('Thomas','.[mN]a.', 'M'); -- | replace | regexp_replace | -- |--------------|----------------| -- | abXXefabXXef | ThM | translate(string , FROM , to)函数将字符串 string 中出现在 FROM 中的字符串替换成 to 中相应位置的字符。如果 FROM 长度大于 to，在 to 中没有对应值的字符将被删除。 SELECT translate('12345', '143', 'ax'); -- | translate | -- |-----------| -- | a2x5 | overlay(string placing substring FROM [for])函数使用 substring 覆盖字符串 string 中从FROM 开始的 for 个字符。 SELECT overlay('Txxxxas' placing 'hom' FROM 2 for 4); -- | overlay | -- |---------| -- | Thomas | 截断与填充 trim([leading | trailing | both] [characters] FROM string)函数从字符串的开头（leading）、结尾（trailing）或者两端（both）删除由指定字符 characters（默认为空格）组成的最长子串。 trim([leading | trailing | both] [FROM] string [, characters])函数的作用相同。 SELECT trim(both 'xyz' FROM 'yxTomxx'); -- | btrim | -- |-------| -- | Tom | btrim(string [, characters])函数的作用与上面 trim 函数的 both 选项相同。 ltrim(string [,characters])与上面 trim 函数的 leading 选项相同。 rtrim(string [, characters])函数上面 trim 函数的trailing 选项相同。 SELECT btrim('yxTomxx', 'xyz'), ltrim('yxTomxx', 'xyz'), rtrim('yxTomxx','xyz'); -- | btrim | ltrim | rtrim | -- |-------|-------|-------| -- | Tom | Tomxx | yxTom | lpad(string, length [, fill ])函数在 string 左侧使用 fill 中的字符（默认空格）进行填充，直到长度为 length。如果 string 长度大于 length，从右侧截断到长度 length。 rpad(string, length [, fill ])函数在 string 右侧使用 fill 中的字符（默认空格）进行填充，直到长度为 length。如果 string 长度大于 length，从右侧截断到长度 length。 repeat(string, number)函数将字符串 string 重复 N 次。 SELECT lpad('hi', 5, 'xy'), rpad('hi', 5, 'xy'), repeat('Pg', 4); -- | lpad | rpad | repeat | -- |-------|-------|----------| -- | xyxhi | hixyx | PgPgPgPg | 字符串格式化 format(formatstr , formatarg)用于对字符串格式化，类似于 C 语言中的 sprintf 函数。 SELECT format('Hello %s, %1$s', 'World'); -- | format | -- |--------------------| -- | Hello World, World | MD5 值 md5(string)函数用于返回十六进制格式的 MD5 值。 SELECT md5('abc'); -- | md5 | -- |----------------------------------| -- | 900150983cd24fb0d6963f7d28e17f72 | 字符串拆分 regexp_split_to_table(string, pattern[, flags])函数用于拆分字符串，使用 POSIX 正则表达式作为分隔符。函数的返回类型是 text 集合。 SELECT regexp_split_to_table('hello world', '\\s+'); -- | regexp_split_to_table | -- |-----------------------| -- | hello | -- | world | split_part(string, delimiter, field)函数使用 delimiter 拆分字符串，并返回指定项（从 1 开始计数）。 SELECT split_part('abc~@~def~@~ghi', '~@~', 2); -- | split_part | -- |------------| -- | def | 字符串反转 reverse(str)函数用于将字符串反转。 SELECT reverse('阿萨1的s黄金卡'); -- | reverse | -- |--------------| -- | 卡金黄s的1萨阿 | 日期函数 计算时间间隔 age(timestamp, timestamp)函数用于计算两个时间点之间的间隔， age(timestamp)函数用于计算当前日期的凌晨 12 点到该时间点之间的间隔。 SELECT age(timestamp '2020-12-31', timestamp '2020-01-01'), age(timestamp '2020-01-01'); -- | age | age(1) | -- |---------------|----------------------| -- |11 mons 30 days|4 years 8 mons 19 days| 获取时间中的信息 date_part(text, timestamp)和 extract(field FROM timestamp)函数用于获取日期时间中的某一部分，例如年份、月份、小时等。 date_part(text, interval)和 extract(field FROM interval)函数用于获取时间间隔中的某一部分。 SELECT date_part( 'year', TIMESTAMP '2020-03-03 20:38:40' ), EXTRACT ( YEAR FROM TIMESTAMP '2020-03-03 20:38:40' ), date_part( 'month', INTERVAL '1 years 5 months' ), EXTRACT ( MONTH FROM INTERVAL '1 years 5 months' ); -- |date_part|date_part|date_part|date_part| -- |---------|---------|---------|---------| -- | 2020 | 2020 | 5 | 5 | 通过返回字段的标题可以看出， extract 函数实际上也是调用了 date_part 函数，只是参数方式不同。 这两个函数支持获取的信息包括： century，世纪； day，对于 timestamp，返回月份中的第几天；对于 interval，返回天数； decade，年份除以 10； dow，星期天（0）到星期六（6）； doy，一年中的第几天，（1 - 365/366）； epoch，对于 timestamp WITH time zone，返回 1970-01-01 00:00:00 UTC 到该时间的秒数；对于 date 和 timestamp，回本地时间的 1970-01-01 00:00:00 到该时间的秒数；对于interval，返回以秒数表示的该时间间隔； hour，小时（1 - 23）； isodow， ISO 8601 标准中的星期一（1）到星期天（7）； isoyear， ISO 8601 标准定义的日期所在的年份。每年从包含 1 月 4 日的星期一开始，2017年 01 月 01 日属于 2016 年； microseconds，微秒，包含秒和小数秒在内的数字乘以 1000000； millennium，千年； milliseconds，毫秒，包含秒和小数秒在内的数字乘以 1000； minute，分钟，（ 0 - 59）； month，月份； quarter，季度，（ 1 - 4）； second，秒数，包含小数秒； timezone， UTC 时区，单位为秒； timezone_hour， UTC 时区中的小时部分； timezone_minute， UTC 时区中的分钟部分； week，ISO 8601 标准中的星期几，每年从第一个星期四所在的一周开始； year，年份。 截断日期/时间 date_trunc(field, source [, time_zone ])函数用于将 timestamp、 timestamp WITH time zone、date、 time 或者 interval 数据截断到指定的精度。 SELECT date_trunc( 'year', TIMESTAMP '2020-03-03 20:38:40' ), date_trunc( 'day', timestamptz '2020-03-03 20:38:40+00', 'Asia/Shanghai' ), date_trunc( 'hour', INTERVAL '2 days 3 hours 40 minutes' ); -- | date_trunc | date_trunc(1) | date_trunc(2) | -- | -------------------|----------------------|---------------| -- | 2020-01-01 00:00:00|2020-03-03 16:00:00+00|2 days 03:00:00| date_trunc 函数支持以下截断精度： microseconds milliseconds second minute hour day week month quarter year decade century millennium 创建日期/时间 make_date(year int, month int, day int)函数用于创建一个日期： SELECT make_date(2022, 03, 15); -- | make_date | -- |-----------| -- | 2022-03-15| make_interval(years int DEFAULT 0, months int DEFAULT 0, weeks int DEFAULT 0, days int DEFAULT 0, hours int DEFAULT 0, mins int DEFAULT 0, secs double precision DEFAULT 0.0)函数通过指定年、月、日等信息创建一个时间间隔。 SELECT make_interval(days =\u003e 1, hours =\u003e 5); -- | make_interval | -- |---------------| -- | 1 day 05:00:00| make_time(hour int, min int, sec double precision)函数通过指定小时、分钟和秒数创建一个时间。 SELECT make_time(1, 2, 30.5); -- | make_time | -- |------------| -- | 01:02:30.5 | make_timestamp(year int, month int, day int, hour int, min int, sec double precision) 函数通过指定年、月、日、时、分、秒创建一个时间戳。 SELECT make_timestamp(2020, 3, 15, 8, 20, 23.5); -- | make_timestamp | -- |----------------------| -- | 2020-03-15 08:20:23.5| make_timestamptz(year int, month int, day int, hour int, min int, sec double precision, [ timezone text ])函数通过指定年、月、日、时、分、秒创建一个带时区的时间戳。如果没有指定时区，使用当前时区。 SELECT make_timestamptz(2020, 3, 15, 8, 20, 23.5); -- | make_timestamptz | -- |-------------------------| -- | 2020-03-15 08:20:23.5+08| to_timestamp(double precision)函数将 Unix 时间戳（自从 1970-01-01 00:00:00+00 以来的秒数）转换为 PostgreSQL 时间戳数据。 SELECT to_timestamp(1583152349); -- | to_timestamp | -- |-----------------------| -- | 2020-03-02 12:32:29+00| 获取系统时间 PostgreSQL 提供了大量用于获取系统当前日期和时间的函数，例如 current_date、 current_time、current_timestamp、 clock_timestamp()、 localtimestamp、 now()、 statement_timestamp()等。 同时还支持延迟语句执行的 pg_sleep()等函数，具体可以可以参考这篇文章。 时区转换 AT TIME ZONE 运算符用于将 timestamp without time zone、 timestamp WITH time zone 以及 time WITH time zone 转换为指定时区中的时间。 SELECT TIMESTAMP '2020-03-03 20:38:40' AT TIME ZONE'Asia/Shanghai', TIMESTAMP WITH TIME ZONE'2020-03-03 20:38:40-05:00' AT TIME ZONE'Asia/Shanghai', TIME WITH TIME ZONE'20:38:40-05:00' AT TIME ZONE'Asia/Shanghai'; -- | timezone | timezone | timezone | -- |-----------------------|-------------------|-----------| -- | 2020-03-03 12:38:40+00|2020-03-04 09:38:40|09:38:40+08| timezone(zone, timestamp)函数等价于 SQL 标准中的 timestamp AT TIME ZONE zone。 还有一些关于日期时间的函数，可以参考官方文档。 类型转换 CAST 函数 CAST ( expr AS data_type )函数用于将 expr 转换为 data_type 数据类型。 PostgreSQL 类型转换运算符（::）也可以实现相同的功能。例如： SELECT CAST ('15' AS INTEGER), '2020-03-15'::DATE; -- | int4|date | -- |-----|----------| -- | 15 |2020-03-15| 如果数据无法转换为指定的类型，将会返回错误。 SELECT CAST ('A15' AS INTEGER); --SQL 错误 [22P02]: 错误: 无效的类型 integer 输入语法: \"A15\" 位置： 14 to_date 函数 to_date(string, format)函数用于将字符串 string 按照 format 格式转换为日期类型。 SELECT to_date('2020/03/15','YYYY/MM/DD'); -- | to_date | -- |-----------| -- | 2020-03-15| 其中， YYYY 代表四位数的年； MM 代表两位数的月； DD 代表两位数的日。更多的格式选项可以参考官方文档。 to_timestamp 函数 to_timestamp(string, format)函数用于将字符串 string 按照 format 格式转换为 timestampWITH time zone 类型。 SELECT to_timestamp('2020-03-15 19:08:00.678', 'YYYY-MM-DD HH24:MI:SS.MS'); -- | to_timestamp | -- |---------------------------| -- | 2020-03-15 19:08:00.678+08| 其中， HH24 表示 24 小时制的小时； MI 表示分钟； SS 表示秒数； MS 表示毫秒数。 to_char 函数 to_char(expre, format)函数用于将 timestamp、 interval、 integer、 double precision 或者 numeric类型的值转换为指定格式的字符串。 SELECT to_char(current_timestamp, 'HH24:MI:SS'), to_char(interval '5h 12m 30s', 'HH12:MI:SS'), to_char(-125.8, '999D99'); -- | to_char |to_char |to_char| -- |---------|--------|-------| -- | 21:30:22|05:12:30|-125.80| to_number 函数 to_number(string, format)函数用于将字符串转换为数字。 SELECT to_number('￥125.8', 'L999D9'); -- | to_number| -- |----------| -- | 125.8 | 隐式类型转换 除了显式使用类型转换函数或运算符之外，很多时候 PostgreSQL 会自动执行数据类型的隐式转换。例如： SELECT 1+'2', 'todo: '||current_timestamp; -- | ?column?|?column? | -- |---------|----------------------------------| -- | 3 |todo:2020-03-09 21:49:49.370621+08| ",
   "wordCount" : "1871",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-09-19T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2024-09-19T00:00:00Z",
   "dateModified": "2024-09-19T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/postgresql/function/"
+    "@id": "https://helium-chain.github.io/posts/postgresql/function/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/postgresql/">PostgreSQL</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/postgresql/">PostgreSQL</a></div>
     <h1 class="post-title entry-hint-parent">
       常用函数
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/pgsql/" target="_blank" rel="noopener">Pgsql</a>
+            <a href="https://helium-chain.github.io/tags/pgsql/" target="_blank" rel="noopener">Pgsql</a>
         </ul>
       </span>
       
@@ -1150,15 +1150,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/pgsql/">Pgsql</a></li>
+      <li><a href="https://helium-chain.github.io/tags/pgsql/">Pgsql</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/postgresql/table/">
+  <a class="prev" href="https://helium-chain.github.io/posts/postgresql/table/">
     <span class="title">« 上一页</span>
     <br>
     <span>表和表空间</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/grpc/ssl/">
+  <a class="next" href="https://helium-chain.github.io/posts/grpc/ssl/">
     <span class="title">下一页 »</span>
     <br>
     <span>SSL/TLS 安全</span>

@@ -9,18 +9,18 @@
 <meta name="keywords" content="grpc">
 <meta name="description" content="proto3 文件介绍。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/grpc/proto/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/grpc/proto/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/grpc/proto/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/grpc/proto/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="proto3" />
 <meta property="og:description" content="proto3 文件介绍。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/grpc/proto/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/grpc/proto/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-09-01T00:00:00+00:00" />
 <meta property="article:modified_time" content="2024-09-01T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="proto3"/>
 <meta name="twitter:description" content="proto3 文件介绍。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "gRPC",
-      "item": "https://helium.github.io/posts/grpc/"
+      "item": "https://helium-chain.github.io/posts/grpc/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "proto3",
-      "item": "https://helium.github.io/posts/grpc/proto/"
+      "item": "https://helium-chain.github.io/posts/grpc/proto/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " .proto 文件用于定义服务。以下文档关于 Proto3。 语言指南：https://protobuf.com.cn/programming-guides/proto3/ 定义消息类型 首先让我们看一个非常简单的例子。假设你要定义搜索请求消息格式， 其中每个搜索请求都有一个查询字符串、你感兴趣的特定结果页面以及每页的结果数量。这是用于定义消息类型的 .proto 文件。 文件的第一行指定您正在使用 proto3 语法：如果您不这样做，则协议缓冲区编译器将假定您正在使用 proto2。这必须是文件中的第一行非空、非注释行。 SearchRequest 消息定义指定三个字段（名称/值对），每个字段对应于您希望包含在此类消息中的每条数据。每个字段都有一个名称和一个类型。 syntax = \"proto3\"; message SearchRequest { string query = 1; int32 page_number = 2; int32 result_per_page = 3; } 指定字段类型 在前面的示例中，所有字段都是标量类型：两个整数（page_number 和 results_per_page）和一个字符串（query）。您还可以为字段指定枚举和复合类型，如其他消息类型。 分配字段编号 您必须为消息定义中的每个字段指定 1 到 536,870,911 之间的一个数字，并遵守以下限制： 给定的数字必须在该消息的所有字段中唯一。 字段编号19,000至19,999为 Protocol Buffers 实现保留。如果您在消息中使用这些保留字段编号之一，协议缓冲区编译器将发出警告。 您不能使用任何先前保留的字段编号或已分配给扩展的任何字段编号。 此编号不能在您的消息类型使用后更改，因为它标识了消息线格式中的字段。“更改”字段编号等同于删除该字段并创建一个具有相同类型但新编号的新字段。有关如何正确执行此操作，请参阅删除字段。 字段编号绝不应重复使用。切勿从保留列表中取出字段编号，以与新字段定义重复使用。请参阅重复使用字段编号的后果。 您应该使用字段编号 1 到 15 来设置最常用的字段。较低的字段编号值在有线格式中占用较小的空间。例如，范围为 1 到 15 的字段编号需要一个字节进行编码。范围为 16 到 2047 的字段编号需要两个字节。您可以在协议缓冲区编码中找到更多相关信息。 指定字段标签 消息字段可以是以下之一 optional：optional 字段处于两种可能状态之一，您可以检查该值是否已显式设置。 字段已设置，并且包含显式设置或从线路解析的值。它将序列化到线路。 字段未设置，并将返回默认值。它不会序列化到线路。 repeated：此字段类型可以在格式良好的消息中重复零次或多次。将保留重复值的顺序。 map：这是一个配对键/值字段类型。有关此字段类型的更多信息，请参阅 Maps。 如果没有应用显式字段标签，则假定默认字段标签，称为“隐式字段存在”。（您无法将字段显式设置为此状态。）格式良好的消息可以有零个或一个此字段（但不能多于一个）。您也无法确定此类型的字段是否已从线路解析。隐式存在字段将序列化到线路，除非它是默认值。有关此主题的更多信息，请参阅 字段存在。 在 proto3 中，标量数字类型的 repeated 字段默认使用 packed 编码。您可以在 Protocol Buffer 编码 中了解有关 packed 编码的更多信息。 添加更多消息类型 可以在单个 .proto 文件中定义多个消息类型。如果您要定义多个相关消息，这很有用 - 例如，如果您想定义与 SearchResponse 消息类型相对应的回复消息格式，则可以将其添加到相同的 .proto。 message SearchRequest { string query = 1; int32 page_number = 2; int32 results_per_page = 3; } message SearchResponse { ... } 合并消息会导致膨胀虽然可以在单个 .proto 文件中定义多种消息类型（例如消息、枚举和服务），但当在一个文件中定义大量具有不同依赖项的消息时，它也可能导致依赖项膨胀。建议尽可能在每个 .proto 文件中包含较少的消息类型。 添加注释 要为 .proto 文件添加注释，请使用 C/C++ 样式的 // 和 /* … */ 语法。 /* SearchRequest represents a search query, with pagination options to * indicate which results to include in the response. */ message SearchRequest { string query = 1; int32 page_number = 2; // Which page number do we want? int32 results_per_page = 3; // Number of results to return per page. } 删除字段 如果操作不当，删除字段可能会导致严重问题。 当不再需要某个字段且已从客户端代码中删除所有引用时，可以从消息中删除该字段定义。但是，必须保留已删除的字段号。如果不保留字段号，开发人员将来有可能重新使用该字段号。 还应保留字段名称，以允许消息的 JSON 和 TextFormat 编码继续进行解析。 保留字段 如果通过完全删除字段或将其注释掉来更新消息类型，则未来的开发人员可以在对类型进行自己的更新时重新使用该字段号。这可能会导致严重问题，如重新使用字段号的后果中所述。 为确保这种情况不会发生，请将已删除的字段号添加到 reserved 列表中。为确保消息的 JSON 和 TextFormat 实例仍可解析，还应将已删除的字段名称添加到 reserved 列表中。 如果任何未来的开发人员尝试使用这些保留的字段号或名称，则协议缓冲区编译器会发出警告。 message Foo { reserved 2, 15, 9 to 11; reserved \"foo\", \"bar\"; } 保留的字段号范围是包含的（9 到 11 与 9、10、11 相同）。请注意，不能在同一个 reserved 语句中混合字段名称和字段号。 从 .proto 生成什么？ 在 .proto 上运行协议缓冲区编译器时，编译器会以你选择的语言生成代码，你将需要使用该代码来处理你在文件中描述的消息类型，包括获取和设置字段值、将消息序列化到输出流以及从输入流解析消息。 对于 C++，编译器会为每个 .proto 生成一个 .h 文件和 .cc 文件，其中包含一个类，用于描述文件中所述的每种消息类型。 对于 Java，编译器会生成一个 .java 文件，其中包含一个类，用于描述每种消息类型，以及一个用于创建消息类实例的特殊 Builder 类。 对于 Kotlin，除了生成的 Java 代码之外，编译器还会为每种消息类型生成一个 .kt 文件，其中包含经过改进的 Kotlin API。这包括一个用于简化创建消息实例的 DSL、一个可空字段访问器和一个复制函数。 Python 有点不同 - Python 编译器会生成一个模块，其中包含 .proto 中每种消息类型的静态描述符，然后使用 元类 在运行时创建必要的 Python 数据访问类。 对于 Go，编译器会生成一个 .pb.go 文件，其中包含一个类型，用于描述文件中每种消息类型。 对于 Ruby，编译器会生成一个 .rb 文件，其中包含一个 Ruby 模块，该模块包含您的消息类型。 对于 Objective-C，编译器会为每个 .proto 生成一个 pbobjc.h 文件和 pbobjc.m 文件，其中包含一个类，用于描述文件中所述的每种消息类型。 对于 C#，编译器会为每个 .proto 生成一个 .cs 文件，其中包含一个类，用于描述文件中所述的每种消息类型。 对于 PHP，编译器会为文件中所述的每种消息类型生成一个 .php 消息文件，并为每个编译的 .proto 文件生成一个 .php 元数据文件。元数据文件用于将有效的消息类型加载到描述符池中。 对于 Dart，编译器会生成一个 .pb.dart 文件，其中包含一个类，用于描述文件中每种消息类型。 标量值类型 标量消息字段可以具有以下类型之一。该表显示了 .proto 文件中指定的类型，以及自动生成的类中的相应类型： .proto C++ Java/Kotlin[1] Python[3] Go Ruby C# PHP Dart double double double float float64 Float double float double float float float float float32 Float float float double int32 int32 int int int32 Fixnum or Bignum (as required) int integer int int64 int64 long int/long[4] int64 Bignum long integer/string[6] Int64 uint32 uint32 int[2] int/long[4] uint32 Fixnum or Bignum (as required) uint integer int uint64 uint64 long[2] int/long[4] uint64 Bignum ulong integer/string[6] Int64 sint32 int32 int int int32 Fixnum or Bignum (as required) int integer int sint64 int64 long int/long[4] int64 Bignum long integer/string[6] Int64 fixed32 uint32 int[2] int/long[4] uint32 Fixnum or Bignum (as required) uint integer int fixed64 uint64 long[2] int/long[4] uint64 Bignum ulong integer/string[6] Int64 sfixed32 int32 int int int32 Fixnum or Bignum (as required) int integer int sfixed64 int64 long int/long[4] int64 Bignum long integer/string[6] Int64 bool bool boolean bool bool TrueClass/FalseClass bool boolean bool string string String str/unicode[5] string String (UTF-8) string string String bytes string ByteString str (Python 2) bytes (Python 3) []byte String (ASCII-8BIT) ByteString string List 注意： int32：使用可变长度编码。对负数进行编码效率低下。如果你的字段可能有负值，请改用 sint32。 int64：使用可变长度编码。对负数进行编码效率低下。如果你的字段可能有负值，请改用 sint64。 uint32：使用可变长度编码。 uint64：使用可变长度编码。 sint32：使用可变长度编码。带符号的 int 值。这些比常规 int32 更有效地编码负数。 sint64：使用可变长度编码。带符号的 int 值。这些比常规 int64 更有效地编码负数。 fixed32：总是四个字节。如果值通常大于 2^28，则比 uint32 更有效。 fixed64：总是八个字节。如果值通常大于 2^56，则比 uint64 更有效。 sfixed32：总是四个字节。 sfixed64：总是八个字节。 string：字符串必须始终包含 UTF-8 编码或 7 位 ASCII 文本，并且不能超过 2^32。 bytes：可以包含不超过 2^32 的任意字节序列。 默认值 当解析消息时，如果编码的消息不包含特定的隐式存在元素，则访问解析对象中的相应字段将返回该字段的默认值。这些默认值是特定于类型的 对于字符串，默认值为空字符串。 对于字节，默认值为空字节。 对于布尔值，默认值是 false。 对于数字类型，默认值是零。 对于枚举，默认值是第一个定义的枚举值，它必须是 0。 对于消息字段，该字段未设置。其确切值取决于语言。有关详细信息，请参阅生成代码指南。 重复字段的默认值为空（通常是相应语言中的空列表）。 请注意，对于标量消息字段，一旦解析了消息，就无法判断某个字段是否明确设置为默认值（例如，布尔值是否设置为 false）或根本未设置：在定义消息类型时应牢记这一点。例如，如果您不希望某个布尔值在设置为 false 时开启某些行为，则不要使用该布尔值；另外请注意，如果标量消息字段已设置为其默认值，则该值不会在网络上序列化。如果浮点值或双精度值设置为 +0，则不会对其进行序列化，但 -0 被视为不同的值，并且会进行序列化。 枚举 在定义消息类型时，您可能希望其某个字段仅具有预定义值列表中的一个值。例如，假设您想为每个 SearchRequest 添加一个 corpus 字段，其中语料库可以是 UNIVERSAL、WEB、IMAGES、LOCAL、NEWS、PRODUCTS 或 VIDEO。您可以通过向消息定义中添加一个 enum 来非常简单地实现此目的，其中每个可能的枚举值都有一个常量。 在以下示例中，我们添加了一个名为 Corpus 的 enum，其中包含所有可能的值，以及一个类型为 Corpus 的字段 enum Corpus { CORPUS_UNSPECIFIED = 0; CORPUS_UNIVERSAL = 1; CORPUS_WEB = 2; CORPUS_IMAGES = 3; CORPUS_LOCAL = 4; CORPUS_NEWS = 5; CORPUS_PRODUCTS = 6; CORPUS_VIDEO = 7; } message SearchRequest { string query = 1; int32 page_number = 2; int32 results_per_page = 3; Corpus corpus = 4; } 正如您所见，Corpus 枚举的第一个常量映射到零：每个枚举定义必须包含一个常量，该常量映射到零作为其第一个元素。这是因为 必须有一个零值，以便我们可以使用 0 作为数字 默认值。 零值需要是第一个元素，以与 proto2 语义兼容，其中第一个枚举值是默认值，除非明确指定了不同的值。 您可以通过为不同的枚举常量分配相同的值来定义别名。为此，您需要将 allow_alias 选项设置为 true。否则，当找到别名时，协议缓冲区编译器会生成一条警告消息。尽管所有别名值在反序列化期间都是有效的，但在序列化时始终使用第一个值。 enum EnumAllowingAlias { option allow_alias = true; EAA_UNSPECIFIED = 0; EAA_STARTED = 1; EAA_RUNNING = 1; EAA_FINISHED = 2; } enum EnumNotAllowingAlias { ENAA_UNSPECIFIED = 0; ENAA_STARTED = 1; // ENAA_RUNNING = 1; // Uncommenting this line will cause a warning message. ENAA_FINISHED = 2; } 枚举器常量必须在 32 位整数的范围内。由于 enum 值在传输中使用 varint 编码，因此负值效率低下，因此不推荐使用。您可以像前面的示例中那样在消息定义中定义 enum，也可以在外部定义 - 这些 enum 可以重复用于 .proto 文件中的任何消息定义。您还可以使用在一个消息中声明的 enum 类型作为另一个消息中字段的类型，使用语法 MessageType.EnumType。 当您对使用 enum 的 .proto 运行协议缓冲区编译器时，生成的代码将具有相应的 enum，用于 Java、Kotlin 或 C++，或者一个特殊的 EnumDescriptor 类，用于 Python，该类用于在运行时生成的类中创建一组具有整数值的符号常量。 保留值 如果您通过完全删除枚举项或将其注释掉来 更新枚举类型，则以后的用户可以在对类型进行自己的更新时重用数字值。如果他们稍后加载相同 .proto 的旧版本，则可能会导致严重问题，包括数据损坏、隐私错误等。确保这种情况不会发生的一种方法是指定已删除条目的数字值（和/或名称，这也会导致 JSON 序列化问题）为 reserved。如果任何以后的用户尝试使用这些标识符，协议缓冲区编译器将发出警告。您可以使用 max 关键字指定保留的数字值范围达到最大可能值。 enum Foo { reserved 2, 15, 9 to 11, 40 to max; reserved \"FOO\", \"BAR\"; } 请注意，您不能在同一个 reserved 语句中混合字段名称和数字值。 使用其他消息类型 您可以使用其他消息类型作为字段类型。例如，假设您希望在每个 SearchResponse 消息中包含 Result 消息——要执行此操作，您可以在同一个 .proto 中定义一个 Result 消息类型，然后在 SearchResponse 中指定一个类型为 Result 的字段。 message SearchResponse { repeated Result results = 1; } message Result { string url = 1; string title = 2; repeated string snippets = 3; } 导入定义 在前面的示例中，Result 消息类型在与 SearchResponse 相同的文件中定义——如果您希望用作字段类型的消息类型已在另一个 .proto 文件中定义，该怎么办？ 您可以通过导入其他 .proto 文件来使用其定义。要导入另一个 .proto 的定义，您需要在文件的顶部添加一个导入语句 import \"myproject/other_protos.proto\"; 默认情况下，您只能使用直接导入的 .proto 文件中的定义。但是，有时您可能需要将 .proto 文件移动到新位置。您可以将占位符 .proto 文件放在旧位置，而不是直接移动 .proto 文件并在单个更改中更新所有调用位置，以使用 import public 概念将所有导入转发到新位置。 请注意，Java 中不提供公共导入功能。 导入 proto（其中包含 import public 语句）的任何代码都可以间接依赖 import public 依赖项。例如 // new.proto // All definitions are moved here // old.proto // This is the proto that all clients are importing. import public \"new.proto\"; import \"other.proto\"; // client.proto import \"old.proto\"; // You use definitions from old.proto and new.proto, but not other.proto 协议编译器使用 -I/–proto_path 标志在协议编译器命令行上指定的一组目录中搜索导入的文件。如果未给出标志，它将在编译器被调用的目录中查找。通常，您应该将 –proto_path 标志设置为项目的根目录，并对所有导入使用完全限定名称。 google 内置的类型：https://github.com/protocolbuffers/protobuf/tree/main/src/google/protobuf 嵌套类型 您可以在其他消息类型中定义和使用消息类型，如下例所示——此处 Result 消息在 SearchResponse 消息中定义。 message SearchResponse { message Result { string url = 1; string title = 2; repeated string snippets = 3; } repeated Result results = 1; } 如果您想在父消息类型外部重新使用此消息类型，则将其称为 _Parent_._Type_ message SomeOtherMessage { SearchResponse.Result result = 1; } 您可以根据需要嵌套消息。在下面的示例中，请注意，两个名为 Inner 的嵌套类型完全独立，因为它们在不同的消息中定义 message Outer { // Level 0 message MiddleAA { // Level 1 message Inner { // Level 2 int64 ival = 1; bool booly = 2; } } message MiddleBB { // Level 1 message Inner { // Level 2 int32 ival = 1; bool booly = 2; } } } Any Any 消息类型允许您将消息用作嵌入式类型，而无需其 .proto 定义。Any 包含一个任意序列化的消息作为 bytes，以及一个充当该消息类型的全局唯一标识符并解析为该消息类型的 URL。要使用 Any 类型，您需要 导入 google/protobuf/any.proto。 import \"google/protobuf/any.proto\"; message ErrorStatus { string message = 1; repeated google.protobuf.Any details = 2; } 给定消息类型的默认类型 URL 为 type.googleapis.com/packagename.messagename。 Oneof 如果您有一个包含许多字段的消息，并且最多只能同时设置一个字段，则可以通过使用 oneof 特性来强制执行此行为并节省内存。 Oneof 字段类似于常规字段，除了 oneof 中的所有字段共享内存之外，并且最多只能同时设置一个字段。设置 oneof 的任何成员会自动清除所有其他成员。您可以使用特殊的 case() 或 WhichOneof() 方法（取决于您选择的语言）来检查 oneof 中设置的值（如果有）。 请注意，如果设置了多个值，则按 proto 中的顺序确定的最后一个设置值将覆盖所有前一个值。 oneof 字段的字段编号在封闭消息中必须是唯一的。 要在 .proto 中定义 oneof，请使用 oneof 关键字，后跟您的 oneof 名称，在本例中为 test_oneof message SampleMessage { oneof test_oneof { string name = 4; SubMessage sub_message = 9; } } oneof有如下的语法规定： oneof内的字段和上一层的字段属于同一级别，因此不能重名 oneof内的字段不能用 Repeated 修饰 oneof内同时只能有一个字段被设置。如果oneof字段被重复设置，则以最后设置的结果为准 Map 如果你想将关联映射创建为数据定义的一部分，则协议缓冲区提供了一个方便的快捷语法。 map map_field = N; 其中 key_type 可以是任何整数或字符串类型（因此，除了浮点类型和 bytes 之外的任何 标量 类型）。请注意，枚举和 proto 消息对于 key_type 都是无效的。value_type 可以是任何类型，除了另一个映射。 因此，例如，如果你想创建一个项目映射，其中每个 Project 消息都与一个字符串键相关联，则可以按如下方式定义它 map projects = 3; Map特性： 映射字段不能是 repeated。 线格式排序和映射值映射迭代排序未定义，因此无法依赖映射项按特定顺序排列。 为 .proto 生成文本格式时，映射按键排序。数字键按数字顺序排序。 从线格式解析或合并时，如果存在重复映射键，则使用最后看到的键。从文本格式解析映射时，如果存在重复键，则解析可能会失败。 如果您为映射字段提供键但未提供值，则序列化该字段时的行为取决于语言。在 C++、Java、Kotlin 和 Python 中，将序列化该类型的默认值，而在其他语言中则不序列化任何内容。 package 您可以向 .proto 文件添加可选的 package 说明符，以防止协议消息类型之间的名称冲突。 package foo.bar; message Open { ... } 然后，您可以在定义消息类型的字段时使用包说明符。 message Foo { ... foo.bar.Open open = 1; ... } ",
   "wordCount" : "1083",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2024-09-01T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2024-09-01T00:00:00Z",
   "dateModified": "2024-09-01T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/grpc/proto/"
+    "@id": "https://helium-chain.github.io/posts/grpc/proto/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/grpc/">gRPC</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/grpc/">gRPC</a></div>
     <h1 class="post-title entry-hint-parent">
       proto3
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/grpc/" target="_blank" rel="noopener">Grpc</a>
+            <a href="https://helium-chain.github.io/tags/grpc/" target="_blank" rel="noopener">Grpc</a>
         </ul>
       </span>
       
@@ -941,15 +941,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/grpc/">Grpc</a></li>
+      <li><a href="https://helium-chain.github.io/tags/grpc/">Grpc</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/postgresql/user-role/">
+  <a class="prev" href="https://helium-chain.github.io/posts/postgresql/user-role/">
     <span class="title">« 上一页</span>
     <br>
     <span>用户和角色</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/postgresql/database/">
+  <a class="next" href="https://helium-chain.github.io/posts/postgresql/database/">
     <span class="title">下一页 »</span>
     <br>
     <span>数据库与模式</span>

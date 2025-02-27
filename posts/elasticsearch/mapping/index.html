@@ -9,18 +9,18 @@
 <meta name="keywords" content="elasticsearch">
 <meta name="description" content="索引的创建、修改、删除。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/elasticsearch/mapping/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/elasticsearch/mapping/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/elasticsearch/mapping/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/elasticsearch/mapping/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="Mappings" />
 <meta property="og:description" content="索引的创建、修改、删除。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/elasticsearch/mapping/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/elasticsearch/mapping/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2021-07-27T00:00:00+00:00" />
 <meta property="article:modified_time" content="2021-07-27T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="Mappings"/>
 <meta name="twitter:description" content="索引的创建、修改、删除。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "ElasticSearch",
-      "item": "https://helium.github.io/posts/elasticsearch/"
+      "item": "https://helium-chain.github.io/posts/elasticsearch/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "Mappings",
-      "item": "https://helium.github.io/posts/elasticsearch/mapping/"
+      "item": "https://helium-chain.github.io/posts/elasticsearch/mapping/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " mapping是对索引库中文档的约束。 Mapping 属性 type 字段类型，常用的有 text、keyword、integer等。 index 字段是否建立倒排索引，默认为true。 false情况下不能被搜索，但支持集合分析。 index属性用于控制字段值是否应该被索引，即是否可以在搜索时使用这些值。这个属性通常与字段类型定义一起使用，特别是在创建或更新索引的映射（mapping）时。 作用： 索引：如果字段被设置为index: true（默认值），那么Elasticsearch会为该字段创建倒排索引，这使得你可以通过该字段进行搜索。 不索引：如果字段被设置为index: false，那么Elasticsearch不会为该字段创建倒排索引，因此你无法通过该字段进行搜索，但是该字段的值仍然会存储在 _source 中。 使用场景： 当你有一个字段，它的值不需要被搜索，但是你希望将其值存储在 _source 中以供后续使用，可以将index属性设置为false。 如果你希望加快索引的速度并减少索引的大小，可以选择性地索引某些字段。 与enabled属性不同，index属性可以用来控制字段是否可搜索，而enabled属性则可以完全禁用字段的索引和存储。 示例： PUT /my_index { \"mappings\": { \"properties\": { \"field1\": { \"type\": \"text\", \"index\": true // 默认值，可省略 }, \"field2\": { \"type\": \"keyword\", \"index\": false // 不可搜索，但存在于 _source 中 } } } } enable 字段是否建立倒排索引以及doc value，enabled属性是用来控制字段是否会被索引和搜索的。 可以为每个字段设置enabled属性。 作用： 索引：如果字段被设置为enabled: true（默认值），那么该字段的值会被索引，并且可以在搜索时使用。 搜索：如果字段被设置为enabled: false，那么该字段的值不会被索引，因此不能在搜索时使用，但是仍然可以在文档的源字段中看到。 使用场景： 当你有一个字段，它的数据量非常大，但你又不希望在搜索时使用它，可以将其enabled属性设置为false来节省索引空间。 在某些情况下，你可能希望只存储某些信息而不进行分析或搜索，这时候也可以将字段的enabled属性设置为false。 使用示例： PUT /my_index { \"mappings\": { \"properties\": { \"field1\": { \"type\": \"text\", \"enabled\": true // 默认值，可省略 }, \"field2\": { \"type\": \"keyword\", \"enabled\": false // 既不可搜索也不存在于 _source 中 } } } } 与index区别： 索引与存储：index控制字段是否可搜索，但不影响字段是否存储在 _source 中。enabled控制字段是否被索引和存储。 影响：设置index: false，字段仍然存储在 _source 中，但不参与搜索。设置enabled: false，字段既不索引也不存储。 使用场景：如果你希望字段不参与搜索但仍然想保留其原始值，使用index: false。如果你不希望字段以任何形式出现在Elasticsearch中，使用enabled: false。 store 默认false，字段是否额外存储，如果需要查询获取的字段只是文档中的小数据，这些字段可以store，减少IO。而且这个存储是独于 _source 的存储的。 store属性用于控制字段值是否应该被独立存储，这意味着字段值可以被单独检索，而不需要从整个文档的 _source 字段中提取。 作用： 独立存储：如果字段被设置为store: true，那么该字段的值会被独立存储在Elasticsearch中，这意味着你可以通过单独的字段检索来获取它的值。 不独立存储：如果字段被设置为store: false（默认值），那么该字段的值不会独立存储，但它仍然会作为 _source 的一部分被存储。 使用场景： 当你经常需要从Elasticsearch中检索特定字段的值，而不需要检索整个文档时，将store属性设置为true可以提高检索效率。 如果文档非常大，而你只需要访问其中的几个字段，那么独立存储这些字段可以节省磁盘空间，因为你不需要存储整个 _source。 示例： PUT /my_index { \"mappings\": { \"properties\": { \"field1\": { \"type\": \"text\", \"store\": true // 独立存储字段值 }, \"field2\": { \"type\": \"keyword\", \"store\": false // 默认值，不独立存储字段值 } } } } 注意事项： 设置store: true会增加Elasticsearch的存储需求，因为每个字段值都需要额外存储。 即使将store设置为true，如果index设置为false，该字段仍然不会被索引，因此无法用于搜索。 如果你不需要从 _source 中检索整个文档，而是只需要特定的几个字段，那么独立存储这些字段可以减少网络传输的数据量。 doc_values 默认true，优化字段排序聚合脚本访问，耗用磁盘空间。 fields 多字段特性。让一个字段拥有多个子字段类型，使得一个字段能够被多个不同的索引方式进行索引。 norms 默认为true，是否支持评分，如果字段只用来过滤和聚合分析，而不需要被评分，那么可以设置为false； type 为 text 时，默认为 true；而 type 为 keyword 时，默认为 false。 analyzer 指定索引和搜索时的分析器，如果同时指定 search_analyzer 则搜索时会优先使用 search_analyzer。 search_analyzer 指定搜索时的分析器，搜索时的优先级最高。 fielddata 默认false，针对text类型排序、聚合、脚本访问优化，尽量避免，操作昂贵。 index_options 用于设置倒排（索引）列表包含的信息，这些信息用于搜索（Search）和高亮显示： docs：只索引文档编号(Doc Number)； freqs：索引文档编号和词频率（term frequency）； positions：索引文档编号，词频率和词位置（序号）； offsets：索引文档编号，词频率，词偏移量（开始和结束位置）和词位置（序号）。 默认情况下，被分词的字符串（analyzed string）字段使用 positions，其他字段默认使用 docs。 此外，需要注意的是 index_option 是 elasticsearch 特有的设置属性；临近搜索和短语查询时，index_option 必须设置为 offsets，同时高亮也可使用 postings highlighter。记录内容越多，占用存储空间越大。 type 字符串类型 text 会做分词处理，如果一个字段要被全文搜索，应该使用text类型。 设置 text 类型后，字段内容会被分析，在生成倒排索引前，字符串会被分词器分成一个个词条。 text类型的字段不用于排序，且很少用于聚合(Terms Aggregation除外)。 keyword 不会做分词处理，只能通过精确值搜索到。 该类型适用于索引结构化的字段，通常用于过滤、排序、聚合。 注意：ES5以后，不推荐使用string类型。 数字类型 对于数字类型的字段，在满足需求情况下，尽量选择范围小的数据类型。 字段的长度越短，搜因和搜索的效率越高。 对于浮点数来说, 优先考虑使用 scaled_float 类型。 scaled_float 是通过缩放因子把浮点数变成 long 类型，比如价格只需要精确到分，price 字段的取值为 57.34，设置放大因子为 100，存储起来就是 5734。 所有的 API 都会把 price 的取值当作浮点数，事实上 Elasticsearch 底层存储的是整数类型，因为压缩整数比压缩浮点数更加节省存储空间 ——-类型——- ——-取值范围——- 说明 byte -128 ~ 127 无符号1字节 short -32768 ~ 32767 无符号2字节 integer -2^31 ~ 2^31-1 无符号4字节 long -2^63 ~ 2^63-1 无符号8字节 double 64位双精度IEE754浮点类型 双精度浮点8字节 float 32位单精度IEE754浮点类型 单精度浮点4字节 half_float 16位半精度IEE754浮点类型 2字节 scaled_float 缩放类型浮点数 8字节 日期类型 date 在 ES 中的日期可以是以下几种形式： 格式化日期的字符串，如 “2015-01-01” 或 “2015/01/01 12:10:30” 毫秒时间戳 秒级时间戳 需要注意的是，ES内部会把日期转换为 UTC（世界标准时间），并将其存储为毫秒时间戳，这样做的原因是和字符串相比，数值在存储和处理时更快。 布尔类型 boolean 如果一个字段是布尔类型，可接受的值为 true、false。 Elasticsearch 5.4 版本以前，可以接受被解释为 true 或 false 的字符串和数字，5.4 版本以后只接受 true、false、”true”、”false”。 二进制类型 binary binary 类型数据格式为base64 编码的字符串，默认「不额外存储，也不可搜索」。 范围类型 range integer_range -2^31 至 2^31-1 long_range -2^63 至 2^63-1 float_range 32-bit IEEE 754 double_range 64-bit IEEE 754 date_range 64 位整数，毫秒计时 数组类型 ES中没有专用的数组类型，默认情况下任何字段都可以包含0个或者多个值，但是一个数组中的值必须是同一种类型。 整型数组：[1,3] 嵌套数组：[1,[2,3]]，等价于 [1,2,3] 对象数组: [{“name”: “lili”, “age”: “18”}, {“name”: “liming”, “age”: “20”} ] 动态添加数据时，数组的第一个值的类型决定整个数组的类型。混合数组类型是不支持的，比如：[1，”abc”]。 数组可以包含 null 值，空数组[ ]会被当作 missing field 对待。在文档中使用 array 类型不需要提前做任何配置，默认支持 对象类型 对象类型很好理解，即JSON对象，需要注意的是，es中会对嵌套的JSON对象做扁平化处理。 例如如下数据: { \"name\":\"lili\", \"friend\":[ \"name\":\"xiaohong\" ] } // 存储的时候变成这样: { \"name\":\"lili\", \"friend.name\":\"xiaohong\" } 嵌套类型 嵌套类型是一种特殊的对象类型，es本身会对对象类型字段做扁平化处理，那么当存储的对象类型为对象数组时，会出现关联关系失效的情况。 { \"name\":\"lili\", \"friends\":[ { \"name\":\"xiaohong\", \"age\": 18 }, { \"name\":\"xiaoming\", \"age\": 20 } ] } // 处理后: { \"name\":\"lili\", \"friends.name\":[\"xiaohong\",\"xiaoming\"], \"friend.age\":[18, 20] } IP类型 ip 类型的字段用于存储 IPv4 或者 IPv6 的地址。如”192.168.1.1”或”192.168.0.0/16”。 令牌计数类型 (token_count) token_count 用于统计text分词后的词条个数，本质上是一个整数型字段。举个例子，映射中指定 name 为 text 类型，增加name.length 字段用于统计分词后词项的长度，类型为 token_count，分词器为标准分词器，命令如下： { \"mappings\": { \"my_type\": { \"properties\": { \"name\": { \"type\": \"text\", \"fields\": { \"length\": { \"type\": \"token_count\", \"analyzer\": \"standard\" } } } } } } } 索引库的CRUD 创建 基本语法： 请求方法：PUT 请求路径：/索引名称 请求参数：mapping 有这样一条文档，需要创建索引。 age：类型为 byte；参与搜索，因此需要index为true；无需分词器。 weight：类型为float；参与搜索，因此需要index为true；无需分词器。 isMarried：类型为boolean；参与搜索，因此需要index为true；无需分词器。 info：类型为字符串，需要分词，因此是text；参与搜索，因此需要index为true；分词器可以用ik_smart。 email：类型为字符串，但是不需要分词，因此是keyword；不参与搜索，因此需要index为false；无需分词器。 score：虽然是数组，但是我们只看元素的类型，类型为float；参与搜索，因此需要index为true；无需分词器。 name：类型为object，需要定义多个子属性 name.firstName；类型为字符串，但是不需要分词，因此是keyword；参与搜索，因此需要index为true；无需分词器。 name.lastName；类型为字符串，但是不需要分词，因此是keyword；参与搜索，因此需要index为true；无需分词器。 注意：所有的索引名都必须要小写。 { \"age\": 21, \"weight\": 52.4, \"isMarried\": false, \"info\": \"美好的一天从清晨开始\", \"email\": \"123456@qq.cn\", \"score\": [99.1, 95.5, 98.9], \"name\": { \"firstName\": \"三\", \"lastName\": \"张\" } } 创建demo。 PUT /users { \"aliases\": { \"alias_users\": {} }, \"settings\": { \"index.number_of_shards\": 1, \"index.number_of_replicas\": 0, \"index.refresh_interval\": \"3s\", \"index.max_result_window\": 1000 }, \"mappings\": { \"properties\": { \"age\": { \"type\": \"byte\" }, \"weight\": { \"type\": \"float\" }, \"isMarried\": { \"type\": \"boolean\" }, \"info\": { \"type\": \"text\", \"analyzer\": \"ik_smart\", \"search_analyzer\": \"ik_max_word\" }, \"email\": { \"type\": \"keyword\", \"index\": \"false\" }, \"score\": { \"type\": \"float\" }, \"name\": { \"properties\": { \"firstName\": { \"type\": \"keyword\", \"index\": \"false\" }, \"lastName\": { \"type\": \"keyword\", \"index\": \"false\" } } } } } } 查询 基本语法： 请求方法：GET 请求路径：/索引名称 请求参数：无 GET /users 修改 基本语法：\n请求方法：PUT 请求路径：/索引名称/_mapping 请求参数：properties。 倒排索引结构虽然不复杂，但是一旦数据结构改变（比如改变了分词器），就需要重新创建倒排索引，这简直是灾难。因此索引库一旦创建，无法修改mapping。\n虽然无法修改mapping中已有的字段，但是却允许添加新的字段到mapping中，因为不会对倒排索引产生影响。\nPUT /users/_mapping { \"properties\": { \"score\": { \"type\": \"float\" } } } 删除 基本语法： 请求方法：DELETE 请求路径：/索引名称 请求参数：无 DELETE /users ",
   "wordCount" : "597",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2021-07-27T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2021-07-27T00:00:00Z",
   "dateModified": "2021-07-27T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/elasticsearch/mapping/"
+    "@id": "https://helium-chain.github.io/posts/elasticsearch/mapping/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/elasticsearch/">ElasticSearch</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/elasticsearch/">ElasticSearch</a></div>
     <h1 class="post-title entry-hint-parent">
       Mappings
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/elasticsearch/" target="_blank" rel="noopener">Elasticsearch</a>
+            <a href="https://helium-chain.github.io/tags/elasticsearch/" target="_blank" rel="noopener">Elasticsearch</a>
         </ul>
       </span>
       
@@ -929,15 +929,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/elasticsearch/">Elasticsearch</a></li>
+      <li><a href="https://helium-chain.github.io/tags/elasticsearch/">Elasticsearch</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/elasticsearch/install/">
+  <a class="prev" href="https://helium-chain.github.io/posts/elasticsearch/install/">
     <span class="title">« 上一页</span>
     <br>
     <span>安装</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/elasticsearch/settings/">
+  <a class="next" href="https://helium-chain.github.io/posts/elasticsearch/settings/">
     <span class="title">下一页 »</span>
     <br>
     <span>Settings</span>

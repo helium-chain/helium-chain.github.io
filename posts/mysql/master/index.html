@@ -9,18 +9,18 @@
 <meta name="keywords" content="mysql">
 <meta name="description" content="mysql 主从复制。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/mysql/master/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/mysql/master/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/mysql/master/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/mysql/master/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,13 +77,13 @@
 <meta property="og:title" content="mysql 主从复制" />
 <meta property="og:description" content="mysql 主从复制。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/mysql/master/" />
-<meta property="og:image" content="https://helium.github.io/posts/mysql/images/mysql-cover.png" /><meta property="article:section" content="posts" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/mysql/master/" />
+<meta property="og:image" content="https://helium-chain.github.io/posts/mysql/images/mysql-cover.png" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2022-08-13T00:00:00+00:00" />
 <meta property="article:modified_time" content="2022-08-13T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/posts/mysql/images/mysql-cover.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/posts/mysql/images/mysql-cover.png" />
 <meta name="twitter:title" content="mysql 主从复制"/>
 <meta name="twitter:description" content="mysql 主从复制。"/>
 
@@ -97,19 +97,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Mysql",
-      "item": "https://helium.github.io/posts/mysql/"
+      "item": "https://helium-chain.github.io/posts/mysql/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "mysql 主从复制",
-      "item": "https://helium.github.io/posts/mysql/master/"
+      "item": "https://helium-chain.github.io/posts/mysql/master/"
     }
   ]
 }
@@ -127,7 +127,7 @@
   "articleBody": " 主从复制是指将主数据库的 DDL 和 DML 操作通过二进制日志传到从库服务器中，然后在从库上对这些日志重新执行（也叫重做），从而使得从库和主库的数据保持同步。 MySQL支持一台主库同时向多台从库进行复制，从库同时也可以作为其他从服务器的主库，实现链状复制。 MySQL的主从复制并不是数据库磁盘上的文件直接拷贝，而是通过逻辑的 binlog 日志复制到要同步的服务器本地，然后由本地的线程读取日志里面的 SQL 语句，重新应用到 MySQL 数据库中。 MySQL 复制的优点主要包含以下三个方面： 做数据的热备，主库宕机后备库能够及时替换主库，保证业务可用性，能一定程度避免数据丢失。 实现读写分离，主库写，从库读，减小主库的读写压力。当主库执行写过程加锁时，不会堵塞从库读操作，从而提高了数据的查询效率。 应对业务量越来越大，I/O 访问频率过高，单机无法满足的问题。增加多个从库做负载，能够降低整体 I/O 访问频率，提高单个机器 I/O 性能。 原理 MySQL主从复制的核心就是二进制日志，具体的过程如下： 基于 binlog 复制模式 MySQL 主从复制默认是异步的模式，复制分成三步： Master 主库在事务提交时，会把数据变更（增删改）记录在二进制日志文件 Binlog 中。 当slave节点连接master时，从库读取主库的二进制日志文件Binlog，写入到从库的中继日志 Relay Log。 slave重做中继日志中的事件，将改变反映它自己的数据。 GTID 复制模式 在传统的复制里面，当发生故障，需要主从切换，需要找到 Binlog 和 位点信息，恢复完成数据之后将主节点指向新的主节点。 在 MySQL 5.6里面，提供了新的数据恢复思路，只需要知道主节点的 IP、端口以及账号密码就行，因为复制是自动的，MySQL会通过内部机制 GTID 自动找点同步。 GTID 是什么 GTID 指的是全局事务 ID，全程是 Global Transaction Identifier，在整个事务流程中每一个事务 ID 是全局唯一的，且在整个主从复制架构中该 ID 都不会相同。 GTID 主从复制方式 基于 GTID 的主从复制方式的出现，主要是用于替换传统的日志点 复制方式。 通过GTID 可以保证每个主库提交的事务在集群中都有唯一的一个事务 ID。 强化了数据库主从的一致性和故障恢复数据的容错能力，在主库 宕机发生主从切换 的情况下，GTID 方式可以让其他从库自动找到新主库复制的位置。而且 GTID 可以忽略已经执行过的事务，减少了数据发生错误的概率。 GTID 的组成 GTID 由server_uuid + tid 组成，其中： server_uuid： server_uuid 是在 Mysql 首次启动过程中自动生成的一个uuid(128位)随机值，生成后会将该值存储到数据目录的auto.cnf中。因为是随机值，所以不同服务器的 Mysql 的server_uuid 都是不相同的。 tid：代表了该实例上已经提交的事务数量，是一个整数，初始值是 1 ，每次提交事务的时候分配给这个事务并加1。 GTID 复制工作原理 假设从库开启了 binlog，那么执行流程如下： 主节点执行事务提交前会产生一个 GTID ，其会随着事务一起记录到 binlog 日志中。 从节点I/O Thread会读取主节点的binlog日志文件并存储在从节点的relaylog日志中。从节点将主节点的GTID这个值配置到gtid_next中，即下一个要读取的GTID值。 从节点读取gtid_next中的值，然后查找自己的binlog日志中是否有这个GTID。 如果有这个记录，说明这个GTID的事务已经执行过了，就忽略掉。 如果没有这个记录，从节点就会执行该GTID事务，并记录到自己的binlog日志中。在读取执行事务前会先检查其他session中是否持有该GTID ，确保不被重复执行。 在解析过程中会判断是否有主键，如果没有就用二级索引，如果没有就用全部扫描。 GTID 使用中的限制条件 GTID 复制是针对事务来说的，一个事务只对应一个 GTID，好多的限制就在于此。其中主要限制如下： 不能使用create table table_name select * from table_name 。 在一个事务中既包含事务表（使用 InnoDB 存储引擎的表）的操作又包含非事务表（使用 MyISAM 存储引擎的表）。 不支持创建或删除临时表操作，如 CREATE TEMPORARY TABLE or DROP TEMPORARY TABLE 语句操作。 使用 GTID 复制从库跳过错误时，不支持执行该 ql_slave_skip_counter 参数的语法。 搭建 docker-compose.yml 文件。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 version: '3.9' services: mysql-master: container_name: mysql-master hostname: mysql-master image: mysql:8.0.19 ports: - 3306:3306 volumes: - ./master/data:/var/lib/mysql - ./master/my.cnf:/etc/mysql/conf.d/my.cnf - ./master/init_db/:/docker-entrypoint-initdb.d/ - /etc/localtime:/etc/localtime:ro environment: TZ: Asia/Shanghai MYSQL_ROOT_PASSWORD: 123456 MYSQL_DATABASE: test character-set-server: utf8mb4 collation-server: utf8mb4_general_ci default-authentication-plugin: mysql_native_password restart: unless-stopped privileged: true healthcheck: test: [ \"CMD\", \"mysqladmin\" ,\"ping\", \"-h\", \"localhost\", \"--silent\" ] interval: 10s timeout: 10s retries: 3 networks: basenetwork: ipv4_address: 172.16.0.101 mysql-slave1: container_name: mysql-slave1 hostname: mysql-slave1 image: mysql:8.0.19 ports: - 3307:3306 volumes: - ./slave01/data:/var/lib/mysql - ./slave01/my.cnf:/etc/mysql/conf.d/my.cnf - ./slave01/init_db/:/docker-entrypoint-initdb.d/ - /etc/localtime:/etc/localtime:ro environment: TZ: Asia/Shanghai MYSQL_ROOT_PASSWORD: 123456 MYSQL_DATABASE: test character-set-server: utf8mb4 collation-server: utf8mb4_general_ci default-authentication-plugin: mysql_native_password restart: unless-stopped privileged: true healthcheck: test: [ \"CMD\", \"mysqladmin\" ,\"ping\", \"-h\", \"localhost\", \"--silent\" ] interval: 10s timeout: 10s retries: 3 networks: basenetwork: ipv4_address: 172.16.0.102 mysql-slave2: container_name: mysql-slave2 hostname: mysql-slave2 image: mysql:8.0.19 ports: - 3308:3306 volumes: - ./slave02/data:/var/lib/mysql - ./slave02/my.cnf:/etc/mysql/conf.d/my.cnf - ./slave02/init_db/:/docker-entrypoint-initdb.d/ - /etc/localtime:/etc/localtime:ro environment: TZ: Asia/Shanghai MYSQL_ROOT_PASSWORD: 123456 MYSQL_DATABASE: test character-set-server: utf8mb4 collation-server: utf8mb4_general_ci default-authentication-plugin: mysql_native_password restart: unless-stopped privileged: true healthcheck: test: [ \"CMD\", \"mysqladmin\" ,\"ping\", \"-h\", \"localhost\", \"--silent\" ] interval: 10s timeout: 10s retries: 3 networks: basenetwork: ipv4_address: 172.16.0.103 networks: basenetwork: driver: bridge ipam: driver: default config: - subnet: 172.16.0.0/24 master配置 修改配置文件 /etc/my.cnf。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 [mysqld] # 开启 gtid 模式 gtid_mode=on # 配置不允许任何事务违反 GTID 一致性,用于保证数据一致性 enforce_gtid_consistency=on # 开启二进制日志 binlog log-bin=mysql-bin # mysql 服务ID，保证整个集群环境中唯一，取值范围：1 – 232-1，默认为1 server-id=1 # 从节点从主节点接收到更新且执行，是否将记录存到从节点的 binlog 日志中（可选） log-slave-updates=on # 当从数据库启动的时候，从节点不会启动复制（可选） #skip-slave-start=1 # 是否只读,1 代表只读, 0 代表读写 read-only=0 # 不需要复制的数据库名（mysql库一般不同步） binlog-ignore-db=mysql #binlog-ignore-db=performation_schema #binlog-ignore-db=information_schema # 指定同步的数据库 #binlog-do-db=db01 # 只保留7天的二进制日志，以防磁盘被日志占满(可选) #expire-logs-days = 7 # 主从复制的格式（mixed,statement,row，默认格式是statement） #binlog_format = mixed # 为每个session 分配的内存，在事务过程中用来存储二进制日志的缓存 # binlog_cache_size = 1M 创建远程连接账号并授予主从复制权限。 1 2 3 4 5 6 7 8 -- 创建ic用户，并设置密码，该用户可在任意主机连接该MySQL服务 CREATE USER 'ic'@'%' IDENTIFIED WITH mysql_native_password BY 'Root@123456'; -- 为 'ic'@'%' 用户分配主从复制权限 GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'ic'@'%'; -- 刷新权限 FLUSH PRIVILEGES; 通过指令，查看二进制日志坐标：show master status; file： 从哪个日志文件开始推送日志文件。(用于从同步) position：从哪个位置开始推送日志。(用于从同步) binlog_ignore_db：指定不需要同步的数据库。 查看master数据有那些slave。 select * from information_schema.processlist as p where p.command = 'Binlog Dump'; slave 配置 slave1的my.cnf。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 [mysqld] # 开启 gtid 模式 gtid_mode=on # 配置不允许任何事务违反 GTID 一致性,用于保证数据一致性 enforce_gtid_consistency=on # 开启二进制日志 binlog log-bin=mysql-bin # mysql 服务ID，保证整个集群环境中唯一，取值范围：1 – 232-1，默认为1 server-id=2 # 从节点从主节点接收到更新且执行，是否将记录存到从节点的 binlog 日志中（可选） log-slave-updates=on # 当从数据库启动的时候，从节点不会启动复制（可选） #skip-slave-start=1 # 是否只读,1 代表只读, 0 代表读写 read-only=1 # 不需要复制的数据库名（mysql库一般不同步） binlog-ignore-db=mysql # 指定同步的数据库 #binlog-do-db=db01 # 只保留7天的二进制日志，以防磁盘被日志占满(可选) #expire-logs-days = 7 # 主从复制的格式（mixed,statement,row，默认格式是statement） #binlog_format = mixed # 为每个session 分配的内存，在事务过程中用来存储二进制日志的缓存 # binlog_cache_size = 1M slave2的my.cnf。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 [mysqld] # 开启 gtid 模式 gtid_mode=on # 配置不允许任何事务违反 GTID 一致性,用于保证数据一致性 enforce_gtid_consistency=on # 开启二进制日志 binlog log-bin=mysql-bin # mysql 服务ID，保证整个集群环境中唯一，取值范围：1 – 232-1，默认为1 server-id=3 # 从节点从主节点接收到更新且执行，是否将记录存到从节点的 binlog 日志中（可选） log-slave-updates=on # 当从数据库启动的时候，从节点不会启动复制（可选） #skip-slave-start=1 # 是否只读,1 代表只读, 0 代表读写 read-only=1 # 不需要复制的数据库名（mysql库一般不同步） binlog-ignore-db=mysql # 指定同步的数据库 #binlog-do-db=db01 # 只保留7天的二进制日志，以防磁盘被日志占满(可选) #expire-logs-days = 7 # 主从复制的格式（mixed,statement,row，默认格式是statement） #binlog_format = mixed # 为每个session 分配的内存，在事务过程中用来存储二进制日志的缓存 # binlog_cache_size = 1M 设置主库配置。 1 2 3 4 -- 8.0.23中的语法 CHANGE REPLICATION SOURCE TO SOURCE_HOST='mysql-master', SOURCE_USER='ic', SOURCE_PASSWORD='Root@123456', SOURCE_PORT=3306, SOURCE_LOG_FILE='binlog.000004', SOURCE_LOG_POS=663; 1 2 3 4 -- mysql8.0.23 之前的版本 CHANGE MASTER TO MASTER_HOST='mysql-master', MASTER_USER='ic', MASTER_PASSWORD='Root@123456', MASTER_PORT=3306, MASTER_LOG_FILE='binlog.000004', MASTER_LOG_POS=663; 参数名 含义 8.0.23前 SOURCE_HOST 主库IP地址 MASTER_HOST SOURCE_USER 连接主库的用户名 MASTER_USER SOURCE_PASSWORD 连接主库的密码 MASTER_PASSWORD SOURCE_LOG_FILE binlog日志文件名 MASTER_LOG_FILE SOURCE_LOG_POS binlog日志文件位置 MASTER_LOG_POS SOURCE_CONNECT_RETRY 连接失败，重试的时间间隔/秒，默认60秒 MASTER_CONNECT_RETRY 开启同步操作。(从库执行) 1 2 3 4 5 -- mysql8.0.22版本之后 start replica; -- mysql8.0.22版本之前 start slave; 查看主从同步状态。(从库执行) 1 2 3 4 5 -- mysql8.0.22版本之后 show replica status; -- mysql8.0.22版本之前 show slave status; 测试 在master运行如下代码。 create database db01; use db01; create table tb_user( id int(11) primary key not null auto_increment, name varchar(50) not null, sex varchar(1) )engine=innodb default charset=utf8mb4; insert into tb_user(id,name,sex) values(null,'Tom', '1'),(null,'Trigger','0'),(null,'Dawn','1'); 在slave01和slave02中分别验证。 查看master数据有那些slave。 select * from information_schema.processlist as p where p.command = 'Binlog Dump'; 注意 CHANGE MASTER 只能同步后续变化数据，首次数据需要，自己手动在所有slave上运行一遍。 github 完整的代码请前往github, https://github.com/helium-chain/master-slave。 ",
   "wordCount" : "911",
   "inLanguage": "zh",
-  "image":"https://helium.github.io/posts/mysql/images/mysql-cover.png","datePublished": "2022-08-13T00:00:00Z",
+  "image":"https://helium-chain.github.io/posts/mysql/images/mysql-cover.png","datePublished": "2022-08-13T00:00:00Z",
   "dateModified": "2022-08-13T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -135,14 +135,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/mysql/master/"
+    "@id": "https://helium-chain.github.io/posts/mysql/master/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -164,8 +164,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -192,32 +192,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -229,7 +229,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/mysql/">Mysql</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/mysql/">Mysql</a></div>
     <h1 class="post-title entry-hint-parent">
       mysql 主从复制
     </h1>
@@ -265,7 +265,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/mysql/" target="_blank" rel="noopener">Mysql</a>
+            <a href="https://helium-chain.github.io/tags/mysql/" target="_blank" rel="noopener">Mysql</a>
         </ul>
       </span>
       
@@ -276,7 +276,7 @@
 
 </div>
   </header> 
-<figure class="entry-cover1"><img loading="eager" src="https://helium.github.io/posts/mysql/images/mysql-cover.png" alt="">
+<figure class="entry-cover1"><img loading="eager" src="https://helium-chain.github.io/posts/mysql/images/mysql-cover.png" alt="">
         
 </figure><aside id="toc-container" class="toc-container wide">
     <div class="toc">
@@ -1123,15 +1123,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/mysql/">Mysql</a></li>
+      <li><a href="https://helium-chain.github.io/tags/mysql/">Mysql</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/mysql/tool/">
+  <a class="prev" href="https://helium-chain.github.io/posts/mysql/tool/">
     <span class="title">« 上一页</span>
     <br>
     <span>mysql 工具</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/mysql/table/">
+  <a class="next" href="https://helium-chain.github.io/posts/mysql/table/">
     <span class="title">下一页 »</span>
     <br>
     <span>mysql 分库分表</span>

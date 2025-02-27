@@ -9,18 +9,18 @@
 <meta name="keywords" content="redis">
 <meta name="description" content="redis sortSet介绍。">
 <meta name="author" content="helium">
-<link rel="canonical" href="https://helium.github.io/posts/redis/sortset/">
+<link rel="canonical" href="https://helium-chain.github.io/posts/redis/sortset/">
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <meta name="referrer" content="no-referrer-when-downgrade">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://helium.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://helium.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://helium.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://helium.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://helium.github.io/apple-touch-icon.png">
+<link rel="icon" href="https://helium-chain.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://helium-chain.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://helium-chain.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://helium-chain.github.io/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="zh" href="https://helium.github.io/posts/redis/sortset/">
+<link rel="alternate" hreflang="zh" href="https://helium-chain.github.io/posts/redis/sortset/">
 <noscript>
     <style>
         #theme-toggle,
@@ -77,14 +77,14 @@
 <meta property="og:title" content="redis sortSet" />
 <meta property="og:description" content="redis sortSet介绍。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://helium.github.io/posts/redis/sortset/" />
-<meta property="og:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta property="og:url" content="https://helium-chain.github.io/posts/redis/sortset/" />
+<meta property="og:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2023-05-09T00:00:00+00:00" />
 <meta property="article:modified_time" content="2023-05-09T00:00:00+00:00" /><meta property="og:site_name" content="Helium" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="https://helium.github.io/favicon-32x32.png" />
+<meta name="twitter:image" content="https://helium-chain.github.io/favicon-32x32.png" />
 <meta name="twitter:title" content="redis sortSet"/>
 <meta name="twitter:description" content="redis sortSet介绍。"/>
 
@@ -98,19 +98,19 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Article",
-      "item": "https://helium.github.io/posts/"
+      "item": "https://helium-chain.github.io/posts/"
     }, 
     {
       "@type": "ListItem",
       "position":  2 ,
       "name": "Redis",
-      "item": "https://helium.github.io/posts/redis/"
+      "item": "https://helium-chain.github.io/posts/redis/"
     }, 
     {
       "@type": "ListItem",
       "position":  3 ,
       "name": "redis sortSet",
-      "item": "https://helium.github.io/posts/redis/sortset/"
+      "item": "https://helium-chain.github.io/posts/redis/sortset/"
     }
   ]
 }
@@ -128,7 +128,7 @@
   "articleBody": " 官方命令地址：https://redis.io/commands/?group=sorted-set sortSet sortedSet是一个可排序的set集合。 SortedSet中的每一个元素都带有一个score属性，可以基于score属性对元素排序，底层的实现是一个跳表（SkipList）加 hash表。 SortedSet具备下列特性：可排序、元素不重复、查询速度快。 因为SortedSet的可排序特性，经常被用来实现排行榜这样的功能。 ZADD 向sortSet添加一个或多个成员，或更新其分数。如果key不存在，则创建该key。\n语法：\nZADD key [NX | XX] [GT | LT] [CH] [INCR] score member [score member ...] XX: 只更新已经存在的元素。不要添加新元素。 NX: 只添加新元素。不要更新已经存在的元素。 LT: 只有当新score小于当前分数时才更新现有元素。这个标志不会阻止添加新元素。 GT: 只有当新score大于当前分数时才更新现有元素。这个标志不会阻止添加新元素。 CH: 将返回值从添加的新元素数修改为更改的元素总数(CH是changed的缩写)。更改的元素是新添加的元素和已经存在的元素更新的分数。因此，在命令行中指定的具有与过去相同分数的元素不会被计算在内。注意:通常’ ZADD ‘的返回值只计算添加的新元素的数量。 INCR: 当指定该选项时，‘ZADD’的行为类似于‘ZINCRBY’。在这种模式下只能指定一个分数-元素对。\n示例： redis\u003e ZADD myzset 1 \"one\" (integer) 1 redis\u003e ZADD myzset 1 \"uno\" (integer) 1 redis\u003e ZADD myzset 2 \"two\" 3 \"three\" (integer) 2 redis\u003e ZRANGE myzset 0 -1 WITHSCORES 1) \"one\" 2) \"1\" 3) \"uno\" 4) \"1\" 5) \"two\" 6) \"2\" 7) \"three\" 8) \"3\" ZCARD 返回已sortSet中成员的数目。\n语法：\nZCARD key 示例： redis\u003e ZADD myzset 1 \"one\" (integer) 1 redis\u003e ZADD myzset 2 \"two\" (integer) 1 redis\u003e ZCARD myzset (integer) 2 ZCOUNT 返回排序集中分数在一定范围内的成员的计数。\n语法：\nZCOUNT key min max 示例： redis\u003e ZADD myzset 1 \"one\" (integer) 1 redis\u003e ZADD myzset 2 \"two\" (integer) 1 redis\u003e ZADD myzset 3 \"three\" (integer) 1 redis\u003e ZCOUNT myzset -inf +inf (integer) 3 redis\u003e ZCOUNT myzset (1 3 (integer) 2 ZDIFF 返回多个排序集之间的差值。\n语法：\nZDIFF numkeys key [key ...] [WITHSCORES] 示例： redis\u003e ZADD zset1 1 \"one\" (integer) 1 redis\u003e ZADD zset1 2 \"two\" (integer) 1 redis\u003e ZADD zset1 3 \"three\" (integer) 1 redis\u003e ZADD zset2 1 \"one\" (integer) 1 redis\u003e ZADD zset2 2 \"two\" (integer) 1 redis\u003e ZDIFF 2 zset1 zset2 1) \"three\" redis\u003e ZDIFF 2 zset1 zset2 WITHSCORES 2) \"three\" 3) \"3\" ZDIFFSTORE 将多个排序集的差值存储在一个键中。\n语法：\nZDIFFSTORE destination numkeys key [key ...] 示例： redis\u003e ZADD zset1 1 \"one\" (integer) 1 redis\u003e ZADD zset1 2 \"two\" (integer) 1 redis\u003e ZADD zset1 3 \"three\" (integer) 1 redis\u003e ZADD zset2 1 \"one\" (integer) 1 redis\u003e ZADD zset2 2 \"two\" (integer) 1 redis\u003e ZDIFFSTORE out 2 zset1 zset2 (integer) 1 redis\u003e ZRANGE out 0 -1 WITHSCORES 1) \"three\" 2) \"3\" ZINCRBY 增加已sortSet中成员的分数。\n语法：\nZINCRBY key increment member 示例： redis\u003e ZADD myzset 1 \"one\" (integer) 1 redis\u003e ZADD myzset 2 \"two\" (integer) 1 redis\u003e ZINCRBY myzset 2 \"one\" \"3\" redis\u003e ZRANGE myzset 0 -1 WITHSCORES 1) \"two\" 2) \"2\" 3) \"one\" 4) \"3\" ZINTER 返回多个排序集的相交。\n语法：\nZINTER numkeys key [key ...] [WEIGHTS weight [weight ...]] [AGGREGATE \u003cSUM | MIN | MAX\u003e] [WITHSCORES] 示例： redis\u003e ZADD zset1 1 \"one\" (integer) 1 redis\u003e ZADD zset1 2 \"two\" (integer) 1 redis\u003e ZADD zset2 1 \"one\" (integer) 1 redis\u003e ZADD zset2 2 \"two\" (integer) 1 redis\u003e ZADD zset2 3 \"three\" (integer) 1 redis\u003e ZINTER 2 zset1 zset2 1) \"one\" 2) \"two\" redis\u003e ZINTER 2 zset1 zset2 WITHSCORES 3) \"one\" 4) \"2\" 5) \"two\" 6) \"4\" ZINTERCARD 返回多个排序集相交的成员数。\n语法：\nZINTERCARD numkeys key [key ...] [LIMIT limit] 示例： redis\u003e ZADD zset1 1 \"one\" (integer) 1 redis\u003e ZADD zset1 2 \"two\" (integer) 1 redis\u003e ZADD zset2 1 \"one\" (integer) 1 redis\u003e ZADD zset2 2 \"two\" (integer) 1 redis\u003e ZADD zset2 3 \"three\" (integer) 1 redis\u003e ZINTER 2 zset1 zset2 1) \"one\" 2) \"two\" redis\u003e ZINTERCARD 2 zset1 zset2 (integer) 2 redis\u003e ZINTERCARD 2 zset1 zset2 LIMIT 1 (integer) 1 ZINTERSTORE 将多个排序集的相交存储在一个键中。\n语法：\nZINTERSTORE destination numkeys key [key ...] [WEIGHTS weight [weight ...]] [AGGREGATE \u003cSUM | MIN | MAX\u003e] 语法： redis\u003e ZADD zset1 1 \"one\" (integer) 1 redis\u003e ZADD zset1 2 \"two\" (integer) 1 redis\u003e ZADD zset2 1 \"one\" (integer) 1 redis\u003e ZADD zset2 2 \"two\" (integer) 1 redis\u003e ZADD zset2 3 \"three\" (integer) 1 redis\u003e ZINTERSTORE out 2 zset1 zset2 WEIGHTS 2 3 (integer) 2 redis\u003e ZRANGE out 0 -1 WITHSCORES 1) \"one\" 2) \"5\" 3) \"two\" 4) \"10\" ZLEXCOUNT 返回字典顺序范围内已sortSet中的成员数。\n语法：\nZLEXCOUNT key min max 示例： redis\u003e ZADD myzset 0 a 0 b 0 c 0 d 0 e (integer) 5 redis\u003e ZADD myzset 0 f 0 g (integer) 2 redis\u003e ZLEXCOUNT myzset - + (integer) 7 redis\u003e ZLEXCOUNT myzset [b [f (integer) 5 ZMPOP 从一个或多个已排序的集合中返回删除后得分最高或最低的成员。如果弹出最后一个成员，则删除排序集。\n语法：\nZMPOP numkeys key [key ...] \u003cMIN | MAX\u003e [COUNT count] 示例： redis\u003e ZMPOP 1 notsuchkey MIN (error) object of type 'NoneType' has no len() redis\u003e ZADD myzset 1 \"one\" 2 \"two\" 3 \"three\" (integer) 3 redis\u003e ZMPOP 1 myzset MIN 1) \"myzset\" 2) 1) 1) \"one\" 1) \"1\" redis\u003e ZRANGE myzset 0 -1 WITHSCORES 3) \"two\" 4) \"2\" 5) \"three\" 6) \"3\" redis\u003e ZMPOP 1 myzset MAX COUNT 10 7) \"myzset\" 8) 1) 1) \"three\" 2) \"3\" 2) 1) \"two\" 1) \"2\" redis\u003e ZADD myzset2 4 \"four\" 5 \"five\" 6 \"six\" (integer) 3 redis\u003e ZMPOP 2 myzset myzset2 MIN COUNT 10 9) \"myzset2\" 10) 1) 1) \"four\" 1) \"4\" 1) 1) \"five\" 1) \"5\" 2) 1) \"six\" 1) \"6\" redis\u003e ZRANGE myzset 0 -1 WITHSCORES (empty array) redis\u003e ZMPOP 2 myzset myzset2 MAX COUNT 10 (error) object of type 'NoneType' has no len() redis\u003e ZRANGE myzset2 0 -1 WITHSCORES (empty array) redis\u003e EXISTS myzset myzset2 (integer) 0 ZMSCORE 返回已sortSet中一个或多个成员的分数。\n语法：\nZMSCORE key member [member ...] 示例： redis\u003e ZADD myzset 1 \"one\" (integer) 1 redis\u003e ZADD myzset 2 \"two\" (integer) 1 redis\u003e ZMSCORE myzset \"one\" \"two\" \"nofield\" 1) \"1\" 2) \"2\" 3) (nil) ZPOPMAX 从已排序的集合中删除得分最高的成员后返回它们。如果弹出最后一个成员，则删除排序集。 ZPOPMAX key [count] 示例： redis\u003e ZADD myzset 1 \"one\" (integer) 1 redis\u003e ZADD myzset 2 \"two\" (integer) 1 redis\u003e ZADD myzset 3 \"three\" (integer) 1 redis\u003e ZPOPMAX myzset 1) \"three\" 2) \"3\" ZPOPMIN 从已排序的集合中删除得分最低的成员后返回它们。如果弹出最后一个成员，则删除排序集。\n语法：\nZPOPMIN key [count] 示例： redis\u003e ZADD myzset 1 \"one\" (integer) 1 redis\u003e ZADD myzset 2 \"two\" (integer) 1 redis\u003e ZADD myzset 3 \"three\" (integer) 1 redis\u003e ZPOPMIN myzset 1) \"one\" 2) \"1\" ZRANDMEMBER 从已排序的集合中返回一个或多个随机成员。\n语法：\nZRANDMEMBER key [count [WITHSCORES]] 示例： redis\u003e ZADD dadi 1 uno 2 due 3 tre 4 quattro 5 cinque 6 sei (integer) 6 redis\u003e ZRANDMEMBER dadi \"quattro\" redis\u003e ZRANDMEMBER dadi \"due\" redis\u003e ZRANDMEMBER dadi -5 WITHSCORES 1) \"uno\" 2) \"1\" 3) \"tre\" 4) \"3\" 5) \"quattro\" 6) \"4\" 7) \"cinque\" 8) \"5\" 9) \"cinque\" 10) \"5\" ZRANGE 返回索引范围内已sortSet中的成员。\n语法：\nZRANGE key start stop [BYSCORE | BYLEX] [REV] [LIMIT offset count] [WITHSCORES] 示例： redis\u003e ZADD myzset 1 \"one\" 2 \"two\" 3 \"three\" (integer) 3 redis\u003e ZRANGE myzset 0 -1 1) \"one\" 2) \"two\" 3) \"three\" redis\u003e ZRANGE myzset 2 3 4) \"three\" redis\u003e ZRANGE myzset -2 -1 5) \"two\" 6) \"three\" ZRANGEBYLEX 返回字典顺序范围内已sortSet中的成员。\n语法：\nZRANGEBYLEX key min max [LIMIT offset count] 示例： redis\u003e ZADD myzset 0 a 0 b 0 c 0 d 0 e 0 f 0 g (integer) 7 redis\u003e ZRANGEBYLEX myzset - [c 1) \"a\" 2) \"b\" 3) \"c\" redis\u003e ZRANGEBYLEX myzset - (c 4) \"a\" 5) \"b\" redis\u003e ZRANGEBYLEX myzset [aaa (g 6) \"b\" 7) \"c\" 8) \"d\" 9) \"e\" 10) \"f\" ZRANGEBYSCORE Returns members in a sorted set within a range of scores. ZRANGESTORE tores a range of members from sorted set in a key. ZRANK Returns the index of a member in a sorted set ordered by ascending scores. ZREM Removes one or more members from a sorted set. Deletes the sorted set if all members were removed. ZREMRANGEBYLEX Removes members in a sorted set within a lexicographical range. Deletes the sorted set if all members were removed. ZREMRANGEBYRANK Removes members in a sorted set within a range of indexes. Deletes the sorted set if all members were removed. ZREMRANGEBYSCORE Removes members in a sorted set within a range of scores. Deletes the sorted set if all members were removed. ZREVRANGE Returns members in a sorted set within a range of indexes in reverse order. ZREVRANGEBYLEX Returns members in a sorted set within a lexicographical range in reverse order. ZREVRANGEBYSCORE Returns members in a sorted set within a range of scores in reverse order. ZREVRANK Returns the index of a member in a sorted set ordered by descending scores. ZSCAN Iterates over members and scores of a sorted set. ZSCORE Returns the score of a member in a sorted set. ZUNION Returns the union of multiple sorted sets. ZUNIONSTORE Stores the union of multiple sorted sets in a key. BZMPOP Removes and returns a member by score from one or more sorted sets. Blocks until a member is available otherwise. Deletes the sorted set if the last element was popped. BZPOPMAX Removes and returns the member with the highest score from one or more sorted sets. Blocks until a member available otherwise. Deletes the sorted set if the last element was popped. BZPOPMIN Removes and returns the member with the lowest score from one or more sorted sets. Blocks until a member is available otherwise. Deletes the sorted set if the last element was popped. ",
   "wordCount" : "1351",
   "inLanguage": "zh",
-  "image": "https://helium.github.io/favicon-32x32.png","datePublished": "2023-05-09T00:00:00Z",
+  "image": "https://helium-chain.github.io/favicon-32x32.png","datePublished": "2023-05-09T00:00:00Z",
   "dateModified": "2023-05-09T00:00:00Z",
   "author":[{
     "@type": "Person",
@@ -136,14 +136,14 @@
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://helium.github.io/posts/redis/sortset/"
+    "@id": "https://helium-chain.github.io/posts/redis/sortset/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Helium",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://helium.github.io/favicon.ico"
+      "url": "https://helium-chain.github.io/favicon.ico"
     }
   }
 }
@@ -165,8 +165,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://helium.github.io/" accesskey="h" title="Blog (Alt + H)">
-                <img src="https://helium.github.io/helium.png" alt="" aria-label="logo"
+            <a href="https://helium-chain.github.io/" accesskey="h" title="Blog (Alt + H)">
+                <img src="https://helium-chain.github.io/helium.png" alt="" aria-label="logo"
                     height="35">Blog</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
@@ -193,32 +193,32 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://helium.github.io/" title="主页">
+                <a href="https://helium-chain.github.io/" title="主页">
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/posts" title="文章">
+                <a href="https://helium-chain.github.io/posts" title="文章">
                     <span>Article</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/archives" title="时间轴">
+                <a href="https://helium-chain.github.io/archives" title="时间轴">
                     <span>Archive</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/tags/" title="标签">
+                <a href="https://helium-chain.github.io/tags/" title="标签">
                     <span>Tag</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                <a href="https://helium-chain.github.io/search/" title="搜索 (Alt &#43; /)" accesskey=/>
                     <span>Search</span>
                 </a>
             </li>
             <li>
-                <a href="https://helium.github.io/support" title="打赏">
+                <a href="https://helium-chain.github.io/support" title="打赏">
                     <span>🫶Help</span>
                 </a>
             </li>
@@ -230,7 +230,7 @@
 
 <article class="post" autonumbering>
   <header class="post-header">
-    <div class="breadcrumbs"><a href="https://helium.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium.github.io/posts/redis/">Redis</a></div>
+    <div class="breadcrumbs"><a href="https://helium-chain.github.io/">主页</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/">Article</a>&nbsp;»&nbsp;<a href="https://helium-chain.github.io/posts/redis/">Redis</a></div>
     <h1 class="post-title entry-hint-parent">
       redis sortSet
     </h1>
@@ -266,7 +266,7 @@
       <span class="x-post-meta-item">
         &nbsp;<svg t="1720840393161" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18680" width="200" height="200"><path d="M995.125144 559.61812l-415.998603-415.998602A52.986489 52.986489 0 0 0 541.413335 127.99957H338.847348c-3.166656-26.559911-9.286635-51.046495-17.999939-71.333094C299.734146 7.333309 271.154242 0 256.00096 0c-13.939953 0-40.439864 6.339979-61.259794 48.806503-10.473298 21.366595-17.946606 48.966502-21.573261 79.193067H53.334974a53.393154 53.393154 0 0 0-53.333154 53.333154v360.078791a52.986489 52.986489 0 0 0 15.619948 37.713206l415.998602 415.998603a53.333154 53.333154 0 0 0 75.426413 0l26.286579-26.293245 26.286578 26.293245a53.426487 53.426487 0 0 0 16.719944 11.333295 21.333262 21.333262 0 0 0 36.079879 11.293295l382.705381-382.705381a53.399821 53.399821 0 0 0 0-75.426413z m-762.070774-491.998347C241.494342 50.373164 250.667645 42.666523 256.00096 42.666523c5.99998 0 16.573278 9.639968 25.646581 30.806564 6.493312 15.159949 11.333295 33.999886 14.146619 54.526483H216.16776c3.206656-23.419921 9.013303-44.359851 16.88661-60.41313z m243.819181 897.330319a10.666631 10.666631 0 0 1-15.079949 0l-415.998603-415.998603A10.573298 10.573298 0 0 1 42.668343 541.411515V181.332724a10.666631 10.666631 0 0 1 10.666631-10.666631h245.332509c0 47.853173-10.373298 92.15969-27.066575 115.632945-5.926647 8.326639-16.566611 14.186619-22.306592 16.113279C204.041135 314.752276 170.667913 356.218803 170.667913 405.331972c0 58.813136 47.853173 106.666308 106.666309 106.666308s106.666308-47.853173 106.666308-106.666308c0-47.086508-30.666564-87.139707-73.079754-101.246327C330.060711 272.705751 341.334007 223.692582 341.334007 170.666093h72.079758a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603a10.666631 10.666631 0 0 1 0 15.079949zM341.334007 405.331972a63.999785 63.999785 0 1 1-63.999785-63.999785 64.073118 64.073118 0 0 1 63.999785 63.999785z m263.539114 559.61812a10.666631 10.666631 0 0 1-15.079949 0L563.499927 938.663513l303.625647-303.61898a53.399821 53.399821 0 0 0 0-75.426413L478.16688 170.666093h63.246455a10.573298 10.573298 0 0 1 7.539974 3.126656l415.998603 415.998603c0.239999 0.239999 0.466665 0.486665 0.666664 0.746664l0.086667 0.106666a10.666631 10.666631 0 0 1 0 13.373289l-0.086667 0.106666c-0.213333 0.259999-0.439999 0.506665-0.666664 0.746664z" fill="#5C5C66" p-id="18681"></path></svg>
         <ul class="post-tags-meta" style="display: inline-block;font-size: 14px;">
-            <a href="https://helium.github.io/tags/redis/" target="_blank" rel="noopener">Redis</a>
+            <a href="https://helium-chain.github.io/tags/redis/" target="_blank" rel="noopener">Redis</a>
         </ul>
       </span>
       
@@ -976,15 +976,15 @@
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://helium.github.io/tags/redis/">Redis</a></li>
+      <li><a href="https://helium-chain.github.io/tags/redis/">Redis</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://helium.github.io/posts/redis/set/">
+  <a class="prev" href="https://helium-chain.github.io/posts/redis/set/">
     <span class="title">« 上一页</span>
     <br>
     <span>redis set</span>
   </a>
-  <a class="next" href="https://helium.github.io/posts/redis/bitmap/">
+  <a class="next" href="https://helium-chain.github.io/posts/redis/bitmap/">
     <span class="title">下一页 »</span>
     <br>
     <span>redis bitmap</span>

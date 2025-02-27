@@ -2,79 +2,79 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>包管理 on Helium</title>
-    <link>https://helium.github.io/tags/%E5%8C%85%E7%AE%A1%E7%90%86/</link>
+    <link>https://helium-chain.github.io/tags/%E5%8C%85%E7%AE%A1%E7%90%86/</link>
     <description>Recent content in 包管理 on Helium</description>
     <image>
       <title>Helium</title>
-      <url>https://helium.github.io/favicon-32x32.png</url>
-      <link>https://helium.github.io/favicon-32x32.png</link>
+      <url>https://helium-chain.github.io/favicon-32x32.png</url>
+      <link>https://helium-chain.github.io/favicon-32x32.png</link>
     </image>
     <generator>Hugo -- 0.128.2</generator>
     <language>zh</language>
     <copyright>Copyright © 2024 蜀ICP备2024091074号 heliu&#39;s blog. All rights reserved</copyright>
     <lastBuildDate>Tue, 25 Jul 2023 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://helium.github.io/tags/%E5%8C%85%E7%AE%A1%E7%90%86/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://helium-chain.github.io/tags/%E5%8C%85%E7%AE%A1%E7%90%86/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>package</title>
-      <link>https://helium.github.io/posts/golang/package/bag/</link>
+      <link>https://helium-chain.github.io/posts/golang/package/bag/</link>
       <pubDate>Sun, 23 Feb 2020 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/package/bag/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/package/bag/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>go modules</title>
-      <link>https://helium.github.io/posts/golang/package/module/</link>
+      <link>https://helium-chain.github.io/posts/golang/package/module/</link>
       <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/package/module/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/package/module/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>go work</title>
-      <link>https://helium.github.io/posts/golang/package/work/</link>
+      <link>https://helium-chain.github.io/posts/golang/package/work/</link>
       <pubDate>Mon, 23 Mar 2020 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/package/work/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/package/work/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>模块相关环境变量</title>
-      <link>https://helium.github.io/posts/golang/package/env/</link>
+      <link>https://helium-chain.github.io/posts/golang/package/env/</link>
       <pubDate>Sun, 05 Apr 2020 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/package/env/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/package/env/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>go.work 文件</title>
-      <link>https://helium.github.io/posts/golang/package/go-work/</link>
+      <link>https://helium-chain.github.io/posts/golang/package/go-work/</link>
       <pubDate>Thu, 23 Apr 2020 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/package/go-work/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/package/go-work/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>go.mod 文件</title>
-      <link>https://helium.github.io/posts/golang/package/go-mod/</link>
+      <link>https://helium-chain.github.io/posts/golang/package/go-mod/</link>
       <pubDate>Fri, 08 May 2020 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/package/go-mod/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/package/go-mod/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>工作区使用</title>
-      <link>https://helium.github.io/posts/golang/package/use-work/</link>
+      <link>https://helium-chain.github.io/posts/golang/package/use-work/</link>
       <pubDate>Sat, 30 May 2020 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/package/use-work/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/package/use-work/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>创建模块</title>
-      <link>https://helium.github.io/posts/golang/package/use-mod/</link>
+      <link>https://helium-chain.github.io/posts/golang/package/use-mod/</link>
       <pubDate>Thu, 18 Jun 2020 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/package/use-mod/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/package/use-mod/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
     <item>
       <title>开发和发布模块</title>
-      <link>https://helium.github.io/posts/golang/package/publish-mod/</link>
+      <link>https://helium-chain.github.io/posts/golang/package/publish-mod/</link>
       <pubDate>Sun, 28 Jun 2020 00:00:00 +0000</pubDate>
-      <guid>https://helium.github.io/posts/golang/package/publish-mod/</guid>
+      <guid>https://helium-chain.github.io/posts/golang/package/publish-mod/</guid>
       <description>💥本文章所有相关go代码参考自go 1.18&#43;版本</description>
     </item>
   </channel>
